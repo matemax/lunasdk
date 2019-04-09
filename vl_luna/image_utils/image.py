@@ -1,8 +1,9 @@
-from typing import Optional, Any
+from enum import Enum
+from typing import Optional
 import requests
 import FaceEngine as CoreFE
-from enum import Enum
 from numpy import array
+
 
 class Format(Enum):
     B8G8R8 = 'B8G8R8'
@@ -33,7 +34,25 @@ class VLImage:
 
     @classmethod
     def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None, npArray: Optional[array] = None,
-             imgFormat: Optional[Format] = None):
+             imgFormat: Optional[Format] = None) -> 'VLImage':
+
+        """
+        Load imag
+        Args:
+            *_:
+            filename:
+            url:
+            npArray:
+            imgFormat:
+
+        Returns:
+            vl image
+
+        >>> img = VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg')
+        >>> img.rect
+        x = 0, y = 0, width = 1000, height = 1288
+
+        """
         if filename is not None:
             with open(filename, "rb") as file:
                 body = file.read()
@@ -53,6 +72,13 @@ class VLImage:
 
     @property
     def rect(self):
+        """
+        >>> 1+1
+        2
+
+        Returns:
+
+        """
         return self._image.getRect()
 
     def computePitch(self, arg0):  # real signature unknown; restored from __doc__
