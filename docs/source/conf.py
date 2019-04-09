@@ -17,8 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'vl_luna'
-copyright = '2019, iVisionLabs'
+project = 'vl luna'
+copyright = '2019, VisionLabs'
 author = 'VisionLabs'
 
 # -- General configuration ---------------------------------------------------
@@ -104,7 +104,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'vlluna doc'
+htmlhelp_basename = 'vl luna doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -130,7 +130,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'vlluna.tex', 'vl_luna Documentation',
+    (master_doc, 'vlluna.tex', 'VL Luna Documentation',
      'VisionLabs', 'manual'),
 ]
 
@@ -139,7 +139,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'vl_luna', 'vl_luna Documentation',
+    (master_doc, 'vl luna', 'vl luna Documentation',
      [author], 1)
 ]
 
@@ -149,7 +149,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'vl_luna', 'vl_luna Documentation',
+    (master_doc, 'vl luna', 'VL luna Documentation',
      author, 'vl_luna', 'One line description of project.',
      'Miscellaneous'),
 ]
