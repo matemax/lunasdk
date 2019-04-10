@@ -88,6 +88,7 @@ todo_include_todos = False
 #
 html_theme = 'bootstrap'
 import sphinx_bootstrap_theme
+html_theme_options = {'body_max_width': '130%'}
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -150,6 +151,6 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'lunavl', 'VL Luna Documentation',
-     author, 'vlluna', 'One line description of project.',
+     author, 'lunavl', 'One line description of project.',
      'Miscellaneous'),
 ]
