@@ -113,6 +113,21 @@ class Rect(Generic[CoordinateType]):
         else:
             self._rect = CoreRectI(x, y, width, height)
 
+    @classmethod
+    def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]):
+        """
+        Load rect from core rect
+
+        Args:
+            rect: core rect
+
+        Returns:
+            new rect
+        """
+        newRect = cls()
+        newRect._rect = rect
+        return newRect
+
     @property
     def x(self) -> CoordinateType:
         """

@@ -1,9 +1,10 @@
-Modules
-=======
+SDK Image
+=========
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
 
-   image_utils
+   geometry
+   sdk_image

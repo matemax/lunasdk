@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'vl luna'
+project = 'lunavl'
 copyright = '2019, VisionLabs'
 author = 'VisionLabs'
 
@@ -104,7 +104,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'vl luna doc'
+htmlhelp_basename = 'lunavl doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -130,7 +130,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'vlluna.tex', 'VL Luna Documentation',
+    (master_doc, 'lunavl.tex', 'VL Luna Documentation',
      'VisionLabs', 'manual'),
 ]
 
@@ -139,7 +139,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'vl luna', 'vl luna Documentation',
+    (master_doc, 'lunavl', 'VL Luna Documentation',
      [author], 1)
 ]
 
@@ -149,7 +149,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'vl luna', 'VL luna Documentation',
-     author, 'vl_luna', 'One line description of project.',
+    (master_doc, 'lunavl', 'VL Luna Documentation',
+     author, 'vlluna', 'One line description of project.',
      'Miscellaneous'),
 ]

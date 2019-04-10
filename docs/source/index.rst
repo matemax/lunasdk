@@ -7,10 +7,10 @@ Welcome to VL Luna's documentation!
 ===================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
-   modules
+   sdk
 
 
 Indices and tables
