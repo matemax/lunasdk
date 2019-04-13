@@ -42,11 +42,11 @@ class VLImage:
     Class image.
 
     Attributes:
-        _image (CoreFE.Image): core image object
+        coreImage (CoreFE.Image): core image object
         source (str): source of image (todo change)
         filename (str): filename of the file which is source of image
     """
-    __slots__ = ("_image", "source", "filename")
+    __slots__ = ("coreImage", "source", "filename")
 
     def __init__(self, body: bytes, imgFormat: Optional[Format] = None, filename: str = ""):
         """
@@ -58,8 +58,8 @@ class VLImage:
         """
         if imgFormat is None:
             imgFormat = Format.R8G8B8
-        self._image = CoreFE.Image()
-        loadResult = self._image.loadFromMemory(body, len(body), imgFormat.coreFormat)
+        self.coreImage = CoreFE.Image()
+        loadResult = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
         if loadResult.isError:
             #: todo: raise correct error.
             raise ValueError
@@ -115,7 +115,7 @@ class VLImage:
         >>> image.format.value
         'R8G8B8'
         """
-        return Format.convertCoreFormat(self._image.getFormat())
+        return Format.convertCoreFormat(self.coreImage.getFormat())
 
     @property
     def rect(self) -> Rect:
@@ -125,7 +125,7 @@ class VLImage:
         Returns:
             rect of the image
         """
-        return Rect.fromCoreRect(self._image.getRect())
+        return Rect.fromCoreRect(self.coreImage.getRect())
 
     def computePitch(self, arg0):
         """
@@ -136,7 +136,7 @@ class VLImage:
         Returns:
 
         """
-        return self._image.computePitch()
+        return self.coreImage.computePitch()
 
     @property
     def bitDepth(self) -> int:
@@ -145,12 +145,12 @@ class VLImage:
         Returns:
 
         """
-        return self._image.getBitDepth()
+        return self.coreImage.getBitDepth()
 
     @property
     def getByteDepth(self):  # real signature unknown; restored from __doc__
         """ getByteDepth(self: FaceEngine.Image) -> int """
-        return self._image.getByteDepth()
+        return self.coreImage.getByteDepth()
 
     @property
     def channelCount(self) -> int:
@@ -164,7 +164,7 @@ class VLImage:
         >>> img.channelCount
         3
         """
-        return self._image.getChannelCount()
+        return self.coreImage.getChannelCount()
 
     @property
     def channelSize(self) -> int:
@@ -178,7 +178,7 @@ class VLImage:
         >>> img.channelSize
         8
         """
-        return self._image.getChannelSize()
+        return self.coreImage.getChannelSize()
 
     @property
     def channelStep(self) -> int:
@@ -193,7 +193,7 @@ class VLImage:
         >>> img.channelStep
         3
         """
-        return self._image.getChannelStep()
+        return self.coreImage.getChannelStep()
 
     def asNPArray(self) -> array:
         """
@@ -203,7 +203,7 @@ class VLImage:
             numpy array
         todo: doctest
         """
-        return self._image.getData()
+        return self.coreImage.getData()
 
     def isBGR(self) -> bool:
         """
@@ -215,7 +215,7 @@ class VLImage:
         >>> VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg').isBGR()
         False
         """
-        return self._image.isBGR()
+        return self.coreImage.isBGR()
 
     def isPadded(self) -> bool:
         """
@@ -223,7 +223,7 @@ class VLImage:
         Returns:
 
         """
-        return self._image.isPadded()
+        return self.coreImage.isPadded()
 
     def save(self, *args, **kwargs):  # real signature unknown; restored from __doc__
         """

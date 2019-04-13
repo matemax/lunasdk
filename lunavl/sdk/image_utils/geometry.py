@@ -37,6 +37,8 @@ class Size(Generic[CoordinateType]):
         """
         return "width = {}, height = {}".format(self.width, self.height)
 
+    def asDict(self):
+        return {"width": self.width, "height": self.height}
 
 class Point(Generic[CoordinateType]):
     """
@@ -92,6 +94,9 @@ class Point(Generic[CoordinateType]):
             return Vector2i(self.x, self.y)
         return Vector2f(self.x, self.y)
 
+    def asDict(self):
+        return [self.x, self.y]
+
     def __repr__(self):
         return "x = {}, y = {}".format(self.x, self.y)
 
@@ -101,7 +106,7 @@ class Rect(Generic[CoordinateType]):
     Rect
 
     Attributes:
-        _rect (CoreRect): core rect object
+        coreRect (CoreRect): core rect object
 
     """
 
@@ -109,9 +114,9 @@ class Rect(Generic[CoordinateType]):
                  width: CoordinateType = 0, height: CoordinateType = 0):
         if any((isinstance(x, float), isinstance(y, float),
                 isinstance(width, float), isinstance(height, float))):
-            self._rect = CoreRectF(x, y, width, height)
+            self.coreRect = CoreRectF(x, y, width, height)
         else:
-            self._rect = CoreRectI(x, y, width, height)
+            self.coreRect = CoreRectI(x, y, width, height)
 
     @classmethod
     def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]):
@@ -125,7 +130,7 @@ class Rect(Generic[CoordinateType]):
             new rect
         """
         newRect = cls()
-        newRect._rect = rect
+        newRect.coreRect = rect
         return newRect
 
     @property
@@ -136,11 +141,11 @@ class Rect(Generic[CoordinateType]):
         Returns:
             self._rect.x
         """
-        return self._rect.x
+        return self.coreRect.x
 
     @x.setter
     def x(self, value: CoordinateType):
-        self._rect.x = value
+        self.coreRect.x = value
 
     @property
     def y(self) -> CoordinateType:
@@ -150,12 +155,12 @@ class Rect(Generic[CoordinateType]):
         Returns:
             self._rect.y
         """
-        return self._rect.y
+        return self.coreRect.y
 
     @y.setter
     def y(self, value: CoordinateType):
 
-        self._rect.y = value
+        self.coreRect.y = value
 
     @property
     def width(self) -> CoordinateType:
@@ -165,11 +170,11 @@ class Rect(Generic[CoordinateType]):
         Returns:
             self._rect.width
         """
-        return self._rect.width
+        return self.coreRect.width
 
     @width.setter
     def width(self, value: CoordinateType):
-        self._rect.width = value
+        self.coreRect.width = value
 
     @property
     def height(self) -> CoordinateType:
@@ -179,11 +184,11 @@ class Rect(Generic[CoordinateType]):
         Returns:
             self._rect.height
         """
-        return self._rect.height
+        return self.coreRect.height
 
     @height.setter
     def height(self, value: CoordinateType):
-        self._rect.height = value
+        self.coreRect.height = value
 
     @property
     def bottom(self) -> CoordinateType:  # real signature unknown; restored from __doc__
@@ -196,7 +201,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, 3, 4).bottom
         6
         """
-        vector = self._rect.bottom()
+        vector = self.coreRect.bottom()
         return vector
 
     @property
@@ -210,7 +215,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, 3, 4).bottomRight
         x = 4, y = 6
         """
-        vector = self._rect.bottomRight()
+        vector = self.coreRect.bottomRight()
         return Point.fromVector2(vector)
 
     @property
@@ -227,7 +232,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, 3, -4).top
         2
         """
-        vector = self._rect.top()
+        vector = self.coreRect.top()
         return vector
 
     @property
@@ -241,7 +246,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, 3, 4).topLeft
         x = 1, y = 2
         """
-        vector = self._rect.topLeft()
+        vector = self.coreRect.topLeft()
         return Point.fromVector2(vector)
 
     @property
@@ -258,7 +263,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, -3, 4).left
         1
         """
-        return self._rect.left()
+        return self.coreRect.left()
 
     @property
     def right(self) -> CoordinateType:
@@ -274,7 +279,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, -3, 4).right
         -2
         """
-        return self._rect.right()
+        return self.coreRect.right()
 
     @property
     def center(self) -> Point[CoordinateType]:
@@ -294,7 +299,7 @@ class Rect(Generic[CoordinateType]):
         x = 3.0, y = 4.5
         """
 
-        vector = self._rect.center()
+        vector = self.coreRect.center()
         return Point.fromVector2(vector)
 
     def getArea(self) -> CoordinateType:
@@ -309,7 +314,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1.0, 2.0, 3.5, 4.5).getArea()
         15.75
         """
-        return self._rect.getArea()
+        return self.coreRect.getArea()
 
     def isInside(self, other: 'Rect') -> bool:
         """
@@ -328,7 +333,7 @@ class Rect(Generic[CoordinateType]):
         >>> second.isInside(first)
         True
         """
-        return self._rect.inside(other._rect)
+        return self.coreRect.inside(other.coreRect)
 
     def isValid(self) -> bool:
         """
@@ -342,7 +347,7 @@ class Rect(Generic[CoordinateType]):
         >>> Rect(1, 2, -3, 3).isValid()
         False
         """
-        return self._rect.isValid()
+        return self.coreRect.isValid()
 
     @property
     def size(self) -> Size[CoordinateType]:
@@ -373,7 +378,7 @@ class Rect(Generic[CoordinateType]):
         >>> first and second
         x = 2, y = 1, width = 2, height = 1
         """
-        return self._rect and other._rect
+        return self.coreRect and other.coreRect
 
     def __eq__(self, other: 'Rect[CoordinateType]') -> bool:
         """
@@ -394,7 +399,7 @@ class Rect(Generic[CoordinateType]):
         >>> first == third
         True
         """
-        return self._rect == other._rect
+        return self.coreRect == other.coreRect
 
     def __ne__(self, other: 'Rect[CoordinateType]') -> bool:
         """
@@ -415,7 +420,7 @@ class Rect(Generic[CoordinateType]):
         >>> first != third
         False
         """
-        return self._rect != other._rect
+        return self.coreRect != other.coreRect
 
     def adjust(self, arg0, arg1, arg2, arg3):  # real signature unknown; restored from __doc__
         """ adjust(self: FaceEngine.Rect, arg0: int, arg1: int, arg2: int, arg3: int) -> None """
@@ -433,6 +438,9 @@ class Rect(Generic[CoordinateType]):
         """ coords(arg0: int, arg1: int, arg2: int, arg3: int) -> FaceEngine.Rect """
         pass
 
+    def asDict(self):
+        return {"x": self.x, "y": self.y, "width": self.width, "height": self.height}
+
     def __repr__(self) -> str:
         """
         Dumps rect to string
@@ -443,4 +451,4 @@ class Rect(Generic[CoordinateType]):
         'x = 1, y = 2, width = 3, height = 4'
 
         """
-        return self._rect.__repr__()
+        return self.coreRect.__repr__()
