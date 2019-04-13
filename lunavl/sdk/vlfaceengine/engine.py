@@ -6,6 +6,10 @@ from typing import Optional
 
 import FaceEngine as CoreFE
 
+from lunavl.sdk.faceengine.facedetector import DetectorType, FaceDetector, ImageForDetection
+from lunavl.sdk.image_utils.geometry import Rect
+from lunavl.sdk.image_utils.image import VLImage
+
 
 class VLFaceEngine:
     """
@@ -41,3 +45,8 @@ class VLFaceEngine:
         self.configPath = CoreFE.createSettingsProvider(pathToFaceEngineConf)
         # todo: validate initialize
         self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData, configPath=pathToFaceEngineConf)
+
+    def createDetector(self, detectorType: DetectorType) -> FaceDetector:
+        return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType), detectorType)
+
+FACE_ENGINE = VLFaceEngine()
