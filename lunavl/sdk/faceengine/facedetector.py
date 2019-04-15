@@ -1,15 +1,19 @@
+"""
+Module contains function for detection faces on images.
+"""
 from enum import Enum
 from typing import Optional, Union, List, NamedTuple, Dict
 
-import FaceEngine
+from FaceEngine import ObjectDetectorClassType, DetectionType, Face  # pylint: disable=E0611 # import from bindings
+from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611 # import from bindings
+from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611 # import from bindings
+from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611 # import from bindings
+from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611 # import from bindings
 
-from FaceEngine import ObjectDetectorClassType, DetectionType, Face, Landmarks5 as CoreLandmarks5, \
-    Landmarks68 as CoreLandmarks68, DetectionFloat, FSDKError
-
-from lunavl.sdk.errors.errors import ErrorInfo
-from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.image_utils.geometry import Rect, Point
-from lunavl.sdk.image_utils.image import VLImage, Format
+from ..errors.errors import ErrorInfo
+from ..errors.exceptions import LunaSDKException
+from ..image_utils.geometry import Rect, Point
+from ..image_utils.image import VLImage, Format
 
 
 class ImageForDetection(NamedTuple):
@@ -66,9 +70,23 @@ class Landmarks5:
         self._coreLandmarks = coreLandmark5
 
     @property
-    def coreLandmarks(self):
+    def coreLandmarks(self) -> CoreLandmarks5:
+        """
+        Get original landmarks from core.
+
+        Returns:
+            coreLandmarks5 from init
+        """
         return self._coreLandmarks
 
+    def asDict(self) -> List[List[float]]:
+        """
+        Convert to dict
+
+        Returns:
+            list to list points
+        """
+        return [point.asDict() for point in self.points]
 
 
 class Landmarks68:
@@ -82,7 +100,6 @@ class Landmarks68:
     """
     __slots__ = ["points", "_coreLandmarks"]
 
-
     def __init__(self, coreLandmark68: CoreLandmarks68):
         """
         Init
@@ -94,9 +111,23 @@ class Landmarks68:
         self._coreLandmarks = CoreLandmarks68
 
     @property
-    def coreLandmarks(self):
+    def coreLandmarks(self) -> CoreLandmarks68:
+        """
+        Get original landmarks from core.
+
+        Returns:
+            coreLandmarks5 from init
+        """
         return self._coreLandmarks
 
+    def asDict(self) -> List[List[float]]:
+        """
+        Convert to dict
+
+        Returns:
+            list to list points
+        """
+        return [point.asDict() for point in self.points]
 
 
 class BoundingBox:
@@ -156,7 +187,7 @@ class FaceDetection:
             res["landmarks5"] = [point.asDict() for point in self.landmarks5.points]
         if self.landmarks68 is not None:
             res["landmarks68"] = [point.asDict() for point in self.landmarks68.points]
-        # todo: may be nullable landmarks5?
+        # TODO: may be nullable landmarks5?
         return res
 
 
@@ -188,9 +219,9 @@ class FaceDetector:
         toDetect = 0
 
         if detect5Landmarks:
-            toDetect = toDetect | FaceEngine.dt5Landmarks
+            toDetect = toDetect | dt5Landmarks
         if detect68Landmarks:
-            toDetect = toDetect | FaceEngine.dt68Landmarks
+            toDetect = toDetect | dt68Landmarks
 
         return DetectionType(toDetect)
 

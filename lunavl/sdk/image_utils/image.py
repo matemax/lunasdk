@@ -1,7 +1,10 @@
+"""
+Module realize VLImage - structure for storing image in special format.
+"""
 from enum import Enum
 from typing import Optional
 import requests
-import FaceEngine as CoreFE
+from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611 # import from bindings
 from numpy import array
 
 try:
@@ -14,26 +17,26 @@ class Format(Enum):
     """
     Enum for vl luna image formats
     """
-    B8G8R8 = 'B8G8R8'               #: BGR format, 8 byte per pixel
-    B8G8R8X8 = 'B8G8R8X8'           #: BGR format with alpha chanel, 8 byte per pixel
-    R16 = 'R16'                     #: IR 16
-    R8 = 'R8'                       #: IR 8
-    R8G8B8 = 'R8G8B8'               #: RGB format, 8 byte per pixel
-    R8G8B8X8 = 'R8G8B8X8'           #: RGB format with alpha chanel, 8 byte per pixel
-    Unknown = 'Unknown'             #: unknown format
+    B8G8R8 = 'B8G8R8'  #: BGR format, 8 byte per pixel
+    B8G8R8X8 = 'B8G8R8X8'  #: BGR format with alpha chanel, 8 byte per pixel
+    R16 = 'R16'  #: IR 16
+    R8 = 'R8'  #: IR 8
+    R8G8B8 = 'R8G8B8'  #: RGB format, 8 byte per pixel
+    R8G8B8X8 = 'R8G8B8X8'  #: RGB format with alpha chanel, 8 byte per pixel
+    Unknown = 'Unknown'  #: unknown format
 
     @property
-    def coreFormat(self) -> CoreFE.FormatType:
+    def coreFormat(self) -> FormatType:
         """
         Convert  format to luna core format.
 
         Returns:
             luna core format
         """
-        return getattr(CoreFE.FormatType, self.value)
+        return getattr(FormatType, self.value)
 
     @staticmethod
-    def convertCoreFormat(format: CoreFE.FormatType):
+    def convertCoreFormat(format: FormatType):
         return getattr(Format, format.name)
 
 
@@ -58,7 +61,7 @@ class VLImage:
         """
         if imgFormat is None:
             imgFormat = Format.R8G8B8
-        self.coreImage = CoreFE.Image()
+        self.coreImage = CoreImage()
         loadResult = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
         if loadResult.isError:
             #: todo: raise correct error.
@@ -104,7 +107,7 @@ class VLImage:
                 img.source = url
                 return img
         if npArray is not None:
-            CoreFE.Image().setData(npArray, imgFormat.coreFormat)
+            CoreImage().setData(npArray, imgFormat.coreFormat)
         raise ValueError
 
     @property

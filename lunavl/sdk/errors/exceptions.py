@@ -1,3 +1,6 @@
+"""
+Module realizes LunaSDKException - single exception for rising in sdk module
+"""
 from typing import Optional, Any
 
 from lunavl.sdk.errors.errors import ErrorInfo

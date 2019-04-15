@@ -1,6 +1,7 @@
 from typing import TypeVar, Generic, Union, List
 
-from FaceEngine import Vector2i, Vector2f, Rect as CoreRectI, RectFloat as CoreRectF
+from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611 # import from bindings
+from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611 # import from bindings
 
 CoordinateType = TypeVar('CoordinateType', float, int)  #: generic type for allowed values type of coordinates
 
@@ -69,8 +70,8 @@ class Point(Generic[CoordinateType]):
             x: x
             y: y
         """
-        self.x = x
-        self.y = y
+        self.x = x  # pylint: disable=C0103
+        self.y = y  # pylint: disable=C0103
 
     @classmethod
     def fromVector2(cls, vec2: Union[Vector2f, Vector2i]) -> 'Point':
@@ -165,7 +166,7 @@ class Rect(Generic[CoordinateType]):
         return newRect
 
     @property
-    def x(self) -> CoordinateType:
+    def x(self) -> CoordinateType:  # pylint: disable=C0103
         """
         Getter of x coordinate
 
@@ -175,7 +176,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.x
 
     @x.setter
-    def x(self, value: CoordinateType):
+    def x(self, value: CoordinateType):  # pylint: disable=C0103
         """
         Setter of x
 
@@ -185,7 +186,7 @@ class Rect(Generic[CoordinateType]):
         self.coreRect.x = value
 
     @property
-    def y(self) -> CoordinateType:
+    def y(self) -> CoordinateType:  # pylint: disable=C0103
         """
         Getter of y coordinate
 
@@ -195,7 +196,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.y
 
     @y.setter
-    def y(self, value: CoordinateType):
+    def y(self, value: CoordinateType):  # pylint: disable=C0103
         """
         Setter of y
 

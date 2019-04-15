@@ -1,13 +1,15 @@
 """
 Module realize wraps on facengine objects
+Attributes:
+    FACE_ENGINE (VLFaceEngine): Global instance of VLFaceEngine
 """
 import os
 from typing import Optional
 
 import FaceEngine as CoreFE
 
-from lunavl.sdk.estimators.face_estimators import HeadPoseEstimator
-from lunavl.sdk.faceengine.facedetector import DetectorType, FaceDetector
+from ..estimators.face_estimators import HeadPoseEstimator
+from ..faceengine.facedetector import DetectorType, FaceDetector
 
 
 class VLFaceEngine:
@@ -66,5 +68,5 @@ class VLFaceEngine:
         return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
 
 
-# (VLFaceEngine): Global
+# (VLFaceEngine): Global instance of VLFaceEngine
 FACE_ENGINE = VLFaceEngine()
