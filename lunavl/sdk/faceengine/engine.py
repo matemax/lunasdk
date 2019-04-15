@@ -7,9 +7,7 @@ from typing import Optional
 import FaceEngine as CoreFE
 
 from lunavl.sdk.estimators.face_estimators import HeadPoseEstimator
-from lunavl.sdk.faceengine.facedetector import DetectorType, FaceDetector, ImageForDetection
-from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.faceengine.facedetector import DetectorType, FaceDetector
 
 
 class VLFaceEngine:
