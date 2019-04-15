@@ -1,3 +1,6 @@
+"""
+Module contains class ErrorInfo. Structure for errors.
+"""
 from FaceEngine import FSDKErrorResult
 
 
