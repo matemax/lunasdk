@@ -51,7 +51,9 @@ class Landmarks5:
 
     Attributes:
         points (List[Point[float]]): 5 point (todo reference)
+        _coreLandmarks (CoreLandmarks5): landmarks which is returned core
     """
+    __slots__ = ["points", "_coreLandmarks"]
 
     def __init__(self, coreLandmark5: CoreLandmarks5):
         """
@@ -61,6 +63,12 @@ class Landmarks5:
             coreLandmark5: core landmarks
         """
         self.points = [Point.fromVector2(point) for point in coreLandmark5]
+        self._coreLandmarks = coreLandmark5
+
+    @property
+    def coreLandmarks(self):
+        return self._coreLandmarks
+
 
 
 class Landmarks68:
@@ -69,7 +77,11 @@ class Landmarks68:
 
     Attributes:
         points (List[Point[float]]): 68 point (todo reference)
+        _coreLandmarks (CoreLandmarks68): landmarks which is returned core
+
     """
+    __slots__ = ["points", "_coreLandmarks"]
+
 
     def __init__(self, coreLandmark68: CoreLandmarks68):
         """
@@ -79,6 +91,12 @@ class Landmarks68:
             coreLandmark68: core landmarks
         """
         self.points = [Point.fromVector2(point) for point in coreLandmark68]
+        self._coreLandmarks = CoreLandmarks68
+
+    @property
+    def coreLandmarks(self):
+        return self._coreLandmarks
+
 
 
 class BoundingBox:
@@ -126,7 +144,7 @@ class FaceDetection:
         else:
             self.landmarks68 = None
 
-    def asDict(self) -> Dict[str]:
+    def asDict(self) -> Dict[str, Union[dict, list]]:
         """
         Convert face detection to dict (json).
 
@@ -234,7 +252,7 @@ class FaceDetector:
             else:
                 img = image[0]
                 detectArea = image[1].coreRect
-            if img.format == Format.R8G8B8:
+            if img.format != Format.R8G8B8:
                 error = ErrorInfo(126, "bad format",
                                   "Bad image format for detection {}, img {}".format(img.format.value, img.format))
                 raise LunaSDKException(error)
