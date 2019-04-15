@@ -6,7 +6,7 @@ import FaceEngine
 from FaceEngine import ObjectDetectorClassType, DetectionType, Face, Landmarks5 as CoreLandmarks5, \
     Landmarks68 as CoreLandmarks68, DetectionFloat, FSDKError
 
-from lunavl.sdk.errors.errors import Error
+from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect, Point
 from lunavl.sdk.image_utils.image import VLImage, Format
@@ -29,7 +29,7 @@ class DetectorType(Enum):
     Detector types enum
     """
     FACE_DET_DEFAULT = "FACE_DET_DEFAULT"  #: what is default?
-    FACE_DET_V1 = "FACE_DET_V1"     #: todo description
+    FACE_DET_V1 = "FACE_DET_V1"  #: todo description
     FACE_DET_V2 = "FACE_DET_V2"
     FACE_DET_V3 = "FACE_DET_V3"
     FACE_DET_COUNT = "FACE_DET_COUNT"
@@ -52,6 +52,7 @@ class Landmarks5:
     Attributes:
         points (List[Point[float]]): 5 point (todo reference)
     """
+
     def __init__(self, coreLandmark5: CoreLandmarks5):
         """
         Init
@@ -69,6 +70,7 @@ class Landmarks68:
     Attributes:
         points (List[Point[float]]): 68 point (todo reference)
     """
+
     def __init__(self, coreLandmark68: CoreLandmarks68):
         """
         Init
@@ -85,6 +87,7 @@ class BoundingBox:
         rect (Rect[float]): face bounding box
         score (float): face score (0,1)
     """
+
     def __init__(self, boundingBox: DetectionFloat):
         """
         Init.
@@ -123,7 +126,7 @@ class FaceDetection:
         else:
             self.landmarks68 = None
 
-    def asDict(self)  -> Dict[str]:
+    def asDict(self) -> Dict[str]:
         """
         Convert face detection to dict (json).
 
@@ -198,7 +201,7 @@ class FaceDetector:
         if detectRes[0].isError:
             if detectRes[0].FSDKError == FSDKError.BufferIsEmpty:
                 return None
-            error = Error.fromSDKError(123, "detection", detectRes[0])
+            error = ErrorInfo.fromSDKError(123, "detection", detectRes[0])
             raise LunaSDKException(error)
         coreDetection = detectRes[1]
         if not coreDetection.detection.isValid():
@@ -232,8 +235,8 @@ class FaceDetector:
                 img = image[0]
                 detectArea = image[1].coreRect
             if img.format == Format.R8G8B8:
-                error = Error(126, "bad format",
-                              "Bad image format for detection {}, img {}".format(img.format.value, img.format))
+                error = ErrorInfo(126, "bad format",
+                                  "Bad image format for detection {}, img {}".format(img.format.value, img.format))
                 raise LunaSDKException(error)
             imgs.append(img.coreImage)
             detectAreas.append(detectArea)
@@ -241,7 +244,7 @@ class FaceDetector:
         detectRes = self._detector.detect(imgs, detectAreas, limit,
                                           self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if detectRes[0].isError:
-            error = Error.fromSDKError(124, "detection", detectRes[0])
+            error = ErrorInfo.fromSDKError(124, "detection", detectRes[0])
             raise LunaSDKException(error)
         res = []
         for imageDetections in detectRes[1]:

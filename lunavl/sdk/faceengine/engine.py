@@ -46,7 +46,28 @@ class VLFaceEngine:
         # todo: validate initialize
         self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData, configPath=pathToFaceEngineConf)
 
-    def createDetector(self, detectorType: DetectorType) -> FaceDetector:
-        return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType), detectorType)
+    def createFaceDetector(self, detectorType: DetectorType) -> FaceDetector:
+        """
+        Create face detector.
 
+        Args:
+            detectorType: detector type
+
+        Returns:
+            detector
+        """
+        return FaceDetector(self._faceEngine.createFaceDetector(detectorType.coreDetectorType), detectorType)
+
+# (VLFaceEngine): Global
 FACE_ENGINE = VLFaceEngine()
+
+
+if __name__ == "__main__":
+    fe = VLFaceEngine()
+    d = fe.createFaceDetector(DetectorType.FACE_DET_V1)
+    image1 = VLImage.load(filename="C:/temp/test.jpg")
+    image2 = VLImage.load(filename="C:/temp/kand.jpg")
+    image3 = VLImage.load(filename="C:/temp/multiple_faces.jpg")
+    detections = d.detect([image1, image2, ImageForDetection(image3, Rect(width=1600, height= 1000))])
+    import pprint
+    pprint.pprint([[detection.asDict() for detection in imageDetections] for imageDetections in detections])

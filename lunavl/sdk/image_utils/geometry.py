@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Union
+from typing import TypeVar, Generic, Union, List
 
 from FaceEngine import Vector2i, Vector2f, Rect as CoreRectI, RectFloat as CoreRectF
 
@@ -37,8 +37,19 @@ class Size(Generic[CoordinateType]):
         """
         return "width = {}, height = {}".format(self.width, self.height)
 
-    def asDict(self):
+    def asDict(self) -> dict:
+        """
+        Convert to dict
+
+        Returns:
+            {"width": self.width, "height": self.height}
+        >>> Size(1, 2).asDict()
+        {'width': 1, 'height': 2}
+        >>> Size(1.0, 2.0).asDict()
+        {'width': 1.0, 'height': 2.0}
+        """
         return {"width": self.width, "height": self.height}
+
 
 class Point(Generic[CoordinateType]):
     """
@@ -86,7 +97,7 @@ class Point(Generic[CoordinateType]):
         >>> vec2 = Point(1, 2).toVector2()
         >>> isinstance(vec2, Vector2i)
         True
-        >>> vec2 = Point(1, 2.0).toVector2()
+        >>> vec2 = Point(1.0, 2.0).toVector2()
         >>> isinstance(vec2, Vector2f)
         True
         """
@@ -94,7 +105,18 @@ class Point(Generic[CoordinateType]):
             return Vector2i(self.x, self.y)
         return Vector2f(self.x, self.y)
 
-    def asDict(self):
+    def asDict(self) -> List[CoordinateType]:
+        """
+        Convert point to list
+
+        Returns:
+            [self.x, self.y]
+
+        >>> Point(1, 2).asDict()
+        [1, 2]
+        >>> Point(1.0, 2.0).asDict()
+        [1.0, 2.0]
+        """
         return [self.x, self.y]
 
     def __repr__(self):
@@ -112,6 +134,15 @@ class Rect(Generic[CoordinateType]):
 
     def __init__(self, x: CoordinateType = 0, y: CoordinateType = 0,
                  width: CoordinateType = 0, height: CoordinateType = 0):
+        """
+        Init. If there are argument of type float coreRect will be type CoreRectF otherwise CoreRectI.
+
+        Args:
+            x: x
+            y: y
+            width: width
+            height: height
+        """
         if any((isinstance(x, float), isinstance(y, float),
                 isinstance(width, float), isinstance(height, float))):
             self.coreRect = CoreRectF(x, y, width, height)
@@ -145,6 +176,12 @@ class Rect(Generic[CoordinateType]):
 
     @x.setter
     def x(self, value: CoordinateType):
+        """
+        Setter of x
+
+        Args:
+            value: new value
+        """
         self.coreRect.x = value
 
     @property
@@ -159,7 +196,12 @@ class Rect(Generic[CoordinateType]):
 
     @y.setter
     def y(self, value: CoordinateType):
+        """
+        Setter of y
 
+        Args:
+            value: new value
+        """
         self.coreRect.y = value
 
     @property
@@ -174,6 +216,12 @@ class Rect(Generic[CoordinateType]):
 
     @width.setter
     def width(self, value: CoordinateType):
+        """
+        Setter of width
+
+        Args:
+            value: new value
+        """
         self.coreRect.width = value
 
     @property
@@ -188,6 +236,12 @@ class Rect(Generic[CoordinateType]):
 
     @height.setter
     def height(self, value: CoordinateType):
+        """
+        Setter of height
+
+        Args:
+            value: new value
+        """
         self.coreRect.height = value
 
     @property
@@ -438,7 +492,17 @@ class Rect(Generic[CoordinateType]):
         """ coords(arg0: int, arg1: int, arg2: int, arg3: int) -> FaceEngine.Rect """
         pass
 
-    def asDict(self):
+    def asDict(self) -> dict:
+        """
+        Convert rect to dict
+
+        Returns:
+            {"x": self.x, "y": self.y, "width": self.width, "height": self.height}
+        >>> Rect(1, 2, 3, 4).asDict()
+        {'x': 1, 'y': 2, 'width': 3, 'height': 4}
+        >>> Rect(1.0, 2, 3.0, 4.0).asDict()
+        {'x': 1.0, 'y': 2.0, 'width': 3.0, 'height': 4.0}
+        """
         return {"x": self.x, "y": self.y, "width": self.width, "height": self.height}
 
     def __repr__(self) -> str:
@@ -449,6 +513,8 @@ class Rect(Generic[CoordinateType]):
 
         >>> "{}".format(Rect(1, 2, 3, 4))
         'x = 1, y = 2, width = 3, height = 4'
+        >>> "{}".format(Rect(1.0, 2.0, 3.0, 4.0))
+        'x = 1.000000, y = 2.000000, width = 3.000000, height = 4.000000'
 
         """
         return self.coreRect.__repr__()
