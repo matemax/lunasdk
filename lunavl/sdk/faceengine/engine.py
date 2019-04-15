@@ -6,6 +6,7 @@ from typing import Optional
 
 import FaceEngine as CoreFE
 
+from lunavl.sdk.estimators.face_estimators import HeadPoseEstimator
 from lunavl.sdk.faceengine.facedetector import DetectorType, FaceDetector, ImageForDetection
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
@@ -56,18 +57,16 @@ class VLFaceEngine:
         Returns:
             detector
         """
-        return FaceDetector(self._faceEngine.createFaceDetector(detectorType.coreDetectorType), detectorType)
+        return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType), detectorType)
+
+    def createHeadPoseEstimator(self):
+        """
+
+        Returns:
+
+        """
+        return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
+
 
 # (VLFaceEngine): Global
 FACE_ENGINE = VLFaceEngine()
-
-
-if __name__ == "__main__":
-    fe = VLFaceEngine()
-    d = fe.createFaceDetector(DetectorType.FACE_DET_V1)
-    image1 = VLImage.load(filename="C:/temp/test.jpg")
-    image2 = VLImage.load(filename="C:/temp/kand.jpg")
-    image3 = VLImage.load(filename="C:/temp/multiple_faces.jpg")
-    detections = d.detect([image1, image2, ImageForDetection(image3, Rect(width=1600, height= 1000))])
-    import pprint
-    pprint.pprint([[detection.asDict() for detection in imageDetections] for imageDetections in detections])
