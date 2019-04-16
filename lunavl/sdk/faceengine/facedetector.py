@@ -108,7 +108,7 @@ class Landmarks68:
             coreLandmark68: core landmarks
         """
         self.points = [Point.fromVector2(point) for point in coreLandmark68]
-        self._coreLandmarks = CoreLandmarks68
+        self._coreLandmarks = coreLandmark68
 
     @property
     def coreLandmarks(self) -> CoreLandmarks68:

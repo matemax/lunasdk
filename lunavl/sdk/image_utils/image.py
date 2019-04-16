@@ -7,10 +7,7 @@ import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611 # import from bindings
 from numpy import array
 
-try:
-    from .geometry import Rect
-except ImportError:
-    from lunavl.sdk.image_utils.geometry import Rect
+from .geometry import Rect
 
 
 class Format(Enum):

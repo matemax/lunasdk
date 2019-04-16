@@ -60,11 +60,12 @@ class VLFaceEngine:
         """
         return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType), detectorType)
 
-    def createHeadPoseEstimator(self):
+    def createHeadPoseEstimator(self) -> HeadPoseEstimator:
         """
+        Create head pose estimator
 
         Returns:
-
+            estimator
         """
         return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
 
