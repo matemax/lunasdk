@@ -1,9 +1,9 @@
 """
 Module contains class ErrorInfo. Structure for errors.
 """
+from typing import Dict, Union
 # pylint: disable=E0611 # import from bindings
 from FaceEngine import FSDKErrorResult
-from typing import Dict, Union
 
 
 class ErrorInfo:
