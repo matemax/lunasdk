@@ -40,7 +40,8 @@ class VLFaceEngine:
                 if "FSDK_ROOT" in os.environ:
                     pathToFaceEngineConf = os.path.join(os.environ["FSDK_ROOT"], "data", "faceengine.conf")
                 # else:
-                #     raise ValueError("Failed on path to faceengine luna data folder, set variable pathToFaceEngineConf"
+                #     raise ValueError("Failed on path to faceengine luna data folder,
+                #                       set variable pathToFaceEngineConf"
                 #                      " or set environment variable *FSDK_ROOT*")
         self.dataPath = pathToData
         self.configPath = CoreFE.createSettingsProvider(pathToFaceEngineConf)
