@@ -4,10 +4,11 @@ Module realize simple examples following features:
     * batch images face detection
     * detect landmarks68 and landmarks5
 """
+import pprint
+
 from lunavl.sdk.faceengine.engine import FACE_ENGINE
 from lunavl.sdk.faceengine.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-import pprint
 
 
 def detectOneFace():
