@@ -6,10 +6,10 @@ from typing import TypeVar, Generic, Union, List
 from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
 from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
 
-CoordinateType = TypeVar('CoordinateType', float, int)  #: generic type for allowed values type of coordinates
+COORDINATE_TYPE = TypeVar('COORDINATE_TYPE', float, int)  #: generic type for allowed values type of coordinates
 
 
-class Size(Generic[CoordinateType]):
+class Size(Generic[COORDINATE_TYPE]):
     """
     Rect size.
 
@@ -19,7 +19,7 @@ class Size(Generic[CoordinateType]):
     """
     __slots__ = ["width", "height"]
 
-    def __init__(self, width: CoordinateType, height: CoordinateType):
+    def __init__(self, width: COORDINATE_TYPE, height: COORDINATE_TYPE):
         """
         Init
 
@@ -55,7 +55,7 @@ class Size(Generic[CoordinateType]):
         return {"width": self.width, "height": self.height}
 
 
-class Point(Generic[CoordinateType]):
+class Point(Generic[COORDINATE_TYPE]):
     """
     Point.
 
@@ -65,7 +65,7 @@ class Point(Generic[CoordinateType]):
     """
     __slots__ = ["x", "y"]
 
-    def __init__(self, x: CoordinateType, y: CoordinateType):
+    def __init__(self, x: COORDINATE_TYPE, y: COORDINATE_TYPE):  # pylint: disable=C0103
         """
         Init
 
@@ -109,7 +109,7 @@ class Point(Generic[CoordinateType]):
             return Vector2i(self.x, self.y)
         return Vector2f(self.x, self.y)
 
-    def asDict(self) -> List[CoordinateType]:
+    def asDict(self) -> List[COORDINATE_TYPE]:
         """
         Convert point to list
 
@@ -127,7 +127,7 @@ class Point(Generic[CoordinateType]):
         return "x = {}, y = {}".format(self.x, self.y)
 
 
-class Rect(Generic[CoordinateType]):
+class Rect(Generic[COORDINATE_TYPE]):
     """
     Rect
 
@@ -136,8 +136,8 @@ class Rect(Generic[CoordinateType]):
 
     """
 
-    def __init__(self, x: CoordinateType = 0, y: CoordinateType = 0,
-                 width: CoordinateType = 0, height: CoordinateType = 0):
+    def __init__(self, x: COORDINATE_TYPE = 0, y: COORDINATE_TYPE = 0,  # pylint: disable=C0103
+                 width: COORDINATE_TYPE = 0, height: COORDINATE_TYPE = 0):
         """
         Init. If there are argument of type float coreRect will be type CoreRectF otherwise CoreRectI.
 
@@ -169,7 +169,7 @@ class Rect(Generic[CoordinateType]):
         return newRect
 
     @property
-    def x(self) -> CoordinateType:  # pylint: disable=C0103
+    def x(self) -> COORDINATE_TYPE:  # pylint: disable=C0103
         """
         Getter of x coordinate
 
@@ -179,7 +179,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.x
 
     @x.setter
-    def x(self, value: CoordinateType):  # pylint: disable=C0103
+    def x(self, value: COORDINATE_TYPE):  # pylint: disable=C0103
         """
         Setter of x
 
@@ -189,7 +189,7 @@ class Rect(Generic[CoordinateType]):
         self.coreRect.x = value
 
     @property
-    def y(self) -> CoordinateType:  # pylint: disable=C0103
+    def y(self) -> COORDINATE_TYPE:  # pylint: disable=C0103
         """
         Getter of y coordinate
 
@@ -199,7 +199,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.y
 
     @y.setter
-    def y(self, value: CoordinateType):  # pylint: disable=C0103
+    def y(self, value: COORDINATE_TYPE):  # pylint: disable=C0103
         """
         Setter of y
 
@@ -209,7 +209,7 @@ class Rect(Generic[CoordinateType]):
         self.coreRect.y = value
 
     @property
-    def width(self) -> CoordinateType:
+    def width(self) -> COORDINATE_TYPE:
         """
         Getter of width
 
@@ -219,7 +219,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.width
 
     @width.setter
-    def width(self, value: CoordinateType):
+    def width(self, value: COORDINATE_TYPE):
         """
         Setter of width
 
@@ -229,7 +229,7 @@ class Rect(Generic[CoordinateType]):
         self.coreRect.width = value
 
     @property
-    def height(self) -> CoordinateType:
+    def height(self) -> COORDINATE_TYPE:
         """
         Getter of height
 
@@ -239,7 +239,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.height
 
     @height.setter
-    def height(self, value: CoordinateType):
+    def height(self, value: COORDINATE_TYPE):
         """
         Setter of height
 
@@ -249,7 +249,7 @@ class Rect(Generic[CoordinateType]):
         self.coreRect.height = value
 
     @property
-    def bottom(self) -> CoordinateType:  # real signature unknown; restored from __doc__
+    def bottom(self) -> COORDINATE_TYPE:  # real signature unknown; restored from __doc__
         """
         Get lower y-coordinate of the rect
 
@@ -263,7 +263,7 @@ class Rect(Generic[CoordinateType]):
         return vector
 
     @property
-    def bottomRight(self) -> Point[CoordinateType]:
+    def bottomRight(self) -> Point[COORDINATE_TYPE]:
         """
         Get coordinates of the right bottom angle
 
@@ -277,7 +277,7 @@ class Rect(Generic[CoordinateType]):
         return Point.fromVector2(vector)
 
     @property
-    def top(self) -> CoordinateType:
+    def top(self) -> COORDINATE_TYPE:
         """
         Get upper y-coordinate of the rect
 
@@ -294,7 +294,7 @@ class Rect(Generic[CoordinateType]):
         return vector
 
     @property
-    def topLeft(self) -> Point[CoordinateType]:  # real signature unknown; restored from __doc__
+    def topLeft(self) -> Point[COORDINATE_TYPE]:  # real signature unknown; restored from __doc__
         """
         Get coordinates of the top left angle
 
@@ -308,7 +308,7 @@ class Rect(Generic[CoordinateType]):
         return Point.fromVector2(vector)
 
     @property
-    def left(self) -> CoordinateType:
+    def left(self) -> COORDINATE_TYPE:
         """
         Get lower x-coordinate of the rect
 
@@ -324,7 +324,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.left()
 
     @property
-    def right(self) -> CoordinateType:
+    def right(self) -> COORDINATE_TYPE:
         """
         Get upper x-coordinate of the rect
 
@@ -340,7 +340,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.right()
 
     @property
-    def center(self) -> Point[CoordinateType]:
+    def center(self) -> Point[COORDINATE_TYPE]:
         """
         Get coordinates of the center
 
@@ -360,7 +360,7 @@ class Rect(Generic[CoordinateType]):
         vector = self.coreRect.center()
         return Point.fromVector2(vector)
 
-    def getArea(self) -> CoordinateType:
+    def getArea(self) -> COORDINATE_TYPE:
         """
         Get rect area
 
@@ -408,7 +408,7 @@ class Rect(Generic[CoordinateType]):
         return self.coreRect.isValid()
 
     @property
-    def size(self) -> Size[CoordinateType]:
+    def size(self) -> Size[COORDINATE_TYPE]:
         """
         Get rect size
 
@@ -420,7 +420,7 @@ class Rect(Generic[CoordinateType]):
         """
         return Size(self.width, self.height)
 
-    def __and__(self, other: 'Rect[CoordinateType]') -> 'Rect[CoordinateType]':
+    def __and__(self, other: 'Rect[COORDINATE_TYPE]') -> 'Rect[COORDINATE_TYPE]':
         """
         Calculate an intersection of rects.
 
@@ -438,7 +438,7 @@ class Rect(Generic[CoordinateType]):
         """
         return self.coreRect and other.coreRect
 
-    def __eq__(self, other: 'Rect[CoordinateType]') -> bool:
+    def __eq__(self, other: 'Rect[COORDINATE_TYPE]') -> bool:
         """
         Compare two rect
 
@@ -459,7 +459,7 @@ class Rect(Generic[CoordinateType]):
         """
         return self.coreRect == other.coreRect
 
-    def __ne__(self, other: 'Rect[CoordinateType]') -> bool:
+    def __ne__(self, other: 'Rect[COORDINATE_TYPE]') -> bool:
         """
         Compare two rect
 

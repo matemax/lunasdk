@@ -2,9 +2,9 @@
 Module contains utils for make face estimations
 """
 from enum import Enum
+from typing import Dict
 
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
-from typing import Dict
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
