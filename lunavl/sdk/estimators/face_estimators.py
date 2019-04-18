@@ -1,6 +1,6 @@
 from enum import Enum
 
-from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType
+from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType # pylint: disable=E0611
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException

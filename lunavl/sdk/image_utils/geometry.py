@@ -1,7 +1,7 @@
 from typing import TypeVar, Generic, Union, List
 
-from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611 # import from bindings
-from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611 # import from bindings
+from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611
+from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611
 
 CoordinateType = TypeVar('CoordinateType', float, int)  #: generic type for allowed values type of coordinates
 

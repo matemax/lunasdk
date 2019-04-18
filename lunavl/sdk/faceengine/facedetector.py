@@ -4,11 +4,11 @@ Module contains function for detection faces on images.
 from enum import Enum
 from typing import Optional, Union, List, NamedTuple, Dict
 
-from FaceEngine import ObjectDetectorClassType, DetectionType, Face  # pylint: disable=E0611 # import from bindings
-from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611 # import from bindings
-from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611 # import from bindings
-from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611 # import from bindings
-from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611 # import from bindings
+from FaceEngine import ObjectDetectorClassType, DetectionType, Face  # pylint: disable=E0611
+from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611
+from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611
+from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611
+from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611
 
 from ..errors.errors import ErrorInfo
 from ..errors.exceptions import LunaSDKException
