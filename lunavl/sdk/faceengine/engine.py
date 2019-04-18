@@ -6,7 +6,7 @@ Attributes:
 import os
 from typing import Optional
 
-import FaceEngine as CoreFE
+import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 
 from ..estimators.face_estimators import HeadPoseEstimator
 from ..faceengine.facedetector import DetectorType, FaceDetector
