@@ -2,7 +2,7 @@
 Module contains class ErrorInfo. Structure for errors.
 """
 from typing import Dict, Union
-from FaceEngine import FSDKErrorResult # pylint: disable=E0611
+from FaceEngine import FSDKErrorResult # pylint: disable=E0611,E0401
 
 
 class ErrorInfo:

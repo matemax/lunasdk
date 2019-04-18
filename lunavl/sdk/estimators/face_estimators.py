@@ -3,7 +3,7 @@ Module contains utils for make face estimations
 """
 from enum import Enum
 
-from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType # pylint: disable=E0611
+from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException

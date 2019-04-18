@@ -3,8 +3,8 @@ Module contains geometric structures (Rect, Point, Size)
 """
 from typing import TypeVar, Generic, Union, List
 
-from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611
-from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611
+from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
 
 CoordinateType = TypeVar('CoordinateType', float, int)  #: generic type for allowed values type of coordinates
 

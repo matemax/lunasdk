@@ -4,7 +4,7 @@ Module realize VLImage - structure for storing image in special format.
 from enum import Enum
 from typing import Optional
 import requests
-from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611
+from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 from numpy import array
 
 from .geometry import Rect
