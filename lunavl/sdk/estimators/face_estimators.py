@@ -1,3 +1,6 @@
+"""
+Module contains utils for make face estimations
+"""
 from enum import Enum
 
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType # pylint: disable=E0611

@@ -1,3 +1,6 @@
+"""
+Module contains geometric structures (Rect, Point, Size)
+"""
 from typing import TypeVar, Generic, Union, List
 
 from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611
