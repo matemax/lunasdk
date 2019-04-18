@@ -3,7 +3,8 @@ Module contains utils for make face estimations
 """
 from enum import Enum
 
-from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType # pylint: disable=E0611,E0401
+from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
+from typing import Dict
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
@@ -45,28 +46,75 @@ class HeadPose:
     __slots__ = ["pitch", "yaw", "roll", "_coreEstimation"]
 
     def __init__(self, coreHeadPose: HeadPoseEstimation):
+        """
+        Init.
+
+        Args:
+            coreHeadPose: core head pose estimation.
+        """
         self.pitch = coreHeadPose.pitch
         self.yaw = coreHeadPose.yaw
         self.roll = coreHeadPose.roll
         self._coreEstimation = coreHeadPose
 
-    def asDict(self):
+    def asDict(self) -> Dict[str, float]:
+        """
+        Convert angles to dict.
+
+        Returns:
+            {"pitch": self.pitch, "roll": self.roll, "yaw": self.yaw}
+        """
         return {"pitch": self.pitch, "roll": self.roll, "yaw": self.yaw}
 
-    def getFrontalFaceType(self) -> FrontalType:
-        return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
+    def getFrontalType(self) -> FrontalType:
+        """
+        Get frontal type of head pose estimation.
 
-    def __repr__(self):
+        Returns:
+            frontal type
+        """
+        return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalType())
+
+    def __repr__(self) -> str:
+        """
+        Generate representation.
+
+        Returns:
+            "pitch = {self.pitch}, roll = {self.roll}, yaw = {self.yaw}"
+        """
         return "pitch = {}, roll = {}, yaw = {}".format(self.pitch, self.roll, self.yaw)
 
 
 class HeadPoseEstimator:
+    """
+    HeadPoseEstimator.
+    Attributes
+        _coreHeadPoseEstimator (IHeadPoseEstimatorPtr): core estimator.
+    """
+    __slots__ = ["_coreHeadPoseEstimator"]
 
     def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
+        """
+        Init.
+
+        Args:
+            coreHeadPoseEstimator: core estimator
+        """
         self._coreHeadPoseEstimator = coreHeadPoseEstimator
 
-    def estimate(self, landmrks68: Landmarks68):
-        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmrks68.coreLandmarks)
+    def estimate(self, landmarks68: Landmarks68) -> HeadPose:
+        """
+        Estimate head pose.
+
+        Args:
+            landmarks68: landmarks68
+
+        Returns:
+            estimate head pose
+        Raises:
+            LunaSDKException: if estimation is failed
+        """
+        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmarks68.coreLandmarks)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
