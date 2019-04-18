@@ -1,3 +1,7 @@
+"""
+Setup module.
+For install package use "pip install ." or "pip install -e ."
+"""
 from setuptools import setup, find_packages
 
 from lunavl.version import VERSION
