@@ -27,7 +27,7 @@ def detectOneFace():
 
     imageWithoutFace = VLImage.load(
         url='https://cdn1.savepice.ru/uploads/2019/4/15/3e3593dc2fd0671c7051b18c99974192-full.jpg')
-    assert detector.detectOne(imageWithoutFace, detect5Landmarks=False, detect68Landmarks=False) is None
+    pprint.pprint(detector.detectOne(imageWithoutFace, detect5Landmarks=False, detect68Landmarks=False) is None)
 
 
 if __name__ == "__main__":
