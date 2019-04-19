@@ -14,13 +14,20 @@ class Format(Enum):
     """
     Enum for vl luna image formats
     """
-    B8G8R8 = 'B8G8R8'  #: BGR format, 8 byte per pixel
-    B8G8R8X8 = 'B8G8R8X8'  #: BGR format with alpha chanel, 8 byte per pixel
-    R16 = 'R16'  #: IR 16
-    R8 = 'R8'  #: IR 8
-    R8G8B8 = 'R8G8B8'  #: RGB format, 8 byte per pixel
-    R8G8B8X8 = 'R8G8B8X8'  #: RGB format with alpha chanel, 8 byte per pixel
-    Unknown = 'Unknown'  #: unknown format
+    #: 3 channel, 8 bit per channel, B-G-R color order format;
+    B8G8R8 = 'B8G8R8'
+    #: 3 channel, 8 bit per channel, B-G-R color order format with 8 bit padding before next pixel;
+    B8G8R8X8 = 'B8G8R8X8'
+    #: 1 channel, 8 bit per channel format;
+    R16 = 'R16'
+    #: 1 channel, 8 bit per channel format;
+    R8 = 'R8'
+    #: 3 channel, 8 bit per channel, R-G-B color order format;
+    R8G8B8 = 'R8G8B8'
+    #: 3 channel, 8 bit per channel, R-G-B color order format with 8 bit padding before next pixel;
+    R8G8B8X8 = 'R8G8B8X8'
+    #: unknown format
+    Unknown = 'Unknown'
 
     @property
     def coreFormat(self) -> FormatType:
@@ -127,29 +134,36 @@ class VLImage:
         """
         return Rect.fromCoreRect(self.coreImage.getRect())
 
-    def computePitch(self, arg0):
+    def computePitch(self, rowWidth) -> int:
         """
-        todo: description and typing
+        Compute row size in bytes
+
         Args:
-            arg0:
+            rowWidth: row width in pixels.
 
         Returns:
-
+            row size in bytes.
         """
-        return self.coreImage.computePitch()
+        return self.coreImage.computePitch(rowWidth)
 
     @property
     def bitDepth(self) -> int:
         """
+        Get number of bits per pixel.
 
         Returns:
-
+            number of bits per pixel.
         """
         return self.coreImage.getBitDepth()
 
     @property
-    def getByteDepth(self):  # real signature unknown; restored from __doc__
-        """ getByteDepth(self: FaceEngine.Image) -> int """
+    def getByteDepth(self) -> int:
+        """
+        Get number of bytes per pixel.
+
+        Returns:
+            number of bytes per pixel.
+        """
         return self.coreImage.getByteDepth()
 
     @property
@@ -188,6 +202,8 @@ class VLImage:
 
         Returns:
             channel size in bytes.
+        Notes:
+            padding bytes are considered spare channels.
 
         >>> img = VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg')
         >>> img.channelStep
@@ -211,6 +227,8 @@ class VLImage:
 
         Returns:
             True if the image is bgr image otherwise False
+        Notes:
+            padding is ignored for padded channels.
 
         >>> VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg').isBGR()
         False
@@ -219,9 +237,11 @@ class VLImage:
 
     def isPadded(self) -> bool:
         """
-        todo: more description
-        Returns:
+        Determinate image format has padding bytes or not.
 
+        Returns:
+            true if image format has padding bytes.
+        todo examples
         """
         return self.coreImage.isPadded()
 
