@@ -40,8 +40,18 @@ class Format(Enum):
         return getattr(FormatType, self.value)
 
     @staticmethod
-    def convertCoreFormat(format: FormatType):
-        return getattr(Format, format.name)
+    def convertCoreFormat(imageFormat: FormatType) -> 'Format':
+        """
+        Convert FormatType to Format
+
+        Args:
+            imageFormat: core image format
+
+        Returns:
+            corresponding lunavl image format
+
+        """
+        return getattr(Format, imageFormat.name)
 
 
 class VLImage:
