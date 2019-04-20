@@ -43,4 +43,13 @@ Landmarks68
 
 More advanced 68-points face alignment is also implemented. Use this when you need precise information about face and
 its parts. The 68 landmarks require additional computation time, so don’t use it if you don’t need precise information
-about a face. If you use 68 landmarks , 5 landmarks will be reassigned to more precise subset of 68 landmarks.
+about a face. If you use 68 landmarks, 5 landmarks will be reassigned to more precise subset of 68 landmarks.
+
+Examples
+--------
+
+.. literalinclude:: ../../../examples/sdk_examples/face_detection.py
+
+
+.. automodule:: lunavl.sdk.image_utils.image
+    :members:
