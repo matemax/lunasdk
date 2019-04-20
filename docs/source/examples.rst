@@ -1,9 +1,9 @@
-Modules
-=======
+Examples
+========
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
 
-   image_utils
+   examples/sdk_examples

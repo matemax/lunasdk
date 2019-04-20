@@ -1,4 +1,4 @@
-LUNA SDK
+Examples
 ========
 
 .. toctree::
@@ -6,4 +6,4 @@ LUNA SDK
    :caption: Contents:
 
 
-   sdk/modules
+   sdk/detector
