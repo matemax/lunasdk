@@ -11,6 +11,7 @@ Welcome to VL Luna's documentation!
    :caption: Contents:
 
    sdk
+   examples
 
 
 Indices and tables

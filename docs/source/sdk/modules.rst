@@ -1,9 +1,10 @@
-LUNA SDK
-========
+Modules
+=======
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
 
-   sdk/modules
+   image_utils
+   face_detection

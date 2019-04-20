@@ -36,7 +36,6 @@ class DetectorType(Enum):
     FACE_DET_V1 = "FACE_DET_V1"  #: todo description
     FACE_DET_V2 = "FACE_DET_V2"
     FACE_DET_V3 = "FACE_DET_V3"
-    FACE_DET_COUNT = "FACE_DET_COUNT"
 
     @property
     def coreDetectorType(self) -> ObjectDetectorClassType:
@@ -134,7 +133,8 @@ class BoundingBox:
     """
     Attributes:
         rect (Rect[float]): face bounding box
-        score (float): face score (0,1)
+        score (float): face score (0,1), detection score is the measure of classification confidence and not the source
+                       image quality. It may be used topick the most "*confident*" face of many.
     """
 
     def __init__(self, boundingBox: DetectionFloat):
