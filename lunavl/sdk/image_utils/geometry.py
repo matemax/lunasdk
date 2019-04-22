@@ -154,7 +154,7 @@ class Rect(Generic[COORDINATE_TYPE]):
             self.coreRect = CoreRectI(x, y, width, height)
 
     @classmethod
-    def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]):
+    def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]) -> 'Rect':
         """
         Load rect from core rect
 
@@ -166,6 +166,22 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         newRect = cls()
         newRect.coreRect = rect
+        return newRect
+
+    @classmethod
+    def initByCorners(cls, topLeftCorner: Point[COORDINATE_TYPE], bottomRightBottom: Point[COORDINATE_TYPE]) -> 'Rect':
+        """
+        Init rect by top left corner, bottom right bottom
+
+        Args:
+            topLeftCorner: top left corner
+            bottomRightBottom: bottom right bottom
+
+        Returns:
+            new rect
+        """
+        newRect = cls()
+        newRect.coreRect = newRect.coreRect.set(topLeftCorner.toVector2(), bottomRightBottom.toVector2())
         return newRect
 
     @property
@@ -480,21 +496,34 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect != other.coreRect
 
-    def adjust(self, arg0, arg1, arg2, arg3):  # real signature unknown; restored from __doc__
-        """ adjust(self: FaceEngine.Rect, arg0: int, arg1: int, arg2: int, arg3: int) -> None """
-        pass
+    def adjust(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE, dh: COORDINATE_TYPE) -> None:
+        """
+        Adjusts the rect by given amounts.
 
-    def adjusted(self, arg0, arg1, arg2, arg3):  # real signature unknown; restored from __doc__
-        """ adjusted(self: FaceEngine.Rect, arg0: int, arg1: int, arg2: int, arg3: int) -> FaceEngine.Rect """
-        pass
+        Args:
+            dx: adjustment for upper left corner x coordinate
+            dy: adjustment for upper left corner y coordinate
+            dw: adjustment for width
+            dh: adjustment for height
+        """
+        self.coreRect.adjust(dx, dy, dw, dh)
 
-    def set(self, arg0, *args, **kwargs):  # real signature unknown; NOTE: unreliably restored from __doc__
-        """ set(self: FaceEngine.Rect, arg0: fsdk::Vector2<int>, arg1: fsdk::Vector2<int>) -> None """
-        pass
+    def adjusted(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE, dh: COORDINATE_TYPE) -> 'Rect':
+        """
+        Copies and adjusts the rect by given amounts.
 
-    def coords(self, arg0, arg1, arg2, arg3):  # real signature unknown; restored from __doc__
-        """ coords(arg0: int, arg1: int, arg2: int, arg3: int) -> FaceEngine.Rect """
-        pass
+        Args:
+            dx: adjustment for upper left corner x coordinate
+            dy: adjustment for upper left corner y coordinate
+            dw: adjustment for width
+            dh: adjustment for height
+
+        Returns:
+            return copy.
+        """
+        newRect = Rect()
+        newRect.coreRect = self.coreRect.adjusted(dx, dy, dw, dh)
+        return newRect
 
     def asDict(self) -> dict:
         """
