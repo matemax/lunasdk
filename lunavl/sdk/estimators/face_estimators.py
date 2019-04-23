@@ -36,7 +36,7 @@ class FrontalType(Enum):
 
 class HeadPose:
     """
-    Head pose. Aircraft principal axes for face https://en.wikipedia.org/wiki/Aircraft_principal_axes.
+    Head pose. Estimate Tait–Bryan angles for head (https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles).
 
     Attributes:
         pitch (float): pitch
