@@ -8,3 +8,4 @@ Modules
 
    image_utils
    face_detection
+   face_estimations
