@@ -154,10 +154,13 @@ class FaceDetection:
         boundingBox (BoundingBox): face bounding box
         landmarks5 (Optional[Landmarks5]): optional landmarks5
         landmarks68 (Optional[Landmarks68]): optional landmarks5
-    """
-    __slots__ = ["boundingBox", "landmarks5", "landmarks68"]
+        _image (VLImage): source of detection
+        _coreDetection (Face): core detection
 
-    def __init__(self, coreDetection: Face):
+    """
+    __slots__ = ["boundingBox", "landmarks5", "landmarks68", "_coreDetection", "_image"]
+
+    def __init__(self, coreDetection: Face, image: VLImage):
         """
         Init.
 
@@ -174,6 +177,28 @@ class FaceDetection:
             self.landmarks68 = Landmarks68(coreDetection.landmarks68_opt.value())
         else:
             self.landmarks68 = None
+        self._image = image
+        self._coreDetection = coreDetection
+
+    @property
+    def coreDetection(self) -> Face:
+        """
+        Detection from core.
+
+        Returns:
+            core detection.
+        """
+        return self._coreDetection
+
+    @property
+    def image(self) -> VLImage:
+        """
+        Get source of detection.
+
+        Returns:
+            source image
+        """
+        return self.image
 
     def asDict(self) -> Dict[str, Union[dict, list]]:
         """
@@ -255,7 +280,7 @@ class FaceDetector:
         coreDetection = detectRes[1]
         if not coreDetection.detection.isValid():
             raise ValueError("WTF bad rect")  # todo check
-        return FaceDetection(coreDetection)
+        return FaceDetection(coreDetection, image)
 
     def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detect5Landmarks: bool = True,
                detect68Landmarks: bool = False) -> List[List[FaceDetection]]:
@@ -296,6 +321,6 @@ class FaceDetector:
             error = ErrorInfo.fromSDKError(124, "detection", detectRes[0])
             raise LunaSDKException(error)
         res = []
-        for imageDetections in detectRes[1]:
-            res.append([FaceDetection(coreDetection) for coreDetection in imageDetections])
+        for numberImage, imageDetections in enumerate(detectRes[1]):
+            res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])
         return res
