@@ -8,7 +8,7 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.facedetector import Landmarks68
+from lunavl.sdk.faceengine.facedetector import Landmarks68, FaceDetection
 
 
 class FrontalType(Enum):
@@ -102,9 +102,9 @@ class HeadPoseEstimator:
         """
         self._coreHeadPoseEstimator = coreHeadPoseEstimator
 
-    def estimate(self, landmarks68: Landmarks68) -> HeadPose:
+    def estimateBy68Landmarks(self, landmarks68: Landmarks68) -> HeadPose:
         """
-        Estimate head pose.
+        Estimate head pose by 68 landmarks.
 
         Args:
             landmarks68: landmarks68
@@ -115,6 +115,26 @@ class HeadPoseEstimator:
             LunaSDKException: if estimation is failed
         """
         err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmarks68.coreLandmarks)
+
+        if err.isError:
+            error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
+            raise LunaSDKException(error)
+        return HeadPose(headPoseEstimation)
+
+    def estimateByDetection(self, detection: FaceDetection) -> HeadPose:
+        """
+        Estimate head pose by detection.
+
+        Args:
+            detection: face detection
+
+        Returns:
+            estimate head pose
+        Raises:
+            LunaSDKException: if estimation is failed
+        """
+        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(detection.image.coreImage,
+                                                                       detection.coreDetection)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
