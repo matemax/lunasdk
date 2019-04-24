@@ -21,7 +21,12 @@ def estimateHeadPose():
     detector = FACE_ENGINE.createFaceDetector(DetectorType.FACE_DET_V1)
     headPoseEstimator = FACE_ENGINE.createHeadPoseEstimator()
     faceDetection = detector.detectOne(image, detect5Landmarks=False, detect68Landmarks=True)
-    angles = headPoseEstimator.estimate(faceDetection.landmarks68)
+    #: estimate by 68 landmarks
+    angles = headPoseEstimator.estimateBy68Landmarks(faceDetection.landmarks68)
+    angles.getFrontalType()
+    pprint.pprint(angles)
+    #: estimate by detection
+    angles = headPoseEstimator.estimateByDetection(faceDetection)
     angles.getFrontalType()
     pprint.pprint(angles)
 
