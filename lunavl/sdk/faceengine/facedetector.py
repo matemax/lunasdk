@@ -324,3 +324,27 @@ class FaceDetector:
         for numberImage, imageDetections in enumerate(detectRes[1]):
             res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])
         return res
+
+    def redetectOne(self):
+        """
+        todo: wtf
+        Returns:
+
+        """
+        pass
+
+    def redect(self):
+        """
+        todo: wtf
+        Returns:
+
+        """
+        pass
+
+    def setDetectionComparer(self):
+        """
+        todo: wtf
+        Returns:
+
+        """
+        pass
