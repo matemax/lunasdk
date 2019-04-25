@@ -496,7 +496,8 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect != other.coreRect
 
-    def adjust(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE, dh: COORDINATE_TYPE) -> None:
+    def adjust(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE,
+               dh: COORDINATE_TYPE) -> None:  # pylint: disable=C0103
         """
         Adjusts the rect by given amounts.
 
@@ -508,7 +509,8 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         self.coreRect.adjust(dx, dy, dw, dh)
 
-    def adjusted(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE, dh: COORDINATE_TYPE) -> 'Rect':
+    def adjusted(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE,
+                 dh: COORDINATE_TYPE) -> 'Rect':  # pylint: disable=C0103
         """
         Copies and adjusts the rect by given amounts.
 
