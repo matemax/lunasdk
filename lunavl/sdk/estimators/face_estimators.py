@@ -33,6 +33,8 @@ class FrontalType(Enum):
         frontalType = cls(frontalFaceType.name)
         return frontalType
 
+    def __repr__(self):
+        return self.value
 
 class HeadPose:
     """
@@ -73,7 +75,7 @@ class HeadPose:
         Returns:
             frontal type
         """
-        return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalType())
+        return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
 
     def __repr__(self) -> str:
         """
@@ -134,7 +136,7 @@ class HeadPoseEstimator:
             LunaSDKException: if estimation is failed
         """
         err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(detection.image.coreImage,
-                                                                       detection.coreDetection)
+                                                                       detection.coreDetection.detection)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)

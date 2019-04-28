@@ -13,7 +13,7 @@ from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E040
 from ..errors.errors import ErrorInfo
 from ..errors.exceptions import LunaSDKException
 from ..image_utils.geometry import Rect, Point
-from ..image_utils.image import VLImage, Format
+from ..image_utils.image import VLImage, ColorFormat
 
 
 class ImageForDetection(NamedTuple):
@@ -198,7 +198,7 @@ class FaceDetection:
         Returns:
             source image
         """
-        return self.image
+        return self._image
 
     def asDict(self) -> Dict[str, Union[dict, list]]:
         """
@@ -218,7 +218,8 @@ class FaceDetection:
 
 class FaceDetector:
     """
-    Class contain
+    Face detector.
+
     Attributes:
         _detector (IDetectorPtr): core detector
 
@@ -308,7 +309,7 @@ class FaceDetector:
             else:
                 img = image[0]
                 detectArea = image[1].coreRect
-            if img.format != Format.R8G8B8:
+            if img.format != ColorFormat.R8G8B8:
                 error = ErrorInfo(126, "bad format",
                                   "Bad image format for detection {}, img {}".format(img.format.value, img.format))
                 raise LunaSDKException(error)

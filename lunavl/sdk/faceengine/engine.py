@@ -7,6 +7,7 @@ import os
 from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
+from lunavl.sdk.faceengine.warper import Warper
 
 from ..estimators.face_estimators import HeadPoseEstimator
 from ..faceengine.facedetector import DetectorType, FaceDetector
@@ -68,6 +69,14 @@ class VLFaceEngine:
             estimator
         """
         return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
+
+    def createWarper(self):
+        """
+        `warp <warping.html>`_:
+        Returns:
+
+        """
+        return Warper(self._faceEngine.createWarper())
 
 
 # (VLFaceEngine): Global instance of VLFaceEngine
