@@ -319,8 +319,7 @@ class FaceDetector:
         detectRes = self._detector.detect(imgs, detectAreas, limit,
                                           self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if detectRes[0].isError:
-            error = ErrorInfo.fromSDKError(124, "detection", detectRes[0])
-            raise LunaSDKException(error)
+            raise LunaSDKException(ErrorInfo.fromSDKError(124, "detection", detectRes[0]))
         res = []
         for numberImage, imageDetections in enumerate(detectRes[1]):
             res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])

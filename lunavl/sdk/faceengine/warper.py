@@ -132,5 +132,4 @@ class Warper:
             raise ValueError("1234567")
         if typeLandmarks == "L68":
             return Landmarks68(warpResult[1])
-        else:
-            return Landmarks5(warpResult[1])
+        return Landmarks5(warpResult[1])
