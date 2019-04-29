@@ -8,6 +8,8 @@ import os
 from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
+
+from lunavl.sdk.estimators.warp_quality_estimator import WarpQualityEstimator
 from lunavl.sdk.faceengine.warper import Warper
 
 from ..estimators.face_estimators import HeadPoseEstimator
@@ -71,11 +73,21 @@ class VLFaceEngine:
         """
         return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
 
+    def createImageQualityEstimator(self) -> WarpQualityEstimator:
+        """
+        Create an image quality estimator
+
+        Returns:
+            estimator
+        """
+        return WarpQualityEstimator(self._faceEngine.createQualityEstimator())
+
     def createWarper(self):
         """
-        `warp <warping.html>`_:
-        Returns:
+        Create warper, `see <warping.html>`_:
 
+        Returns:
+            warper.
         """
         return Warper(self._faceEngine.createWarper())
 

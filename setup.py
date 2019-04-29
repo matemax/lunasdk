@@ -12,7 +12,7 @@ setup(
     version=VERSION,
     author="VisionLabs",
     author_email="m.limonov@visionlabs.ru",
-    packages=find_packages(exclude=["docs", "tests", "tests.*"]),
+    packages=find_packages(exclude=["docs", "tests", "tests.*", "examples"]),
     zip_safe=False,
     install_requires=[
         'requests',

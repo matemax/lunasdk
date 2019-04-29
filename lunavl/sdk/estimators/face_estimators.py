@@ -90,6 +90,7 @@ class HeadPose:
 class HeadPoseEstimator:
     """
     HeadPoseEstimator.
+
     Attributes
         _coreHeadPoseEstimator (IHeadPoseEstimatorPtr): core estimator.
     """

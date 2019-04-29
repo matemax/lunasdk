@@ -1,3 +1,6 @@
+"""
+Module for creating warped images
+"""
 from typing import Union
 
 from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
@@ -19,7 +22,7 @@ class WarpedImage(VLImage):
     """
 
     @property
-    def warp(self) -> 'WarpedImage':
+    def warpedImage(self) -> 'WarpedImage':
         """
         Property for compatibility with *Warp* for outside methods.
         Returns:

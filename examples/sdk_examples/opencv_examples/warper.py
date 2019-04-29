@@ -1,5 +1,7 @@
 import pprint
 
+import cv2
+
 from lunavl.sdk.faceengine.engine import FACE_ENGINE
 from lunavl.sdk.faceengine.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
@@ -17,6 +19,10 @@ def createWarp():
     warper = FACE_ENGINE.createWarper()
     warp = warper.warp(faceDetection)
     pprint.pprint(warp.warpedImage.rect)
+    cv2.imshow("Wapred image", warp.warpedImage.asNPArray())
+    cv2.imshow("Original image", image.asNPArray())
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":

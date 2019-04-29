@@ -16,7 +16,10 @@ def createWarp():
     faceDetection = detector.detectOne(image)
     warper = FACE_ENGINE.createWarper()
     warp = warper.warp(faceDetection)
-    pprint.pprint(warp.warpedImage.rect)
+
+    qualityEstimator = FACE_ENGINE.createImageQualityEstimator()
+
+    pprint.pprint(qualityEstimator.estimate(warp.warpedImage))
 
 
 if __name__ == "__main__":
