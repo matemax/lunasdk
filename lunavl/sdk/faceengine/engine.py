@@ -1,5 +1,6 @@
 """
 Module realize wraps on facengine objects
+
 Attributes:
     FACE_ENGINE (VLFaceEngine): Global instance of VLFaceEngine
 """
