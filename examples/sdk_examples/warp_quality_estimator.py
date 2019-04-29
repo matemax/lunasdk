@@ -1,3 +1,6 @@
+"""
+Warp quality estimation example
+"""
 import pprint
 
 from lunavl.sdk.faceengine.engine import FACE_ENGINE
@@ -5,10 +8,9 @@ from lunavl.sdk.faceengine.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 
 
-def createWarp():
+def estimateWarpQuality():
     """
     Create warp from detection.
-
     """
     image = VLImage.load(
         url='https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg')
@@ -23,4 +25,4 @@ def createWarp():
 
 
 if __name__ == "__main__":
-    createWarp()
+    estimateWarpQuality()

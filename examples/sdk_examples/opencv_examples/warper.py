@@ -1,6 +1,9 @@
+"""
+Warps visualization example.
+"""
 import pprint
 
-import cv2
+import cv2  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.faceengine.engine import FACE_ENGINE
 from lunavl.sdk.faceengine.facedetector import DetectorType
