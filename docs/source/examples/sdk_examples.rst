@@ -7,3 +7,4 @@ Examples
 
 
    sdk/detector
+   sdk/warping

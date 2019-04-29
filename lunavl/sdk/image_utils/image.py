@@ -2,17 +2,31 @@
 Module realize VLImage - structure for storing image in special format.
 """
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from numpy import array
 
 from .geometry import Rect
 
-
-class Format(Enum):
+class ImageFormat(Enum):
     """
-    Enum for vl luna image formats
+    Enum for image format
+    """
+    #: jpg
+    JPG = 'jpg'
+    #: png
+    PNG = 'png'
+    #: ppm
+    PPM = 'ppm'
+    #: tif
+    TIF = 'tif'
+
+
+class ColorFormat(Enum):
+    """
+    Enum for vl luna color formats
     """
     #: 3 channel, 8 bit per channel, B-G-R color order format;
     B8G8R8 = 'B8G8R8'
@@ -40,7 +54,7 @@ class Format(Enum):
         return getattr(FormatType, self.value)
 
     @staticmethod
-    def convertCoreFormat(imageFormat: FormatType) -> 'Format':
+    def convertCoreFormat(imageFormat: FormatType) -> 'ColorFormat':
         """
         Convert FormatType to Format
 
@@ -51,7 +65,7 @@ class Format(Enum):
             corresponding lunavl image format
 
         """
-        return getattr(Format, imageFormat.name)
+        return getattr(ColorFormat, imageFormat.name)
 
 
 class VLImage:
@@ -65,7 +79,7 @@ class VLImage:
     """
     __slots__ = ("coreImage", "source", "filename")
 
-    def __init__(self, body: bytes, imgFormat: Optional[Format] = None, filename: str = ""):
+    def __init__(self, body: Union[bytes, array, CoreImage], imgFormat: Optional[ColorFormat] = None, filename: str = ""):
         """
         Init.
 
@@ -74,18 +88,28 @@ class VLImage:
             imgFormat:
         """
         if imgFormat is None:
-            imgFormat = Format.R8G8B8
+            imgFormat = ColorFormat.R8G8B8
         self.coreImage = CoreImage()
-        loadResult = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
-        if loadResult.isError:
-            #: todo: raise correct error.
-            raise ValueError
+
+        if isinstance(body, CoreImage):
+            self.coreImage = body
+        elif isinstance(body, bytes):
+            loadResult = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
+            if loadResult.isError:
+                #: todo: raise correct error.
+                raise ValueError
+        elif isinstance(body, array):
+            #: todo, format ?????
+            self.coreImage.setData(body, imgFormat.coreFormat)
+        else:
+            raise TypeError("wtf  image type")
+
         self.source = body
         self.filename = filename
 
     @classmethod
-    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None, npArray: Optional[array] = None,
-             imgFormat: Optional[Format] = None) -> 'VLImage':
+    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None,
+             imgFormat: Optional[ColorFormat] = None) -> 'VLImage':
 
         """
         Load imag from numpy array or file or url.
@@ -94,7 +118,6 @@ class VLImage:
             *_: for remove positional argument
             filename: filename
             url: url
-            npArray:
             imgFormat:
 
         Returns:
@@ -120,19 +143,17 @@ class VLImage:
                 img = cls(response.content, imgFormat)
                 img.source = url
                 return img
-        if npArray is not None:
-            CoreImage().setData(npArray, imgFormat.coreFormat)
         raise ValueError
 
     @property
-    def format(self) -> Format:
+    def format(self) -> ColorFormat:
         """ getFormat(self: FaceEngine.Image) -> FaceEngine.FormatType
 
         >>> image = VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg')
         >>> image.format.value
         'R8G8B8'
         """
-        return Format.convertCoreFormat(self.coreImage.getFormat())
+        return ColorFormat.convertCoreFormat(self.coreImage.getFormat())
 
     @property
     def rect(self) -> Rect:
@@ -255,8 +276,25 @@ class VLImage:
         """
         return self.coreImage.isPadded()
 
-    def save(self, *args, **kwargs):  # real signature unknown; restored from __doc__
+    def save(self, filename: str):
         """
-        todo: do it
+        Save image to disk. Support image format: *ppm, jpg, png, tif*.
+
+        Args:
+            filename: filename
+        Raises:
+            todo it
+        """
+        saveRes = self.coreImage.save(filename)
+        if saveRes.isError:
+            raise ValueError
+
+    def convertToBinaryImg(self, imageFormat: ImageFormat = ImageFormat.PPM) -> bytes:
+        """
+        Convert VL image to binary image
+        Args:
+            imageFormat: format
+        Returns:
+            bytes
         """
         pass

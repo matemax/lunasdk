@@ -6,6 +6,8 @@ Modules
    :caption: Contents:
 
 
+   faceengine
    image_utils
    face_detection
+   warping
    face_estimations
