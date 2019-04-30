@@ -121,3 +121,4 @@ class WarpQualityEstimator:
         if error.isError:
             raise ValueError("1234yui")
         return Quality(coreQuality)
+
