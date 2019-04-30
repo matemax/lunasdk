@@ -13,7 +13,7 @@ from lunavl.sdk.estimators.emotions import EmotionsEstimator
 from lunavl.sdk.estimators.warp_quality_estimator import WarpQualityEstimator
 from lunavl.sdk.faceengine.warper import Warper
 
-from ..estimators.face_estimators import HeadPoseEstimator
+from ..estimators.head_pose import HeadPoseEstimator
 from ..faceengine.facedetector import DetectorType, FaceDetector
 
 
