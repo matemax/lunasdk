@@ -8,6 +8,7 @@ import os
 from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
+from lunavl.sdk.estimators.emotions import EmotionsEstimator
 
 from lunavl.sdk.estimators.warp_quality_estimator import WarpQualityEstimator
 from lunavl.sdk.faceengine.warper import Warper
@@ -91,6 +92,14 @@ class VLFaceEngine:
         """
         return Warper(self._faceEngine.createWarper())
 
+    def createEmotionEstimator(self) -> EmotionsEstimator:
+        """
+        Create emotions estimator
+
+        Returns:
+            estimator
+        """
+        return EmotionsEstimator(self._faceEngine.createEmotionsEstimator())
 
 # (VLFaceEngine): Global instance of VLFaceEngine
 FACE_ENGINE = VLFaceEngine()
