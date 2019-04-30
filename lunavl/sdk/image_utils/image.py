@@ -5,10 +5,10 @@ from enum import Enum
 from typing import Optional, Union
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
-from lunavl.sdk.errors.exceptions import LunaSDKException
 from numpy import array
 
 from .geometry import Rect
+
 
 class ImageFormat(Enum):
     """
@@ -79,7 +79,8 @@ class VLImage:
     """
     __slots__ = ("coreImage", "source", "filename")
 
-    def __init__(self, body: Union[bytes, array, CoreImage], imgFormat: Optional[ColorFormat] = None, filename: str = ""):
+    def __init__(self, body: Union[bytes, array, CoreImage], imgFormat: Optional[ColorFormat] = None,
+                 filename: str = ""):
         """
         Init.
 
