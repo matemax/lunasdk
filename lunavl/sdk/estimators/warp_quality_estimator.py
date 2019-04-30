@@ -86,7 +86,13 @@ class Quality:
         return {"darkness": self.dark, "lightning": self.light, "saturation": self.gray, "blurness": self.blur}
 
     def __repr__(self) -> str:
-        return "{}".format(self.asDict())
+        """
+        Representation
+
+        Returns:
+            str(self.asDict())
+        """
+        return str(self.asDict())
 
 
 class WarpQualityEstimator:
