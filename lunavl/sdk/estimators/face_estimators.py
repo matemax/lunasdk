@@ -36,6 +36,7 @@ class FrontalType(Enum):
     def __repr__(self):
         return self.value
 
+
 class HeadPose:
     """
     Head pose. Estimate Tait–Bryan angles for head (https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles).
