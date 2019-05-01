@@ -34,8 +34,27 @@ Emotions estimation presents emotions a snormalized float values in the range of
 a specific emotion and 1st is the maximum intensity of an emotion.
 
 
+Mouth state
+-----------
+
+
+This estimator is designed to determine smile/mouth/occlusion probability using warped image. Smile estimation
+structure consists of:
+
+    - Smile score;
+    - Mouth score;
+    - Occlusion score.
+
+Sum of scores always equals 1. Each score means probability of corresponding state. Smile score prevails in cases where
+smile was successfully detected. If there is any object on photo that hides mouth occlusion score prevails.
+Mouth score prevails in cases where neither a smile nor an occlusion was detected.
+
+
 .. automodule:: lunavl.sdk.estimators.head_pose
     :members:
 
 .. automodule:: lunavl.sdk.estimators.emotion
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.mouth_state
     :members:
