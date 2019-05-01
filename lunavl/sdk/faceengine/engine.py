@@ -9,8 +9,9 @@ from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 from lunavl.sdk.estimators.emotions import EmotionsEstimator
+from lunavl.sdk.estimators.mouth_state import MouthStateEstimator
 
-from lunavl.sdk.estimators.warp_quality_estimator import WarpQualityEstimator
+from lunavl.sdk.estimators.warp_quality import WarpQualityEstimator
 from lunavl.sdk.faceengine.warper import Warper
 
 from ..estimators.head_pose import HeadPoseEstimator
@@ -100,6 +101,16 @@ class VLFaceEngine:
             estimator
         """
         return EmotionsEstimator(self._faceEngine.createEmotionsEstimator())
+
+    def createMouthEstimator(self) -> MouthStateEstimator:
+        """
+        Create mouth state estimator
+
+        Returns:
+            estimator
+        """
+        return MouthStateEstimator(self._faceEngine.createSmileEstimator())
+
 
 # (VLFaceEngine): Global instance of VLFaceEngine
 FACE_ENGINE = VLFaceEngine()
