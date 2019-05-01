@@ -131,11 +131,18 @@ class Landmarks68:
 
 class BoundingBox:
     """
-    Attributes:
-        rect (Rect[float]): face bounding box
-        score (float): face score (0,1), detection score is the measure of classification confidence and not the source
+    Detection bounding box, it is characterized of rect and score:
+
+        - rect (Rect[float]): face bounding box
+        - score (float): face score (0,1), detection score is the measure of classification confidence and not the source
                        image quality. It may be used topick the most "*confident*" face of many.
+
+    Attributes:
+
+        _coreBoundingBox (DetectionFloat): core boundin box
+        _
     """
+    __slots__ = ['_coreBoundingBox']
 
     def __init__(self, boundingBox: DetectionFloat):
         """
@@ -144,8 +151,37 @@ class BoundingBox:
         Args:
             boundingBox: core bounding box
         """
-        self.score = boundingBox.score
-        self.rect = Rect.fromCoreRect(boundingBox.rect)
+        self._coreBoundingBox = boundingBox
+
+    @property
+    def score(self) -> float:
+        """
+        Get score
+
+        Returns:
+            number in range [0,1]
+        """
+        return self._coreBoundingBox.score
+
+    @property
+    def rect(self) -> Rect[float]:
+        """
+        Get rect.
+
+        Returns:
+            float rect
+        """
+        return Rect.fromCoreRect(self._coreBoundingBox.rect)
+
+    @property
+    def coreBoundingBox(self) -> DetectionFloat:
+        """
+        Get a raw core bounding box.
+
+        Returns:
+            core detection from init.
+        """
+        return self._coreBoundingBox
 
 
 class FaceDetection:

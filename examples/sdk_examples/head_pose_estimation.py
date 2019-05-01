@@ -29,7 +29,7 @@ def estimateHeadPose():
     pprint.pprint(angles.getFrontalType())
 
     #: estimate by detection
-    angles = headPoseEstimator.estimateByDetection(faceDetection)
+    angles = headPoseEstimator.estimateByBoundingBox(faceDetection.boundingBox, image)
     angles.getFrontalType()
     pprint.pprint(angles)
 
