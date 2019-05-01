@@ -1,3 +1,6 @@
+"""
+Module contains a mouth state estimator
+"""
 from typing import Union
 
 from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0611,E0401
