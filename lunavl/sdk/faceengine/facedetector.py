@@ -117,6 +117,15 @@ class BoundingBox(BaseEstimation):
         """
         return Rect.fromCoreRect(self._coreEstimation.rect)
 
+    def asDict(self) -> dict:
+        """
+        Convert to  dict.
+
+        Returns:
+            {"rect": self.rect, "score": self.score}
+        """
+        return {"rect": self.rect.asDict(), "score": self.score}
+
 
 class FaceDetection(BaseEstimation):
     """
