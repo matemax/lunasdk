@@ -49,7 +49,6 @@ class Emotions(BaseEstimation):
     is characterized a score (value in range [0,1]). Sum of all scores is equal to 1. Predominate
     emotion is emotion with max value of score
     """
-    __slots__ = ('_coreEmotions',)
 
     def __init__(self, coreEmotions):
         """
@@ -86,7 +85,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.anger
+        return self._coreEstimation.anger
 
     @property
     def disgust(self):
@@ -96,7 +95,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.disgust
+        return self._coreEstimation.disgust
 
     @property
     def fear(self):
@@ -106,7 +105,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.fear
+        return self._coreEstimation.fear
 
     @property
     def happiness(self):
@@ -116,7 +115,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.happiness
+        return self._coreEstimation.happiness
 
     @property
     def sadness(self):
@@ -126,7 +125,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.sadness
+        return self._coreEstimation.sadness
 
     @property
     def surprise(self):
@@ -136,7 +135,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.surprise
+        return self._coreEstimation.surprise
 
     @property
     def neutral(self):
@@ -146,7 +145,7 @@ class Emotions(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEmotions.neutral
+        return self._coreEstimation.neutral
 
     @property
     def predominateEmotion(self) -> Emotion:
@@ -156,7 +155,7 @@ class Emotions(BaseEstimation):
         Returns:
             emotion with max score value
         """
-        return Emotion.fromCoreEmotion(self._coreEmotions.getPredominantEmotion())
+        return Emotion.fromCoreEmotion(self._coreEstimation.getPredominantEmotion())
 
 
 class EmotionsEstimator:
