@@ -8,7 +8,8 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.facedetector import Landmarks68, FaceDetection, BoundingBox
+from lunavl.sdk.estimators.base_estimation import BaseEstimation
+from lunavl.sdk.faceengine.facedetector import Landmarks68, BoundingBox
 from lunavl.sdk.image_utils.image import VLImage
 
 
@@ -38,16 +39,10 @@ class FrontalType(Enum):
         return self.value
 
 
-class HeadPose:
+class HeadPose(BaseEstimation):
     """
     Head pose. Estimate Tait–Bryan angles for head (https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles).
-
-    Attributes:
-        pitch (float): pitch
-        yaw (float): pitch
-        roll (float): pitch
     """
-    __slots__ = ["pitch", "yaw", "roll", "_coreEstimation"]
 
     def __init__(self, coreHeadPose: HeadPoseEstimation):
         """
@@ -56,10 +51,38 @@ class HeadPose:
         Args:
             coreHeadPose: core head pose estimation.
         """
-        self.pitch = coreHeadPose.pitch
-        self.yaw = coreHeadPose.yaw
-        self.roll = coreHeadPose.roll
-        self._coreEstimation = coreHeadPose
+
+        super().__init__(coreHeadPose)
+
+    @property
+    def yaw(self) -> float:
+        """
+        Get the yaw angle.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.yaw
+
+    @property
+    def pitch(self) -> float:
+        """
+        Get the pitch angle.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.pitch
+
+    @property
+    def roll(self) -> float:
+        """
+        Get the pitch angle.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.roll
 
     def asDict(self) -> Dict[str, float]:
         """
@@ -78,15 +101,6 @@ class HeadPose:
             frontal type
         """
         return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
-
-    def __repr__(self) -> str:
-        """
-        Generate representation.
-
-        Returns:
-            "pitch = {self.pitch}, roll = {self.roll}, yaw = {self.yaw}"
-        """
-        return "pitch = {}, roll = {}, yaw = {}".format(self.pitch, self.roll, self.yaw)
 
 
 class HeadPoseEstimator:
@@ -119,7 +133,7 @@ class HeadPoseEstimator:
         Raises:
             LunaSDKException: if estimation is failed
         """
-        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmarks68.coreLandmarks)
+        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmarks68.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
@@ -139,7 +153,7 @@ class HeadPoseEstimator:
             LunaSDKException: if estimation is failed
         """
         err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(imageWithDetection.coreImage,
-                                                                       detection.coreBoundingBox)
+                                                                       detection.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)

@@ -6,6 +6,7 @@ from typing import Union
 
 from FaceEngine import IEmotionsEstimatorPtr, Emotions as CoreEmotions  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.estimators.base_estimation import BaseEstimation
 from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 
 
@@ -42,16 +43,13 @@ class Emotion(Enum):
         return getattr(Emotion, coreEmotion.name)
 
 
-class Emotions:
+class Emotions(BaseEstimation):
     """
     Container for storing estimate emotions. List of emotions is represented in enum Emotion. Each emotion
     is characterized a score (value in range [0,1]). Sum of all scores is equal to 1. Predominate
     emotion is emotion with max value of score
-
-    Attributes:
-        _coreEmotions: core estimation
     """
-    __slots__ = ['_coreEmotions']
+    __slots__ = ('_coreEmotions',)
 
     def __init__(self, coreEmotions):
         """
@@ -60,7 +58,7 @@ class Emotions:
         Args:
             coreEmotions:  estimation from core
         """
-        self._coreEmotions = coreEmotions
+        super().__init__(coreEmotions)
 
     def asDict(self):
         """
@@ -79,15 +77,6 @@ class Emotions:
                     'surprise': self.surprise,
                     'neutral': self.neutral,
                 }}
-
-    def __repr__(self) -> str:
-        """
-        Representation.
-
-        Returns:
-            str(self.asDict())
-        """
-        return str(self.asDict())
 
     @property
     def anger(self) -> float:

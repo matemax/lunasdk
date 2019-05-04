@@ -5,17 +5,14 @@ from typing import Dict, Union
 
 from FaceEngine import Quality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.estimators.base_estimation import BaseEstimation
 from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 
 
-class Quality:
+class Quality(BaseEstimation):
     """
     Structure quality
-
-    Attributes:
-        _coreQuality:
     """
-    __slots__ = ["_coreQuality"]
 
     def __init__(self, coreQuality: CoreQuality):
         """
@@ -24,7 +21,7 @@ class Quality:
         Args:
             coreQuality: estimated core quality
         """
-        self._coreQuality = coreQuality
+        super().__init__(coreQuality)
 
     @property
     def blur(self) -> float:
@@ -34,7 +31,7 @@ class Quality:
         Returns:
             float in range(0, 1)
         """
-        return self._coreQuality.blur
+        return self._coreEstimation.blur
 
     @property
     def dark(self) -> float:
@@ -44,7 +41,7 @@ class Quality:
         Returns:
             float in range(0, 1)
         """
-        return self._coreQuality.dark
+        return self._coreEstimation.dark
 
     @property
     def gray(self) -> float:
@@ -54,7 +51,7 @@ class Quality:
         Returns:
             float in range(0, 1)
         """
-        return self._coreQuality.gray
+        return self._coreEstimation.gray
 
     @property
     def light(self) -> float:
@@ -64,17 +61,7 @@ class Quality:
         Returns:
             float in range(0, 1)
         """
-        return self._coreQuality.light
-
-    @property
-    def coreQuality(self) -> CoreQuality:
-        """
-        Get estimated core quality.
-
-        Returns:
-            core quality
-        """
-        return self._coreQuality
+        return self._coreEstimation.light
 
     def asDict(self) -> Dict[str, float]:
         """
@@ -84,15 +71,6 @@ class Quality:
             {"darkness": self.dark, "lightning": self.light, "saturation": self.gray, "blurness": self.blur}
         """
         return {"darkness": self.dark, "lightning": self.light, "saturation": self.gray, "blurness": self.blur}
-
-    def __repr__(self) -> str:
-        """
-        Representation
-
-        Returns:
-            str(self.asDict())
-        """
-        return str(self.asDict())
 
 
 class WarpQualityEstimator:

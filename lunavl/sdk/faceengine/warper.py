@@ -85,8 +85,8 @@ class Warper:
         """
         if faceDetection.landmarks5 is None:
             raise ValueError("detection must contains landmarks5")
-        return self._coreWarper.createTransformation(faceDetection.coreDetection.detection,
-                                                     faceDetection.landmarks5.coreLandmarks)
+        return self._coreWarper.createTransformation(faceDetection.coreEstimation.detection,
+                                                     faceDetection.landmarks5.coreEstimation)
 
     def warp(self, faceDetection: FaceDetection) -> Warp:
         """
@@ -125,7 +125,7 @@ class Warper:
         if typeLandmarks == "L68":
             warpResult = self._coreWarper.warp(faceDetection.landmarks68.coreLandmarks, transformation)
         elif typeLandmarks == "L5":
-            warpResult = self._coreWarper.warp(faceDetection.landmarks5.coreLandmarks, transformation)
+            warpResult = self._coreWarper.warp(faceDetection.landmarks5.coreEstimation, transformation)
         else:
             raise ValueError("Invalid value of typeLandmarks, must be 'L68' or 'L5'")
         if warpResult[0].isError:

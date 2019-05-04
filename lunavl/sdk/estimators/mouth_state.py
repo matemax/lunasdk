@@ -5,20 +5,17 @@ from typing import Union
 
 from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.estimators.base_estimation import BaseEstimation
 from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 
 
-class MouthStates:
+class MouthStates(BaseEstimation):
     """
     Mouth states. There are 3 states of mouth: smile, occlusion and neither a smile nor an occlusion was detected.
-
-    Attributes:
-        _coreEstimation (SmileEstimation): core mouth estimation.
     """
-    __slots__ = ['_coreEstimation']
 
     def __init__(self, coreEstimation: SmileEstimation):
-        self._coreEstimation = coreEstimation
+        super().__init__(coreEstimation)
 
     @property
     def smile(self) -> float:
@@ -58,15 +55,6 @@ class MouthStates:
             {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
         """
         return {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
-
-    def __repr__(self):
-        """
-        Representation.
-
-        Returns:
-            str(self.asDict())
-        """
-        return str(self.asDict())
 
 
 class MouthStateEstimator:
