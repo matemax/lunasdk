@@ -10,7 +10,7 @@ from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E06
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
 from FaceEngine import EyeAngles, GazeEstimation as CoreGazeEstimation   # pylint: disable=E0611,E0401
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
+from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.estimators.head_pose import HeadPose
 from lunavl.sdk.faceengine.facedetector import Landmarks5, Landmarks68
 
@@ -156,15 +156,10 @@ class EyesEstimation(BaseEstimation):
                 "right_eye": self.rightEye.asDict()}
 
 
-class EyeEstimator:
+class EyeEstimator(BaseEstimator):
     """
     Eye estimator.
-
-    Attributes:
-        _coreEstimator (IEyeEstimatorPtr): core estimator
     """
-    __slots__ = ['_coreEstimator']
-
     def __init__(self, coreEstimator: IEyeEstimatorPtr):
         """
         Init.
@@ -172,7 +167,7 @@ class EyeEstimator:
         Args:
             coreEstimator: core estimator
         """
-        self._coreEstimator = coreEstimator
+        super().__init__(coreEstimator)
 
     def estimate(self, transformedLandmarks: Union[Landmarks5, Landmarks68],
                  warp: Union[Warp, WarpedImage]) -> EyesEstimation:
@@ -271,14 +266,10 @@ class GazeEstimation(BaseEstimation):
         return {"left_eye": self.leftEye.asDict(), "right_eye": self.rightEye.asDict()}
 
 
-class GazeEstimator:
+class GazeEstimator(BaseEstimator):
     """
     Gaze direction estimator.
-
-    Attributes:
-        _coreEstimator (IGazeEstimatorPtr): core estimator
     """
-    __slots__ = ['_coreEstimator']
 
     def __init__(self, coreEstimator: IGazeEstimatorPtr):
         """
@@ -287,7 +278,7 @@ class GazeEstimator:
         Args:
             coreEstimator: core estimator
         """
-        self._coreEstimator = coreEstimator
+        super().__init__(coreEstimator)
 
     def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation):
         """

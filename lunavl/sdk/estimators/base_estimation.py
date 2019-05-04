@@ -1,7 +1,8 @@
-from typing import Union
+from abc import ABC, abstractmethod
+from typing import Union, Any
 
 
-class BaseEstimation:
+class BaseEstimation(ABC):
     """
     Base class for estimation structures.
 
@@ -22,6 +23,7 @@ class BaseEstimation:
         """
         return self._coreEstimation
 
+    @abstractmethod
     def asDict(self) -> Union[dict, list]:
         """
         Convert to  dict.
@@ -29,7 +31,7 @@ class BaseEstimation:
         Returns:
             dict from luna api
         """
-        raise NotImplemented
+        ...
 
     def __repr__(self) -> str:
         """
@@ -39,3 +41,32 @@ class BaseEstimation:
             str(self.asDict())
         """
         return str(self.asDict())
+
+
+class BaseEstimator(ABC):
+    """
+    Base estimator class.
+
+    Attributes:
+        _coreEstimator: core estimator
+    """
+    __slots__ = ('_coreEstimator',)
+
+    def __init__(self, coreEstimator):
+        """
+        Init.
+
+        Args:
+            coreEstimator: core estimator
+        """
+        self._coreEstimator = coreEstimator
+
+    @abstractmethod
+    def estimate(self, *args, **kwargs) -> Any:
+        """
+        Estimate attributes on warp.
+
+        Returns:
+            estimated attributes
+        """
+        ...

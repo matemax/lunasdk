@@ -5,7 +5,7 @@ from typing import Dict, Union
 
 from FaceEngine import Quality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
+from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 
 
@@ -73,15 +73,10 @@ class Quality(BaseEstimation):
         return {"darkness": self.dark, "lightning": self.light, "saturation": self.gray, "blurness": self.blur}
 
 
-class WarpQualityEstimator:
+class WarpQualityEstimator(BaseEstimator):
     """
     Warp quality estimator.
-
-    Attributes:
-        _coreQualityEstimator (IQualityEstimatorPtr):  core quality estimator
     """
-    __slots__ = ["_coreQualityEstimator"]
-
     def __init__(self, coreEstimator: IQualityEstimatorPtr):
         """
         Init.
@@ -89,7 +84,8 @@ class WarpQualityEstimator:
         Args:
             coreEstimator: core quality estimator
         """
-        self._coreQualityEstimator = coreEstimator
+        super().__init__(coreEstimator)
+
 
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Quality:
         """
@@ -101,7 +97,7 @@ class WarpQualityEstimator:
         Returns:
             estimated quality
         """
-        error, coreQuality = self._coreQualityEstimator.estimate(warp.warpedImage.coreImage)
+        error, coreQuality = self._coreEstimator.estimate(warp.warpedImage.coreImage)
         if error.isError:
             raise ValueError("1234yui")
         return Quality(coreQuality)

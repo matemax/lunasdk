@@ -6,7 +6,7 @@ from typing import Union
 
 from FaceEngine import IEmotionsEstimatorPtr, Emotions as CoreEmotions  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
+from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 
 
@@ -158,14 +158,10 @@ class Emotions(BaseEstimation):
         return Emotion.fromCoreEmotion(self._coreEstimation.getPredominantEmotion())
 
 
-class EmotionsEstimator:
+class EmotionsEstimator(BaseEstimator):
     """
     Emotions estimator.
-
-    Attributes:
-        _coreEstimator (IEmotionsEstimatorPtr): core estimator
     """
-    __slots__ = ['_coreEstimator']
 
     def __init__(self, coreEstimator: IEmotionsEstimatorPtr):
         """
@@ -174,7 +170,7 @@ class EmotionsEstimator:
         Args:
             coreEstimator: core estimator
         """
-        self._coreEstimator = coreEstimator
+        super().__init__(coreEstimator)
 
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Emotions:
         """

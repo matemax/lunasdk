@@ -8,7 +8,7 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
+from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.faceengine.facedetector import Landmarks68, BoundingBox
 from lunavl.sdk.image_utils.image import VLImage
 
@@ -103,14 +103,10 @@ class HeadPose(BaseEstimation):
         return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
 
 
-class HeadPoseEstimator:
+class HeadPoseEstimator(BaseEstimator):
     """
     HeadPoseEstimator.
-
-    Attributes
-        _coreHeadPoseEstimator (IHeadPoseEstimatorPtr): core estimator.
     """
-    __slots__ = ["_coreHeadPoseEstimator"]
 
     def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
         """
@@ -119,7 +115,7 @@ class HeadPoseEstimator:
         Args:
             coreHeadPoseEstimator: core estimator
         """
-        self._coreHeadPoseEstimator = coreHeadPoseEstimator
+        super().__init__(coreHeadPoseEstimator)
 
     def estimateBy68Landmarks(self, landmarks68: Landmarks68) -> HeadPose:
         """
@@ -133,12 +129,18 @@ class HeadPoseEstimator:
         Raises:
             LunaSDKException: if estimation is failed
         """
-        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmarks68.coreEstimation)
+        err, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
             raise LunaSDKException(error)
         return HeadPose(headPoseEstimation)
+
+    def estimate(self,  landmarks68: Landmarks68) -> HeadPose:
+        """
+        Realize interface of a abstract  ectimator. Call estimateBy68Landmarks
+        """
+        return self.estimateBy68Landmarks(landmarks68)
 
     def estimateByBoundingBox(self, detection: BoundingBox, imageWithDetection: VLImage) -> HeadPose:
         """
@@ -152,7 +154,7 @@ class HeadPoseEstimator:
         Raises:
             LunaSDKException: if estimation is failed
         """
-        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(imageWithDetection.coreImage,
+        err, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage,
                                                                        detection.coreEstimation)
 
         if err.isError:
