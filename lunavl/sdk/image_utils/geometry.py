@@ -569,7 +569,6 @@ class Landmarks(BaseEstimation):
 
     Attributes:
         _points (Optional[List[Point[float]]]): lazy load attributes, converted to point list core landmarks
-        _coreLandmarks (CoreLandmarks5): landmarks which is returned core
     """
     __slots__ = ["_points", "_coreLandmarks"]
 
@@ -592,7 +591,7 @@ class Landmarks(BaseEstimation):
             list of points
         """
         if self._points is None:
-            self._points = [Point.fromVector2(point) for point in self._coreLandmarks]
+            self._points = [Point.fromVector2(point) for point in self._coreEstimation]
         return self._points
 
     def asDict(self) -> List[List[float]]:
