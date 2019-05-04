@@ -21,7 +21,7 @@ def estimateWarpQuality():
 
     qualityEstimator = FACE_ENGINE.createImageQualityEstimator()
 
-    pprint.pprint(qualityEstimator.estimate(warp.warpedImage))
+    pprint.pprint(qualityEstimator.estimate(warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":

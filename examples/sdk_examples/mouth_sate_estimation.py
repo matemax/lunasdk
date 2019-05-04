@@ -20,7 +20,7 @@ def estimateMouthState():
 
     emotionEstimator = FACE_ENGINE.createMouthEstimator()
 
-    pprint.pprint(emotionEstimator.estimate(warp.warpedImage))
+    pprint.pprint(emotionEstimator.estimate(warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":

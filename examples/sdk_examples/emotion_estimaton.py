@@ -20,7 +20,7 @@ def estimateEmotion():
 
     emotionEstimator = FACE_ENGINE.createEmotionEstimator()
 
-    pprint.pprint(emotionEstimator.estimate(warp.warpedImage))
+    pprint.pprint(emotionEstimator.estimate(warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":

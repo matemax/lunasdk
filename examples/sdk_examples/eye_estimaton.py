@@ -21,7 +21,7 @@ def estimateEyes():
 
     eyesEstimator = FACE_ENGINE.createEyeEstimator()
 
-    pprint.pprint(eyesEstimator.estimate(landMarks5Transformation, warp.warpedImage))
+    pprint.pprint(eyesEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":

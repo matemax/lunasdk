@@ -31,7 +31,7 @@ def estimateGazeDirection():
 
     gazeEstimator = FACE_ENGINE.createGazeEstimator()
 
-    pprint.pprint(gazeEstimator.estimate(headPose, eyesEstimation))
+    pprint.pprint(gazeEstimator.estimate(headPose, eyesEstimation).asDict())
 
 
 if __name__ == "__main__":
