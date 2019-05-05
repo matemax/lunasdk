@@ -45,7 +45,8 @@ class BaseEstimation(ABC):
 
 class BaseEstimator(ABC):
     """
-    Base estimator class.
+    Base estimator class. Class is  a container for core estimations. Mostly estimate attributes  can be get through
+    a corresponding properties.
 
     Attributes:
         _coreEstimator: core estimator

@@ -76,6 +76,11 @@ class EyelidLandmarks(Landmarks):
 class Eye(BaseEstimation):
     """
     Eye structure.
+
+    Estimation properties:
+
+        - eyelid
+        - iris
     """
     __slots__ = ("irisLandmarks", "eyelidLandMarks", "state")
 
@@ -197,6 +202,10 @@ class EyeEstimator(BaseEstimator):
 class GazeDirection(BaseEstimation):
     """
     Gaze direction structure.
+    Estimation properties:
+
+        - yaw
+        - pitch
     """
 
     def __init__(self, coreEstimation: EyeAngles):

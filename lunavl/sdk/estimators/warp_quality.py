@@ -12,6 +12,13 @@ from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 class Quality(BaseEstimation):
     """
     Structure quality
+
+    Estimation properties:
+
+        - dark
+        - blur
+        - gray
+        - light
     """
 
     def __init__(self, coreQuality: CoreQuality):

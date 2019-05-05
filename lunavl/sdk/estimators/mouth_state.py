@@ -12,6 +12,11 @@ from lunavl.sdk.faceengine.warper import Warp, WarpedImage
 class MouthStates(BaseEstimation):
     """
     Mouth states. There are 3 states of mouth: smile, occlusion and neither a smile nor an occlusion was detected.
+
+    Estimation properties:
+
+        - smile
+        - mouth
     """
 
     def __init__(self, coreEstimation: SmileEstimation):

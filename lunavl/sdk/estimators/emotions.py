@@ -47,7 +47,19 @@ class Emotions(BaseEstimation):
     """
     Container for storing estimate emotions. List of emotions is represented in enum Emotion. Each emotion
     is characterized a score (value in range [0,1]). Sum of all scores is equal to 1. Predominate
-    emotion is emotion with max value of score
+    emotion is emotion with max value of score.
+
+    Estimation properties:
+
+        - anger
+        - disgust
+        - fear
+        - happiness
+        - sadness
+        - surprise
+        - neutral
+        - predominateEmotion
+
     """
 
     def __init__(self, coreEmotions):

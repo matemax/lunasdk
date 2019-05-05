@@ -42,6 +42,11 @@ class FrontalType(Enum):
 class HeadPose(BaseEstimation):
     """
     Head pose. Estimate Tait–Bryan angles for head (https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles).
+    Estimation properties:
+
+        - pitch
+        - roll
+        - yaw
     """
 
     def __init__(self, coreHeadPose: HeadPoseEstimation):
