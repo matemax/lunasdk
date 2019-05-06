@@ -73,4 +73,4 @@ class BaseEstimator(ABC):
         Returns:
             estimated attributes
         """
-        ...
+        pass
