@@ -1,5 +1,5 @@
 """
-Module contains utils for make face estimations
+Module contains a head pose estimator
 """
 from enum import Enum
 from typing import Dict
