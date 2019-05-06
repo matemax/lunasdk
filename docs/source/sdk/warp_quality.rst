@@ -11,5 +11,5 @@ and will produce lower factor if:
 
  The quality factor is a value in range [0..1] where 0 corresponds to low quality and 1 to high quality.
 
-.. automodule:: lunavl.sdk.estimators.warp_quality_estimator
+.. automodule:: lunavl.sdk.estimators.warp_quality
     :members:

@@ -1,5 +1,5 @@
-Face Estimations
-================
+Face attributes estimations
+===========================
 
 Head pose
 ---------
@@ -41,20 +41,59 @@ Mouth state
 This estimator is designed to determine smile/mouth/occlusion probability using warped image. Smile estimation
 structure consists of:
 
-    - Smile score;
-    - Mouth score;
-    - Occlusion score.
+    - Smile score
+    - Mouth score
+    - Occlusion score
 
 Sum of scores always equals 1. Each score means probability of corresponding state. Smile score prevails in cases where
 smile was successfully detected. If there is any object on photo that hides mouth occlusion score prevails.
 Mouth score prevails in cases where neither a smile nor an occlusion was detected.
 
+Eyes estimation
+---------------
+
+This estimator aims to determine:
+
+    - eye state: open, closed, occluded
+    - precise eye iris location as an array of landmarks
+    - recise eyelid location as an array of landmarks
+
+
+Iris landmarks are presented with a template structure Landmarks that is specialized for 32points. Eyelid landmarks
+are presented with a template structure Landmarks that is specialized for 6points.
+
+
+You can only pass warped image with detected face to the estimator interface. Better image quality leads to better
+results.
+
+.. note::
+
+    Orientation terms “left” and “right” refer to the way you see the image as it is show non the screen. It means
+    that left eye is not necessarily left from the person’s point of view, but is on the left side of the screen.
+    Consequently, right eye is the one on the right side of the screen. More formally, the label “left” refers to
+    subject’s left eye (and similarly for the right eye), such that *xright<xleft*.
+
+Gaze direction estimation
+-------------------------
+
+This estimator is designed to determine gaze direction relatively to head pose estimation. Zero position corresponds to
+a gaze direction orthogonally to face plane, with the axis of symmetry parallel to the vertical camera axis
+
+.. note::
+
+  Roll angle is not estimated, prediction precision decreases as a rotation angle increases.
+
+.. automodule:: lunavl.sdk.estimators.base_estimation
+    :members:
 
 .. automodule:: lunavl.sdk.estimators.head_pose
     :members:
 
-.. automodule:: lunavl.sdk.estimators.emotion
+.. automodule:: lunavl.sdk.estimators.emotions
     :members:
 
 .. automodule:: lunavl.sdk.estimators.mouth_state
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.eyes
     :members:
