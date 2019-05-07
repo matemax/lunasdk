@@ -214,6 +214,7 @@ class GazeDirection(BaseEstimation):
         - pitch
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: EyeAngles):
         """
         Init.
