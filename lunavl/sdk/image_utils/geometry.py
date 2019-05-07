@@ -7,7 +7,6 @@ from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
 from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
 
 from FaceEngine import Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks  # pylint: disable=E0611,E0401
-from FaceEngine import Landmarks68  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 

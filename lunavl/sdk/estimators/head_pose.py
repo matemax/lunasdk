@@ -141,7 +141,7 @@ class HeadPoseEstimator(BaseEstimator):
             raise LunaSDKException(error)
         return HeadPose(headPoseEstimation)
 
-    def estimate(self,  landmarks68: Landmarks68) -> HeadPose:
+    def estimate(self, landmarks68: Landmarks68) -> HeadPose:
         """
         Realize interface of a abstract  ectimator. Call estimateBy68Landmarks
         """
@@ -160,7 +160,7 @@ class HeadPoseEstimator(BaseEstimator):
             LunaSDKException: if estimation is failed
         """
         err, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage,
-                                                                       detection.coreEstimation)
+                                                               detection.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
