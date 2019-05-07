@@ -35,8 +35,25 @@ Landmarks5
 ~~~~~~~~~~
 
 At the very minimum, just 5 landmarks are required: two for eyes, one for a nose tip and two for mouth corners. Using
-these coordinates, one may warp the source photo image (see Chapter“Image warping”) for use with all other FaceEngine
+these coordinates, one may warp the source photo image for use with all other FaceEngine
 algorithms. All detector may provide 5 landmarks for each detection without additional computations.
+
+*landmarks5* contains the following landmarks:
+
+============            ==================
+Array index             Landmark location
+============            ==================
+0                       Left eye center
+------------            ------------------
+1                       Right eye center
+------------            ------------------
+2                       Nose tip
+------------            ------------------
+3                       Left mouth corner
+------------            ------------------
+4                       Right mouth corner
+============            ==================
+
 
 Landmarks68
 ~~~~~~~~~~~
@@ -44,6 +61,11 @@ Landmarks68
 More advanced 68-points face alignment is also implemented. Use this when you need precise information about face and
 its parts. The 68 landmarks require additional computation time, so don’t use it if you don’t need precise information
 about a face. If you use 68 landmarks, 5 landmarks will be reassigned to more precise subset of 68 landmarks.
+
+
+*landmarks68* contains the landmarks according to I-Bug 68-point annotation scheme.
+
+.. image:: figure_68_markup.jpg
 
 Examples
 --------

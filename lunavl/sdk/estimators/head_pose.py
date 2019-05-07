@@ -1,5 +1,4 @@
-"""
-Module contains utils for make face estimations
+"""Module contains utils for make face estimations
 """
 from enum import Enum
 from typing import Dict
@@ -8,7 +7,9 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.facedetector import Landmarks68, FaceDetection
+from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
+from lunavl.sdk.faceengine.facedetector import Landmarks68, BoundingBox
+from lunavl.sdk.image_utils.image import VLImage
 
 
 class FrontalType(Enum):
@@ -37,17 +38,17 @@ class FrontalType(Enum):
         return self.value
 
 
-class HeadPose:
+class HeadPose(BaseEstimation):
     """
     Head pose. Estimate Tait–Bryan angles for head (https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles).
+    Estimation properties:
 
-    Attributes:
-        pitch (float): pitch
-        yaw (float): pitch
-        roll (float): pitch
+        - pitch
+        - roll
+        - yaw
     """
-    __slots__ = ["pitch", "yaw", "roll", "_coreEstimation"]
 
+    #  pylint: disable=W0235
     def __init__(self, coreHeadPose: HeadPoseEstimation):
         """
         Init.
@@ -55,10 +56,38 @@ class HeadPose:
         Args:
             coreHeadPose: core head pose estimation.
         """
-        self.pitch = coreHeadPose.pitch
-        self.yaw = coreHeadPose.yaw
-        self.roll = coreHeadPose.roll
-        self._coreEstimation = coreHeadPose
+
+        super().__init__(coreHeadPose)
+
+    @property
+    def yaw(self) -> float:
+        """
+        Get the yaw angle.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.yaw
+
+    @property
+    def pitch(self) -> float:
+        """
+        Get the pitch angle.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.pitch
+
+    @property
+    def roll(self) -> float:
+        """
+        Get the pitch angle.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.roll
 
     def asDict(self) -> Dict[str, float]:
         """
@@ -78,25 +107,12 @@ class HeadPose:
         """
         return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
 
-    def __repr__(self) -> str:
-        """
-        Generate representation.
 
-        Returns:
-            "pitch = {self.pitch}, roll = {self.roll}, yaw = {self.yaw}"
-        """
-        return "pitch = {}, roll = {}, yaw = {}".format(self.pitch, self.roll, self.yaw)
-
-
-class HeadPoseEstimator:
+class HeadPoseEstimator(BaseEstimator):
     """
     HeadPoseEstimator.
-
-    Attributes
-        _coreHeadPoseEstimator (IHeadPoseEstimatorPtr): core estimator.
     """
-    __slots__ = ["_coreHeadPoseEstimator"]
-
+    #  pylint: disable=W0235
     def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
         """
         Init.
@@ -104,7 +120,7 @@ class HeadPoseEstimator:
         Args:
             coreHeadPoseEstimator: core estimator
         """
-        self._coreHeadPoseEstimator = coreHeadPoseEstimator
+        super().__init__(coreHeadPoseEstimator)
 
     def estimateBy68Landmarks(self, landmarks68: Landmarks68) -> HeadPose:
         """
@@ -118,27 +134,34 @@ class HeadPoseEstimator:
         Raises:
             LunaSDKException: if estimation is failed
         """
-        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(landmarks68.coreLandmarks)
+        err, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)
             raise LunaSDKException(error)
         return HeadPose(headPoseEstimation)
 
-    def estimateByDetection(self, detection: FaceDetection) -> HeadPose:
+    #  pylint: disable=W0221
+    def estimate(self, landmarks68: Landmarks68) -> HeadPose:
+        """
+        Realize interface of a abstract  estimator. Call estimateBy68Landmarks
+        """
+        return self.estimateBy68Landmarks(landmarks68)
+
+    def estimateByBoundingBox(self, detection: BoundingBox, imageWithDetection: VLImage) -> HeadPose:
         """
         Estimate head pose by detection.
 
         Args:
-            detection: face detection
-
+            detection: detection bounding box
+            imageWithDetection: image with the detection.
         Returns:
             estimate head pose
         Raises:
             LunaSDKException: if estimation is failed
         """
-        err, headPoseEstimation = self._coreHeadPoseEstimator.estimate(detection.image.coreImage,
-                                                                       detection.coreDetection.detection)
+        err, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage,
+                                                               detection.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)

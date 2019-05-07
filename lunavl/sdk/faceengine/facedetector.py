@@ -10,9 +10,10 @@ from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E
 from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611,E0401
 from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.estimators.base_estimation import BaseEstimation
 from ..errors.errors import ErrorInfo
 from ..errors.exceptions import LunaSDKException
-from ..image_utils.geometry import Rect, Point
+from ..image_utils.geometry import Rect, Landmarks
 from ..image_utils.image import VLImage, ColorFormat
 
 
@@ -48,16 +49,12 @@ class DetectorType(Enum):
         return getattr(ObjectDetectorClassType, self.value)
 
 
-class Landmarks5:
+class Landmarks5(Landmarks):
     """
     Landmarks5
-
-    Attributes:
-        points (List[Point[float]]): 5 point (todo reference)
-        _coreLandmarks (CoreLandmarks5): landmarks which is returned core
     """
-    __slots__ = ["points", "_coreLandmarks"]
 
+    #  pylint: disable=W0235
     def __init__(self, coreLandmark5: CoreLandmarks5):
         """
         Init
@@ -65,40 +62,15 @@ class Landmarks5:
         Args:
             coreLandmark5: core landmarks
         """
-        self.points = [Point.fromVector2(point) for point in coreLandmark5]
-        self._coreLandmarks = coreLandmark5
-
-    @property
-    def coreLandmarks(self) -> CoreLandmarks5:
-        """
-        Get original landmarks from core.
-
-        Returns:
-            coreLandmarks5 from init
-        """
-        return self._coreLandmarks
-
-    def asDict(self) -> List[List[float]]:
-        """
-        Convert to dict
-
-        Returns:
-            list to list points
-        """
-        return [point.asDict() for point in self.points]
+        super().__init__(coreLandmark5)
 
 
-class Landmarks68:
+class Landmarks68(Landmarks):
     """
     Landmarks68
-
-    Attributes:
-        points (List[Point[float]]): 68 point (todo reference)
-        _coreLandmarks (CoreLandmarks68): landmarks which is returned core
-
     """
-    __slots__ = ["points", "_coreLandmarks"]
 
+    #  pylint: disable=W0235
     def __init__(self, coreLandmark68: CoreLandmarks68):
         """
         Init
@@ -106,37 +78,19 @@ class Landmarks68:
         Args:
             coreLandmark68: core landmarks
         """
-        self.points = [Point.fromVector2(point) for point in coreLandmark68]
-        self._coreLandmarks = coreLandmark68
-
-    @property
-    def coreLandmarks(self) -> CoreLandmarks68:
-        """
-        Get original landmarks from core.
-
-        Returns:
-            coreLandmarks5 from init
-        """
-        return self._coreLandmarks
-
-    def asDict(self) -> List[List[float]]:
-        """
-        Convert to dict
-
-        Returns:
-            list to list points
-        """
-        return [point.asDict() for point in self.points]
+        super().__init__(coreLandmark68)
 
 
-class BoundingBox:
+class BoundingBox(BaseEstimation):
     """
-    Attributes:
-        rect (Rect[float]): face bounding box
-        score (float): face score (0,1), detection score is the measure of classification confidence and not the source
-                       image quality. It may be used topick the most "*confident*" face of many.
+    Detection bounding box, it is characterized of rect and score:
+
+        - rect (Rect[float]): face bounding box
+        - score (float): face score (0,1), detection score is the measure of classification confidence
+                         and not the source image quality. It may be used topick the most "*confident*" face of many.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, boundingBox: DetectionFloat):
         """
         Init.
@@ -144,21 +98,49 @@ class BoundingBox:
         Args:
             boundingBox: core bounding box
         """
-        self.score = boundingBox.score
-        self.rect = Rect.fromCoreRect(boundingBox.rect)
+        super().__init__(boundingBox)
+
+    @property
+    def score(self) -> float:
+        """
+        Get score
+
+        Returns:
+            number in range [0,1]
+        """
+        return self._coreEstimation.score
+
+    @property
+    def rect(self) -> Rect[float]:
+        """
+        Get rect.
+
+        Returns:
+            float rect
+        """
+        return Rect.fromCoreRect(self._coreEstimation.rect)
+
+    def asDict(self) -> dict:
+        """
+        Convert to  dict.
+
+        Returns:
+            {"rect": self.rect, "score": self.score}
+        """
+        return {"rect": self.rect.asDict(), "score": self.score}
 
 
-class FaceDetection:
+class FaceDetection(BaseEstimation):
     """
     Attributes:
         boundingBox (BoundingBox): face bounding box
         landmarks5 (Optional[Landmarks5]): optional landmarks5
         landmarks68 (Optional[Landmarks68]): optional landmarks5
         _image (VLImage): source of detection
-        _coreDetection (Face): core detection
 
     """
-    __slots__ = ["boundingBox", "landmarks5", "landmarks68", "_coreDetection", "_image"]
+    __slots__ = ("boundingBox", "landmarks5", "landmarks68", "_coreDetection", "_image", "_emotions",
+                 "_quality", "_mouthState")
 
     def __init__(self, coreDetection: Face, image: VLImage):
         """
@@ -167,6 +149,8 @@ class FaceDetection:
         Args:
             coreDetection: core detection
         """
+        super().__init__(coreDetection)
+
         self.boundingBox = BoundingBox(coreDetection.detection)
         if coreDetection.landmarks5_opt.isValid():
             self.landmarks5 = Landmarks5(coreDetection.landmarks5_opt.value())
@@ -178,17 +162,9 @@ class FaceDetection:
         else:
             self.landmarks68 = None
         self._image = image
-        self._coreDetection = coreDetection
-
-    @property
-    def coreDetection(self) -> Face:
-        """
-        Detection from core.
-
-        Returns:
-            core detection.
-        """
-        return self._coreDetection
+        self._emotions = None
+        self._quality = None
+        self._mouthState = None
 
     @property
     def image(self) -> VLImage:
@@ -271,14 +247,14 @@ class FaceDetector:
         else:
             _detectArea = detectArea.coreRect
 
-        detectRes = self._detector.detectOne(image.coreImage, _detectArea,
-                                             self._getDetectionType(detect5Landmarks, detect68Landmarks))
-        if detectRes[0].isError:
-            if detectRes[0].FSDKError == FSDKError.BufferIsEmpty:
+        error, detectRes = self._detector.detectOne(image.coreImage, _detectArea,
+                                                    self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        if error.isError:
+            if error.FSDKError == FSDKError.BufferIsEmpty:
                 return None
-            error = ErrorInfo.fromSDKError(123, "detection", detectRes[0])
+            error = ErrorInfo.fromSDKError(123, "detection", error)
             raise LunaSDKException(error)
-        coreDetection = detectRes[1]
+        coreDetection = detectRes
         if not coreDetection.detection.isValid():
             raise ValueError("WTF bad rect")  # todo check
         return FaceDetection(coreDetection, image)
@@ -305,23 +281,22 @@ class FaceDetector:
 
             if isinstance(image, VLImage):
                 img = image
-                detectArea = image.coreImage.getRect()
+                detectAreas.append(image.coreImage.getRect())
             else:
-                img = image[0]
-                detectArea = image[1].coreRect
+                img = image.image
+                detectAreas.append(image.detectArea.coreRect)
             if img.format != ColorFormat.R8G8B8:
                 error = ErrorInfo(126, "bad format",
                                   "Bad image format for detection {}, img {}".format(img.format.value, img.format))
                 raise LunaSDKException(error)
             imgs.append(img.coreImage)
-            detectAreas.append(detectArea)
 
-        detectRes = self._detector.detect(imgs, detectAreas, limit,
-                                          self._getDetectionType(detect5Landmarks, detect68Landmarks))
-        if detectRes[0].isError:
-            raise LunaSDKException(ErrorInfo.fromSDKError(124, "detection", detectRes[0]))
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit,
+                                                 self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        if error.isError:
+            raise LunaSDKException(ErrorInfo.fromSDKError(124, "detection", error))
         res = []
-        for numberImage, imageDetections in enumerate(detectRes[1]):
+        for numberImage, imageDetections in enumerate(detectRes):
             res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])
         return res
 

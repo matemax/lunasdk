@@ -1,5 +1,4 @@
-"""
-Module realize wraps on facengine objects
+"""Module realize wraps on facengine objects
 
 Attributes:
     FACE_ENGINE (VLFaceEngine): Global instance of VLFaceEngine
@@ -9,6 +8,7 @@ from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 from lunavl.sdk.estimators.emotions import EmotionsEstimator
+from lunavl.sdk.estimators.eyes import EyeEstimator, GazeEstimator
 from lunavl.sdk.estimators.mouth_state import MouthStateEstimator
 
 from lunavl.sdk.estimators.warp_quality import WarpQualityEstimator
@@ -110,6 +110,24 @@ class VLFaceEngine:
             estimator
         """
         return MouthStateEstimator(self._faceEngine.createSmileEstimator())
+
+    def createEyeEstimator(self) -> EyeEstimator:
+        """
+        Create eyes estimator
+
+        Returns:
+            estimator
+        """
+        return EyeEstimator(self._faceEngine.createEyeEstimator())
+
+    def createGazeEstimator(self) -> GazeEstimator:
+        """
+        Create gaze direction estimator
+
+        Returns:
+            estimator
+        """
+        return GazeEstimator(self._faceEngine.createGazeEstimator())
 
 
 # (VLFaceEngine): Global instance of VLFaceEngine

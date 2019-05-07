@@ -23,13 +23,13 @@ def estimateHeadPose():
     faceDetection = detector.detectOne(image, detect5Landmarks=False, detect68Landmarks=True)
     #: estimate by 68 landmarks
     angles = headPoseEstimator.estimateBy68Landmarks(faceDetection.landmarks68)
-    pprint.pprint(angles)
+    pprint.pprint(angles.asDict())
 
     #: get frontal type
     pprint.pprint(angles.getFrontalType())
 
     #: estimate by detection
-    angles = headPoseEstimator.estimateByDetection(faceDetection)
+    angles = headPoseEstimator.estimateByBoundingBox(faceDetection.boundingBox, image)
     angles.getFrontalType()
     pprint.pprint(angles)
 

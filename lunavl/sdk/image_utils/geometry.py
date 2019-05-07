@@ -6,7 +6,13 @@ from typing import TypeVar, Generic, Union, List
 from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
 from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
 
+from FaceEngine import Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks  # pylint: disable=E0611,E0401
+
+from lunavl.sdk.estimators.base_estimation import BaseEstimation
+
 COORDINATE_TYPE = TypeVar('COORDINATE_TYPE', float, int)  #: generic type for allowed values type of coordinates
+LANDMARKS = TypeVar('LANDMARKS', Landmarks5, Landmarks68, IrisLandmarks,
+                    EyelidLandmarks)  #: generic type for allowed values type of landmarks
 
 
 class Size(Generic[COORDINATE_TYPE]):
@@ -554,3 +560,44 @@ class Rect(Generic[COORDINATE_TYPE]):
 
         """
         return self.coreRect.__repr__()
+
+
+class Landmarks(BaseEstimation):
+    """
+    Base class for landmarks
+
+    Attributes:
+        _points (Optional[List[Point[float]]]): lazy load attributes, converted to point list core landmarks
+    """
+    __slots__ = ["_points", "_coreLandmarks"]
+
+    def __init__(self, coreLandmarks: LANDMARKS):
+        """
+        Init
+
+        Args:
+            coreLandmarks (LANDMARKS): core landmarks
+        """
+        super().__init__(coreLandmarks)
+        self._points = None
+
+    @property
+    def points(self) -> List[Point[float]]:
+        """
+        Lazy load of points.
+
+        Returns:
+            list of points
+        """
+        if self._points is None:
+            self._points = [Point.fromVector2(point) for point in self._coreEstimation]
+        return self._points
+
+    def asDict(self) -> List[List[float]]:
+        """
+        Convert to dict
+
+        Returns:
+            list to list points
+        """
+        return [point.asDict() for point in self.points]

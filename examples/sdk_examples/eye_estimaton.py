@@ -1,5 +1,5 @@
 """
-An mouth state estimation example
+Eyes estimation example
 """
 import pprint
 
@@ -8,7 +8,7 @@ from lunavl.sdk.faceengine.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 
 
-def estimateMouthState():
+def estimateEyes():
     """
     Estimate emotion from a warped image.
     """
@@ -17,11 +17,12 @@ def estimateMouthState():
     faceDetection = detector.detectOne(image)
     warper = FACE_ENGINE.createWarper()
     warp = warper.warp(faceDetection)
+    landMarks5Transformation = warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
 
-    emotionEstimator = FACE_ENGINE.createMouthEstimator()
+    eyesEstimator = FACE_ENGINE.createEyeEstimator()
 
-    pprint.pprint(emotionEstimator.estimate(warp.warpedImage).asDict())
+    pprint.pprint(eyesEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":
-    estimateMouthState()
+    estimateEyes()
