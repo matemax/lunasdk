@@ -8,6 +8,8 @@ import os
 from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
+
+from lunavl.sdk.estimators.basic_attributes import BasicAttributesEstimator
 from lunavl.sdk.estimators.emotions import EmotionsEstimator
 from lunavl.sdk.estimators.eyes import EyeEstimator, GazeEstimator
 from lunavl.sdk.estimators.mouth_state import MouthStateEstimator
@@ -129,6 +131,15 @@ class VLFaceEngine:
             estimator
         """
         return GazeEstimator(self._faceEngine.createGazeEstimator())
+
+    def createBasicAttributesEstimator(self) -> BasicAttributesEstimator:
+        """
+        Create basic attributes estimator (age, gender, ethnicity)
+
+        Returns:
+            estimator
+        """
+        return BasicAttributesEstimator(self._faceEngine.createAttributeEstimator())
 
 
 # (VLFaceEngine): Global instance of VLFaceEngine
