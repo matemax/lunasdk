@@ -174,6 +174,7 @@ class EyeEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, transformedLandmarks: Union[Landmarks5, Landmarks68],
                  warp: Union[Warp, WarpedImage]) -> EyesEstimation:
         """
@@ -289,6 +290,7 @@ class GazeEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation):
         """
         Estimate a gaze direction
