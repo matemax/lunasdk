@@ -31,7 +31,7 @@ class BaseEstimation(ABC):
         Returns:
             dict from luna api
         """
-        ...
+        pass
 
     def __repr__(self) -> str:
         """
@@ -70,4 +70,4 @@ class BaseEstimator(ABC):
         Returns:
             estimated attributes
         """
-        ...
+        pass
