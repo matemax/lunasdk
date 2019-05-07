@@ -4,7 +4,7 @@ Module contains a mouth state estimator
 from enum import Enum
 from typing import Union
 
-from FaceEngine import IEyeEstimatorPtr, SmileEstimation, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
 from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
