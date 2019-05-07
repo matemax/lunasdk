@@ -1,5 +1,4 @@
-"""
-Module for estimate a warped image quality.
+"""Module for estimate a warped image quality.
 """
 from typing import Dict, Union
 

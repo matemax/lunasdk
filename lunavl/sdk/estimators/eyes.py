@@ -86,6 +86,7 @@ class Eye(BaseEstimation):
     """
     __slots__ = ("irisLandmarks", "eyelidLandMarks", "state")
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation):
         """
         Init.

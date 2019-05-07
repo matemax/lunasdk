@@ -1,5 +1,4 @@
-"""
-Module contains utils for make face estimations
+"""Module contains utils for make face estimations
 """
 from enum import Enum
 from typing import Dict
@@ -49,6 +48,7 @@ class HeadPose(BaseEstimation):
         - yaw
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreHeadPose: HeadPoseEstimation):
         """
         Init.

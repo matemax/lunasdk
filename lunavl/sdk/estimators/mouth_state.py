@@ -1,5 +1,4 @@
-"""
-Module contains a mouth state estimator
+"""Module contains a mouth state estimator
 """
 from typing import Union
 

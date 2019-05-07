@@ -1,5 +1,4 @@
-"""
-Module contains function for detection faces on images.
+"""Module contains function for detection faces on images.
 """
 from enum import Enum
 from typing import Optional, Union, List, NamedTuple, Dict
@@ -90,6 +89,7 @@ class BoundingBox(BaseEstimation):
                          and not the source image quality. It may be used topick the most "*confident*" face of many.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, boundingBox: DetectionFloat):
         """
         Init.
