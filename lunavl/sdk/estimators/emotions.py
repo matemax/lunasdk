@@ -61,6 +61,7 @@ class Emotions(BaseEstimation):
 
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEmotions):
         """
         Init.
@@ -184,6 +185,7 @@ class EmotionsEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Emotions:
         """
         Estimate emotion on warp.

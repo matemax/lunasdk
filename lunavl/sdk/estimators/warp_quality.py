@@ -20,6 +20,7 @@ class Quality(BaseEstimation):
         - light
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreQuality: CoreQuality):
         """
         Init.

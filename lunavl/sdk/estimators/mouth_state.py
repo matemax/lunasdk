@@ -18,6 +18,7 @@ class MouthStates(BaseEstimation):
         - mouth
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: SmileEstimation):
         super().__init__(coreEstimation)
 
@@ -76,6 +77,7 @@ class MouthStateEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage]) -> MouthStates:
         """
         Estimate mouth state on warp.

@@ -1,4 +1,5 @@
-"""Module contains function for detection faces on images.
+"""
+Module contains function for detection faces on images.
 """
 from enum import Enum
 from typing import Optional, Union, List, NamedTuple, Dict
@@ -247,7 +248,7 @@ class FaceDetector:
             _detectArea = detectArea.coreRect
 
         error, detectRes = self._detector.detectOne(image.coreImage, _detectArea,
-                                             self._getDetectionType(detect5Landmarks, detect68Landmarks))
+                                                    self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if error.isError:
             if error.FSDKError == FSDKError.BufferIsEmpty:
                 return None
