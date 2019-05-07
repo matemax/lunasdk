@@ -48,6 +48,7 @@ class IrisLandmarks(Landmarks):
      Eyelid landmarks.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreIrisLandmarks: CoreIrisLandmarks):
         """
         Init
@@ -63,6 +64,7 @@ class EyelidLandmarks(Landmarks):
      Eyelid landmarks.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEyelidLandmarks: CoreEyelidLandmarks):
         """
         Init
@@ -165,6 +167,8 @@ class EyeEstimator(BaseEstimator):
     """
     Eye estimator.
     """
+
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IEyeEstimatorPtr):
         """
         Init.
@@ -281,6 +285,7 @@ class GazeEstimator(BaseEstimator):
     Gaze direction estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IGazeEstimatorPtr):
         """
         Init.

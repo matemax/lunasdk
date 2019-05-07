@@ -67,6 +67,7 @@ class MouthStateEstimator(BaseEstimator):
     Mouth state estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: ISmileEstimatorPtr):
         """
         Init.

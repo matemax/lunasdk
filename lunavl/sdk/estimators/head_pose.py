@@ -112,7 +112,7 @@ class HeadPoseEstimator(BaseEstimator):
     """
     HeadPoseEstimator.
     """
-
+    #  pylint: disable=W0235
     def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
         """
         Init.
@@ -141,9 +141,10 @@ class HeadPoseEstimator(BaseEstimator):
             raise LunaSDKException(error)
         return HeadPose(headPoseEstimation)
 
+    #  pylint: disable=W0221
     def estimate(self, landmarks68: Landmarks68) -> HeadPose:
         """
-        Realize interface of a abstract  ectimator. Call estimateBy68Landmarks
+        Realize interface of a abstract  estimator. Call estimateBy68Landmarks
         """
         return self.estimateBy68Landmarks(landmarks68)
 

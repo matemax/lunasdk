@@ -54,6 +54,7 @@ class Landmarks5(Landmarks):
     Landmarks5
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreLandmark5: CoreLandmarks5):
         """
         Init
@@ -69,6 +70,7 @@ class Landmarks68(Landmarks):
     Landmarks68
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreLandmark68: CoreLandmarks68):
         """
         Init

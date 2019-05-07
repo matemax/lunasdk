@@ -175,6 +175,7 @@ class EmotionsEstimator(BaseEstimator):
     Emotions estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IEmotionsEstimatorPtr):
         """
         Init.
