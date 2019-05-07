@@ -84,6 +84,7 @@ class WarpQualityEstimator(BaseEstimator):
     """
     Warp quality estimator.
     """
+
     def __init__(self, coreEstimator: IQualityEstimatorPtr):
         """
         Init.
@@ -92,7 +93,6 @@ class WarpQualityEstimator(BaseEstimator):
             coreEstimator: core quality estimator
         """
         super().__init__(coreEstimator)
-
 
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Quality:
         """
