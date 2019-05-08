@@ -64,6 +64,7 @@ class Ethnicities(BaseEstimation):
         - predominateEmotion
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: EthnicityEstimation):
         """
         Init.
@@ -150,6 +151,7 @@ class BasicAttributes(BaseEstimation):
     """
     __slots__ = ("ethnicity", 'age', 'gender')
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: AttributeResult):
         """
         Init.
@@ -202,6 +204,7 @@ class BasicAttributesEstimator(BaseEstimator):
     Basic attributes estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IAttributeEstimatorPtr):
         """
         Init.
@@ -211,6 +214,7 @@ class BasicAttributesEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool,
                  estimateEthnicity: bool):
         """
