@@ -1,5 +1,4 @@
-"""
-Module contains a basic attributes estimator.
+"""Module contains a basic attributes estimator.
 
 See `basic attributes`_.
 """
