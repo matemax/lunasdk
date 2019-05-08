@@ -127,7 +127,8 @@ class Ethnicities(BaseEstimation):
                     "asian": self.asian,
                     "indian": self.indian,
                     "caucasian": self.caucasian,
-                    "african_american": self.africanAmerican}
+                    "african_american": self.africanAmerican
+                }
                 }
 
     @property
