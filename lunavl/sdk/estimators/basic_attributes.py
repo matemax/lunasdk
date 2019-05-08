@@ -1,5 +1,7 @@
 """
 Module contains a basic attributes estimator.
+
+See `basic attributes`_.
 """
 from enum import Enum
 from typing import Union
@@ -53,7 +55,6 @@ class Ethnicity(Enum):
 class Ethnicities(BaseEstimation):
     """
     Class for ethnicities estimation.
-
 
     Estimation properties:
 

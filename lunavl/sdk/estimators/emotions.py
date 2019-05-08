@@ -1,4 +1,6 @@
 """Module contains an emotion estimator
+
+See emotions_.
 """
 from enum import Enum
 from typing import Union
