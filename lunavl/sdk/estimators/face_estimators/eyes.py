@@ -14,7 +14,7 @@ from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimati
 from FaceEngine import EyeAngles, GazeEstimation as CoreGazeEstimation   # pylint: disable=E0611,E0401
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.estimators.head_pose import HeadPose
+from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
 from lunavl.sdk.faceengine.facedetector import Landmarks5, Landmarks68
 
 from lunavl.sdk.faceengine.warper import Warp, WarpedImage

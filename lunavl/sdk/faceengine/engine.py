@@ -8,15 +8,15 @@ from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.estimators.basic_attributes import BasicAttributesEstimator
-from lunavl.sdk.estimators.emotions import EmotionsEstimator
-from lunavl.sdk.estimators.eyes import EyeEstimator, GazeEstimator
-from lunavl.sdk.estimators.mouth_state import MouthStateEstimator
+from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator
+from lunavl.sdk.estimators.face_estimators.emotions import EmotionsEstimator
+from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
+from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator
 
-from lunavl.sdk.estimators.warp_quality import WarpQualityEstimator
+from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstimator
 from lunavl.sdk.faceengine.warper import Warper
 
-from ..estimators.head_pose import HeadPoseEstimator
+from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..faceengine.facedetector import DetectorType, FaceDetector
 
 

@@ -127,16 +127,19 @@ Classes and methods
 .. automodule:: lunavl.sdk.estimators.base_estimation
     :members:
 
-.. automodule:: lunavl.sdk.estimators.head_pose
+.. automodule:: lunavl.sdk.estimators.face_estimators.head_pose
     :members:
 
-.. automodule:: lunavl.sdk.estimators.emotions
+.. automodule:: lunavl.sdk.estimators.face_estimators.emotions
     :members:
 
-.. automodule:: lunavl.sdk.estimators.mouth_state
+.. automodule:: lunavl.sdk.estimators.face_estimators.mouth_state
     :members:
 
-.. automodule:: lunavl.sdk.estimators.eyes
+.. automodule:: lunavl.sdk.estimators.face_estimators.eyes
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.basic_attributes
     :members:
 
 .. automodule:: lunavl.sdk.estimators.basic_attributes
