@@ -122,14 +122,15 @@ class Ethnicities(BaseEstimation):
         Returns:
             dict in platform format
         """
-        return {"predominate_ethnicity": str(self.predominateEmotion),
-                "estimation": {
-                    "asian": self.asian,
-                    "indian": self.indian,
-                    "caucasian": self.caucasian,
-                    "african_american": self.africanAmerican
-                }
-                }
+        return {
+            "predominate_ethnicity": str(self.predominateEmotion),
+            "estimation": {
+                "asian": self.asian,
+                "indian": self.indian,
+                "caucasian": self.caucasian,
+                "african_american": self.africanAmerican
+            }
+        }
 
     @property
     def predominateEmotion(self) -> Ethnicity:
