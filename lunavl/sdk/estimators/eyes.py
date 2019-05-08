@@ -4,7 +4,7 @@ Module contains a mouth state estimator
 from enum import Enum
 from typing import Union
 
-from FaceEngine import IEyeEstimatorPtr, SmileEstimation, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
 from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
@@ -48,6 +48,7 @@ class IrisLandmarks(Landmarks):
      Eyelid landmarks.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreIrisLandmarks: CoreIrisLandmarks):
         """
         Init
@@ -63,6 +64,7 @@ class EyelidLandmarks(Landmarks):
      Eyelid landmarks.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEyelidLandmarks: CoreEyelidLandmarks):
         """
         Init
@@ -84,6 +86,7 @@ class Eye(BaseEstimation):
     """
     __slots__ = ("irisLandmarks", "eyelidLandMarks", "state")
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation):
         """
         Init.
@@ -165,6 +168,8 @@ class EyeEstimator(BaseEstimator):
     """
     Eye estimator.
     """
+
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IEyeEstimatorPtr):
         """
         Init.
@@ -174,6 +179,7 @@ class EyeEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, transformedLandmarks: Union[Landmarks5, Landmarks68],
                  warp: Union[Warp, WarpedImage]) -> EyesEstimation:
         """
@@ -208,6 +214,7 @@ class GazeDirection(BaseEstimation):
         - pitch
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: EyeAngles):
         """
         Init.
@@ -280,6 +287,7 @@ class GazeEstimator(BaseEstimator):
     Gaze direction estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IGazeEstimatorPtr):
         """
         Init.
@@ -289,6 +297,7 @@ class GazeEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation):
         """
         Estimate a gaze direction

@@ -54,6 +54,7 @@ class Landmarks5(Landmarks):
     Landmarks5
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreLandmark5: CoreLandmarks5):
         """
         Init
@@ -69,6 +70,7 @@ class Landmarks68(Landmarks):
     Landmarks68
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreLandmark68: CoreLandmarks68):
         """
         Init
@@ -88,6 +90,7 @@ class BoundingBox(BaseEstimation):
                          and not the source image quality. It may be used topick the most "*confident*" face of many.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, boundingBox: DetectionFloat):
         """
         Init.
@@ -244,14 +247,14 @@ class FaceDetector:
         else:
             _detectArea = detectArea.coreRect
 
-        detectRes = self._detector.detectOne(image.coreImage, _detectArea,
-                                             self._getDetectionType(detect5Landmarks, detect68Landmarks))
-        if detectRes[0].isError:
-            if detectRes[0].FSDKError == FSDKError.BufferIsEmpty:
+        error, detectRes = self._detector.detectOne(image.coreImage, _detectArea,
+                                                    self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        if error.isError:
+            if error.FSDKError == FSDKError.BufferIsEmpty:
                 return None
-            error = ErrorInfo.fromSDKError(123, "detection", detectRes[0])
+            error = ErrorInfo.fromSDKError(123, "detection", error)
             raise LunaSDKException(error)
-        coreDetection = detectRes[1]
+        coreDetection = detectRes
         if not coreDetection.detection.isValid():
             raise ValueError("WTF bad rect")  # todo check
         return FaceDetection(coreDetection, image)
@@ -278,23 +281,22 @@ class FaceDetector:
 
             if isinstance(image, VLImage):
                 img = image
-                detectArea = image.coreImage.getRect()
+                detectAreas.append(image.coreImage.getRect())
             else:
-                img = image[0]
-                detectArea = image[1].coreRect
+                img = image.image
+                detectAreas.append(image.detectArea.coreRect)
             if img.format != ColorFormat.R8G8B8:
                 error = ErrorInfo(126, "bad format",
                                   "Bad image format for detection {}, img {}".format(img.format.value, img.format))
                 raise LunaSDKException(error)
             imgs.append(img.coreImage)
-            detectAreas.append(detectArea)
 
-        detectRes = self._detector.detect(imgs, detectAreas, limit,
-                                          self._getDetectionType(detect5Landmarks, detect68Landmarks))
-        if detectRes[0].isError:
-            raise LunaSDKException(ErrorInfo.fromSDKError(124, "detection", detectRes[0]))
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit,
+                                                 self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        if error.isError:
+            raise LunaSDKException(ErrorInfo.fromSDKError(124, "detection", error))
         res = []
-        for numberImage, imageDetections in enumerate(detectRes[1]):
+        for numberImage, imageDetections in enumerate(detectRes):
             res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])
         return res
 

@@ -1,5 +1,4 @@
-"""
-Module for creating warped images
+"""Module for creating warped images
 """
 from typing import Union
 

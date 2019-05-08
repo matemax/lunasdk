@@ -49,6 +49,7 @@ class HeadPose(BaseEstimation):
         - yaw
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreHeadPose: HeadPoseEstimation):
         """
         Init.
@@ -112,7 +113,7 @@ class HeadPoseEstimator(BaseEstimator):
     """
     HeadPoseEstimator.
     """
-
+    #  pylint: disable=W0235
     def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
         """
         Init.
@@ -141,9 +142,10 @@ class HeadPoseEstimator(BaseEstimator):
             raise LunaSDKException(error)
         return HeadPose(headPoseEstimation)
 
-    def estimate(self,  landmarks68: Landmarks68) -> HeadPose:
+    #  pylint: disable=W0221
+    def estimate(self, landmarks68: Landmarks68) -> HeadPose:
         """
-        Realize interface of a abstract  ectimator. Call estimateBy68Landmarks
+        Realize interface of a abstract  estimator. Call estimateBy68Landmarks
         """
         return self.estimateBy68Landmarks(landmarks68)
 
@@ -160,7 +162,7 @@ class HeadPoseEstimator(BaseEstimator):
             LunaSDKException: if estimation is failed
         """
         err, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage,
-                                                                       detection.coreEstimation)
+                                                               detection.coreEstimation)
 
         if err.isError:
             error = ErrorInfo.fromSDKError(125, "head pose estimation", err)

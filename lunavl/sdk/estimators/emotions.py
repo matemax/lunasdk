@@ -1,5 +1,4 @@
-"""
-Module contains an emotion estimator
+"""Module contains an emotion estimator
 """
 from enum import Enum
 from typing import Union
@@ -62,6 +61,7 @@ class Emotions(BaseEstimation):
 
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEmotions):
         """
         Init.
@@ -175,6 +175,7 @@ class EmotionsEstimator(BaseEstimator):
     Emotions estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IEmotionsEstimatorPtr):
         """
         Init.
@@ -184,6 +185,7 @@ class EmotionsEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Emotions:
         """
         Estimate emotion on warp.

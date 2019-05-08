@@ -1,5 +1,4 @@
-"""
-Module for estimate a warped image quality.
+"""Module for estimate a warped image quality.
 """
 from typing import Dict, Union
 
@@ -21,6 +20,7 @@ class Quality(BaseEstimation):
         - light
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreQuality: CoreQuality):
         """
         Init.
@@ -84,6 +84,8 @@ class WarpQualityEstimator(BaseEstimator):
     """
     Warp quality estimator.
     """
+
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IQualityEstimatorPtr):
         """
         Init.
@@ -93,7 +95,7 @@ class WarpQualityEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
-
+    #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Quality:
         """
         Estimate quality from a warp.
