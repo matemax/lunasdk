@@ -83,6 +83,35 @@ a gaze direction orthogonally to face plane, with the axis of symmetry parallel 
 
   Roll angle is not estimated, prediction precision decreases as a rotation angle increases.
 
+Basic attribute estimation
+--------------------------
+
+The Attribute estimator determines face basic attributes. Currently, the following attributes are available:
+
+    - age: determines person’s age
+    - gender: determines person’s gender
+    - ethnicity: determines ethnicity of a person
+
+Before using attribute estimator, user is free to decide whether to estimateor not some specific attributes
+listed above through
+
+Output structure, which consists of optional fields describing results of user requested attributes:
+
+    - age is reported in years (float in range [0, 100])
+    - for gender estimation 1 means male, 0 means female. Estimation precision in cooperative mode is 99.81%
+      with the threshold 0.5. Estimation precision in non-cooperative mode is 92.5%.
+    - ethnicity estimation returns 4 float normalized values, each value describes probability of person’s ethnicity.
+      The following ethnicity's are available:
+
+         - asian
+         - caucasian
+         - african american
+         - indian
+
+Classes and methods
+-------------------
+
+
 .. automodule:: lunavl.sdk.estimators.base_estimation
     :members:
 
@@ -96,4 +125,7 @@ a gaze direction orthogonally to face plane, with the axis of symmetry parallel 
     :members:
 
 .. automodule:: lunavl.sdk.estimators.eyes
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.basic_attributes
     :members:
