@@ -142,5 +142,5 @@ Classes and methods
 .. automodule:: lunavl.sdk.estimators.face_estimators.basic_attributes
     :members:
 
-.. automodule:: lunavl.sdk.estimators.basic_attributes
+.. automodule:: lunavl.sdk.estimators.face_estimators.basic_attributes
     :members:
