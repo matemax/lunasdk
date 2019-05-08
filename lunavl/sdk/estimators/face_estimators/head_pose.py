@@ -1,5 +1,7 @@
 """
-Module contains a head pose estimator
+Module contains a head pose estimator.
+
+See `head pose`_.
 """
 from enum import Enum
 from typing import Dict

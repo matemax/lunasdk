@@ -1,5 +1,8 @@
 """
 Module contains a mouth state estimator
+
+See `eyes`_ and `gaze direction`_.
+
 """
 from enum import Enum
 from typing import Union

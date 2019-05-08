@@ -1,5 +1,6 @@
-"""
-Module contains a basic attributes estimator.
+"""Module contains a basic attributes estimator.
+
+See `basic attributes`_.
 """
 from enum import Enum
 from typing import Union
@@ -46,6 +47,7 @@ class Ethnicity(Enum):
             snake case ethnicity
         """
         if self in (Ethnicity.Asian, Ethnicity.Indian, Ethnicity.Caucasian):
+            # pylint: disable=E1101
             return self.name.lower()
         return "african_american"
 
@@ -53,7 +55,6 @@ class Ethnicity(Enum):
 class Ethnicities(BaseEstimation):
     """
     Class for ethnicities estimation.
-
 
     Estimation properties:
 
@@ -64,6 +65,7 @@ class Ethnicities(BaseEstimation):
         - predominateEmotion
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: EthnicityEstimation):
         """
         Init.
@@ -120,13 +122,15 @@ class Ethnicities(BaseEstimation):
         Returns:
             dict in platform format
         """
-        return {"predominate_ethnicity": str(self.predominateEmotion),
-                "estimation": {
-                    "asian": self.asian,
-                    "indian": self.indian,
-                    "caucasian": self.caucasian,
-                    "african_american": self.africanAmerican}
-                }
+        return {
+            "predominate_ethnicity": str(self.predominateEmotion),
+            "estimation": {
+                "asian": self.asian,
+                "indian": self.indian,
+                "caucasian": self.caucasian,
+                "african_american": self.africanAmerican
+            }
+        }
 
     @property
     def predominateEmotion(self) -> Ethnicity:
@@ -150,6 +154,7 @@ class BasicAttributes(BaseEstimation):
     """
     __slots__ = ("ethnicity", 'age', 'gender')
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimation: AttributeResult):
         """
         Init.
@@ -202,6 +207,7 @@ class BasicAttributesEstimator(BaseEstimator):
     Basic attributes estimator.
     """
 
+    #  pylint: disable=W0235
     def __init__(self, coreEstimator: IAttributeEstimatorPtr):
         """
         Init.
@@ -211,6 +217,7 @@ class BasicAttributesEstimator(BaseEstimator):
         """
         super().__init__(coreEstimator)
 
+    #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool,
                  estimateEthnicity: bool):
         """
