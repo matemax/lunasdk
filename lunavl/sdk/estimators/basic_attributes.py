@@ -48,6 +48,7 @@ class Ethnicity(Enum):
             snake case ethnicity
         """
         if self in (Ethnicity.Asian, Ethnicity.Indian, Ethnicity.Caucasian):
+            # pylint: disable=E1101
             return self.name.lower()
         return "african_american"
 
