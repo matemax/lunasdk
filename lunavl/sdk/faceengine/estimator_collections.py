@@ -154,7 +154,7 @@ class FaceEstimatorsCollection:
     @headPoseEstimator.setter
     def headPoseEstimator(self, newEstimator: HeadPoseEstimator) -> None:
         """
-        Set head pose estimator
+        Set head pose estimator.
 
         Args:
             newEstimator: new estimator
@@ -178,7 +178,7 @@ class FaceEstimatorsCollection:
     @basicAttributesEstimator.setter
     def basicAttributesEstimator(self, newEstimator: BasicAttributesEstimator) -> None:
         """
-        Set basic attributes estimator
+        Set basic attributes estimator.
 
         Args:
             newEstimator: new estimator
@@ -202,7 +202,7 @@ class FaceEstimatorsCollection:
     @eyeEstimator.setter
     def eyeEstimator(self, newEstimator: EyeEstimator) -> None:
         """
-        Set eye estimator
+        Set eye estimator.
 
         Args:
             newEstimator: new estimator
@@ -226,7 +226,7 @@ class FaceEstimatorsCollection:
     @emotionsEstimator.setter
     def emotionsEstimator(self, newEstimator: EmotionsEstimator) -> None:
         """
-        Set emotions estimator
+        Set emotions estimator.
 
         Args:
             newEstimator: new estimator
@@ -250,7 +250,7 @@ class FaceEstimatorsCollection:
     @gazeDirectionEstimator.setter
     def gazeDirectionEstimator(self, newEstimator: GazeEstimator) -> None:
         """
-        Set gaze direction estimator
+        Set gaze direction estimator.
 
         Args:
             newEstimator: new estimator
@@ -274,7 +274,7 @@ class FaceEstimatorsCollection:
     @mouthStateEstimator.setter
     def mouthStateEstimator(self, newEstimator: MouthStateEstimator) -> None:
         """
-        Set mouth state estimator
+        Set mouth state estimator.
 
         Args:
             newEstimator: new estimator
@@ -298,7 +298,7 @@ class FaceEstimatorsCollection:
     @warpQualityEstimator.setter
     def warpQualityEstimator(self, newEstimator: WarpQualityEstimator) -> None:
         """
-        Set warp quality estimator
+        Set warp quality estimator.
 
         Args:
             newEstimator: new estimator
