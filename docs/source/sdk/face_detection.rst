@@ -73,5 +73,5 @@ Examples
 .. literalinclude:: ../../../examples/sdk_examples/face_detection.py
 
 
-.. automodule:: lunavl.sdk.image_utils.image
+.. automodule:: lunavl.sdk.faceengine.facedetector
     :members:

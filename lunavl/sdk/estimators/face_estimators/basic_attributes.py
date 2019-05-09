@@ -160,7 +160,7 @@ class BasicAttributes(BaseEstimation):
         Init.
 
         Args:
-            coreEstimation: cire ethnicity estimation
+            coreEstimation: core ethnicity estimation
         """
         super().__init__(coreEstimation)
 

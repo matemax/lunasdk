@@ -10,5 +10,5 @@ Modules
    image_utils
    face_detection
    warping
-   warp_quality
    face_estimations
+   estimator_collections
