@@ -19,7 +19,7 @@ def estimateWarpQuality():
     warper = FACE_ENGINE.createWarper()
     warp = warper.warp(faceDetection)
 
-    qualityEstimator = FACE_ENGINE.createImageQualityEstimator()
+    qualityEstimator = FACE_ENGINE.createWarpQualityEstimator()
 
     pprint.pprint(qualityEstimator.estimate(warp.warpedImage).asDict())
 

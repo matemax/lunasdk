@@ -77,7 +77,7 @@ class VLFaceEngine:
         """
         return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
 
-    def createImageQualityEstimator(self) -> WarpQualityEstimator:
+    def createWarpQualityEstimator(self) -> WarpQualityEstimator:
         """
         Create an image quality estimator
 
