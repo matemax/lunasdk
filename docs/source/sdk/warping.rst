@@ -19,5 +19,5 @@ The purpose of the process is to:
 
 
 
-.. automodule:: lunavl.sdk.faceengine.warper
+.. automodule:: lunavl.sdk.estimators.face_estimators.warper
     :members:
