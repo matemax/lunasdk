@@ -10,5 +10,5 @@ A estimator collection are a logical groped estimators. Estimators from collecti
 Class *FaceEstimatorsCollection* contains all estimators for a face.
 
 
-.. automodule:: lunavl.sdk.faceengine.estimator_collections
+.. automodule:: lunavl.sdk.estimator_collections
     :members:
