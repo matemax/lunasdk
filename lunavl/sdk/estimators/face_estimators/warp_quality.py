@@ -7,7 +7,7 @@ from typing import Dict, Union
 from FaceEngine import Quality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.faceengine.warper import Warp, WarpedImage
+from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 
 
 class Quality(BaseEstimation):

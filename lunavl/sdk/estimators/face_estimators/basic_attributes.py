@@ -9,7 +9,7 @@ from FaceEngine import IAttributeEstimatorPtr, AttributeRequest, AttributeResult
 from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimator, BaseEstimation
-from lunavl.sdk.faceengine.warper import Warp, WarpedImage
+from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 
 
 class Ethnicity(Enum):
@@ -219,7 +219,7 @@ class BasicAttributesEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     def estimate(self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool,
-                 estimateEthnicity: bool):
+                 estimateEthnicity: bool) -> BasicAttributes:
         """
         Estimate ethnicity.
 

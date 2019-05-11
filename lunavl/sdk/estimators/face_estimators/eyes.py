@@ -17,7 +17,7 @@ from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
 from lunavl.sdk.faceengine.facedetector import Landmarks5, Landmarks68
 
-from lunavl.sdk.faceengine.warper import Warp, WarpedImage
+from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.image_utils.geometry import Landmarks
 
 
@@ -301,7 +301,7 @@ class GazeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation):
+    def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation) -> GazeEstimation:
         """
         Estimate a gaze direction
 
