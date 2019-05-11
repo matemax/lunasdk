@@ -1,6 +1,8 @@
+"""Module realize hight level api for estimate face attributes
+"""
 from typing import Optional, Union, List, Dict
 
-from FaceEngine import Face
+from FaceEngine import Face   # pylint: disable=E0611,E0401
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
