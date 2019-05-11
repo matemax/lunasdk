@@ -26,3 +26,6 @@ Example
 16.0
 >>> detection.emotions.predominateEmotion.name
 'Happiness'
+
+.. automodule:: lunavl.sdk.luna_faces
+    :members:
