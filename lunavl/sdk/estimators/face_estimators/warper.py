@@ -122,7 +122,7 @@ class Warper:
         """
         transformation = self._createWarpTransformation(faceDetection)
         if typeLandmarks == "L68":
-            warpResult = self._coreWarper.warp(faceDetection.landmarks68.coreLandmarks, transformation)
+            warpResult = self._coreWarper.warp(faceDetection.landmarks68.coreEstimation, transformation)
         elif typeLandmarks == "L5":
             warpResult = self._coreWarper.warp(faceDetection.landmarks5.coreEstimation, transformation)
         else:
