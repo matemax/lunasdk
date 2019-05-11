@@ -44,9 +44,11 @@ class FaceEstimatorsCollection:
         _warpQualityEstimator (Optional[WarpQualityEstimator]): lazy load warp quality estimator
         _basicAttributesEstimator (Optional[BasicAttributesEstimator]): lazy load basic attributes estimator
         _emotionsEstimator (Optional[EmotionsEstimator]): lazy load emotions estimator
+        warper (Optional[Warper]): warper
     """
     __slots__ = ("_headPoseEstimator", "_eyeEstimator", "_gazeDirectionEstimator", "_mouthStateEstimator",
-                 "_warpQualityEstimator", "_basicAttributesEstimator", "_emotionsEstimator", "_faceEngine")
+                 "_warpQualityEstimator", "_basicAttributesEstimator", "_emotionsEstimator", "_faceEngine",
+                 "warper")
 
     def __init__(self, startEstimators: Optional[List[FaceEstimator]] = None,
                  faceEngine: Optional[VLFaceEngine] = None):
@@ -69,6 +71,7 @@ class FaceEstimatorsCollection:
         self._mouthStateEstimator = None
         self._warpQualityEstimator = None
         self._headPoseEstimator = None
+        self.warper = self._faceEngine.createWarper()
 
         if startEstimators:
             for estimator in set(startEstimators):
@@ -329,6 +332,7 @@ class FaceEstimatorsCollection:
                 continue
             if getattr(self, estimatorName) is not None:
                 self.initEstimator(FaceEstimatorsCollection._getEstimatorByAttributeName(estimatorName))
+        self.warper = self._faceEngine.createWarper()
 
     def removeEstimator(self, estimator: FaceEstimator) -> None:
         """
