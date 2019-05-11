@@ -205,6 +205,11 @@ class VLFaceDetector:
           faceEngine (VLFaceEngine): face engine for detector and estimators, default *FACE_ENGINE*.
     """
 
+    #: a global instance of FaceEngine for usual creating detectors
+    faceEngine: VLFaceEngine = FACE_ENGINE
+    #: estimator collection of class for usual creating detectors
+    estimatorCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=FACE_ENGINE)
+
     def __init__(self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
                  faceEngine: Optional[VLFaceEngine] = None):
         """
@@ -214,12 +219,10 @@ class VLFaceDetector:
             detectorType: detector type
             faceEngine: face engine for detector and estimators
         """
-        if faceEngine is None:
-            self.faceEngine = FACE_ENGINE
-        else:
+        if faceEngine is not None:
             self.faceEngine = faceEngine
+            self.estimatorCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
-        self.estimatorCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect[float]] = None) -> Union[None, VLFaceDetection]:
         """
