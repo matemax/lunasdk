@@ -136,10 +136,11 @@ class VLFaceDetection(FaceDetection):
         Returns:
             eyes estimation
         """
-        if self._warpQuality is None:
-            if self._transformedLandmarks68:
+        if self._eyes is None:
+            if self._transformedLandmarks68 is None:
                 self._transformedLandmarks68 = self.estimatorCollection.warper. \
                     makeWarpTransformationWithLandmarks(self, "L68")
+
             self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._transformedLandmarks68, self.warp)
         return self._eyes
 
@@ -151,9 +152,9 @@ class VLFaceDetection(FaceDetection):
         Returns:
             gaze direction
         """
-        if self._warpQuality is None:
-            self._warpQuality = self.estimatorCollection.gazeDirectionEstimator.estimate(self.headPose, self.eye)
-        return self._warpQuality
+        if self._gaze is None:
+            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self.headPose, self.eyes)
+        return self._gaze
 
     def asDict(self) -> Dict[str, Union[dict, list, float]]:
         """
