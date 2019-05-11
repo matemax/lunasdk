@@ -14,7 +14,7 @@ from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimat
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator
 
 from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstimator
-from lunavl.sdk.faceengine.warper import Warper
+from lunavl.sdk.estimators.face_estimators.warper import Warper
 
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..faceengine.facedetector import DetectorType, FaceDetector
@@ -86,7 +86,7 @@ class VLFaceEngine:
         """
         return WarpQualityEstimator(self._faceEngine.createQualityEstimator())
 
-    def createWarper(self):
+    def createWarper(self) -> Warper:
         """
         Create warper, `see <warping.html>`_:
 
