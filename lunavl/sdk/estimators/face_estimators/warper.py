@@ -22,7 +22,7 @@ class WarpedImage(VLImage):
         - the face is always centered and rotated so that imaginary line between the eyes is horizontal.
     """
 
-    def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage=None):
+    def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
         """
         Init.
 
@@ -54,6 +54,7 @@ class WarpedImage(VLImage):
         if self.format != self.format.R8G8B8:
             raise ValueError("Bad image format for warped image, must be R8G8B8")
 
+    #  pylint: disable=W0221
     @classmethod
     def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> 'WarpedImage':
         """
@@ -67,7 +68,7 @@ class WarpedImage(VLImage):
         Returns:
             warp
         """
-        warp = cls(vlImage=VLImage.load(filename=filename, url=url))
+        warp = cls(body=b"", vlImage=VLImage.load(filename=filename, url=url))
         warp.assertWarp()
         return warp
 
