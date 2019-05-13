@@ -1,10 +1,13 @@
 """Module for creating warped images
 """
-from typing import Union
+from typing import Union, Optional
+
+from numpy.ma import array
 
 from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
 from lunavl.sdk.image_utils.image import VLImage
 from FaceEngine import IWarperPtr, Transformation  # pylint: disable=E0611,E0401
+from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 
 
 class WarpedImage(VLImage):
@@ -17,8 +20,56 @@ class WarpedImage(VLImage):
         - it's always in RGB color format
         - it always contains just a single face
         - the face is always centered and rotated so that imaginary line between the eyes is horizontal.
-
     """
+
+    def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage=None):
+        """
+        Init.
+
+        Args:
+            body: body of image - bytes numpy array or core image
+            filename: user mark a source of image
+            vlImage: source is vl image.
+        """
+        if vlImage is None:
+            super().__init__(body, filename=filename)
+            self.assertWarp()
+        else:
+            self.source = vlImage.source
+            self.filename = vlImage.filename
+            self.coreImage = vlImage.coreImage
+
+    def assertWarp(self):
+        """
+        Validate size and format
+
+        Raises:
+            ValueError("Bad image size for warped image"): if image has incorrect size
+            ValueError("Bad image format for warped image, must be R8G8B8"): if image has incorrect format
+        Warnings:
+            this checks are not guarantee that image is warp. This function is intended for debug
+        """
+        if self.rect.size.height != 250 or self.rect.width != 250:
+            raise ValueError("Bad image size for warped image")
+        if self.format != self.format.R8G8B8:
+            raise ValueError("Bad image format for warped image, must be R8G8B8")
+
+    @classmethod
+    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> 'WarpedImage':
+        """
+        Load imag from numpy array or file or url.
+
+        Args:
+            *_: for remove positional argument
+            filename: filename
+            url: url
+
+        Returns:
+            warp
+        """
+        warp = cls(vlImage=VLImage.load(filename=filename, url=url))
+        warp.assertWarp()
+        return warp
 
     @property
     def warpedImage(self) -> 'WarpedImage':
