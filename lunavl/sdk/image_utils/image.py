@@ -85,8 +85,9 @@ class VLImage:
         Init.
 
         Args:
-            body:
-            imgFormat:
+            body: body of image - bytes numpy array or core image
+            imgFormat: img format
+            filename: user mark a source of image
         """
         if imgFormat is None:
             imgFormat = ColorFormat.R8G8B8
