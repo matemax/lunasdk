@@ -21,3 +21,19 @@ You can install this package several path:
 We get a path to folder with neural network models and path to a FaceEngine configuration file  from environment 
 variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by default. You can specify these path's 
 in initialization *VLFaceEngine*. 
+
+## Getting Started:
+
+``` python
+>>> from lunavl.sdk.luna_faces import VLFaceDetector
+>>> from lunavl.sdk.luna_faces import VLImage
+>>> detector = VLFaceDetector()
+>>> image = VLImage.load(
+...         url='https://cdn1.savepice.ru/uploads/2019/4/15/aa970957128d9892f297cdfa5b3fda88-full.jpg')
+>>> detection = detector.detectOne(image)
+>>> detection.basicAttributes.age
+16.0
+>>> detection.emotions.predominateEmotion.name
+'Happiness'
+```
+
