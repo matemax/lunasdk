@@ -10,6 +10,7 @@ Welcome to VL Luna's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   install
    sdk
    examples
 
