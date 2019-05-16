@@ -22,7 +22,10 @@ We get a path to folder with neural network models and path to a FaceEngine conf
 variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by default. You can specify these path's 
 in initialization *VLFaceEngine*. 
 
-## Getting Started:
+## Getting Started
+
+
+Attributes estimation example:
 
 ``` python
 >>> from lunavl.sdk.luna_faces import VLFaceDetector
