@@ -21,6 +21,7 @@ def estimateAll():
     pprint.pprint(detection.gaze.asDict())
     pprint.pprint(detection.headPose.asDict())
     pprint.pprint(detection.mouthState.asDict())
+    pprint.pprint(detection.ags)
 
 
 if __name__ == "__main__":

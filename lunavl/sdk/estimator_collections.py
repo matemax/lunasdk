@@ -3,6 +3,7 @@
 from enum import Enum
 from typing import List, Optional
 
+from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator
 from lunavl.sdk.estimators.face_estimators.emotions import EmotionsEstimator
 from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
@@ -30,6 +31,8 @@ class FaceEstimator(Enum):
     MouthState = 6
     #: warp quality estimator
     WarpQuality = 7
+    #: ags estimator
+    AGS = 8
 
 
 class FaceEstimatorsCollection:
@@ -44,11 +47,12 @@ class FaceEstimatorsCollection:
         _warpQualityEstimator (Optional[WarpQualityEstimator]): lazy load warp quality estimator
         _basicAttributesEstimator (Optional[BasicAttributesEstimator]): lazy load basic attributes estimator
         _emotionsEstimator (Optional[EmotionsEstimator]): lazy load emotions estimator
+        _AGSEstimator (Optional[AGSEstimator]): lazy load ags estimator
         warper (Optional[Warper]): warper
     """
     __slots__ = ("_headPoseEstimator", "_eyeEstimator", "_gazeDirectionEstimator", "_mouthStateEstimator",
                  "_warpQualityEstimator", "_basicAttributesEstimator", "_emotionsEstimator", "_faceEngine",
-                 "warper")
+                 "_AGSEstimator", "warper")
 
     def __init__(self, startEstimators: Optional[List[FaceEstimator]] = None,
                  faceEngine: Optional[VLFaceEngine] = None):
@@ -71,6 +75,7 @@ class FaceEstimatorsCollection:
         self._mouthStateEstimator = None
         self._warpQualityEstimator = None
         self._headPoseEstimator = None
+        self._AGSEstimator = None
         self.warper = self._faceEngine.createWarper()
 
         if startEstimators:
@@ -137,6 +142,8 @@ class FaceEstimatorsCollection:
             self._warpQualityEstimator = self._faceEngine.createWarpQualityEstimator()
         elif estimator == FaceEstimator.HeadPose:
             self._headPoseEstimator = self._faceEngine.createHeadPoseEstimator()
+        elif estimator == FaceEstimator.AGS:
+            self._AGSEstimator = self._faceEngine.createAGSEstimator()
         else:
             raise ValueError("Bad estimator type")
 
@@ -163,6 +170,32 @@ class FaceEstimatorsCollection:
             newEstimator: new estimator
         """
         self._headPoseEstimator = newEstimator
+
+    # pylint: disable=C0103
+    @property
+    def AGSEstimator(self) -> AGSEstimator:
+        """
+        Get ags estimator.
+
+        If estimator is initialized it will be returned otherwise it will be initialized and returned
+
+        Returns:
+            estimator
+        """
+        if self._AGSEstimator is None:
+            self._AGSEstimator = self._faceEngine.createAGSEstimator()
+        return self._AGSEstimator
+
+    # pylint: disable=C0103
+    @AGSEstimator.setter
+    def AGSEstimator(self, newEstimator: AGSEstimator) -> None:
+        """
+        Set ags estimator.
+
+        Args:
+            newEstimator: new estimator
+        """
+        self._AGSEstimator = newEstimator
 
     @property
     def basicAttributesEstimator(self) -> BasicAttributesEstimator:

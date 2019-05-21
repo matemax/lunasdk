@@ -8,6 +8,7 @@ from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator
 from lunavl.sdk.estimators.face_estimators.emotions import EmotionsEstimator
 from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
@@ -139,6 +140,15 @@ class VLFaceEngine:
             estimator
         """
         return BasicAttributesEstimator(self._faceEngine.createAttributeEstimator())
+
+    def createAGSEstimator(self) -> AGSEstimator:
+        """
+        Approximate garbage score estimator
+
+        Returns:
+            estimator
+        """
+        return AGSEstimator(self._faceEngine.createAGSEstimator())
 
 
 # (VLFaceEngine): Global instance of VLFaceEngine
