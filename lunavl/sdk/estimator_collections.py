@@ -171,6 +171,7 @@ class FaceEstimatorsCollection:
         """
         self._headPoseEstimator = newEstimator
 
+    # pylint: disable=C0103
     @property
     def AGSEstimator(self) -> AGSEstimator:
         """
@@ -185,6 +186,7 @@ class FaceEstimatorsCollection:
             self._AGSEstimator = self._faceEngine.createAGSEstimator()
         return self._AGSEstimator
 
+    # pylint: disable=C0103
     @AGSEstimator.setter
     def AGSEstimator(self, newEstimator: AGSEstimator) -> None:
         """
