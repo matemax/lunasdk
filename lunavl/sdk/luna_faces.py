@@ -2,7 +2,7 @@
 """
 from typing import Optional, Union, List, Dict
 
-from FaceEngine import Face   # pylint: disable=E0611,E0401
+from FaceEngine import Face  # pylint: disable=E0611,E0401
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
@@ -30,11 +30,12 @@ class VLFaceDetection(FaceDetection):
         _gaze (Optional[GazeEstimation]): lazy load gaze direction estimation
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
         _headPose (Optional[HeadPose]): lazy load head pose estimation
+        _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks68 (Optional[Landmarks68]): lazy load transformed landmarks68
 
     """
     __slots__ = ("_warp", "_emotions", "_eyes", "_mouthState", "_basicAttributes",
-                 "_gaze", "_warpQuality", "_headPose", "estimatorCollection", "_transformedLandmarks68")
+                 "_gaze", "_warpQuality", "_headPose", "estimatorCollection", "_transformedLandmarks68", "_ags")
 
     def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
         """
@@ -53,6 +54,7 @@ class VLFaceDetection(FaceDetection):
         self._warpQuality: Optional[Quality] = None
         self._headPose: Optional[HeadPose] = None
         self._transformedLandmarks68: Optional[Landmarks68] = None
+        self._ags = None
         self.estimatorCollection = estimatorCollection
 
     @property
@@ -103,6 +105,18 @@ class VLFaceDetection(FaceDetection):
         if self._emotions is None:
             self._emotions = self.estimatorCollection.emotionsEstimator.estimate(self.warp)
         return self._emotions
+
+    @property
+    def ags(self) -> float:
+        """
+        Get ags of the detection.
+
+        Returns:
+            emotions
+        """
+        if self._ags is None:
+            self._ags = self.estimatorCollection.AGSEstimator.estimate(self)
+        return self._ags
 
     @property
     def basicAttributes(self) -> BasicAttributes:

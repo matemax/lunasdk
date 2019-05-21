@@ -133,7 +133,15 @@ and will produce lower factor if:
  - Image is over-exposured (i.e., too light);
  - Image color variation is low (i.e., image is monochrome or close to monochrome).
 
- The quality factor is a value in range [0..1] where 0 corresponds to low quality and 1 to high quality.
+The quality factor is a value in range [0..1] where 0 corresponds to low quality and 1 to high quality.
+
+.. _`ags`:
+
+Approximate garbage score
+-------------------------
+
+This estimator aims to determine the quality of source input image suitable for later descriptor extraction and
+matching. AGS is a float in range [0..1] where 0 corresponds to low quality.
 
 
 Classes and methods
@@ -162,4 +170,7 @@ Classes and methods
     :members:
 
 .. automodule:: lunavl.sdk.estimators.face_estimators.warp_quality
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.ags
     :members:
