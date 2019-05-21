@@ -13,8 +13,11 @@ The main dependencies is Luna SDK library and an FaceEnginePythonBindings. If th
  
 You can install this package several path:
 
-- install from github: *pip install  git+https://github.com/matemax/lunasdk.git*
-- you can load archive from github, unpack it and make a command: *python setup.py install*.
+  - install from github:
+    ```console
+    pip install  git+https://github.com/matemax/lunasdk.git
+    ```
+  - you can load archive from github, unpack it and make a command: *python setup.py install*.
 
 ## Setup
 
@@ -23,7 +26,6 @@ variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by
 in initialization *VLFaceEngine*. 
 
 ## Getting Started
-
 
 Attributes estimation example:
 
@@ -39,4 +41,3 @@ Attributes estimation example:
 >>> detection.emotions.predominateEmotion.name
 'Happiness'
 ```
-
