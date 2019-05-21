@@ -9,8 +9,8 @@ We implemented only interface to LUNA C++ SDK. It is face detection and recognit
 ## Install
 
 The main dependencies is Luna SDK library and an FaceEnginePythonBindings. If these dependencies is installed
- add to *PATH* a path to *FaceEngineSDK.dll* or *FaceEngineSDK.so*. 
- 
+ add to *PATH* a path to *FaceEngineSDK.dll* or *FaceEngineSDK.so*.
+
 You can install this package several path:
 
 - install from github:
@@ -18,7 +18,7 @@ You can install this package several path:
   ```console
   pip install git+https://github.com/matemax/lunasdk.git
   ```
-  
+
 - you can load archive from github, unpack it and make a command:
   
   ```console
