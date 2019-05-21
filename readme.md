@@ -13,7 +13,7 @@ The main dependencies is Luna SDK library and an FaceEnginePythonBindings. If th
 
 You can install this package several path:
 
-- install from github:
+-   install from github:
   
   ```console
   pip install git+https://github.com/matemax/lunasdk.git
