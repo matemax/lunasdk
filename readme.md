@@ -15,15 +15,15 @@ You can install this package several path:
 
 -   install from github:
   
-  ```console
-  pip install git+https://github.com/matemax/lunasdk.git
-  ```
+    ```console
+    pip install git+https://github.com/matemax/lunasdk.git
+    ```
 
-- you can load archive from github, unpack it and make a command:
+-   you can load archive from github, unpack it and make a command:
   
-  ```console
-  python setup.py install
-  ```
+    ```console
+    python setup.py install
+    ```
 
 ## Setup
 
