@@ -10,11 +10,13 @@ from lunavl.sdk.estimators.face_estimators.eyes import EyesEstimation, GazeEstim
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
-from lunavl.sdk.estimators.face_estimators.warper import Warp
+from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.engine import VLFaceEngine, FACE_ENGINE
 from lunavl.sdk.faceengine.facedetector import FaceDetection, DetectorType, ImageForDetection, Landmarks68, FaceDetector
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
+from numpy.ma import array
+from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 
 
 class VLFaceDetection(FaceDetection):
@@ -180,7 +182,7 @@ class VLFaceDetection(FaceDetection):
             All estimated attributes will be added to dict
         """
         res = {"rect": self.boundingBox.rect.asDict()}
-        if self._quality is not None:
+        if self._warpQuality is not None:
             res["quality"] = self.warpQuality.asDict()
         if self.landmarks5 is not None:
             res["landmarks5"] = self.landmarks5.asDict()
@@ -223,8 +225,8 @@ class VLFaceDetector:
 
     #: a global instance of FaceEngine for usual creating detectors
     faceEngine: VLFaceEngine = FACE_ENGINE
-    #: estimator collection of class for usual creating detectors
-    estimatorCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=FACE_ENGINE)
+    #: estimators collection of class for usual creating detectors
+    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=FACE_ENGINE)
 
     def __init__(self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
                  faceEngine: Optional[VLFaceEngine] = None):
@@ -237,7 +239,7 @@ class VLFaceDetector:
         """
         if faceEngine is not None:
             self.faceEngine = faceEngine
-            self.estimatorCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
+            self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect[float]] = None) -> Union[None, VLFaceDetection]:
@@ -253,7 +255,7 @@ class VLFaceDetector:
         detectRes = self._faceDetector.detectOne(image, detectArea, True, True)
         if detectRes is None:
             return None
-        return VLFaceDetection(detectRes.coreEstimation, detectRes.image, self.estimatorCollection)
+        return VLFaceDetection(detectRes.coreEstimation, detectRes.image, self.estimatorsCollection)
 
     def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5) -> List[List[VLFaceDetection]]:
         """
@@ -268,6 +270,113 @@ class VLFaceDetector:
         detectRes = self._faceDetector.detect(images, limit, True, True)
         res = []
         for imageNumber, image in enumerate(images):
-            res.append([VLFaceDetection(detectRes.coreEstimation, image, self.estimatorCollection) for detectRes in
+            res.append([VLFaceDetection(detectRes.coreEstimation, image, self.estimatorsCollection) for detectRes in
                         detectRes[imageNumber]])
         return res
+
+
+class VLWarpedImage(WarpedImage):
+    """
+    High level detection object.
+
+    Attributes:
+
+        _emotions (Optional[Emotions]): lazy load emotions estimations
+        _mouthState (Optional[MouthStates]): lazy load mouth state estimation
+        _basicAttributes (Optional[BasicAttributes]): lazy load basic attribute estimation
+        _warpQuality (Optional[Quality]): lazy load warp quality estimation
+    """
+    __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality")
+
+    def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
+        super().__init__(body, filename, vlImage)
+        self._emotions: Optional[Emotions] = None
+        self._eyes: Optional[EyesEstimation] = None
+        self._mouthState: Optional[MouthStates] = None
+        self._basicAttributes: Optional[BasicAttributes] = None
+        self._warpQuality: Optional[Quality] = None
+
+    #: estimators collection of class for usual creating detectors
+    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=FACE_ENGINE)
+
+    @property
+    def mouthState(self) -> MouthStates:
+        """
+        Get a mouth state of the detection
+
+        Returns:
+            mouth state
+        """
+        if self._mouthState is None:
+            self._mouthState = VLWarpedImage.estimatorsCollection.mouthStateEstimator.estimate(self)
+        return self._mouthState
+
+    @property
+    def emotions(self) -> Emotions:
+        """
+        Get emotions of the detection.
+
+        Returns:
+            emotions
+        """
+        if self._emotions is None:
+            self._emotions = VLWarpedImage.estimatorsCollection.emotionsEstimator.estimate(self)
+        return self._emotions
+
+    @property
+    def basicAttributes(self) -> BasicAttributes:
+        """
+        Get all basic attributes of the detection.
+
+        Returns:
+            basic attributes (age, gender, ethnicity)
+        """
+        if self._basicAttributes is None:
+            self._basicAttributes = VLWarpedImage.estimatorsCollection.basicAttributesEstimator.estimate(self,
+                                                                                                         estimateAge=True,
+                                                                                                         estimateEthnicity=True,
+                                                                                                         estimateGender=True)
+        return self._basicAttributes
+
+    @property
+    def warpQuality(self) -> Quality:
+        """
+        Get quality of warped image which corresponding the detection
+        Returns:
+            quality
+        """
+        if self._warpQuality is None:
+            self._warpQuality = VLWarpedImage.estimatorsCollection.warpQualityEstimator.estimate(self)
+        return self._warpQuality
+
+    def asDict(self) -> Dict[str, Union[dict, list, float]]:
+        """
+        Convert to dict.
+
+        Returns:
+            All estimated attributes will be added to dict
+        """
+        res = {}
+        if self._warpQuality is not None:
+            res["quality"] = self.warpQuality.asDict()
+
+        attributes = {}
+
+        if self._emotions is not None:
+            attributes["emotions"] = self._emotions.asDict()
+
+        if self._eyes is not None:
+            attributes["eyes_attributes"] = self._eyes.asDict()
+
+        if self._mouthState is not None:
+            attributes["mouth_attributes"] = self._mouthState.asDict()
+
+        if self._basicAttributes is not None:
+            attributes["basic_attributes"] = self._basicAttributes.asDict()
+
+        res["attributes"] = attributes
+        return res
+
+    @property
+    def warp(self) -> Warp:
+        return self
