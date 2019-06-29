@@ -9,3 +9,4 @@ class BaseTestClass(unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.faceEngine = VLFaceEngine()
+
