@@ -2,7 +2,10 @@
 """
 from typing import Optional, Union, List, Dict
 
+from numpy.ma import array
+from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from FaceEngine import Face  # pylint: disable=E0611,E0401
+
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
@@ -15,8 +18,6 @@ from lunavl.sdk.faceengine.engine import VLFaceEngine, FACE_ENGINE
 from lunavl.sdk.faceengine.facedetector import FaceDetection, DetectorType, ImageForDetection, Landmarks68, FaceDetector
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
-from numpy.ma import array
-from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 
 
 class VLFaceDetection(FaceDetection):
