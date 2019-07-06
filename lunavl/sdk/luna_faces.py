@@ -332,10 +332,9 @@ class VLWarpedImage(WarpedImage):
             basic attributes (age, gender, ethnicity)
         """
         if self._basicAttributes is None:
-            self._basicAttributes = VLWarpedImage.estimatorsCollection.basicAttributesEstimator.estimate(self,
-                                                                                                         estimateAge=True,
-                                                                                                         estimateEthnicity=True,
-                                                                                                         estimateGender=True)
+            estimator = VLWarpedImage.estimatorsCollection.basicAttributesEstimator
+            self._basicAttributes = estimator.estimate(self, estimateAge=True, estimateEthnicity=True,
+                                                       estimateGender=True)
         return self._basicAttributes
 
     @property
