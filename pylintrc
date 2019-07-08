@@ -243,8 +243,7 @@ function-naming-style=camelCase
 
 # Good variable names which should always be accepted, separated by a comma.
 good-names=i,
-           j
-           ,
+           j,
            k,
            ex,
            Run,

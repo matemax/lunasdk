@@ -303,5 +303,10 @@ class VLImage:
         """
         pass
 
-    def isValid(self):
+    def isValid(self) -> bool:
+        """
+        Check image is valid loaded  to core image or not
+        Returns:
+            True if image is valid otherwise False
+        """
         return self.coreImage.isValid()
