@@ -153,14 +153,14 @@ class FaceDetection(BaseEstimation):
 
         self.boundingBox = BoundingBox(coreDetection.detection)
         if coreDetection.landmarks5_opt.isValid():
-            self.landmarks5 = Landmarks5(coreDetection.landmarks5_opt.value())
+            self.landmarks5: Optional[Landmarks5] = Landmarks5(coreDetection.landmarks5_opt.value())
         else:
-            self.landmarks5 = None
+            self.landmarks5: Optional[Landmarks5] = None
 
         if coreDetection.landmarks68_opt.isValid():
-            self.landmarks68 = Landmarks68(coreDetection.landmarks68_opt.value())
+            self.landmarks68: Optional[Landmarks68] = Landmarks68(coreDetection.landmarks68_opt.value())
         else:
-            self.landmarks68 = None
+            self.landmarks68: Optional[Landmarks68] = None
         self._image = image
         self._emotions = None
         self._quality = None

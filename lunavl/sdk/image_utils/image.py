@@ -2,10 +2,11 @@
 Module realize VLImage - structure for storing image in special format.
 """
 from enum import Enum
+from pathlib import Path
 from typing import Optional, Union
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
-from numpy import array
+from numpy import ndarray
 
 from .geometry import Rect
 
@@ -79,7 +80,7 @@ class VLImage:
     """
     __slots__ = ("coreImage", "source", "filename")
 
-    def __init__(self, body: Union[bytes, array, CoreImage], imgFormat: Optional[ColorFormat] = None,
+    def __init__(self, body: Union[bytes, ndarray, CoreImage], imgFormat: Optional[ColorFormat] = None,
                  filename: str = ""):
         """
         Init.
@@ -100,7 +101,7 @@ class VLImage:
             if loadResult.isError:
                 #: todo: raise correct error.
                 raise ValueError
-        elif isinstance(body, array):
+        elif isinstance(body, ndarray):
             #: todo, format ?????
             self.coreImage.setData(body, imgFormat.coreFormat)
         else:
@@ -133,10 +134,11 @@ class VLImage:
         todo: more doc test
         """
         if filename is not None:
-            with open(filename, "rb") as file:
+            path = Path(filename)
+            with path.open("rb") as file:
                 body = file.read()
                 img = cls(body, imgFormat)
-                img.source = filename
+                img.source = path.name
                 return img
 
         if url is not None:
@@ -244,7 +246,7 @@ class VLImage:
         """
         return self.coreImage.getChannelStep()
 
-    def asNPArray(self) -> array:
+    def asNPArray(self) -> ndarray:
         """
         Get image as numpy array.
 
@@ -300,3 +302,12 @@ class VLImage:
             bytes
         """
         pass
+
+    def isValid(self) -> bool:
+        """
+        Check image is valid loaded  to core image or not
+
+        Returns:
+            True if image is valid otherwise False
+        """
+        return self.coreImage.isValid()
