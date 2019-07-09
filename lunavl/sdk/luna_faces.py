@@ -278,7 +278,7 @@ class VLFaceDetector:
 
 class VLWarpedImage(WarpedImage):
     """
-    High level detection object.
+    High level sample object.
 
     Attributes:
 
@@ -379,4 +379,10 @@ class VLWarpedImage(WarpedImage):
 
     @property
     def warp(self) -> Warp:
+        """
+        Support VLFaceDetection interface.
+
+        Returns:
+            self
+        """
         return self
