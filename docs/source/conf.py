@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'lunavl'
-copyright = '2019, VisionLabs'
-author = 'VisionLabs'
+copyright = '2019, matemax'
+author = 'matemax'
 
 # -- General configuration ---------------------------------------------------
 
