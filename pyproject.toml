@@ -1,0 +1,16 @@
+[tool]
+[tool.poetry]
+name = "lunavl"
+version = "0.0.0"
+description = "Python interface for VisionLabs Luna platform"
+authors = ["VisionLabs <m.limonov@visionlabs.ru>"]
+repository = "https://github.com/matemax/lunasdk"
+[tool.poetry.dependencies]
+python = ">=3.5"
+numpy = "*"
+requests = "*"
+[tool.poetry.dev-dependencies]
+sphinx = ">=2.0.0"
+pytest = ">=4.4"
+pytest-subtests = "*"
+sphinx-autodoc-typehints = "*"
