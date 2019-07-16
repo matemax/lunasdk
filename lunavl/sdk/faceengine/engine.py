@@ -12,6 +12,7 @@ from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator
 from lunavl.sdk.estimators.face_estimators.emotions import EmotionsEstimator
 from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator
 
 from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstimator
@@ -149,6 +150,16 @@ class VLFaceEngine:
             estimator
         """
         return AGSEstimator(self._faceEngine.createAGSEstimator())
+
+    def createFaceDescriptorEstimator(self) -> FaceDescriptorEstimator:
+        """
+        Approximate garbage score estimator
+
+        Returns:
+            estimator
+        """
+        return FaceDescriptorEstimator(self._faceEngine.createExtractor(), self._faceEngine.createDescriptor,
+                                       self._faceEngine.createDescriptorBatch)
 
 
 # (VLFaceEngine): Global instance of VLFaceEngine
