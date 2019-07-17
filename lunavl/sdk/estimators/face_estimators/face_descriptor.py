@@ -19,10 +19,8 @@ class FaceDescriptor(BaseEstimation):
         super().__init__(coreEstimation)
         self.garbageScore = garbageScore
 
-    def asDict(self) -> Union[dict, list]:
-        return {"descriptor": self.coreEstimation.getData()}
 
-    def asDict(self) -> Union[dict, list]:
+    def asDict(self) -> dict:
         return {"descriptor": self.coreEstimation.getData(),
                 "score": self.garbageScore}
 
