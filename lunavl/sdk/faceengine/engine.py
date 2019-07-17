@@ -1,7 +1,4 @@
 """Module realize wraps on facengine objects
-
-Attributes:
-    FACE_ENGINE (VLFaceEngine): Global instance of VLFaceEngine
 """
 import os
 from typing import Optional
@@ -160,7 +157,3 @@ class VLFaceEngine:
         """
         return FaceDescriptorEstimator(self._faceEngine.createExtractor(), self._faceEngine.createDescriptor,
                                        self._faceEngine.createDescriptorBatch)
-
-
-# (VLFaceEngine): Global instance of VLFaceEngine
-FACE_ENGINE = VLFaceEngine()

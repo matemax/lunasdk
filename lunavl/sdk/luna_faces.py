@@ -14,7 +14,7 @@ from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
-from lunavl.sdk.faceengine.engine import VLFaceEngine, FACE_ENGINE
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.facedetector import FaceDetection, DetectorType, ImageForDetection, Landmarks68, FaceDetector
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
@@ -225,9 +225,9 @@ class VLFaceDetector:
     """
 
     #: a global instance of FaceEngine for usual creating detectors
-    faceEngine: VLFaceEngine = FACE_ENGINE
+    faceEngine: VLFaceEngine = VLFaceEngine()
     #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=FACE_ENGINE)
+    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def __init__(self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
                  faceEngine: Optional[VLFaceEngine] = None):
@@ -298,7 +298,7 @@ class VLWarpedImage(WarpedImage):
         self._warpQuality: Optional[Quality] = None
 
     #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=FACE_ENGINE)
+    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=VLFaceEngine())
 
     @property
     def mouthState(self) -> MouthStates:

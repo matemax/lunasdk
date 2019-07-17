@@ -10,7 +10,7 @@ from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimat
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator
 from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstimator
-from lunavl.sdk.faceengine.engine import VLFaceEngine, FACE_ENGINE
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 
 
 class FaceEstimator(Enum):
@@ -64,7 +64,7 @@ class FaceEstimatorsCollection:
             faceEngine: faceengine, factory for estimators
         """
         if faceEngine is None:
-            self._faceEngine = FACE_ENGINE
+            self._faceEngine = VLFaceEngine()
         else:
             self._faceEngine = faceEngine
 
@@ -376,6 +376,3 @@ class FaceEstimatorsCollection:
         """
         estimatorName = self._getAttributeNameByEstimator(estimator)
         setattr(self, estimatorName, None)
-
-
-FACE_ESTIMATORS_COLLECTION = FaceEstimatorsCollection()

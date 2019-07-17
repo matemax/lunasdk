@@ -6,7 +6,7 @@ Module realize simple examples following features:
 """
 import pprint
 
-from lunavl.sdk.faceengine.engine import FACE_ENGINE
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 
@@ -15,7 +15,8 @@ def detectOneFace():
     """
     Detect one face on an image.
     """
-    detector = FACE_ENGINE.createFaceDetector(DetectorType.FACE_DET_V1)
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
 
     imageWithOneFace = VLImage.load(
         url='https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg')
