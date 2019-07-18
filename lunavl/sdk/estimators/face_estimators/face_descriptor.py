@@ -19,7 +19,6 @@ class FaceDescriptor(BaseEstimation):
         super().__init__(coreEstimation)
         self.garbageScore = garbageScore
 
-
     def asDict(self) -> dict:
         return {"descriptor": self.coreEstimation.getData(),
                 "score": self.garbageScore}
@@ -58,7 +57,7 @@ class FaceDescriptorBatch(BaseEstimation):
         return self._coreEstimation.getMaxCount()
 
     def asDict(self) -> Union[dict, list]:
-        return {"descriptors": [descriptor.asDict() for descriptor in self]}
+        return [descriptor.asDict() for descriptor in self]
 
     def __getitem__(self, i):
         return FaceDescriptor(self._coreEstimation.getDescriptorFast(i), self.scores[i])
@@ -104,7 +103,7 @@ class FaceDescriptorEstimator(BaseEstimator):
         return FaceDescriptor(descriptor, res.value)
 
     def estimateWarpsBatch(self, warps: List[Union[Warp, WarpedImage]], aggregate: bool = False,
-                           descriptorBatch: Optional[FaceDescriptorBatch] = None):
+                           descriptorBatch: Optional[FaceDescriptorBatch] = None) -> FaceDescriptorBatch:
         if descriptorBatch is not None:
             # if (len(warps) != len(FaceDescriptorBatch)) and (aggregate and len(FaceDescriptorBatch) == 1):
             #     raise ValueError("12343")
