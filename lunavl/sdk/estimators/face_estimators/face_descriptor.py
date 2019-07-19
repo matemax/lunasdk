@@ -1,7 +1,7 @@
 from lunavl.sdk.estimators.base_estimation import BaseEstimator, BaseEstimation
 from FaceEngine import IDescriptorExtractorPtr, IDescriptorPtr, PyIFaceEngine, \
     IDescriptorBatchPtr  # pylint: disable=E0611,E0401
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Tuple
 
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 
@@ -103,7 +103,8 @@ class FaceDescriptorEstimator(BaseEstimator):
         return FaceDescriptor(descriptor, res.value)
 
     def estimateWarpsBatch(self, warps: List[Union[Warp, WarpedImage]], aggregate: bool = False,
-                           descriptorBatch: Optional[FaceDescriptorBatch] = None) -> FaceDescriptorBatch:
+                           descriptorBatch: Optional[FaceDescriptorBatch] = None) -> Tuple[FaceDescriptorBatch,
+                                                                                           FaceDescriptor]:
         if descriptorBatch is not None:
             # if (len(warps) != len(FaceDescriptorBatch)) and (aggregate and len(FaceDescriptorBatch) == 1):
             #     raise ValueError("12343")
@@ -111,13 +112,17 @@ class FaceDescriptorEstimator(BaseEstimator):
         else:
             descriptorBatch = self.descriptorDescriptorBatchFactory(len(warps))
         if aggregate:
+            aggregatedDescriptor = self.descriptorFactory()
+
             res, scores = self._coreEstimator.extractFromWarpedImageBatch(
                 [warp.warpedImage.coreImage for warp in warps],
-                descriptorBatch, aggregate, len(warps))
+                descriptorBatch, aggregatedDescriptor, len(warps))
+            aggregatedDescriptor = FaceDescriptor(aggregatedDescriptor, res.value)
         else:
+            aggregatedDescriptor = None
             res, scores = self._coreEstimator.extractFromWarpedImageBatch(
                 [warp.warpedImage.coreImage for warp in warps],
                 descriptorBatch, len(warps))
         if res.isError:
             raise ValueError("12343")
-        return FaceDescriptorBatch(descriptorBatch, scores)
+        return FaceDescriptorBatch(descriptorBatch, scores), aggregatedDescriptor
