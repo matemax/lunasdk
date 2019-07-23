@@ -125,8 +125,8 @@ class Ethnicities(BaseEstimation):
             dict in platform format
         """
         return {
-            "predominate_ethnicity": str(self.predominateEmotion),
-            "estimation": {
+            "predominant_ethnicity": str(self.predominateEmotion),
+            "estimations": {
                 "asian": self.asian,
                 "indian": self.indian,
                 "caucasian": self.caucasian,
@@ -190,9 +190,9 @@ class BasicAttributes(BaseEstimation):
         """
         res = {}
         if self.ethnicity is not None:
-            res["ethnicity"] = self.ethnicity.asDict()
+            res["ethnicities"] = self.ethnicity.asDict()
         else:
-            res["ethnicity"] = None
+            res["ethnicities"] = None
         if self.age is not None:
             res["age"] = round(self.age)
         else:
