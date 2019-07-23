@@ -121,8 +121,6 @@ class LunaVLError:
         Create error from sdk error
 
         Args:
-            errorCode: error code
-            desc: description
             sdkError: sdk error
 
         Returns:

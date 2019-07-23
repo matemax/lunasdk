@@ -1,3 +1,5 @@
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.base_estimation import BaseEstimator, BaseEstimation
 from FaceEngine import IDescriptorExtractorPtr, IDescriptorPtr, PyIFaceEngine, \
     IDescriptorBatchPtr  # pylint: disable=E0611,E0401
@@ -97,16 +99,14 @@ class FaceDescriptorEstimator(BaseEstimator):
         """
         if descriptor is None:
             descriptor = self.descriptorFactory()
-        res = self._coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, descriptor)
-        if res.isError:
-            raise ValueError("12343")
-        return FaceDescriptor(descriptor, res.value)
+        optionalGS = self._coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, descriptor)
+        if optionalGS.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(optionalGS))
+        return FaceDescriptor(descriptor, optionalGS.value)
 
     def estimateWarpsBatch(self, warps: List[Union[Warp, WarpedImage]], aggregate: bool = False,
                            descriptorBatch: Optional[FaceDescriptorBatch] = None) -> FaceDescriptorBatch:
         if descriptorBatch is not None:
-            # if (len(warps) != len(FaceDescriptorBatch)) and (aggregate and len(FaceDescriptorBatch) == 1):
-            #     raise ValueError("12343")
             pass
         else:
             descriptorBatch = self.descriptorDescriptorBatchFactory(len(warps))
