@@ -7,6 +7,8 @@ from typing import Union
 
 from FaceEngine import IAttributeEstimatorPtr, AttributeRequest, AttributeResult  # pylint: disable=E0611,E0401
 from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint: disable=E0611,E0401
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimator, BaseEstimation
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
@@ -218,6 +220,7 @@ class BasicAttributesEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
+    @CoreExceptionWarp(LunaVLError.EstimationBasicAttributeError)
     def estimate(self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool,
                  estimateEthnicity: bool) -> BasicAttributes:
         """
@@ -243,5 +246,5 @@ class BasicAttributesEstimator(BaseEstimator):
         error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage,
                                                              AttributeRequest(dtAttributes))
         if error.isError:
-            raise ValueError("12343")
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return BasicAttributes(baseAttributes)

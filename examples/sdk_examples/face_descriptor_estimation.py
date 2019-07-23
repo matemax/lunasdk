@@ -25,6 +25,5 @@ def estimateDescriptor():
     pprint.pprint(extractor.estimateWarpsBatch([warp.warpedImage, warp.warpedImage]))
 
 
-
 if __name__ == "__main__":
     estimateDescriptor()

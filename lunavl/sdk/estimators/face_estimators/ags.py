@@ -5,6 +5,8 @@ See ags_.
 from typing import Optional
 
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimator
 from lunavl.sdk.faceengine.facedetector import BoundingBox, FaceDetection
@@ -27,6 +29,7 @@ class AGSEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
+    @CoreExceptionWarp(LunaVLError.EstimationAGSError)
     def estimate(self, detection: Optional[FaceDetection] = None,
                  image: Optional[VLImage] = None, boundingBox: Optional[BoundingBox] = None) -> float:
         """
@@ -45,5 +48,5 @@ class AGSEstimator(BaseEstimator):
         else:
             error, ags = self._coreEstimator.estimate(detection.image.coreImage, detection.boundingBox.coreEstimation)
         if error.isError:
-            raise ValueError("12343")
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return ags
