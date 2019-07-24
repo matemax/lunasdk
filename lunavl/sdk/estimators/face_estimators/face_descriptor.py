@@ -114,15 +114,15 @@ class FaceDescriptorEstimator(BaseEstimator):
         if aggregate:
             aggregatedDescriptor = self.descriptorFactory()
 
-            res, scores = self._coreEstimator.extractFromWarpedImageBatch(
-                [warp.warpedImage.coreImage for warp in warps],
-                descriptorBatch, aggregatedDescriptor, len(warps))
-            aggregatedDescriptor = FaceDescriptor(aggregatedDescriptor, res.value)
+            optionalGSAggregateDescriptor, scores = self._coreEstimator.extractFromWarpedImageBatch(
+                [warp.warpedImage.coreImage for warp in warps], descriptorBatch, aggregatedDescriptor, len(warps))
+            aggregatedDescriptor = FaceDescriptor(aggregatedDescriptor, optionalGSAggregateDescriptor.value)
+            if optionalGSAggregateDescriptor.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(optionalGSAggregateDescriptor))
         else:
             aggregatedDescriptor = None
-            res, scores = self._coreEstimator.extractFromWarpedImageBatch(
-                [warp.warpedImage.coreImage for warp in warps],
-                descriptorBatch, len(warps))
-        if res.isError:
-            raise ValueError("12343")
+            error, scores = self._coreEstimator.extractFromWarpedImageBatch(
+                [warp.warpedImage.coreImage for warp in warps], descriptorBatch, len(warps))
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
         return FaceDescriptorBatch(descriptorBatch, scores), aggregatedDescriptor
