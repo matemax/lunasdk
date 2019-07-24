@@ -37,7 +37,7 @@ def CoreExceptionWarp(error: ErrorInfo):
         @wraps(func)
         async def wrap(*func_args, **func_kwargs):
             try:
-                res = await func(*func_args, **func_kwargs)
+                res = func(*func_args, **func_kwargs)
                 return res
             except RuntimeError as e:
                 raise LunaSDKException(error.detalize(str(e)), exception=e)
