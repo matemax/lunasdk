@@ -152,6 +152,8 @@ class Warper:
 
         Returns:
             Warp
+        Raises:
+            LunaSDKException: if creation failed
         """
         transformation = self._createWarpTransformation(faceDetection)
         error, warp = self._coreWarper.warp(faceDetection.image.coreImage, transformation)
@@ -175,6 +177,7 @@ class Warper:
             warping landmarks
         Raises:
             ValueError: if landmarks5 is not estimated
+            LunaSDKException: if transform failed
         """
         transformation = self._createWarpTransformation(faceDetection)
         if typeLandmarks == "L68":

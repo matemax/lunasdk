@@ -92,6 +92,8 @@ class MouthStateEstimator(BaseEstimator):
 
         Returns:
             estimated states
+        Raises:
+            LunaSDKException: if estimation failed
         """
         error, mouthState = self._coreEstimator.estimate(warp.warpedImage.coreImage)
         if error.isError:

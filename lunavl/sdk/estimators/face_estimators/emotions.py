@@ -200,6 +200,8 @@ class EmotionsEstimator(BaseEstimator):
 
         Returns:
             estimated emotions
+        Raises:
+            LunaSDKException: if estimation failed
         """
         error, emotions = self._coreEstimator.estimate(warp.warpedImage.coreImage)
         if error.isError:

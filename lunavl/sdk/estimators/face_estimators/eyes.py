@@ -197,6 +197,8 @@ class EyeEstimator(BaseEstimator):
 
         Returns:
             estimated states
+        Raises:
+            LunaSDKException: if estimation failed
         """
         cropper = EyeCropper()
         if isinstance(transformedLandmarks, Landmarks5):
@@ -314,6 +316,8 @@ class GazeEstimator(BaseEstimator):
             eyesEstimation: eyes estimation
         Returns:
             estimated states
+        Raises:
+            LunaSDKException: if estimation failed
         """
         error, gaze = self._coreEstimator.estimate(headPose.coreEstimation, eyesEstimation.coreEstimation)
         if error.isError:

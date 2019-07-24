@@ -110,6 +110,8 @@ class WarpQualityEstimator(BaseEstimator):
 
         Returns:
             estimated quality
+        Raises:
+            LunaSDKException: if estimation failed
         """
         error, coreQuality = self._coreEstimator.estimate(warp.warpedImage.coreImage)
         if error.isError:

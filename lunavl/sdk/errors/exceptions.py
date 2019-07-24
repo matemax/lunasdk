@@ -2,7 +2,7 @@
 Module realizes LunaSDKException - single exception for rising in sdk module
 """
 from functools import wraps
-from typing import Optional, Any
+from typing import Optional, Any, Callable
 
 from lunavl.sdk.errors.errors import ErrorInfo
 
@@ -14,6 +14,7 @@ class LunaSDKException(Exception):
     Attributes:
         error (ErrorInfo): error
         context (Any): additional info
+        exception (Optional[Exception]): other exception which converted to self
     """
 
     def __init__(self, error: ErrorInfo, context: Optional[Any] = None, exception: Optional[Exception] = None):
@@ -25,7 +26,7 @@ class LunaSDKException(Exception):
 
 def CoreExceptionWarp(error: ErrorInfo):
     """
-    Decorator for catching exceptions  from c.
+    Decorator catch runtime exceptions from core (as supposed)  and converts it to LunaSDKException.
 
     Args:
         error: returning error in the exception case
@@ -33,7 +34,7 @@ def CoreExceptionWarp(error: ErrorInfo):
         if exception was caught, system calls error method with error
     """
 
-    def realWarp(func):
+    def realWarp(func: Callable):
         @wraps(func)
         async def wrap(*func_args, **func_kwargs):
             try:

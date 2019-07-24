@@ -234,6 +234,8 @@ class BasicAttributesEstimator(BaseEstimator):
 
         Returns:
             estimated ethnicity
+        Raises:
+            LunaSDKException: if estimation failed
         """
         dtAttributes = 0
         if estimateAge:

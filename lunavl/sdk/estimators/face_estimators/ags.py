@@ -30,8 +30,8 @@ class AGSEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWarp(LunaVLError.EstimationAGSError)
-    def estimate(self, detection: Optional[FaceDetection] = None,
-                 image: Optional[VLImage] = None, boundingBox: Optional[BoundingBox] = None) -> float:
+    def estimate(self, detection: Optional[FaceDetection] = None,  image: Optional[VLImage] = None,
+                 boundingBox: Optional[BoundingBox] = None) -> float:
         """
         Estimate emotion on warp.
 
@@ -42,6 +42,8 @@ class AGSEstimator(BaseEstimator):
 
         Returns:
             estimated ags, float in range[0,1]
+        Raises:
+            LunaSDKException: if estimation failed
         """
         if detection is None:
             error, ags = self._coreEstimator.estimate(image.coreImage, boundingBox.coreEstimation)

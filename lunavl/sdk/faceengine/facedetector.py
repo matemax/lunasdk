@@ -241,8 +241,13 @@ class FaceDetector:
         Returns:
             face detection if face is found otherwise None
         Raises:
-            LunaSDKException: if detectOne is failed
+            LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
+        if image.format != ColorFormat.R8G8B8:
+            details = "Bad image format for detection,  format: {}, image: {}".format(image.format.value,
+                                                                                      image.filename)
+            raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
+
         if detectArea is None:
             _detectArea = image.coreImage.getRect()
         else:
@@ -271,7 +276,7 @@ class FaceDetector:
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
         Raises:
-            LunaSDKException: if any image has bad format or detect is failed
+            LunaSDKException(LunaVLError.InvalidImageFormat): if any image has bad format or detect is failed
 
         """
         imgs = []
@@ -285,7 +290,7 @@ class FaceDetector:
                 img = image.image
                 detectAreas.append(image.detectArea.coreRect)
             if img.format != ColorFormat.R8G8B8:
-                details = "Bad image format for detection {}, img {}".format(img.format.value, img.format)
+                details = "Bad image format for detection, format {}, img {}".format(img.format.value, img.filename)
                 raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
             imgs.append(img.coreImage)
 
