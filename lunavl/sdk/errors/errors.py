@@ -101,8 +101,10 @@ class LunaVLError:
     InvalidWidth = ErrorInfo(100034, "Invalid image width", "")
 
     CreationDescriptorError = ErrorInfo(110001, "Creation descriptor error", "")
+    CreationBatchDescriptorsError = ErrorInfo(110001, "Creation descriptor error", "")
     CreationImageError = ErrorInfo(110001, "Creation core image error", "")
     EstimationDescriptorError = ErrorInfo(110001, "Estimation descriptor error", "")
+    EstimationBatchDescriptorError = ErrorInfo(110001, "Estimation descriptor error", "")
     EstimationBasicAttributeError = ErrorInfo(110001, "Estimation basic attributes error", "")
     EstimationAGSError = ErrorInfo(110001, "Estimation AGS error", "")
     EstimationHeadPoseError = ErrorInfo(110001, "Estimation head pose error", "")
@@ -114,6 +116,8 @@ class LunaVLError:
     EstimationEyesError = ErrorInfo(110001, "Estimation eyes error", "")
     CreationWarpError = ErrorInfo(110001, "Creation warped image error", "")
     WarpTransformationError = ErrorInfo(110001, "Landmarks transformation error", "")
+    DetectOneFaceError = ErrorInfo(110001, "Detect one face error", "")
+    DetectFacesError = ErrorInfo(110001, "Detect one face error", "")
 
     @classmethod
     def fromSDKError(cls, sdkError: FSDKErrorResult) -> 'ErrorInfo':

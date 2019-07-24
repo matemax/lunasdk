@@ -12,7 +12,7 @@ from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E040
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import LunaSDKException
+from ..errors.exceptions import LunaSDKException, CoreExceptionWarp
 from ..image_utils.geometry import Rect, Landmarks
 from ..image_utils.image import VLImage, ColorFormat
 
@@ -227,6 +227,7 @@ class FaceDetector:
 
         return DetectionType(toDetect)
 
+    @CoreExceptionWarp(LunaVLError.DetectOneFaceError)
     def detectOne(self, image: VLImage, detectArea: Optional[Rect[float]] = None, detect5Landmarks: bool = True,
                   detect68Landmarks: bool = False) -> Union[None, FaceDetection]:
         """
@@ -256,6 +257,7 @@ class FaceDetector:
         coreDetection = detectRes
         return FaceDetection(coreDetection, image)
 
+    @CoreExceptionWarp(LunaVLError.DetectFacesError)
     def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detect5Landmarks: bool = True,
                detect68Landmarks: bool = False) -> List[List[FaceDetection]]:
         """
