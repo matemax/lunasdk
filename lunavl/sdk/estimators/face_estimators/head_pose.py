@@ -164,8 +164,7 @@ class HeadPoseEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation is failed
         """
-        error, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage,
-                                                               detection.coreEstimation)
+        error, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage, detection.coreEstimation)
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
