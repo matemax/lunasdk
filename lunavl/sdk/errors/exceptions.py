@@ -36,7 +36,7 @@ def CoreExceptionWarp(error: ErrorInfo):
 
     def realWarp(func: Callable):
         @wraps(func)
-        async def wrap(*func_args, **func_kwargs):
+        def wrap(*func_args, **func_kwargs):
             try:
                 res = func(*func_args, **func_kwargs)
                 return res
