@@ -29,7 +29,7 @@ class BaseEstimation(ABC):
     @abstractmethod
     def asDict(self) -> Union[dict, list]:
         """
-        Convert to  dict.
+        Convert to a dict.
 
         Returns:
             dict from luna api
