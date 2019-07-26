@@ -12,6 +12,8 @@ from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
 from FaceEngine import EyeAngles, GazeEstimation as CoreGazeEstimation   # pylint: disable=E0611,E0401
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
@@ -183,6 +185,7 @@ class EyeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
+    @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
     def estimate(self, transformedLandmarks: Union[Landmarks5, Landmarks68],
                  warp: Union[Warp, WarpedImage]) -> EyesEstimation:
         """
@@ -194,6 +197,8 @@ class EyeEstimator(BaseEstimator):
 
         Returns:
             estimated states
+        Raises:
+            LunaSDKException: if estimation failed
         """
         cropper = EyeCropper()
         if isinstance(transformedLandmarks, Landmarks5):
@@ -204,7 +209,7 @@ class EyeEstimator(BaseEstimator):
                                                  transformedLandmarks.coreEstimation)
         error, eyesEstimation = self._coreEstimator.estimate(warp.warpedImage.coreImage, eyeRects)
         if error.isError:
-            raise ValueError("12343")
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return EyesEstimation(eyesEstimation)
 
 
@@ -301,6 +306,7 @@ class GazeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
+    @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
     def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation) -> GazeEstimation:
         """
         Estimate a gaze direction
@@ -310,8 +316,10 @@ class GazeEstimator(BaseEstimator):
             eyesEstimation: eyes estimation
         Returns:
             estimated states
+        Raises:
+            LunaSDKException: if estimation failed
         """
         error, gaze = self._coreEstimator.estimate(headPose.coreEstimation, eyesEstimation.coreEstimation)
         if error.isError:
-            raise ValueError("12343")
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return GazeEstimation(gaze)

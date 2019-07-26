@@ -2,6 +2,8 @@
 """
 from typing import Union, Optional
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWarp
 from numpy.ma import array
 
 from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
@@ -122,6 +124,7 @@ class Warper:
         """
         self._coreWarper = coreWarper
 
+    @CoreExceptionWarp(LunaVLError.WarpTransformationError)
     def _createWarpTransformation(self, faceDetection: FaceDetection) -> Transformation:
         """
         Create warp transformation.
@@ -139,6 +142,7 @@ class Warper:
         return self._coreWarper.createTransformation(faceDetection.coreEstimation.detection,
                                                      faceDetection.landmarks5.coreEstimation)
 
+    @CoreExceptionWarp(LunaVLError.CreationWarpError)
     def warp(self, faceDetection: FaceDetection) -> Warp:
         """
         Create warp from detection.
@@ -148,13 +152,15 @@ class Warper:
 
         Returns:
             Warp
+        Raises:
+            LunaSDKException: if creation failed
         """
         transformation = self._createWarpTransformation(faceDetection)
-        warpResult = self._coreWarper.warp(faceDetection.image.coreImage, transformation)
-        if warpResult[0].isError:
-            raise ValueError("1234567")
+        error, warp = self._coreWarper.warp(faceDetection.image.coreImage, transformation)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
 
-        warpedImage = WarpedImage(body=warpResult[1], filename=faceDetection.image.filename)
+        warpedImage = WarpedImage(body=warp, filename=faceDetection.image.filename)
 
         return Warp(warpedImage, faceDetection)
 
@@ -171,16 +177,17 @@ class Warper:
             warping landmarks
         Raises:
             ValueError: if landmarks5 is not estimated
+            LunaSDKException: if transform failed
         """
         transformation = self._createWarpTransformation(faceDetection)
         if typeLandmarks == "L68":
-            warpResult = self._coreWarper.warp(faceDetection.landmarks68.coreEstimation, transformation)
+            error, warp = self._coreWarper.warp(faceDetection.landmarks68.coreEstimation, transformation)
         elif typeLandmarks == "L5":
-            warpResult = self._coreWarper.warp(faceDetection.landmarks5.coreEstimation, transformation)
+            error, warp = self._coreWarper.warp(faceDetection.landmarks5.coreEstimation, transformation)
         else:
             raise ValueError("Invalid value of typeLandmarks, must be 'L68' or 'L5'")
-        if warpResult[0].isError:
-            raise ValueError("1234567")
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         if typeLandmarks == "L68":
-            return Landmarks68(warpResult[1])
-        return Landmarks5(warpResult[1])
+            return Landmarks68(warp)
+        return Landmarks5(warp)

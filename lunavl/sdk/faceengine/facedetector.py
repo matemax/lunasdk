@@ -4,15 +4,15 @@ Module contains function for detection faces on images.
 from enum import Enum
 from typing import Optional, Union, List, NamedTuple, Dict
 
-from FaceEngine import ObjectDetectorClassType, DetectionType, Face  # pylint: disable=E0611,E0401
+from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
-from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611,E0401
+from FaceEngine import ObjectDetectorClassType, DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
-
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
-from ..errors.errors import ErrorInfo
-from ..errors.exceptions import LunaSDKException
+
+from ..errors.errors import LunaVLError
+from ..errors.exceptions import LunaSDKException, CoreExceptionWarp
 from ..image_utils.geometry import Rect, Landmarks
 from ..image_utils.image import VLImage, ColorFormat
 
@@ -227,6 +227,7 @@ class FaceDetector:
 
         return DetectionType(toDetect)
 
+    @CoreExceptionWarp(LunaVLError.DetectOneFaceError)
     def detectOne(self, image: VLImage, detectArea: Optional[Rect[float]] = None, detect5Landmarks: bool = True,
                   detect68Landmarks: bool = False) -> Union[None, FaceDetection]:
         """
@@ -240,8 +241,13 @@ class FaceDetector:
         Returns:
             face detection if face is found otherwise None
         Raises:
-            LunaSDKException: if detectOne is failed
+            LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
+        if image.format != ColorFormat.R8G8B8:
+            details = "Bad image format for detection,  format: {}, image: {}".format(image.format.value,
+                                                                                      image.filename)
+            raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
+
         if detectArea is None:
             _detectArea = image.coreImage.getRect()
         else:
@@ -252,13 +258,11 @@ class FaceDetector:
         if error.isError:
             if error.FSDKError == FSDKError.BufferIsEmpty:
                 return None
-            error = ErrorInfo.fromSDKError(123, "detection", error)
-            raise LunaSDKException(error)
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         coreDetection = detectRes
-        if not coreDetection.detection.isValid():
-            raise ValueError("WTF bad rect")  # todo check
         return FaceDetection(coreDetection, image)
 
+    @CoreExceptionWarp(LunaVLError.DetectFacesError)
     def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detect5Landmarks: bool = True,
                detect68Landmarks: bool = False) -> List[List[FaceDetection]]:
         """
@@ -272,7 +276,7 @@ class FaceDetector:
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
         Raises:
-            LunaSDKException: if any image has bad format or detect is failed
+            LunaSDKException(LunaVLError.InvalidImageFormat): if any image has bad format or detect is failed
 
         """
         imgs = []
@@ -286,15 +290,14 @@ class FaceDetector:
                 img = image.image
                 detectAreas.append(image.detectArea.coreRect)
             if img.format != ColorFormat.R8G8B8:
-                error = ErrorInfo(126, "bad format",
-                                  "Bad image format for detection {}, img {}".format(img.format.value, img.format))
-                raise LunaSDKException(error)
+                details = "Bad image format for detection, format {}, img {}".format(img.format.value, img.filename)
+                raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
             imgs.append(img.coreImage)
 
         error, detectRes = self._detector.detect(imgs, detectAreas, limit,
                                                  self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if error.isError:
-            raise LunaSDKException(ErrorInfo.fromSDKError(124, "detection", error))
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
             res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])

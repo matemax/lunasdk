@@ -3,7 +3,7 @@ An emotion estimation example
 """
 import pprint
 
-from lunavl.sdk.faceengine.engine import FACE_ENGINE
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 
@@ -13,12 +13,13 @@ def estimateEmotion():
     Estimate emotion from a warped image.
     """
     image = VLImage.load(filename='C:/temp/test.jpg')
-    detector = FACE_ENGINE.createFaceDetector(DetectorType.FACE_DET_V1)
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
-    warper = FACE_ENGINE.createWarper()
+    warper = faceEngine.createWarper()
     warp = warper.warp(faceDetection)
 
-    emotionEstimator = FACE_ENGINE.createEmotionEstimator()
+    emotionEstimator = faceEngine.createEmotionEstimator()
 
     pprint.pprint(emotionEstimator.estimate(warp.warpedImage).asDict())
 

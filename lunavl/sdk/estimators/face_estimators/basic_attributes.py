@@ -7,6 +7,8 @@ from typing import Union
 
 from FaceEngine import IAttributeEstimatorPtr, AttributeRequest, AttributeResult  # pylint: disable=E0611,E0401
 from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint: disable=E0611,E0401
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimator, BaseEstimation
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
@@ -123,8 +125,8 @@ class Ethnicities(BaseEstimation):
             dict in platform format
         """
         return {
-            "predominate_ethnicity": str(self.predominateEmotion),
-            "estimation": {
+            "predominant_ethnicity": str(self.predominateEmotion),
+            "estimations": {
                 "asian": self.asian,
                 "indian": self.indian,
                 "caucasian": self.caucasian,
@@ -188,9 +190,9 @@ class BasicAttributes(BaseEstimation):
         """
         res = {}
         if self.ethnicity is not None:
-            res["ethnicity"] = self.ethnicity.asDict()
+            res["ethnicities"] = self.ethnicity.asDict()
         else:
-            res["ethnicity"] = None
+            res["ethnicities"] = None
         if self.age is not None:
             res["age"] = round(self.age)
         else:
@@ -218,6 +220,7 @@ class BasicAttributesEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
+    @CoreExceptionWarp(LunaVLError.EstimationBasicAttributeError)
     def estimate(self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool,
                  estimateEthnicity: bool) -> BasicAttributes:
         """
@@ -231,6 +234,8 @@ class BasicAttributesEstimator(BaseEstimator):
 
         Returns:
             estimated ethnicity
+        Raises:
+            LunaSDKException: if estimation failed
         """
         dtAttributes = 0
         if estimateAge:
@@ -243,5 +248,5 @@ class BasicAttributesEstimator(BaseEstimator):
         error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage,
                                                              AttributeRequest(dtAttributes))
         if error.isError:
-            raise ValueError("12343")
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return BasicAttributes(baseAttributes)

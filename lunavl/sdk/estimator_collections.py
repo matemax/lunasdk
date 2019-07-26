@@ -1,4 +1,4 @@
-"""Module contains estimator collections.
+"""Module contains face estimator collections.
 """
 from enum import Enum
 from typing import List, Optional
@@ -7,10 +7,11 @@ from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator
 from lunavl.sdk.estimators.face_estimators.emotions import EmotionsEstimator
 from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator
 from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstimator
-from lunavl.sdk.faceengine.engine import VLFaceEngine, FACE_ENGINE
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 
 
 class FaceEstimator(Enum):
@@ -33,6 +34,8 @@ class FaceEstimator(Enum):
     WarpQuality = 7
     #: ags estimator
     AGS = 8
+    #: face descriptor estimator
+    Descriptor = 9
 
 
 class FaceEstimatorsCollection:
@@ -48,11 +51,12 @@ class FaceEstimatorsCollection:
         _basicAttributesEstimator (Optional[BasicAttributesEstimator]): lazy load basic attributes estimator
         _emotionsEstimator (Optional[EmotionsEstimator]): lazy load emotions estimator
         _AGSEstimator (Optional[AGSEstimator]): lazy load ags estimator
+        _descriptorEstimator (Optional[FaceDescriptorEstimator]): lazy load face descriptor estimator
         warper (Optional[Warper]): warper
     """
     __slots__ = ("_headPoseEstimator", "_eyeEstimator", "_gazeDirectionEstimator", "_mouthStateEstimator",
                  "_warpQualityEstimator", "_basicAttributesEstimator", "_emotionsEstimator", "_faceEngine",
-                 "_AGSEstimator", "warper")
+                 "_AGSEstimator", "warper", "_descriptorEstimator")
 
     def __init__(self, startEstimators: Optional[List[FaceEstimator]] = None,
                  faceEngine: Optional[VLFaceEngine] = None):
@@ -64,7 +68,7 @@ class FaceEstimatorsCollection:
             faceEngine: faceengine, factory for estimators
         """
         if faceEngine is None:
-            self._faceEngine = FACE_ENGINE
+            self._faceEngine = VLFaceEngine()
         else:
             self._faceEngine = faceEngine
 
@@ -76,6 +80,7 @@ class FaceEstimatorsCollection:
         self._warpQualityEstimator = None
         self._headPoseEstimator = None
         self._AGSEstimator = None
+        self._descriptorEstimator = None
         self.warper = self._faceEngine.createWarper()
 
         if startEstimators:
@@ -110,7 +115,6 @@ class FaceEstimatorsCollection:
             corresponding attribute name
         Raises:
             ValueError("Bad estimator"): if attribute name not found
-
         """
         for estimatorName in self.__slots__:
             if estimatorName == "_faceEngine":
@@ -144,8 +148,24 @@ class FaceEstimatorsCollection:
             self._headPoseEstimator = self._faceEngine.createHeadPoseEstimator()
         elif estimator == FaceEstimator.AGS:
             self._AGSEstimator = self._faceEngine.createAGSEstimator()
+        elif estimator == FaceEstimator.Descriptor:
+            self._descriptorEstimator = self._faceEngine.createFaceDescriptorEstimator()
         else:
             raise ValueError("Bad estimator type")
+
+    @property
+    def descriptorEstimator(self) -> FaceDescriptorEstimator:
+        """
+        Get head pose estimator.
+
+        If estimator is initialized it will be returned otherwise it will be initialized and returned
+
+        Returns:
+            estimator
+        """
+        if self._descriptorEstimator is None:
+            self._descriptorEstimator = self._faceEngine.createFaceDescriptorEstimator()
+        return self._descriptorEstimator
 
     @property
     def headPoseEstimator(self) -> HeadPoseEstimator:
@@ -376,6 +396,3 @@ class FaceEstimatorsCollection:
         """
         estimatorName = self._getAttributeNameByEstimator(estimator)
         setattr(self, estimatorName, None)
-
-
-FACE_ESTIMATORS_COLLECTION = FaceEstimatorsCollection()

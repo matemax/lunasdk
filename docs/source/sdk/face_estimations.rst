@@ -18,7 +18,7 @@ facilities you may save time, and use fast estimator from 68landmarks.
 
 .. _Tait–Bryan: https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles
 
-.. emotions_:
+.. _`emotions`:
 
 Emotions
 --------
@@ -39,7 +39,7 @@ results.
 Emotions estimation presents emotions a snormalized float values in the range of [0..1] where 0 is lack of
 a specific emotion and 1st is the maximum intensity of an emotion.
 
-.. `mouth state`_:
+.. _`mouth state`:
 
 Mouth state
 -----------
@@ -144,6 +144,29 @@ This estimator aims to determine the quality of source input image suitable for 
 matching. AGS is a float in range [0..1] where 0 corresponds to low quality.
 
 
+.. _`face descriptor`:
+
+Face descriptor
+---------------
+
+Descriptor itself is a set of object parameters that are specially encoded. Descriptors are typically more or less
+invariant to various affine object transformations and slight color variations. This property allows efficient use of
+such sets to identify, lookup, and compare real-world objects’ images.
+
+
+Descriptor extraction. Extraction is performed from object image areas around some previously discovered facial
+landmarks, so the quality of the descriptor highly depends on them and the image it was obtained from.
+
+Face descriptor algorithm evolves with time, so newer FaceEngine versions contain improved models of the algorithm.
+Currently next versions are available: 46, 51, 52 and 54. Versions 54, 52 and 51 more precise then 46, but works very
+fast on GPU. Version 54 is the most precise.
+
+
+Descriptor object stores a compact set of packed properties as well as some helper parameters that were used to extract
+these properties from the source image. Together these parameters determine descriptor compatibility. Not all
+descriptors are compatible to each other. It is impossible to batch and match in compatible descriptors, so you
+should pay attention what settings do you use when extracting them.
+
 Classes and methods
 -------------------
 
@@ -173,4 +196,7 @@ Classes and methods
     :members:
 
 .. automodule:: lunavl.sdk.estimators.face_estimators.ags
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.face_descriptor
     :members:

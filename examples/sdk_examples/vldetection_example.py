@@ -11,8 +11,7 @@ def estimateAll():
     Estimate all attributes
     """
     detector = VLFaceDetector()
-    image = VLImage.load(
-        url='https://cdn1.savepice.ru/uploads/2019/4/15/aa970957128d9892f297cdfa5b3fda88-full.jpg')
+    image = VLImage.load( filename='C:/temp/test.jpg')
     detection = detector.detectOne(image)
     pprint.pprint(detection.basicAttributes.asDict())
     pprint.pprint(detection.emotions.asDict())
@@ -22,6 +21,7 @@ def estimateAll():
     pprint.pprint(detection.headPose.asDict())
     pprint.pprint(detection.mouthState.asDict())
     pprint.pprint(detection.ags)
+    pprint.pprint(detection.descriptor.asDict())
 
 
 if __name__ == "__main__":

@@ -149,7 +149,7 @@ class TestDetector(BaseTestClass):
         assert 1 == len(detections[1])
         assert 1 == len(detections[1])
 
-    @pytest.mark.skip("core bug")
+    # @pytest.mark.skip("core bug")
     def test_detect_by_bad_area(self):
         image = VLImage.load(filename=ONE_FACE)
         area = Rect(100, 100, image.rect.width, image.rect.height)
