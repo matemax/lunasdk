@@ -1,5 +1,5 @@
 """
-Warp quality estimation example
+Face descriptor estimate example
 """
 import pprint
 
@@ -10,7 +10,7 @@ from lunavl.sdk.image_utils.image import VLImage
 
 def estimateDescriptor():
     """
-    Create warp from detection.
+    Estimate face descriptor.
     """
     image = VLImage.load(filename='C:/temp/test.jpg')
     faceEngine = VLFaceEngine()
@@ -22,7 +22,11 @@ def estimateDescriptor():
     extractor = faceEngine.createFaceDescriptorEstimator()
 
     pprint.pprint(extractor.estimate(warp.warpedImage))
-    pprint.pprint(extractor.estimateWarpsBatch([warp.warpedImage, warp.warpedImage]))
+    pprint.pprint(extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage]))
+    batch, aggregateDescriptor = extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage],
+                                                                    aggregate=True)
+    pprint.pprint(batch)
+    pprint.pprint(aggregateDescriptor)
 
 
 if __name__ == "__main__":

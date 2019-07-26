@@ -1,3 +1,9 @@
+"""
+Module contains a face descriptor estimator
+
+See `face descriptor`_.
+
+"""
 from typing import Union, Optional, List, Tuple, Dict, Iterator
 
 from FaceEngine import IDescriptorExtractorPtr, IDescriptorPtr, PyIFaceEngine, \
@@ -191,7 +197,7 @@ class FaceDescriptorEstimator(BaseEstimator):
         optionalGS = self._coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
         if optionalGS.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(optionalGS))
-        return FaceDescriptor(descriptor, optionalGS.value)
+        return FaceDescriptor(coreDescriptor, optionalGS.value)
 
     @CoreExceptionWarp(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(self, warps: List[Union[Warp, WarpedImage]], aggregate: bool = False,
