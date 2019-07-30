@@ -16,6 +16,7 @@ from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstima
 from lunavl.sdk.estimators.face_estimators.warper import Warper
 
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
+from lunavl.sdk.faceengine.matcher import FaceMatcher
 from ..faceengine.facedetector import DetectorType, FaceDetector
 
 
@@ -157,3 +158,6 @@ class VLFaceEngine:
         """
         return FaceDescriptorEstimator(self._faceEngine.createExtractor(), self._faceEngine.createDescriptor,
                                        self._faceEngine.createDescriptorBatch)
+
+    def createFaceMatcher(self) -> FaceMatcher:
+        return FaceMatcher(self._faceEngine.createMatcher())
