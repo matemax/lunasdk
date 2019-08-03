@@ -2,10 +2,14 @@ from abc import abstractmethod
 from typing import Any, List, Union
 from FaceEngine import IDescriptorMatcherPtr  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
+from lunavl.sdk.faceengine.descriptors import FaceDescriptorFactory
 
 
 class MatchResult:
+    # __slots__ = ("")
     pass
 
 
@@ -17,9 +21,9 @@ class FaceMatcher:
     Attributes:
         _coreMatcher (IDescriptorMatcherPtr): core matcher
     """
-    __slots__ = ('_coreMatcher',)
+    __slots__ = ('_coreMatcher', 'descriptorFactory')
 
-    def __init__(self, coreMatcher: IDescriptorMatcherPtr):
+    def __init__(self, coreMatcher: IDescriptorMatcherPtr, descriptorFactory: FaceDescriptorFactory):
         """
         Init.
 
@@ -27,6 +31,7 @@ class FaceMatcher:
             coreMatcher: core matcher
         """
         self._coreMatcher = coreMatcher
+        self.descriptorFactory = descriptorFactory
 
     @abstractmethod
     def match(self, reference: FaceDescriptor,
@@ -38,8 +43,20 @@ class FaceMatcher:
             estimated attributes
         """
         if isinstance(candidates, FaceDescriptor):
-            return self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
+            error = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            return error.value
         elif isinstance(candidates, FaceDescriptorBatch):
-            return self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
+            error, matchResults = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            return matchResults
         else:
-            pass
+            batch = self.descriptorFactory.generateDescriptorsBatch(len(candidates))
+            for candidate in candidates:
+                batch.append(candidate)
+            error, matchResults = self._coreMatcher.match(reference.coreEstimation, batch.coreEstimation)
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            return matchResults
