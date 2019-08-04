@@ -198,5 +198,8 @@ Classes and methods
 .. automodule:: lunavl.sdk.estimators.face_estimators.ags
     :members:
 
+.. automodule:: lunavl.sdk.faceengine.descriptors
+    :members:
+
 .. automodule:: lunavl.sdk.estimators.face_estimators.face_descriptor
     :members:
