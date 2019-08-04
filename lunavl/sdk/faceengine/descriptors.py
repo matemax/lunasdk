@@ -150,8 +150,6 @@ class FaceDescriptorFactory:
         self._coreFaceDescriptorBatchFactory: 'PyIFaceEngine.createDescriptorBatch' = \
             coreFaceEngine.createDescriptorBatch
 
-
-
     @CoreExceptionWarp(LunaVLError.CreationDescriptorError)
     def generateDescriptor(self) -> IDescriptorPtr:
         """
