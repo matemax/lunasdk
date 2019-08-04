@@ -33,12 +33,6 @@ def matchDescriptors():
     print(matcher.match(descriptor1, descriptor2))
     print(matcher.match(descriptor1, batch))
     print(matcher.match(descriptor1, [descriptor2, descriptor1]))
-    #
-    # pprint.pprint(extractor.estimateDescriptorsBatch([warp1.warpedImage, warp1.warpedImage]))
-    # batch, aggregateDescriptor = extractor.estimateDescriptorsBatch([warp1.warpedImage, warp1.warpedImage],
-    #                                                                 aggregate=True)
-    # pprint.pprint(batch)
-    # pprint.pprint(aggregateDescriptor)
 
 
 if __name__ == "__main__":

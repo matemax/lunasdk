@@ -13,3 +13,4 @@ Modules
    face_estimations
    estimator_collections
    high_level_api
+   matching
