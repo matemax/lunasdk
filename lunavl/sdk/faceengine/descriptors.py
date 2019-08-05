@@ -136,19 +136,27 @@ class FaceDescriptorBatch(BaseEstimation):
         for index in range(itemCount):
             yield FaceDescriptor(self._coreEstimation.getDescriptorFast(index), self.scores[index])
 
-    def append(self, descriptor: FaceDescriptor):
+    def append(self, descriptor: FaceDescriptor) -> None:
+        """
+        Add descriptor to end of batch.
+
+        Args:
+            descriptor: descriptor
+        """
         self.coreEstimation.add(descriptor.coreEstimation)
         self.scores.append(descriptor.garbageScore)
 
 
 class FaceDescriptorFactory:
+    """
+    Face Descriptor factory.
+
+    Attributes:
+        _faceEngine (VLFaceEngine): faceEngine
+    """
 
     def __init__(self, faceEngine: 'VLFaceEngine'):
-        self.faceEngine = faceEngine
-        coreFaceEngine = self.faceEngine.coreFaceEngine
-        self._coreFaceDescriptorFactory: 'PyIFaceEngine.createDescriptorBatch' = coreFaceEngine.createDescriptor
-        self._coreFaceDescriptorBatchFactory: 'PyIFaceEngine.createDescriptorBatch' = \
-            coreFaceEngine.createDescriptorBatch
+        self._faceEngine = faceEngine
 
     @CoreExceptionWarp(LunaVLError.CreationDescriptorError)
     def generateDescriptor(self) -> IDescriptorPtr:
@@ -158,7 +166,7 @@ class FaceDescriptorFactory:
         Returns:
             core descriptor
         """
-        return FaceDescriptor(self._coreFaceDescriptorFactory())
+        return FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor())
 
     @CoreExceptionWarp(LunaVLError.CreationDescriptorError)
     def generateDescriptorsBatch(self, size: int) -> IDescriptorBatchPtr:
@@ -171,4 +179,4 @@ class FaceDescriptorFactory:
         Returns:
             batch
         """
-        return FaceDescriptorBatch(self._coreFaceDescriptorBatchFactory(size))
+        return FaceDescriptorBatch(self._faceEngine.coreFaceEngine.createDescriptorBatch(size))
