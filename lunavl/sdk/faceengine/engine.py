@@ -18,7 +18,9 @@ from lunavl.sdk.estimators.face_estimators.warper import Warper
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
 from lunavl.sdk.faceengine.descriptors import FaceDescriptorFactory
 from lunavl.sdk.faceengine.matcher import FaceMatcher
-from ..faceengine.facedetector import DetectorType, FaceDetector
+from lunavl.sdk.faceengine.setting_provider import DetectorType
+
+from ..faceengine.facedetector import FaceDetector
 
 
 class VLFaceEngine:
