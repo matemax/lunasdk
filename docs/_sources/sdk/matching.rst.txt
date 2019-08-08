@@ -13,9 +13,9 @@ It is possible to match a pair of descriptors with each other or a single descri
 
 A simple rule to help you decide which storage to opt for:
 
-    #) when searching among less than a hundred descriptors use separat descriptor object;
+    #) when searching among less than a hundred descriptors use separate descriptor object;
 
-    #) when searching among bigger number of descriptors usea batch.
+    #) when searching among bigger number of descriptors use a batch.
 
 
 .. automodule:: lunavl.sdk.faceengine.descriptors
