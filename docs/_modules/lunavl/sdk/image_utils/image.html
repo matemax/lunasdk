@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.image_utils.image &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.image_utils.image</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module realize VLImage - structure for storing image in special format.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">FormatType</span><span class="p">,</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">CoreImage</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndarray</span>
+
+<span class="kn">from</span> <span class="nn">.geometry</span> <span class="k">import</span> <span class="n">Rect</span>
+
+
+<div class="viewcode-block" id="ImageFormat"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.ImageFormat">[docs]</a><span class="k">class</span> <span class="nc">ImageFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum for image format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: jpg</span>
+    <span class="n">JPG</span> <span class="o">=</span> <span class="s1">&#39;jpg&#39;</span>
+    <span class="c1">#: png</span>
+    <span class="n">PNG</span> <span class="o">=</span> <span class="s1">&#39;png&#39;</span>
+    <span class="c1">#: ppm</span>
+    <span class="n">PPM</span> <span class="o">=</span> <span class="s1">&#39;ppm&#39;</span>
+    <span class="c1">#: tif</span>
+    <span class="n">TIF</span> <span class="o">=</span> <span class="s1">&#39;tif&#39;</span></div>
+
+
+<div class="viewcode-block" id="ColorFormat"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.ColorFormat">[docs]</a><span class="k">class</span> <span class="nc">ColorFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum for vl luna color formats</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: 3 channel, 8 bit per channel, B-G-R color order format;</span>
+    <span class="n">B8G8R8</span> <span class="o">=</span> <span class="s1">&#39;B8G8R8&#39;</span>
+    <span class="c1">#: 3 channel, 8 bit per channel, B-G-R color order format with 8 bit padding before next pixel;</span>
+    <span class="n">B8G8R8X8</span> <span class="o">=</span> <span class="s1">&#39;B8G8R8X8&#39;</span>
+    <span class="c1">#: 1 channel, 8 bit per channel format;</span>
+    <span class="n">R16</span> <span class="o">=</span> <span class="s1">&#39;R16&#39;</span>
+    <span class="c1">#: 1 channel, 8 bit per channel format;</span>
+    <span class="n">R8</span> <span class="o">=</span> <span class="s1">&#39;R8&#39;</span>
+    <span class="c1">#: 3 channel, 8 bit per channel, R-G-B color order format;</span>
+    <span class="n">R8G8B8</span> <span class="o">=</span> <span class="s1">&#39;R8G8B8&#39;</span>
+    <span class="c1">#: 3 channel, 8 bit per channel, R-G-B color order format with 8 bit padding before next pixel;</span>
+    <span class="n">R8G8B8X8</span> <span class="o">=</span> <span class="s1">&#39;R8G8B8X8&#39;</span>
+    <span class="c1">#: unknown format</span>
+    <span class="n">Unknown</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coreFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FormatType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert  format to luna core format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            luna core format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">FormatType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convertCoreFormat</span><span class="p">(</span><span class="n">imageFormat</span><span class="p">:</span> <span class="n">FormatType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ColorFormat&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert FormatType to Format</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imageFormat: core image format</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            corresponding lunavl image format</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ColorFormat</span><span class="p">,</span> <span class="n">imageFormat</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="VLImage"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage">[docs]</a><span class="k">class</span> <span class="nc">VLImage</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class image.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        coreImage (CoreFE.Image): core image object</span>
+<span class="sd">        source (str): source of image (todo change)</span>
+<span class="sd">        filename (str): filename of the file which is source of image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;coreImage&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;filename&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">CoreImage</span><span class="p">],</span> <span class="n">imgFormat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ColorFormat</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            body: body of image - bytes numpy array or core image</span>
+<span class="sd">            imgFormat: img format</span>
+<span class="sd">            filename: user mark a source of image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">imgFormat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">imgFormat</span> <span class="o">=</span> <span class="n">ColorFormat</span><span class="o">.</span><span class="n">R8G8B8</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span> <span class="o">=</span> <span class="n">CoreImage</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">CoreImage</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">loadResult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">loadFromMemory</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">),</span> <span class="n">imgFormat</span><span class="o">.</span><span class="n">coreFormat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">loadResult</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+                <span class="c1">#: todo: raise correct error.</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+            <span class="c1">#: todo, format ?????</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">imgFormat</span><span class="o">.</span><span class="n">coreFormat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;wtf  image type&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+
+<div class="viewcode-block" id="VLImage.load"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">imgFormat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ColorFormat</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;VLImage&#39;</span><span class="p">:</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load imag from numpy array or file or url.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *_: for remove positional argument</span>
+<span class="sd">            filename: filename</span>
+<span class="sd">            url: url</span>
+<span class="sd">            imgFormat:</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            vl image</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if no one argument  did not set.</span>
+
+<span class="sd">        &gt;&gt;&gt; VLImage.load(url=&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;).rect</span>
+<span class="sd">        x = 0, y = 0, width = 1000, height = 1288</span>
+
+<span class="sd">        todo: more doc test</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">imgFormat</span><span class="p">)</span>
+                <span class="n">img</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">return</span> <span class="n">img</span>
+
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">imgFormat</span><span class="p">)</span>
+                <span class="n">img</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">url</span>
+                <span class="k">return</span> <span class="n">img</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColorFormat</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; getFormat(self: FaceEngine.Image) -&gt; FaceEngine.FormatType</span>
+
+<span class="sd">        &gt;&gt;&gt; image = VLImage.load(url=&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; image.format.value</span>
+<span class="sd">        &#39;R8G8B8&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ColorFormat</span><span class="o">.</span><span class="n">convertCoreFormat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getFormat</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Rect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get rect of image.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            rect of the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Rect</span><span class="o">.</span><span class="n">fromCoreRect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getRect</span><span class="p">())</span>
+
+<div class="viewcode-block" id="VLImage.computePitch"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.computePitch">[docs]</a>    <span class="k">def</span> <span class="nf">computePitch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowWidth</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute row size in bytes</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rowWidth: row width in pixels.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            row size in bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">computePitch</span><span class="p">(</span><span class="n">rowWidth</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bitDepth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get number of bits per pixel.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            number of bits per pixel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getBitDepth</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">getByteDepth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get number of bytes per pixel.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            number of bytes per pixel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getByteDepth</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">channelCount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get chanel count of the image.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            channel count.</span>
+
+<span class="sd">        &gt;&gt;&gt; img = VLImage.load(url=&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; img.channelCount</span>
+<span class="sd">        3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getChannelCount</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">channelSize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get size of one chanel in bites.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            channel size in bytes.</span>
+
+<span class="sd">        &gt;&gt;&gt; img = VLImage.load(url=&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; img.channelSize</span>
+<span class="sd">        8</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getChannelSize</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">channelStep</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get chanel step.</span>
+<span class="sd">        todo: more description</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            channel size in bytes.</span>
+<span class="sd">        Notes:</span>
+<span class="sd">            padding bytes are considered spare channels.</span>
+
+<span class="sd">        &gt;&gt;&gt; img = VLImage.load(url=&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; img.channelStep</span>
+<span class="sd">        3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getChannelStep</span><span class="p">()</span>
+
+<div class="viewcode-block" id="VLImage.asNPArray"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.asNPArray">[docs]</a>    <span class="k">def</span> <span class="nf">asNPArray</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get image as numpy array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy array</span>
+<span class="sd">        todo: doctest</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="VLImage.isBGR"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.isBGR">[docs]</a>    <span class="k">def</span> <span class="nf">isBGR</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether format image is bgr or not.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the image is bgr image otherwise False</span>
+<span class="sd">        Notes:</span>
+<span class="sd">            padding is ignored for padded channels.</span>
+
+<span class="sd">        &gt;&gt;&gt; VLImage.load(url=&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;).isBGR()</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">isBGR</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="VLImage.isPadded"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.isPadded">[docs]</a>    <span class="k">def</span> <span class="nf">isPadded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determinate image format has padding bytes or not.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            true if image format has padding bytes.</span>
+<span class="sd">        todo examples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">isPadded</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="VLImage.save"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save image to disk. Support image format: *ppm, jpg, png, tif*.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename: filename</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            todo it</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">saveRes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">saveRes</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span></div>
+
+<div class="viewcode-block" id="VLImage.convertToBinaryImg"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.convertToBinaryImg">[docs]</a>    <span class="k">def</span> <span class="nf">convertToBinaryImg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageFormat</span><span class="p">:</span> <span class="n">ImageFormat</span> <span class="o">=</span> <span class="n">ImageFormat</span><span class="o">.</span><span class="n">PPM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert VL image to binary image</span>
+<span class="sd">        Args:</span>
+<span class="sd">            imageFormat: format</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="VLImage.isValid"><a class="viewcode-back" href="../../../../sdk/sdk_image.html#lunavl.sdk.image_utils.image.VLImage.isValid">[docs]</a>    <span class="k">def</span> <span class="nf">isValid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check image is valid loaded  to core image or not</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if image is valid otherwise False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span><span class="o">.</span><span class="n">isValid</span><span class="p">()</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

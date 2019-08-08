@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Estimator collections &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="High level api" href="high_level_api.html" />
+    <link rel="prev" title="Face attributes estimations" href="face_estimations.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Estimator collections</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="face_estimations.html" title="Previous Chapter: Face attributes estimations"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Face attribut...</span>
+    </a>
+  </li>
+  <li>
+    <a href="high_level_api.html" title="Next Chapter: High level api"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">High level api &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/estimator_collections.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="estimator-collections">
+<h1>Estimator collections<a class="headerlink" href="#estimator-collections" title="Permalink to this headline">¶</a></h1>
+<p>99% real applications is needed one instance of faceengine and one instance of every estimators. Initialization of
+estimators is to slow therefore application should initialize all needing estimators on start up and re use its.</p>
+<p>A estimator collection are a logical groped estimators. Estimators from collection are initialized in first call.</p>
+<p>Class <em>FaceEstimatorsCollection</em> contains all estimators for a face.</p>
+<span class="target" id="module-lunavl.sdk.estimator_collections"></span><p>Module contains face estimator collections.</p>
+<dl class="class">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.estimator_collections.</code><code class="descname">FaceEstimator</code><a class="reference internal" href="../_modules/lunavl/sdk/estimator_collections.html#FaceEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum for face estimators.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.AGS">
+<code class="descname">AGS</code><em class="property"> = 8</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.AGS" title="Permalink to this definition">¶</a></dt>
+<dd><p>ags estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.BasicAttributes">
+<code class="descname">BasicAttributes</code><em class="property"> = 4</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.BasicAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>basic attributes estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.Descriptor">
+<code class="descname">Descriptor</code><em class="property"> = 9</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.Descriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>face descriptor estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.Emotions">
+<code class="descname">Emotions</code><em class="property"> = 3</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.Emotions" title="Permalink to this definition">¶</a></dt>
+<dd><p>emotion estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.Eye">
+<code class="descname">Eye</code><em class="property"> = 2</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.Eye" title="Permalink to this definition">¶</a></dt>
+<dd><p>eye estimation (eyelid, iris landmarks and state)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.GazeDirection">
+<code class="descname">GazeDirection</code><em class="property"> = 5</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.GazeDirection" title="Permalink to this definition">¶</a></dt>
+<dd><p>gaze direction estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.HeadPose">
+<code class="descname">HeadPose</code><em class="property"> = 1</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.HeadPose" title="Permalink to this definition">¶</a></dt>
+<dd><p>head pose estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.MouthState">
+<code class="descname">MouthState</code><em class="property"> = 6</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.MouthState" title="Permalink to this definition">¶</a></dt>
+<dd><p>mouth state estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimator.WarpQuality">
+<code class="descname">WarpQuality</code><em class="property"> = 7</em><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimator.WarpQuality" title="Permalink to this definition">¶</a></dt>
+<dd><p>warp quality estimator</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.estimator_collections.</code><code class="descname">FaceEstimatorsCollection</code><span class="sig-paren">(</span><em>startEstimators=None</em>, <em>faceEngine=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimator_collections.html#FaceEstimatorsCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of lazy load face estimators.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._headPoseEstimator">
+<code class="descname">_headPoseEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._headPoseEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load head pose estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.head_pose.HeadPoseEstimator" title="lunavl.sdk.estimators.face_estimators.head_pose.HeadPoseEstimator">HeadPoseEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._eyeEstimator">
+<code class="descname">_eyeEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._eyeEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load eye estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator" title="lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator">EyeEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._gazeDirectionEstimator">
+<code class="descname">_gazeDirectionEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._gazeDirectionEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load gaze direction estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator" title="lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator">GazeEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._mouthStateEstimator">
+<code class="descname">_mouthStateEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._mouthStateEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load mouth state estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStateEstimator" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStateEstimator">MouthStateEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._warpQualityEstimator">
+<code class="descname">_warpQualityEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._warpQualityEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load warp quality estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.WarpQualityEstimator" title="lunavl.sdk.estimators.face_estimators.warp_quality.WarpQualityEstimator">WarpQualityEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._basicAttributesEstimator">
+<code class="descname">_basicAttributesEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._basicAttributesEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load basic attributes estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator">BasicAttributesEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._emotionsEstimator">
+<code class="descname">_emotionsEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._emotionsEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load emotions estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.EmotionsEstimator" title="lunavl.sdk.estimators.face_estimators.emotions.EmotionsEstimator">EmotionsEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._AGSEstimator">
+<code class="descname">_AGSEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._AGSEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load ags estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.ags.AGSEstimator" title="lunavl.sdk.estimators.face_estimators.ags.AGSEstimator">AGSEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection._descriptorEstimator">
+<code class="descname">_descriptorEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection._descriptorEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load face descriptor estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.face_descriptor.FaceDescriptorEstimator" title="lunavl.sdk.estimators.face_estimators.face_descriptor.FaceDescriptorEstimator">FaceDescriptorEstimator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.warper">
+<code class="descname">warper</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.warper" title="Permalink to this definition">¶</a></dt>
+<dd><p>warper</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="warping.html#lunavl.sdk.estimators.face_estimators.warper.Warper" title="lunavl.sdk.estimators.face_estimators.warper.Warper">Warper</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.AGSEstimator">
+<code class="descname">AGSEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.AGSEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ags estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.ags.AGSEstimator" title="lunavl.sdk.estimators.face_estimators.ags.AGSEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AGSEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.basicAttributesEstimator">
+<code class="descname">basicAttributesEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.basicAttributesEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get basic attributes estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicAttributesEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.descriptorEstimator">
+<code class="descname">descriptorEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.descriptorEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get head pose estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.face_descriptor.FaceDescriptorEstimator" title="lunavl.sdk.estimators.face_estimators.face_descriptor.FaceDescriptorEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDescriptorEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.emotionsEstimator">
+<code class="descname">emotionsEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.emotionsEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get emotions estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.EmotionsEstimator" title="lunavl.sdk.estimators.face_estimators.emotions.EmotionsEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmotionsEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.eyeEstimator">
+<code class="descname">eyeEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.eyeEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get eye estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator" title="lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EyeEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.faceEngine">
+<code class="descname">faceEngine</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.faceEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get current faceengine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self._faceEngine</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine" title="lunavl.sdk.faceengine.engine.VLFaceEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">VLFaceEngine</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.gazeDirectionEstimator">
+<code class="descname">gazeDirectionEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.gazeDirectionEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get gaze direction estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator" title="lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">GazeEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.headPoseEstimator">
+<code class="descname">headPoseEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.headPoseEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get head pose estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.head_pose.HeadPoseEstimator" title="lunavl.sdk.estimators.face_estimators.head_pose.HeadPoseEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeadPoseEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.initEstimator">
+<code class="descname">initEstimator</code><span class="sig-paren">(</span><em>estimator</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimator_collections.html#FaceEstimatorsCollection.initEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.initEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an estimator. Create new estimator with help self._faceengine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>estimator</strong> – estimator for creating</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong><strong>(</strong><strong>&quot;Bad estimator type&quot;</strong><strong>)</strong> – if estimator not found</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.mouthStateEstimator">
+<code class="descname">mouthStateEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.mouthStateEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get mouth state estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStateEstimator" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStateEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouthStateEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.removeEstimator">
+<code class="descname">removeEstimator</code><span class="sig-paren">(</span><em>estimator</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimator_collections.html#FaceEstimatorsCollection.removeEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.removeEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove estimators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>estimator</strong> – estimator for removing</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimator_collections.FaceEstimatorsCollection.warpQualityEstimator">
+<code class="descname">warpQualityEstimator</code><a class="headerlink" href="#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.warpQualityEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get warp quality estimator.</p>
+<p>If estimator is initialized it will be returned otherwise it will be initialized and returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.WarpQualityEstimator" title="lunavl.sdk.estimators.face_estimators.warp_quality.WarpQualityEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">WarpQualityEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

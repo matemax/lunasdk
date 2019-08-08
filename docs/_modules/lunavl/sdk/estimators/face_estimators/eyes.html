@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.estimators.face_estimators.eyes &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.estimators.face_estimators.eyes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module contains a mouth state estimator</span>
+
+<span class="sd">See `eyes`_ and `gaze direction`_.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">IEyeEstimatorPtr</span><span class="p">,</span> <span class="n">EyeCropper</span><span class="p">,</span> <span class="n">IGazeEstimatorPtr</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">EyelidLandmarks</span> <span class="k">as</span> <span class="n">CoreEyelidLandmarks</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">IrisLandmarks</span> <span class="k">as</span> <span class="n">CoreIrisLandmarks</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">State</span> <span class="k">as</span> <span class="n">CoreEyeState</span><span class="p">,</span> <span class="n">EyesEstimation</span> <span class="k">as</span> <span class="n">CoreEyesEstimation</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">EyeAngles</span><span class="p">,</span> <span class="n">GazeEstimation</span> <span class="k">as</span> <span class="n">CoreGazeEstimation</span>   <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.errors.errors</span> <span class="k">import</span> <span class="n">LunaVLError</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.errors.exceptions</span> <span class="k">import</span> <span class="n">CoreExceptionWarp</span><span class="p">,</span> <span class="n">LunaSDKException</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.base_estimation</span> <span class="k">import</span> <span class="n">BaseEstimation</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.head_pose</span> <span class="k">import</span> <span class="n">HeadPose</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.facedetector</span> <span class="k">import</span> <span class="n">Landmarks5</span><span class="p">,</span> <span class="n">Landmarks68</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warper</span> <span class="k">import</span> <span class="n">Warp</span><span class="p">,</span> <span class="n">WarpedImage</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.image_utils.geometry</span> <span class="k">import</span> <span class="n">Landmarks</span>
+
+
+<div class="viewcode-block" id="EyeState"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyeState">[docs]</a><span class="k">class</span> <span class="nc">EyeState</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum for eye states.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: eye is opened</span>
+    <span class="n">Open</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#: eye is occluded</span>
+    <span class="n">Occluded</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1">#: eye is closed</span>
+    <span class="n">Closed</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fromCoreEmotion</span><span class="p">(</span><span class="n">coreEyeState</span><span class="p">:</span> <span class="n">CoreEyeState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;EyeState&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get enum element by core emotion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEyeState: an eye state form core</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            corresponding eye state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">EyeState</span><span class="p">,</span> <span class="n">coreEyeState</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IrisLandmarks"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.IrisLandmarks">[docs]</a><span class="k">class</span> <span class="nc">IrisLandmarks</span><span class="p">(</span><span class="n">Landmarks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Eyelid landmarks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreIrisLandmarks</span><span class="p">:</span> <span class="n">CoreIrisLandmarks</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreIrisLandmarks: core iris landmarks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreIrisLandmarks</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EyelidLandmarks"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyelidLandmarks">[docs]</a><span class="k">class</span> <span class="nc">EyelidLandmarks</span><span class="p">(</span><span class="n">Landmarks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Eyelid landmarks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEyelidLandmarks</span><span class="p">:</span> <span class="n">CoreEyelidLandmarks</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEyelidLandmarks: core  eyelid landmarks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEyelidLandmarks</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Eye"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.Eye">[docs]</a><span class="k">class</span> <span class="nc">Eye</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Eye structure.</span>
+
+<span class="sd">    Estimation properties:</span>
+
+<span class="sd">        - eyelid</span>
+<span class="sd">        - iris</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;irisLandmarks&quot;</span><span class="p">,</span> <span class="s2">&quot;eyelidLandMarks&quot;</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">)</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimation: core estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irisLandmarks</span> <span class="o">=</span> <span class="n">IrisLandmarks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">iris</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyelidLandMarks</span> <span class="o">=</span> <span class="n">EyelidLandmarks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">eyelid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">EyeState</span><span class="o">.</span><span class="n">fromCoreEmotion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eyelid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyelidLandmarks</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get eyelid landmarks.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            eyelid landmarks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyelidLandMarks</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">iris</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IrisLandmarks</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get iris landmarks.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            iris landmarks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">irisLandmarks</span>
+
+<div class="viewcode-block" id="Eye.asDict"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.Eye.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            {&quot;iris_landmarks&quot;: self.irisLandmarks.asDict(), &quot;eyelid_landmarks&quot;: self.eyelidLandMarks.asDict(),</span>
+<span class="sd">             &quot;state&quot;: self.state.name.lower()}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;iris_landmarks&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">irisLandmarks</span><span class="o">.</span><span class="n">asDict</span><span class="p">(),</span>
+                <span class="s2">&quot;eyelid_landmarks&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyelidLandMarks</span><span class="o">.</span><span class="n">asDict</span><span class="p">(),</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()}</span></div></div>
+
+
+<div class="viewcode-block" id="EyesEstimation"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyesEstimation">[docs]</a><span class="k">class</span> <span class="nc">EyesEstimation</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Eyes estimation structure.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        leftEye (Eye): estimation for left eye</span>
+<span class="sd">        rightEye (Eye): estimation for right eye</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;leftEye&quot;</span><span class="p">,</span> <span class="s2">&quot;rightEye&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimation</span><span class="p">:</span> <span class="n">CoreEyesEstimation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimation: core estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftEye</span> <span class="o">=</span> <span class="n">Eye</span><span class="p">(</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">leftEye</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rightEye</span> <span class="o">=</span> <span class="n">Eye</span><span class="p">(</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">rightEye</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EyesEstimation.asDict"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyesEstimation.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            {&#39;yaw&#39;: self.leftEye, &#39;pitch&#39;: self.rightEye}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;left_eye&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">leftEye</span><span class="o">.</span><span class="n">asDict</span><span class="p">(),</span>
+                <span class="s2">&quot;right_eye&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rightEye</span><span class="o">.</span><span class="n">asDict</span><span class="p">()}</span></div></div>
+
+
+<div class="viewcode-block" id="EyeEstimator"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator">[docs]</a><span class="k">class</span> <span class="nc">EyeEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Eye estimator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimator</span><span class="p">:</span> <span class="n">IEyeEstimatorPtr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimator: core estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimator</span><span class="p">)</span>
+
+    <span class="c1">#  pylint: disable=W0221</span>
+<div class="viewcode-block" id="EyeEstimator.estimate"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator.estimate">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">EstimationEyesGazeError</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformedLandmarks</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Landmarks5</span><span class="p">,</span> <span class="n">Landmarks68</span><span class="p">],</span>
+                 <span class="n">warp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Warp</span><span class="p">,</span> <span class="n">WarpedImage</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">EyesEstimation</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate mouth state on warp.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            warp: warped image</span>
+<span class="sd">            transformedLandmarks: transformed landmarks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimated states</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            LunaSDKException: if estimation failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cropper</span> <span class="o">=</span> <span class="n">EyeCropper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformedLandmarks</span><span class="p">,</span> <span class="n">Landmarks5</span><span class="p">):</span>
+            <span class="n">eyeRects</span> <span class="o">=</span> <span class="n">cropper</span><span class="o">.</span><span class="n">cropByLandmarks5</span><span class="p">(</span><span class="n">warp</span><span class="o">.</span><span class="n">warpedImage</span><span class="o">.</span><span class="n">coreImage</span><span class="p">,</span>
+                                                <span class="n">transformedLandmarks</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eyeRects</span> <span class="o">=</span> <span class="n">cropper</span><span class="o">.</span><span class="n">cropByLandmarks68</span><span class="p">(</span><span class="n">warp</span><span class="o">.</span><span class="n">warpedImage</span><span class="o">.</span><span class="n">coreImage</span><span class="p">,</span>
+                                                 <span class="n">transformedLandmarks</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">)</span>
+        <span class="n">error</span><span class="p">,</span> <span class="n">eyesEstimation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">warp</span><span class="o">.</span><span class="n">warpedImage</span><span class="o">.</span><span class="n">coreImage</span><span class="p">,</span> <span class="n">eyeRects</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LunaSDKException</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">fromSDKError</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">EyesEstimation</span><span class="p">(</span><span class="n">eyesEstimation</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GazeDirection"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeDirection">[docs]</a><span class="k">class</span> <span class="nc">GazeDirection</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaze direction structure.</span>
+<span class="sd">    Estimation properties:</span>
+
+<span class="sd">        - yaw</span>
+<span class="sd">        - pitch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimation</span><span class="p">:</span> <span class="n">EyeAngles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">yaw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the yaw angle.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float in range(0, 1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">yaw</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pitch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the pitch angle.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float in range(0, 1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">pitch</span>
+
+<div class="viewcode-block" id="GazeDirection.asDict"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeDirection.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            {&#39;yaw&#39;: self.yaw, &#39;pitch&#39;: self.pitch}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;yaw&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span> <span class="s1">&#39;pitch&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="GazeEstimation"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimation">[docs]</a><span class="k">class</span> <span class="nc">GazeEstimation</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaze estimation.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        leftEye (GazeDirection): left eye gaze direction</span>
+<span class="sd">        rightEye (GazeDirection): right eye gaze direction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;leftEye&quot;</span><span class="p">,</span> <span class="s2">&quot;rightEye&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimation</span><span class="p">:</span> <span class="n">CoreGazeEstimation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimation: core estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftEye</span> <span class="o">=</span> <span class="n">GazeDirection</span><span class="p">(</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">leftEye</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rightEye</span> <span class="o">=</span> <span class="n">GazeDirection</span><span class="p">(</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">rightEye</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GazeEstimation.asDict"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimation.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert self to a dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            {&quot;left_eye&quot;: self.leftEye.asDict(), &quot;right_eye&quot;: self.rightEye.asDict()}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;left_eye&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">leftEye</span><span class="o">.</span><span class="n">asDict</span><span class="p">(),</span> <span class="s2">&quot;right_eye&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rightEye</span><span class="o">.</span><span class="n">asDict</span><span class="p">()}</span></div></div>
+
+
+<div class="viewcode-block" id="GazeEstimator"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator">[docs]</a><span class="k">class</span> <span class="nc">GazeEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaze direction estimator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimator</span><span class="p">:</span> <span class="n">IGazeEstimatorPtr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimator: core estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimator</span><span class="p">)</span>
+
+    <span class="c1">#  pylint: disable=W0221</span>
+<div class="viewcode-block" id="GazeEstimator.estimate"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator.estimate">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">EstimationEyesGazeError</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headPose</span><span class="p">:</span> <span class="n">HeadPose</span><span class="p">,</span> <span class="n">eyesEstimation</span><span class="p">:</span> <span class="n">EyesEstimation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeEstimation</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate a gaze direction</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            headPose: head pose (calculated using landmarks68)</span>
+<span class="sd">            eyesEstimation: eyes estimation</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            estimated states</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            LunaSDKException: if estimation failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error</span><span class="p">,</span> <span class="n">gaze</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">headPose</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">,</span> <span class="n">eyesEstimation</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LunaSDKException</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">fromSDKError</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">GazeEstimation</span><span class="p">(</span><span class="n">gaze</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

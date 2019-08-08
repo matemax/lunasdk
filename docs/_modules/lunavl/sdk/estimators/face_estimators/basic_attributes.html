@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.estimators.face_estimators.basic_attributes &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.estimators.face_estimators.basic_attributes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module contains a basic attributes estimator.</span>
+
+<span class="sd">See `basic attributes`_.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">IAttributeEstimatorPtr</span><span class="p">,</span> <span class="n">AttributeRequest</span><span class="p">,</span> <span class="n">AttributeResult</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">EthnicityEstimation</span><span class="p">,</span> <span class="n">Ethnicity</span> <span class="k">as</span> <span class="n">CoreEthnicity</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.errors.errors</span> <span class="k">import</span> <span class="n">LunaVLError</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.errors.exceptions</span> <span class="k">import</span> <span class="n">CoreExceptionWarp</span><span class="p">,</span> <span class="n">LunaSDKException</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.base_estimation</span> <span class="k">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">BaseEstimation</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warper</span> <span class="k">import</span> <span class="n">Warp</span><span class="p">,</span> <span class="n">WarpedImage</span>
+
+
+<div class="viewcode-block" id="Ethnicity"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.Ethnicity">[docs]</a><span class="k">class</span> <span class="nc">Ethnicity</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum for ethnicities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: african american</span>
+    <span class="n">AfricanAmerican</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#: asian</span>
+    <span class="n">Asian</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1">#: indian</span>
+    <span class="n">Indian</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="c1">#: caucasian</span>
+    <span class="n">Caucasian</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fromCoreEmotion</span><span class="p">(</span><span class="n">coreEthnicity</span><span class="p">:</span> <span class="n">CoreEthnicity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Ethnicity&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get enum element by core ethnicity.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEthnicity: core ethnicity</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            corresponding ethnicity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Ethnicity</span><span class="p">,</span> <span class="n">coreEthnicity</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert enum element to string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            snake case ethnicity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Ethnicity</span><span class="o">.</span><span class="n">Asian</span><span class="p">,</span> <span class="n">Ethnicity</span><span class="o">.</span><span class="n">Indian</span><span class="p">,</span> <span class="n">Ethnicity</span><span class="o">.</span><span class="n">Caucasian</span><span class="p">):</span>
+            <span class="c1"># pylint: disable=E1101</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;african_american&quot;</span></div>
+
+
+<div class="viewcode-block" id="Ethnicities"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.Ethnicities">[docs]</a><span class="k">class</span> <span class="nc">Ethnicities</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for ethnicities estimation.</span>
+
+<span class="sd">    Estimation properties:</span>
+
+<span class="sd">        - asian</span>
+<span class="sd">        - indian</span>
+<span class="sd">        - caucasian</span>
+<span class="sd">        - africanAmerican</span>
+<span class="sd">        - predominateEmotion</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimation</span><span class="p">:</span> <span class="n">EthnicityEstimation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimation: core ethnicities estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">asian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get asian ethnicity value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value in range [0, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">asian</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">indian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get indian ethnicity value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value in range [0, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">indian</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">caucasian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get caucasian ethnicity value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value in range [0, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">caucasian</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">africanAmerican</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get african american ethnicity value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value in range [0, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">africanAmerican</span>
+
+<div class="viewcode-block" id="Ethnicities.asDict"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.Ethnicities.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict in platform format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;predominant_ethnicity&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predominateEmotion</span><span class="p">),</span>
+            <span class="s2">&quot;estimations&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;asian&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asian</span><span class="p">,</span>
+                <span class="s2">&quot;indian&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">indian</span><span class="p">,</span>
+                <span class="s2">&quot;caucasian&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">caucasian</span><span class="p">,</span>
+                <span class="s2">&quot;african_american&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">africanAmerican</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">predominateEmotion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Ethnicity</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get predominate ethnicity (ethnicity with max score value).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ethnicity with max score value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Ethnicity</span><span class="o">.</span><span class="n">fromCoreEmotion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">getPredominantEthnicity</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="BasicAttributes"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes">[docs]</a><span class="k">class</span> <span class="nc">BasicAttributes</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for basic attribute estimation</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        age (Optional[float]): age, number in range [0, 100]</span>
+<span class="sd">        gender (Optional[float]): gender, number in range [0, 1]</span>
+<span class="sd">        ethnicity (Optional[Ethnicities]): ethnicity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ethnicity&quot;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">)</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimation</span><span class="p">:</span> <span class="n">AttributeResult</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimation: core ethnicity estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">coreEstimation</span><span class="o">.</span><span class="n">ethnicity_opt</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ethnicity</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ethnicity</span> <span class="o">=</span> <span class="n">Ethnicities</span><span class="p">(</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">ethnicity_opt</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">coreEstimation</span><span class="o">.</span><span class="n">ethnicity_opt</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">coreEstimation</span><span class="o">.</span><span class="n">age_opt</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">coreEstimation</span><span class="o">.</span><span class="n">gender_opt</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gender</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gender</span> <span class="o">=</span> <span class="n">coreEstimation</span><span class="o">.</span><span class="n">gender_opt</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BasicAttributes.asDict"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict with keys &quot;ethnicity&quot;, &quot;gender&quot;, &quot;age&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ethnicity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;ethnicities&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ethnicity</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;ethnicities&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gender</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;gender&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gender</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;gender&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
+
+
+<div class="viewcode-block" id="BasicAttributesEstimator"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator">[docs]</a><span class="k">class</span> <span class="nc">BasicAttributesEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basic attributes estimator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#  pylint: disable=W0235</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreEstimator</span><span class="p">:</span> <span class="n">IAttributeEstimatorPtr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreEstimator: core estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimator</span><span class="p">)</span>
+
+    <span class="c1">#  pylint: disable=W0221</span>
+<div class="viewcode-block" id="BasicAttributesEstimator.estimate"><a class="viewcode-back" href="../../../../../sdk/face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator.estimate">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">EstimationBasicAttributeError</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Warp</span><span class="p">,</span> <span class="n">WarpedImage</span><span class="p">],</span> <span class="n">estimateAge</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">estimateGender</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                 <span class="n">estimateEthnicity</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasicAttributes</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate ethnicity.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            warp: warped image</span>
+<span class="sd">            estimateAge: estimate age or not</span>
+<span class="sd">            estimateGender: estimate gender or not</span>
+<span class="sd">            estimateEthnicity: estimate ethnicity or not</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimated ethnicity</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            LunaSDKException: if estimation failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dtAttributes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">estimateAge</span><span class="p">:</span>
+            <span class="n">dtAttributes</span> <span class="o">|=</span> <span class="n">AttributeRequest</span><span class="o">.</span><span class="n">estimateAge</span>
+        <span class="k">if</span> <span class="n">estimateGender</span><span class="p">:</span>
+            <span class="n">dtAttributes</span> <span class="o">|=</span> <span class="n">AttributeRequest</span><span class="o">.</span><span class="n">estimateGender</span>
+        <span class="k">if</span> <span class="n">estimateEthnicity</span><span class="p">:</span>
+            <span class="n">dtAttributes</span> <span class="o">|=</span> <span class="n">AttributeRequest</span><span class="o">.</span><span class="n">estimateEthnicity</span>
+
+        <span class="n">error</span><span class="p">,</span> <span class="n">baseAttributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">warp</span><span class="o">.</span><span class="n">warpedImage</span><span class="o">.</span><span class="n">coreImage</span><span class="p">,</span>
+                                                             <span class="n">AttributeRequest</span><span class="p">(</span><span class="n">dtAttributes</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LunaSDKException</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">fromSDKError</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">BasicAttributes</span><span class="p">(</span><span class="n">baseAttributes</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

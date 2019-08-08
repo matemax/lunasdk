@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Geometric utils &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SDK Image" href="sdk_image.html" />
+    <link rel="prev" title="SDK Image" href="image_utils.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Geometric utils</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="image_utils.html" title="Previous Chapter: SDK Image"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; SDK Image</span>
+    </a>
+  </li>
+  <li>
+    <a href="sdk_image.html" title="Next Chapter: SDK Image"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">SDK Image &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/geometry.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="module-lunavl.sdk.image_utils.geometry">
+<span id="geometric-utils"></span><h1>Geometric utils<a class="headerlink" href="#module-lunavl.sdk.image_utils.geometry" title="Permalink to this headline">¶</a></h1>
+<p>Module contains geometric structures (Rect, Point, Size)</p>
+<dl class="data">
+<dt id="lunavl.sdk.image_utils.geometry.COORDINATE_TYPE">
+<code class="descclassname">lunavl.sdk.image_utils.geometry.</code><code class="descname">COORDINATE_TYPE</code><em class="property"> = ~COORDINATE_TYPE</em><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.COORDINATE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>generic type for allowed values type of coordinates</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="lunavl.sdk.image_utils.geometry.LANDMARKS">
+<code class="descclassname">lunavl.sdk.image_utils.geometry.</code><code class="descname">LANDMARKS</code><em class="property"> = ~LANDMARKS</em><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.LANDMARKS" title="Permalink to this definition">¶</a></dt>
+<dd><p>generic type for allowed values type of landmarks</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.geometry.Landmarks">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.geometry.</code><code class="descname">Landmarks</code><span class="sig-paren">(</span><em>coreLandmarks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Landmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Landmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for landmarks</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Landmarks._points">
+<code class="descname">_points</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Landmarks._points" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load attributes, converted to point list core landmarks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[List[<a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Point" title="lunavl.sdk.image_utils.geometry.Point">Point</a>[float]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Landmarks.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Landmarks.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Landmarks.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list to list points</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Landmarks.points">
+<code class="descname">points</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Landmarks.points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lazy load of points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of points</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Point" title="lunavl.sdk.image_utils.geometry.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.geometry.Point">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.geometry.</code><code class="descname">Point</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Point.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Point.x">
+<code class="descname">x</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Point.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>x-coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>CoordinateType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Point.y">
+<code class="descname">y</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Point.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y-coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>CoordinateType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Point.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Point.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Point.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert point to list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>[self.x, self.y]</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+<span class="go">[1, 2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+<span class="go">[1.0, 2.0]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="lunavl.sdk.image_utils.geometry.Point.fromVector2">
+<em class="property">classmethod </em><code class="descname">fromVector2</code><span class="sig-paren">(</span><em>vec2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Point.fromVector2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Point.fromVector2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Point from Core Vector2i and Vector2f</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vec2</strong> – vector2i or vector2f</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>point</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Point" title="lunavl.sdk.image_utils.geometry.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Point.toVector2">
+<code class="descname">toVector2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Point.toVector2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Point.toVector2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Vector2i or Vector2f from point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Vector2i if x and y are integer otherwise Vector2f</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vec2</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">toVector2</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vec2</span><span class="p">,</span> <span class="n">Vector2i</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vec2</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">toVector2</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vec2</span><span class="p">,</span> <span class="n">Vector2f</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Vector2i</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector2f</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.geometry.Rect">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.geometry.</code><code class="descname">Rect</code><span class="sig-paren">(</span><em>x=0</em>, <em>y=0</em>, <em>width=0</em>, <em>height=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.coreRect">
+<code class="descname">coreRect</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.coreRect" title="Permalink to this definition">¶</a></dt>
+<dd><p>core rect object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>CoreRect</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.adjust">
+<code class="descname">adjust</code><span class="sig-paren">(</span><em>dx</em>, <em>dy</em>, <em>dw</em>, <em>dh</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.adjust"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.adjust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the rect by given amounts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> – adjustment for upper left corner x coordinate</p></li>
+<li><p><strong>dy</strong> – adjustment for upper left corner y coordinate</p></li>
+<li><p><strong>dw</strong> – adjustment for width</p></li>
+<li><p><strong>dh</strong> – adjustment for height</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.adjusted">
+<code class="descname">adjusted</code><span class="sig-paren">(</span><em>dx</em>, <em>dy</em>, <em>dw</em>, <em>dh</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.adjusted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.adjusted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies and adjusts the rect by given amounts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> – adjustment for upper left corner x coordinate</p></li>
+<li><p><strong>dy</strong> – adjustment for upper left corner y coordinate</p></li>
+<li><p><strong>dw</strong> – adjustment for width</p></li>
+<li><p><strong>dh</strong> – adjustment for height</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>return copy.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Rect" title="lunavl.sdk.image_utils.geometry.Rect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rect</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert rect to dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.x, “y”: self.y, “width”: self.width, “height”: self.height}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>{“x”</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+<span class="go">{&#39;x&#39;: 1, &#39;y&#39;: 2, &#39;width&#39;: 3, &#39;height&#39;: 4}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+<span class="go">{&#39;x&#39;: 1.0, &#39;y&#39;: 2.0, &#39;width&#39;: 3.0, &#39;height&#39;: 4.0}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.bottom">
+<code class="descname">bottom</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.bottom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get lower y-coordinate of the rect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.y + self.width</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">bottom</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.bottomRight">
+<code class="descname">bottomRight</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.bottomRight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get coordinates of the right bottom angle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>point</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">bottomRight</span>
+<span class="go">x = 4, y = 6</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Point" title="lunavl.sdk.image_utils.geometry.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.center">
+<code class="descname">center</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get coordinates of the center</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>point</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">center</span>
+<span class="go">x = 2, y = 4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">center</span>
+<span class="go">x = 2, y = 4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">center</span>
+<span class="go">x = 3, y = 4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span><span class="o">.</span><span class="n">center</span>
+<span class="go">x = 3.0, y = 4.5</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Point" title="lunavl.sdk.image_utils.geometry.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.fromCoreRect">
+<em class="property">classmethod </em><code class="descname">fromCoreRect</code><span class="sig-paren">(</span><em>rect</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.fromCoreRect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.fromCoreRect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load rect from core rect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rect</strong> – core rect</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new rect</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Rect" title="lunavl.sdk.image_utils.geometry.Rect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rect</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.getArea">
+<code class="descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.getArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rect area</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.width * self.height</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">getArea</span><span class="p">()</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span><span class="o">.</span><span class="n">getArea</span><span class="p">()</span>
+<span class="go">15.75</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.height">
+<code class="descname">height</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter of height</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self._rect.height</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.initByCorners">
+<em class="property">classmethod </em><code class="descname">initByCorners</code><span class="sig-paren">(</span><em>topLeftCorner</em>, <em>bottomRightBottom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.initByCorners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.initByCorners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init rect by top left corner, bottom right bottom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>topLeftCorner</strong> – top left corner</p></li>
+<li><p><strong>bottomRightBottom</strong> – bottom right bottom</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new rect</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Rect" title="lunavl.sdk.image_utils.geometry.Rect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rect</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.isInside">
+<code class="descname">isInside</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.isInside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.isInside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check other rect is inside in this or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> – other rect</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true if this inside of the ‘other’</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span><span class="o">.</span><span class="n">isInside</span><span class="p">(</span><span class="n">second</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second</span><span class="o">.</span><span class="n">isInside</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.isValid">
+<code class="descname">isValid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Rect.isValid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.isValid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate width and height of the rect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if  width and height &gt; 0 otherwise False</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.left">
+<code class="descname">left</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.left" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get lower x-coordinate of the rect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.x</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">left</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">left</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.right">
+<code class="descname">right</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.right" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get upper x-coordinate of the rect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.x</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">right</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">right</span>
+<span class="go">-2</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.size">
+<code class="descname">size</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rect size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>size</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+<span class="go">width = 3, height = 4</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Size" title="lunavl.sdk.image_utils.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.top">
+<code class="descname">top</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get upper y-coordinate of the rect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.y</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">top</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">top</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.topLeft">
+<code class="descname">topLeft</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.topLeft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get coordinates of the top left angle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>point</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Rect</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">topLeft</span>
+<span class="go">x = 1, y = 2</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.geometry.Point" title="lunavl.sdk.image_utils.geometry.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.width">
+<code class="descname">width</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter of width</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self._rect.width</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.x">
+<code class="descname">x</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter of x coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self._rect.x</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Rect.y">
+<code class="descname">y</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Rect.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter of y coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self._rect.y</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>~COORDINATE_TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.geometry.Size">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.geometry.</code><code class="descname">Size</code><span class="sig-paren">(</span><em>width</em>, <em>height</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rect size.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Size.width">
+<code class="descname">width</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Size.width" title="Permalink to this definition">¶</a></dt>
+<dd><p>width</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>CoordinateType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.geometry.Size.height">
+<code class="descname">height</code><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Size.height" title="Permalink to this definition">¶</a></dt>
+<dd><p>height</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>CoordinateType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.geometry.Size.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/geometry.html#Size.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.geometry.Size.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.width, “height”: self.height}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>{“width”</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+<span class="go">{&#39;width&#39;: 1, &#39;height&#39;: 2}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Size</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+<span class="go">{&#39;width&#39;: 1.0, &#39;height&#39;: 2.0}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

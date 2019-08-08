@@ -1,0 +1,205 @@
+Face attributes estimations
+===========================
+
+.. _`head pose`:
+
+Head pose
+---------
+
+This estimator is designed to determine camera-space head pose. Since 3D head translation is hard to determine
+reliably without camera-specific calibration,only 3D rotation component is estimated.
+It estimate `Tait–Bryan`_ angles for head. Zero position
+corresponds to a face placed orthogonally to camera direction, with the axis of symmetry parallel to the vertical
+camera axis.
+
+There are two head pose estimation method available: estimate by 68 face-aligned landmarks and estimate by original
+input image in RGB format. Estimation by image is more precise. If you have already extracted 68 landmarks for another
+facilities you may save time, and use fast estimator from 68landmarks.
+
+.. _Tait–Bryan: https://en.wikipedia.org/wiki/Euler_angles#Tait–Bryan_angles
+
+.. _`emotions`:
+
+Emotions
+--------
+
+This estimator aims to determine whether a face depicted on an image expresses the following emotions:
+
+    - Anger
+    - Disgust
+    - Fear
+    - Happiness
+    - Surprise
+    - Sadness
+    - Neutrality
+
+You can pass only warped images with detected faces to the estimator interface. Better image quality leads to better
+results.
+
+Emotions estimation presents emotions a snormalized float values in the range of [0..1] where 0 is lack of
+a specific emotion and 1st is the maximum intensity of an emotion.
+
+.. _`mouth state`:
+
+Mouth state
+-----------
+
+This estimator is designed to determine smile/mouth/occlusion probability using warped image. Smile estimation
+structure consists of:
+
+    - Smile score
+    - Mouth score
+    - Occlusion score
+
+Sum of scores always equals 1. Each score means probability of corresponding state. Smile score prevails in cases where
+smile was successfully detected. If there is any object on photo that hides mouth occlusion score prevails.
+Mouth score prevails in cases where neither a smile nor an occlusion was detected.
+
+.. _eyes:
+
+Eyes estimation
+---------------
+
+This estimator aims to determine:
+
+    - eye state: open, closed, occluded
+    - precise eye iris location as an array of landmarks
+    - recise eyelid location as an array of landmarks
+
+
+Iris landmarks are presented with a template structure Landmarks that is specialized for 32points. Eyelid landmarks
+are presented with a template structure Landmarks that is specialized for 6points.
+
+
+You can only pass warped image with detected face to the estimator interface. Better image quality leads to better
+results.
+
+.. note::
+
+    Orientation terms “left” and “right” refer to the way you see the image as it is show non the screen. It means
+    that left eye is not necessarily left from the person’s point of view, but is on the left side of the screen.
+    Consequently, right eye is the one on the right side of the screen. More formally, the label “left” refers to
+    subject’s left eye (and similarly for the right eye), such that *xright<xleft*.
+
+.. _`gaze direction`:
+
+Gaze direction estimation
+-------------------------
+
+This estimator is designed to determine gaze direction relatively to head pose estimation. Zero position corresponds to
+a gaze direction orthogonally to face plane, with the axis of symmetry parallel to the vertical camera axis
+
+.. note::
+
+  Roll angle is not estimated, prediction precision decreases as a rotation angle increases.
+
+.. _`basic attributes`:
+
+Basic attribute estimation
+--------------------------
+
+The Attribute estimator determines face basic attributes. Currently, the following attributes are available:
+
+    - age: determines person’s age
+    - gender: determines person’s gender
+    - ethnicity: determines ethnicity of a person
+
+Before using attribute estimator, user is free to decide whether to estimateor not some specific attributes
+listed above through
+
+Output structure, which consists of optional fields describing results of user requested attributes:
+
+    - age is reported in years (float in range [0, 100])
+    - for gender estimation 1 means male, 0 means female. Estimation precision in cooperative mode is 99.81%
+      with the threshold 0.5. Estimation precision in non-cooperative mode is 92.5%.
+    - ethnicity estimation returns 4 float normalized values, each value describes probability of person’s ethnicity.
+      The following ethnicity's are available:
+
+         - asian
+         - caucasian
+         - african american
+         - indian
+
+.. _`warp quality`:
+
+Warp quality
+------------
+
+This estimator aims to predict visual quality of an image. It is trained specifically on pre-warped human face images
+and will produce lower factor if:
+
+ - Image is blurred;
+ - Image is under-exposured (i.e., too dark);
+ - Image is over-exposured (i.e., too light);
+ - Image color variation is low (i.e., image is monochrome or close to monochrome).
+
+The quality factor is a value in range [0..1] where 0 corresponds to low quality and 1 to high quality.
+
+.. _`ags`:
+
+Approximate garbage score
+-------------------------
+
+This estimator aims to determine the quality of source input image suitable for later descriptor extraction and
+matching. AGS is a float in range [0..1] where 0 corresponds to low quality.
+
+
+.. _`face descriptor`:
+
+Face descriptor
+---------------
+
+Descriptor itself is a set of object parameters that are specially encoded. Descriptors are typically more or less
+invariant to various affine object transformations and slight color variations. This property allows efficient use of
+such sets to identify, lookup, and compare real-world objects’ images.
+
+
+Descriptor extraction. Extraction is performed from object image areas around some previously discovered facial
+landmarks, so the quality of the descriptor highly depends on them and the image it was obtained from.
+
+Face descriptor algorithm evolves with time, so newer FaceEngine versions contain improved models of the algorithm.
+Currently next versions are available: 46, 51, 52 and 54. Versions 54, 52 and 51 more precise then 46, but works very
+fast on GPU. Version 54 is the most precise.
+
+
+Descriptor object stores a compact set of packed properties as well as some helper parameters that were used to extract
+these properties from the source image. Together these parameters determine descriptor compatibility. Not all
+descriptors are compatible to each other. It is impossible to batch and match in compatible descriptors, so you
+should pay attention what settings do you use when extracting them.
+
+Classes and methods
+-------------------
+
+
+.. automodule:: lunavl.sdk.estimators.base_estimation
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.head_pose
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.emotions
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.mouth_state
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.eyes
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.basic_attributes
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.basic_attributes
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.warp_quality
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.ags
+    :members:
+
+.. automodule:: lunavl.sdk.faceengine.descriptors
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.face_descriptor
+    :members:

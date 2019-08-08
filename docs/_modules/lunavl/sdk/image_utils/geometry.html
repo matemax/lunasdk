@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.image_utils.geometry &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.image_utils.geometry</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module contains geometric structures (Rect, Point, Size)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">Vector2i</span><span class="p">,</span> <span class="n">Vector2f</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">Rect</span> <span class="k">as</span> <span class="n">CoreRectI</span><span class="p">,</span> <span class="n">RectFloat</span> <span class="k">as</span> <span class="n">CoreRectF</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">Landmarks5</span><span class="p">,</span> <span class="n">Landmarks68</span><span class="p">,</span> <span class="n">IrisLandmarks</span><span class="p">,</span> <span class="n">EyelidLandmarks</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.base_estimation</span> <span class="k">import</span> <span class="n">BaseEstimation</span>
+
+<span class="n">COORDINATE_TYPE</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;COORDINATE_TYPE&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>  <span class="c1">#: generic type for allowed values type of coordinates</span>
+<span class="n">LANDMARKS</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;LANDMARKS&#39;</span><span class="p">,</span> <span class="n">Landmarks5</span><span class="p">,</span> <span class="n">Landmarks68</span><span class="p">,</span> <span class="n">IrisLandmarks</span><span class="p">,</span>
+                    <span class="n">EyelidLandmarks</span><span class="p">)</span>  <span class="c1">#: generic type for allowed values type of landmarks</span>
+
+
+<div class="viewcode-block" id="Size"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Size">[docs]</a><span class="k">class</span> <span class="nc">Size</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rect size.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        width (CoordinateType): width</span>
+<span class="sd">        height (CoordinateType): height</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            width: width</span>
+<span class="sd">            height: height</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Size representation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            &quot;width = {self.width}, height = {self.height}&quot;</span>
+<span class="sd">        &gt;&gt;&gt; str(Size(1, 2))</span>
+<span class="sd">        &#39;width = 1, height = 2&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;width = </span><span class="si">{}</span><span class="s2">, height = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Size.asDict"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Size.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            {&quot;width&quot;: self.width, &quot;height&quot;: self.height}</span>
+<span class="sd">        &gt;&gt;&gt; Size(1, 2).asDict()</span>
+<span class="sd">        {&#39;width&#39;: 1, &#39;height&#39;: 2}</span>
+<span class="sd">        &gt;&gt;&gt; Size(1.0, 2.0).asDict()</span>
+<span class="sd">        {&#39;width&#39;: 1.0, &#39;height&#39;: 2.0}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="Point"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Point">[docs]</a><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Point.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        x (CoordinateType): x-coordinate</span>
+<span class="sd">        y (CoordinateType): y-coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">):</span>  <span class="c1"># pylint: disable=C0103</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: x</span>
+<span class="sd">            y: y</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>  <span class="c1"># pylint: disable=C0103</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>  <span class="c1"># pylint: disable=C0103</span>
+
+<div class="viewcode-block" id="Point.fromVector2"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Point.fromVector2">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromVector2</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vec2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Vector2f</span><span class="p">,</span> <span class="n">Vector2i</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create Point from Core Vector2i and Vector2f</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vec2: vector2i or vector2f</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">point</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">vec2</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">vec2</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">return</span> <span class="n">point</span></div>
+
+<div class="viewcode-block" id="Point.toVector2"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Point.toVector2">[docs]</a>    <span class="k">def</span> <span class="nf">toVector2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Vector2i</span><span class="p">,</span> <span class="n">Vector2f</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create Vector2i or Vector2f from point</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Vector2i if x and y are integer otherwise Vector2f</span>
+<span class="sd">        &gt;&gt;&gt; vec2 = Point(1, 2).toVector2()</span>
+<span class="sd">        &gt;&gt;&gt; isinstance(vec2, Vector2i)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; vec2 = Point(1.0, 2.0).toVector2()</span>
+<span class="sd">        &gt;&gt;&gt; isinstance(vec2, Vector2f)</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Vector2i</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Vector2f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Point.asDict"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Point.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert point to list</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [self.x, self.y]</span>
+
+<span class="sd">        &gt;&gt;&gt; Point(1, 2).asDict()</span>
+<span class="sd">        [1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; Point(1.0, 2.0).asDict()</span>
+<span class="sd">        [1.0, 2.0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;x = </span><span class="si">{}</span><span class="s2">, y = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rect"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect">[docs]</a><span class="k">class</span> <span class="nc">Rect</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rect</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        coreRect (CoreRect): core rect object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># pylint: disable=C0103</span>
+                 <span class="n">width</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init. If there are argument of type float coreRect will be type CoreRectF otherwise CoreRectI.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: x</span>
+<span class="sd">            y: y</span>
+<span class="sd">            width: width</span>
+<span class="sd">            height: height</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">float</span><span class="p">))):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">=</span> <span class="n">CoreRectF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">=</span> <span class="n">CoreRectI</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Rect.fromCoreRect"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.fromCoreRect">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromCoreRect</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rect</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">CoreRectF</span><span class="p">,</span> <span class="n">CoreRectI</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Rect&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load rect from core rect</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rect: core rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            new rect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">newRect</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">newRect</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">=</span> <span class="n">rect</span>
+        <span class="k">return</span> <span class="n">newRect</span></div>
+
+<div class="viewcode-block" id="Rect.initByCorners"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.initByCorners">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">initByCorners</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">topLeftCorner</span><span class="p">:</span> <span class="n">Point</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">],</span> <span class="n">bottomRightBottom</span><span class="p">:</span> <span class="n">Point</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Rect&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init rect by top left corner, bottom right bottom</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            topLeftCorner: top left corner</span>
+<span class="sd">            bottomRightBottom: bottom right bottom</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            new rect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">newRect</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">newRect</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">=</span> <span class="n">newRect</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">topLeftCorner</span><span class="o">.</span><span class="n">toVector2</span><span class="p">(),</span> <span class="n">bottomRightBottom</span><span class="o">.</span><span class="n">toVector2</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">newRect</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>  <span class="c1"># pylint: disable=C0103</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter of x coordinate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self._rect.x</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@x</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">):</span>  <span class="c1"># pylint: disable=C0103</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter of x</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>  <span class="c1"># pylint: disable=C0103</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter of y coordinate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self._rect.y</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">y</span>
+
+    <span class="nd">@y</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">):</span>  <span class="c1"># pylint: disable=C0103</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter of y</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter of width</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self._rect.width</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">width</span>
+
+    <span class="nd">@width</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter of width</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter of height</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self._rect.height</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">height</span>
+
+    <span class="nd">@height</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter of height</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bottom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>  <span class="c1"># real signature unknown; restored from __doc__</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get lower y-coordinate of the rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self.y + self.width</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).bottom</span>
+<span class="sd">        6</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">vector</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bottomRight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get coordinates of the right bottom angle</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            point</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).bottomRight</span>
+<span class="sd">        x = 4, y = 6</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">bottomRight</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Point</span><span class="o">.</span><span class="n">fromVector2</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">top</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get upper y-coordinate of the rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self.y</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).top</span>
+<span class="sd">        2</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, -4).top</span>
+<span class="sd">        2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">top</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">vector</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">topLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]:</span>  <span class="c1"># real signature unknown; restored from __doc__</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get coordinates of the top left angle</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            point</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).topLeft</span>
+<span class="sd">        x = 1, y = 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">topLeft</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Point</span><span class="o">.</span><span class="n">fromVector2</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">left</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get lower x-coordinate of the rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self.x</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).left</span>
+<span class="sd">        1</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, -3, 4).left</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">left</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">right</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get upper x-coordinate of the rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self.x</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).right</span>
+<span class="sd">        4</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, -3, 4).right</span>
+<span class="sd">        -2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">right</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get coordinates of the center</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            point</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).center</span>
+<span class="sd">        x = 2, y = 4</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 5).center</span>
+<span class="sd">        x = 2, y = 4</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 4, 4).center</span>
+<span class="sd">        x = 3, y = 4</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1.0, 2.0, 4.0, 5.0).center</span>
+<span class="sd">        x = 3.0, y = 4.5</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Point</span><span class="o">.</span><span class="n">fromVector2</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Rect.getArea"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.getArea">[docs]</a>    <span class="k">def</span> <span class="nf">getArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COORDINATE_TYPE</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get rect area</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self.width * self.height</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).getArea()</span>
+<span class="sd">        12</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1.0, 2.0, 3.5, 4.5).getArea()</span>
+<span class="sd">        15.75</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">getArea</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Rect.isInside"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.isInside">[docs]</a>    <span class="k">def</span> <span class="nf">isInside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Rect&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check other rect is inside in this or not</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: other rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            true if this inside of the &#39;other&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; first = Rect(1, 2, 3, 4)</span>
+<span class="sd">        &gt;&gt;&gt; second = Rect(1, 2, 3, 3)</span>
+<span class="sd">        &gt;&gt;&gt; first.isInside(second)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; second.isInside(first)</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">inside</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">coreRect</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Rect.isValid"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.isValid">[docs]</a>    <span class="k">def</span> <span class="nf">isValid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate width and height of the rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if  width and height &gt; 0 otherwise False</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).isValid()</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, -3, 3).isValid()</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">isValid</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Size</span><span class="p">[</span><span class="n">COORDINATE_TYPE</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get rect size</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            size</span>
+
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).size</span>
+<span class="sd">        width = 3, height = 4</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Rect[COORDINATE_TYPE]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Rect[COORDINATE_TYPE]&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate an intersection of rects.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: other rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            intersection of rects</span>
+
+
+<span class="sd">        &gt;&gt;&gt; first = Rect(1, 2, 3, 4)</span>
+<span class="sd">        &gt;&gt;&gt; second = Rect(2, 1, 3, 3)</span>
+<span class="sd">        &gt;&gt;&gt; first and second</span>
+<span class="sd">        x = 2, y = 1, width = 2, height = 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">coreRect</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Rect[COORDINATE_TYPE]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare two rect</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: other rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if x, y, width, height other rect are equal x, y, width, height this rect</span>
+
+
+<span class="sd">        &gt;&gt;&gt; first = Rect(1, 2, 3, 4)</span>
+<span class="sd">        &gt;&gt;&gt; second = Rect(1, 2, 3, 3)</span>
+<span class="sd">        &gt;&gt;&gt; first == second</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; third = Rect(1, 2, 3, 4)</span>
+<span class="sd">        &gt;&gt;&gt; first == third</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">coreRect</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Rect[COORDINATE_TYPE]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare two rect</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: other rect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if any of x, y, width, height other rect are not equal corresponding x, y, width, height of this rect</span>
+
+
+<span class="sd">        &gt;&gt;&gt; first = Rect(1, 2, 3, 4)</span>
+<span class="sd">        &gt;&gt;&gt; second = Rect(1, 2, 3, 3)</span>
+<span class="sd">        &gt;&gt;&gt; first != second</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; third = Rect(1, 2, 3, 4)</span>
+<span class="sd">        &gt;&gt;&gt; first != third</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">coreRect</span>
+
+<div class="viewcode-block" id="Rect.adjust"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.adjust">[docs]</a>    <span class="k">def</span> <span class="nf">adjust</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span> <span class="n">dy</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span> <span class="n">dw</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span>  <span class="c1"># pylint: disable=C0103</span>
+               <span class="n">dh</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adjusts the rect by given amounts.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dx: adjustment for upper left corner x coordinate</span>
+<span class="sd">            dy: adjustment for upper left corner y coordinate</span>
+<span class="sd">            dw: adjustment for width</span>
+<span class="sd">            dh: adjustment for height</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">adjust</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dw</span><span class="p">,</span> <span class="n">dh</span><span class="p">)</span></div>
+
+    <span class="c1"># pylint: disable=C0103</span>
+<div class="viewcode-block" id="Rect.adjusted"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.adjusted">[docs]</a>    <span class="k">def</span> <span class="nf">adjusted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span> <span class="n">dy</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span> <span class="n">dw</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">,</span>
+                 <span class="n">dh</span><span class="p">:</span> <span class="n">COORDINATE_TYPE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Rect&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copies and adjusts the rect by given amounts.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dx: adjustment for upper left corner x coordinate</span>
+<span class="sd">            dy: adjustment for upper left corner y coordinate</span>
+<span class="sd">            dw: adjustment for width</span>
+<span class="sd">            dh: adjustment for height</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            return copy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">newRect</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">()</span>
+        <span class="n">newRect</span><span class="o">.</span><span class="n">coreRect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="n">adjusted</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dw</span><span class="p">,</span> <span class="n">dh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newRect</span></div>
+
+<div class="viewcode-block" id="Rect.asDict"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Rect.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert rect to dict</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            {&quot;x&quot;: self.x, &quot;y&quot;: self.y, &quot;width&quot;: self.width, &quot;height&quot;: self.height}</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1, 2, 3, 4).asDict()</span>
+<span class="sd">        {&#39;x&#39;: 1, &#39;y&#39;: 2, &#39;width&#39;: 3, &#39;height&#39;: 4}</span>
+<span class="sd">        &gt;&gt;&gt; Rect(1.0, 2, 3.0, 4.0).asDict()</span>
+<span class="sd">        {&#39;x&#39;: 1.0, &#39;y&#39;: 2.0, &#39;width&#39;: 3.0, &#39;height&#39;: 4.0}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dumps rect to string</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            &quot;x = {self.x}, y = {self.y}, width = {self.width}, width = {self.height}&quot;</span>
+
+<span class="sd">        &gt;&gt;&gt; &quot;{}&quot;.format(Rect(1, 2, 3, 4))</span>
+<span class="sd">        &#39;x = 1, y = 2, width = 3, height = 4&#39;</span>
+<span class="sd">        &gt;&gt;&gt; &quot;{}&quot;.format(Rect(1.0, 2.0, 3.0, 4.0))</span>
+<span class="sd">        &#39;x = 1.000000, y = 2.000000, width = 3.000000, height = 4.000000&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreRect</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Landmarks"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Landmarks">[docs]</a><span class="k">class</span> <span class="nc">Landmarks</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for landmarks</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _points (Optional[List[Point[float]]]): lazy load attributes, converted to point list core landmarks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_points&quot;</span><span class="p">,</span> <span class="s2">&quot;_coreLandmarks&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreLandmarks</span><span class="p">:</span> <span class="n">LANDMARKS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreLandmarks (LANDMARKS): core landmarks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreLandmarks</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Point</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazy load of points.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of points</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="o">.</span><span class="n">fromVector2</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span>
+
+<div class="viewcode-block" id="Landmarks.asDict"><a class="viewcode-back" href="../../../../sdk/geometry.html#lunavl.sdk.image_utils.geometry.Landmarks.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list to list points</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">point</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">]</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

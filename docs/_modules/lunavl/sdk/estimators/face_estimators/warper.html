@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.estimators.face_estimators.warper &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.estimators.face_estimators.warper</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module for creating warped images</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.errors.errors</span> <span class="k">import</span> <span class="n">LunaVLError</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.errors.exceptions</span> <span class="k">import</span> <span class="n">LunaSDKException</span><span class="p">,</span> <span class="n">CoreExceptionWarp</span>
+<span class="kn">from</span> <span class="nn">numpy.ma</span> <span class="k">import</span> <span class="n">array</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.facedetector</span> <span class="k">import</span> <span class="n">FaceDetection</span><span class="p">,</span> <span class="n">Landmarks68</span><span class="p">,</span> <span class="n">Landmarks5</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.image_utils.image</span> <span class="k">import</span> <span class="n">VLImage</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">IWarperPtr</span><span class="p">,</span> <span class="n">Transformation</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">CoreImage</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+
+<div class="viewcode-block" id="WarpedImage"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.WarpedImage">[docs]</a><span class="k">class</span> <span class="nc">WarpedImage</span><span class="p">(</span><span class="n">VLImage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raw warped image.</span>
+
+<span class="sd">    Properties of a warped image:</span>
+
+<span class="sd">        - its size is always 250x250 pixels</span>
+<span class="sd">        - it&#39;s always in RGB color format</span>
+<span class="sd">        - it always contains just a single face</span>
+<span class="sd">        - the face is always centered and rotated so that imaginary line between the eyes is horizontal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">CoreImage</span><span class="p">],</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">vlImage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VLImage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            body: body of image - bytes numpy array or core image</span>
+<span class="sd">            filename: user mark a source of image</span>
+<span class="sd">            vlImage: source is vl image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">vlImage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertWarp</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">vlImage</span><span class="o">.</span><span class="n">source</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">vlImage</span><span class="o">.</span><span class="n">filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coreImage</span> <span class="o">=</span> <span class="n">vlImage</span><span class="o">.</span><span class="n">coreImage</span>
+
+<div class="viewcode-block" id="WarpedImage.assertWarp"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.WarpedImage.assertWarp">[docs]</a>    <span class="k">def</span> <span class="nf">assertWarp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate size and format</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError(&quot;Bad image size for warped image&quot;): if image has incorrect size</span>
+<span class="sd">            ValueError(&quot;Bad image format for warped image, must be R8G8B8&quot;): if image has incorrect format</span>
+<span class="sd">        Warnings:</span>
+<span class="sd">            this checks are not guarantee that image is warp. This function is intended for debug</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">250</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">width</span> <span class="o">!=</span> <span class="mi">250</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad image size for warped image&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="o">.</span><span class="n">R8G8B8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad image format for warped image, must be R8G8B8&quot;</span><span class="p">)</span></div>
+
+    <span class="c1">#  pylint: disable=W0221</span>
+<div class="viewcode-block" id="WarpedImage.load"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.WarpedImage.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;WarpedImage&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load imag from numpy array or file or url.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *_: for remove positional argument</span>
+<span class="sd">            filename: filename</span>
+<span class="sd">            url: url</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            warp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warp</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">vlImage</span><span class="o">=</span><span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">))</span>
+        <span class="n">warp</span><span class="o">.</span><span class="n">assertWarp</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">warp</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warpedImage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;WarpedImage&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property for compatibility with *Warp* for outside methods.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="Warp"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.Warp">[docs]</a><span class="k">class</span> <span class="nc">Warp</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Structure for storing warp.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sourceDetection (FaceDetection): detection which generated warp</span>
+<span class="sd">        warpedImage (WarpedImage):</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sourceDetection&quot;</span><span class="p">,</span> <span class="s2">&quot;warpedImage&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warpedImage</span><span class="p">:</span> <span class="n">WarpedImage</span><span class="p">,</span> <span class="n">sourceDetection</span><span class="p">:</span> <span class="n">FaceDetection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            warpedImage: warped image</span>
+<span class="sd">            sourceDetection: detection which generated warp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceDetection</span> <span class="o">=</span> <span class="n">sourceDetection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warpedImage</span> <span class="o">=</span> <span class="n">warpedImage</span></div>
+
+
+<div class="viewcode-block" id="Warper"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.Warper">[docs]</a><span class="k">class</span> <span class="nc">Warper</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class warper.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _coreWarper (IWarperPtr): core warper</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_coreWarper&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreWarper</span><span class="p">:</span> <span class="n">IWarperPtr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreWarper: core warper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coreWarper</span> <span class="o">=</span> <span class="n">coreWarper</span>
+
+    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">WarpTransformationError</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_createWarpTransformation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">faceDetection</span><span class="p">:</span> <span class="n">FaceDetection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Transformation</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create warp transformation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            faceDetection: face detection with landmarks5</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            transformation</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if detection does not contain a landmarks5</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">faceDetection</span><span class="o">.</span><span class="n">landmarks5</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;detection must contains landmarks5&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreWarper</span><span class="o">.</span><span class="n">createTransformation</span><span class="p">(</span><span class="n">faceDetection</span><span class="o">.</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">detection</span><span class="p">,</span>
+                                                     <span class="n">faceDetection</span><span class="o">.</span><span class="n">landmarks5</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Warper.warp"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.Warper.warp">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">CreationWarpError</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">warp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">faceDetection</span><span class="p">:</span> <span class="n">FaceDetection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Warp</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create warp from detection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            faceDetection: face detection with landmarks5</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Warp</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            LunaSDKException: if creation failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transformation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_createWarpTransformation</span><span class="p">(</span><span class="n">faceDetection</span><span class="p">)</span>
+        <span class="n">error</span><span class="p">,</span> <span class="n">warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreWarper</span><span class="o">.</span><span class="n">warp</span><span class="p">(</span><span class="n">faceDetection</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">coreImage</span><span class="p">,</span> <span class="n">transformation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LunaSDKException</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">fromSDKError</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+
+        <span class="n">warpedImage</span> <span class="o">=</span> <span class="n">WarpedImage</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">warp</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">faceDetection</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Warp</span><span class="p">(</span><span class="n">warpedImage</span><span class="p">,</span> <span class="n">faceDetection</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Warper.makeWarpTransformationWithLandmarks"><a class="viewcode-back" href="../../../../../sdk/warping.html#lunavl.sdk.estimators.face_estimators.warper.Warper.makeWarpTransformationWithLandmarks">[docs]</a>    <span class="k">def</span> <span class="nf">makeWarpTransformationWithLandmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">faceDetection</span><span class="p">:</span> <span class="n">FaceDetection</span><span class="p">,</span>
+                                            <span class="n">typeLandmarks</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Landmarks68</span><span class="p">,</span> <span class="n">Landmarks5</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make warp transformation with landmarks</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            faceDetection: face detection  with landmarks5</span>
+<span class="sd">            typeLandmarks: landmarks for warping (&quot;L68&quot; or &quot;L5&quot;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            warping landmarks</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if landmarks5 is not estimated</span>
+<span class="sd">            LunaSDKException: if transform failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transformation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_createWarpTransformation</span><span class="p">(</span><span class="n">faceDetection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typeLandmarks</span> <span class="o">==</span> <span class="s2">&quot;L68&quot;</span><span class="p">:</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreWarper</span><span class="o">.</span><span class="n">warp</span><span class="p">(</span><span class="n">faceDetection</span><span class="o">.</span><span class="n">landmarks68</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">,</span> <span class="n">transformation</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">typeLandmarks</span> <span class="o">==</span> <span class="s2">&quot;L5&quot;</span><span class="p">:</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreWarper</span><span class="o">.</span><span class="n">warp</span><span class="p">(</span><span class="n">faceDetection</span><span class="o">.</span><span class="n">landmarks5</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">,</span> <span class="n">transformation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid value of typeLandmarks, must be &#39;L68&#39; or &#39;L5&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">isError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LunaSDKException</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">fromSDKError</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">typeLandmarks</span> <span class="o">==</span> <span class="s2">&quot;L68&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Landmarks68</span><span class="p">(</span><span class="n">warp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Landmarks5</span><span class="p">(</span><span class="n">warp</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

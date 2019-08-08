@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Warping &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Face attributes estimations" href="face_estimations.html" />
+    <link rel="prev" title="Face detection and landmarks" href="face_detection.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Warping</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="face_detection.html" title="Previous Chapter: Face detection and landmarks"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Face detectio...</span>
+    </a>
+  </li>
+  <li>
+    <a href="face_estimations.html" title="Next Chapter: Face attributes estimations"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Face attribut... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/warping.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="warping">
+<h1>Warping<a class="headerlink" href="#warping" title="Permalink to this headline">¶</a></h1>
+<p id="id1">Warping is the process of face image normalization. It requires landmarks and face detection to operate.
+The warp has the following properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>its size is always 250x250 pixels</p></li>
+<li><p>it’s always in RGB color format</p></li>
+<li><p>it always contains just a single face</p></li>
+<li><p>the face is always centered and rotated so that imaginary line between the eyes is horizontal.</p></li>
+</ul>
+</div></blockquote>
+<p>The purpose of the process is to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>compensate image plane rotation (roll angle);</p></li>
+<li><p>center the image using eye positions;</p></li>
+<li><p>properly crop the image.</p></li>
+</ul>
+</div></blockquote>
+<span class="target" id="module-lunavl.sdk.estimators.face_estimators.warper"></span><p>Module for creating warped images</p>
+<dl class="class">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warp">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.estimators.face_estimators.warper.</code><code class="descname">Warp</code><span class="sig-paren">(</span><em>warpedImage</em>, <em>sourceDetection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#Warp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure for storing warp.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warp.sourceDetection">
+<code class="descname">sourceDetection</code><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warp.sourceDetection" title="Permalink to this definition">¶</a></dt>
+<dd><p>detection which generated warp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="face_detection.html#lunavl.sdk.faceengine.facedetector.FaceDetection" title="lunavl.sdk.faceengine.facedetector.FaceDetection">FaceDetection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warp.warpedImage">
+<code class="descname">warpedImage</code><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warp.warpedImage" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage" title="lunavl.sdk.estimators.face_estimators.warper.WarpedImage">WarpedImage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.WarpedImage">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.estimators.face_estimators.warper.</code><code class="descname">WarpedImage</code><span class="sig-paren">(</span><em>body</em>, <em>filename=''</em>, <em>vlImage=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#WarpedImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raw warped image.</p>
+<p>Properties of a warped image:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>its size is always 250x250 pixels</p></li>
+<li><p>it’s always in RGB color format</p></li>
+<li><p>it always contains just a single face</p></li>
+<li><p>the face is always centered and rotated so that imaginary line between the eyes is horizontal.</p></li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.WarpedImage.assertWarp">
+<code class="descname">assertWarp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#WarpedImage.assertWarp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage.assertWarp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate size and format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong><strong>(</strong><strong>&quot;Bad image size for warped image&quot;</strong><strong>)</strong> – if image has incorrect size</p></li>
+<li><p><strong>ValueError</strong><strong>(</strong><strong>&quot;Bad image format for warped image</strong><strong>, </strong><strong>must be R8G8B8&quot;</strong><strong>)</strong> – if image has incorrect format</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>this checks are not guarantee that image is warp. This function is intended for debug</p>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.WarpedImage.load">
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>*_</em>, <em>filename=None</em>, <em>url=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#WarpedImage.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load imag from numpy array or file or url.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*_</strong> – for remove positional argument</p></li>
+<li><p><strong>filename</strong> – filename</p></li>
+<li><p><strong>url</strong> – url</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>warp</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage" title="lunavl.sdk.estimators.face_estimators.warper.WarpedImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">WarpedImage</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.WarpedImage.warpedImage">
+<code class="descname">warpedImage</code><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage.warpedImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property for compatibility with <em>Warp</em> for outside methods.
+:returns: self</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.estimators.face_estimators.warper.WarpedImage" title="lunavl.sdk.estimators.face_estimators.warper.WarpedImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">WarpedImage</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warper">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.estimators.face_estimators.warper.</code><code class="descname">Warper</code><span class="sig-paren">(</span><em>coreWarper</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#Warper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class warper.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warper._coreWarper">
+<code class="descname">_coreWarper</code><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warper._coreWarper" title="Permalink to this definition">¶</a></dt>
+<dd><p>core warper</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>IWarperPtr</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warper.makeWarpTransformationWithLandmarks">
+<code class="descname">makeWarpTransformationWithLandmarks</code><span class="sig-paren">(</span><em>faceDetection</em>, <em>typeLandmarks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#Warper.makeWarpTransformationWithLandmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warper.makeWarpTransformationWithLandmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make warp transformation with landmarks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>faceDetection</strong> – face detection  with landmarks5</p></li>
+<li><p><strong>typeLandmarks</strong> – landmarks for warping (“L68” or “L5”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>warping landmarks</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – if landmarks5 is not estimated</p></li>
+<li><p><strong>LunaSDKException</strong> – if transform failed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="face_detection.html#lunavl.sdk.faceengine.facedetector.Landmarks68" title="lunavl.sdk.faceengine.facedetector.Landmarks68"><code class="xref py py-class docutils literal notranslate"><span class="pre">Landmarks68</span></code></a>, <a class="reference internal" href="face_detection.html#lunavl.sdk.faceengine.facedetector.Landmarks5" title="lunavl.sdk.faceengine.facedetector.Landmarks5"><code class="xref py py-class docutils literal notranslate"><span class="pre">Landmarks5</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.estimators.face_estimators.warper.Warper.warp">
+<code class="descname">warp</code><span class="sig-paren">(</span><em>faceDetection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/estimators/face_estimators/warper.html#Warper.warp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.estimators.face_estimators.warper.Warper.warp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create warp from detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>faceDetection</strong> – face detection with landmarks5</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Warp</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>LunaSDKException</strong> – if creation failed</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.estimators.face_estimators.warper.Warp" title="lunavl.sdk.estimators.face_estimators.warper.Warp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warp</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

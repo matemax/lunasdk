@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.faceengine.engine &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.faceengine.engine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module realize wraps on facengine objects</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">FaceEngine</span> <span class="k">as</span> <span class="nn">CoreFE</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.ags</span> <span class="k">import</span> <span class="n">AGSEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.basic_attributes</span> <span class="k">import</span> <span class="n">BasicAttributesEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.emotions</span> <span class="k">import</span> <span class="n">EmotionsEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.eyes</span> <span class="k">import</span> <span class="n">EyeEstimator</span><span class="p">,</span> <span class="n">GazeEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.face_descriptor</span> <span class="k">import</span> <span class="n">FaceDescriptorEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.mouth_state</span> <span class="k">import</span> <span class="n">MouthStateEstimator</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warp_quality</span> <span class="k">import</span> <span class="n">WarpQualityEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warper</span> <span class="k">import</span> <span class="n">Warper</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.head_pose</span> <span class="k">import</span> <span class="n">HeadPoseEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.descriptors</span> <span class="k">import</span> <span class="n">FaceDescriptorFactory</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.matcher</span> <span class="k">import</span> <span class="n">FaceMatcher</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.setting_provider</span> <span class="k">import</span> <span class="n">DetectorType</span>
+
+<span class="kn">from</span> <span class="nn">..faceengine.facedetector</span> <span class="k">import</span> <span class="n">FaceDetector</span>
+
+
+<div class="viewcode-block" id="VLFaceEngine"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine">[docs]</a><span class="k">class</span> <span class="nc">VLFaceEngine</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraper on FaceEngine.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        dataPath (str): path to a faceengine data folder</span>
+<span class="sd">        configPath (str): path to a faceengine configuration file</span>
+<span class="sd">        _faceEngine (PyIFaceEngine): python C++ binding on IFaceEngine, Root LUNA SDK object interface</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathToData</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pathToFaceEngineConf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pathToData: path to a faceengine data folder</span>
+<span class="sd">            pathToFaceEngineConf:  path to a faceengine configuration file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pathToData</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;FSDK_ROOT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">pathToData</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;FSDK_ROOT&quot;</span><span class="p">],</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed on path to faceengine luna data folder, set variable pathToData or set&quot;</span>
+                                 <span class="s2">&quot;environment variable *FSDK_ROOT*&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pathToFaceEngineConf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;FSDK_ROOT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                    <span class="n">pathToFaceEngineConf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;FSDK_ROOT&quot;</span><span class="p">],</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;faceengine.conf&quot;</span><span class="p">)</span>
+                <span class="c1"># else:</span>
+                <span class="c1">#     raise ValueError(&quot;Failed on path to faceengine luna data folder,</span>
+                <span class="c1">#                       set variable pathToFaceEngineConf&quot;</span>
+                <span class="c1">#                      &quot; or set environment variable *FSDK_ROOT*&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span> <span class="o">=</span> <span class="n">pathToData</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configPath</span> <span class="o">=</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">createSettingsProvider</span><span class="p">(</span><span class="n">pathToFaceEngineConf</span><span class="p">)</span>
+        <span class="c1"># todo: validate initialize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">createFaceEngine</span><span class="p">(</span><span class="n">dataPath</span><span class="o">=</span><span class="n">pathToData</span><span class="p">,</span> <span class="n">configPath</span><span class="o">=</span><span class="n">pathToFaceEngineConf</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VLFaceEngine.createFaceDetector"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDetector">[docs]</a>    <span class="k">def</span> <span class="nf">createFaceDetector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detectorType</span><span class="p">:</span> <span class="n">DetectorType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDetector</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create face detector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            detectorType: detector type</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            detector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FaceDetector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createDetector</span><span class="p">(</span><span class="n">detectorType</span><span class="o">.</span><span class="n">coreDetectorType</span><span class="p">),</span> <span class="n">detectorType</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createHeadPoseEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createHeadPoseEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createHeadPoseEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HeadPoseEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create head pose estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">HeadPoseEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createHeadPoseEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createWarpQualityEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createWarpQualityEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createWarpQualityEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WarpQualityEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an image quality estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">WarpQualityEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createQualityEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createWarper"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createWarper">[docs]</a>    <span class="k">def</span> <span class="nf">createWarper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Warper</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create warper, `see &lt;warping.html&gt;`_:</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            warper.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Warper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createWarper</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createEmotionEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createEmotionEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createEmotionEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EmotionsEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create emotions estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">EmotionsEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createEmotionsEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createMouthEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createMouthEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createMouthEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MouthStateEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create mouth state estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">MouthStateEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createSmileEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createEyeEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createEyeEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createEyeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create eyes estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">EyeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createEyeEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createGazeEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createGazeEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createGazeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create gaze direction estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">GazeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createGazeEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createBasicAttributesEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createBasicAttributesEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createBasicAttributesEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasicAttributesEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create basic attributes estimator (age, gender, ethnicity)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">BasicAttributesEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createAttributeEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createAGSEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createAGSEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createAGSEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AGSEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Approximate garbage score estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">AGSEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createAGSEstimator</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VLFaceEngine.createFaceDescriptorEstimator"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDescriptorEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">createFaceDescriptorEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDescriptorEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Approximate garbage score estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FaceDescriptorEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createExtractor</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">createFaceDescriptorFactory</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">createFaceDescriptorFactory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDescriptorFactory</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FaceDescriptorFactory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">createFaceMatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceMatcher</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FaceMatcher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createMatcher</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">createFaceDescriptorFactory</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coreFaceEngine</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">PyIFaceEngine</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

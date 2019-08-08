@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.estimator_collections &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.estimator_collections</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module contains face estimator collections.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.ags</span> <span class="k">import</span> <span class="n">AGSEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.basic_attributes</span> <span class="k">import</span> <span class="n">BasicAttributesEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.emotions</span> <span class="k">import</span> <span class="n">EmotionsEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.eyes</span> <span class="k">import</span> <span class="n">EyeEstimator</span><span class="p">,</span> <span class="n">GazeEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.face_descriptor</span> <span class="k">import</span> <span class="n">FaceDescriptorEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.head_pose</span> <span class="k">import</span> <span class="n">HeadPoseEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.mouth_state</span> <span class="k">import</span> <span class="n">MouthStateEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warp_quality</span> <span class="k">import</span> <span class="n">WarpQualityEstimator</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.engine</span> <span class="k">import</span> <span class="n">VLFaceEngine</span>
+
+
+<div class="viewcode-block" id="FaceEstimator"><a class="viewcode-back" href="../../../sdk/estimator_collections.html#lunavl.sdk.estimator_collections.FaceEstimator">[docs]</a><span class="k">class</span> <span class="nc">FaceEstimator</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum for face estimators.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: head pose estimator</span>
+    <span class="n">HeadPose</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#: eye estimation (eyelid, iris landmarks and state)</span>
+    <span class="n">Eye</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1">#: emotion estimator</span>
+    <span class="n">Emotions</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="c1">#: basic attributes estimator</span>
+    <span class="n">BasicAttributes</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="c1">#: gaze direction estimator</span>
+    <span class="n">GazeDirection</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="c1">#: mouth state estimator</span>
+    <span class="n">MouthState</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="c1">#: warp quality estimator</span>
+    <span class="n">WarpQuality</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="c1">#: ags estimator</span>
+    <span class="n">AGS</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="c1">#: face descriptor estimator</span>
+    <span class="n">Descriptor</span> <span class="o">=</span> <span class="mi">9</span></div>
+
+
+<div class="viewcode-block" id="FaceEstimatorsCollection"><a class="viewcode-back" href="../../../sdk/estimator_collections.html#lunavl.sdk.estimator_collections.FaceEstimatorsCollection">[docs]</a><span class="k">class</span> <span class="nc">FaceEstimatorsCollection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collection of lazy load face estimators.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _headPoseEstimator (Optional[HeadPoseEstimator]): lazy load head pose estimator</span>
+<span class="sd">        _eyeEstimator (Optional[EyeEstimator]): lazy load eye estimator</span>
+<span class="sd">        _gazeDirectionEstimator (Optional[GazeEstimator]): lazy load gaze direction estimator</span>
+<span class="sd">        _mouthStateEstimator (Optional[MouthStateEstimator]): lazy load mouth state estimator</span>
+<span class="sd">        _warpQualityEstimator (Optional[WarpQualityEstimator]): lazy load warp quality estimator</span>
+<span class="sd">        _basicAttributesEstimator (Optional[BasicAttributesEstimator]): lazy load basic attributes estimator</span>
+<span class="sd">        _emotionsEstimator (Optional[EmotionsEstimator]): lazy load emotions estimator</span>
+<span class="sd">        _AGSEstimator (Optional[AGSEstimator]): lazy load ags estimator</span>
+<span class="sd">        _descriptorEstimator (Optional[FaceDescriptorEstimator]): lazy load face descriptor estimator</span>
+<span class="sd">        warper (Optional[Warper]): warper</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_headPoseEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;_eyeEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;_gazeDirectionEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;_mouthStateEstimator&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;_warpQualityEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;_basicAttributesEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;_emotionsEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;_faceEngine&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;_AGSEstimator&quot;</span><span class="p">,</span> <span class="s2">&quot;warper&quot;</span><span class="p">,</span> <span class="s2">&quot;_descriptorEstimator&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startEstimators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">FaceEstimator</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">faceEngine</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VLFaceEngine</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            startEstimators: list of estimators which will be initiate now</span>
+<span class="sd">            faceEngine: faceengine, factory for estimators</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">faceEngine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">VLFaceEngine</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">faceEngine</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributesEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eyeEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emotionsEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gazeDirectionEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mouthStateEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warpQualityEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headPoseEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_AGSEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_descriptorEstimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createWarper</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">startEstimators</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">startEstimators</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initEstimator</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_getEstimatorByAttributeName</span><span class="p">(</span><span class="n">estimatorAttributeName</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get face estimator by attribute name which corresponding to estimator</span>
+<span class="sd">        Args:</span>
+<span class="sd">            estimatorAttributeName: name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            corresponding face estimator</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError(&quot;Bad attribute name&quot;): if face estimator not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">FaceEstimator</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">estimator</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">estimatorAttributeName</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Estimator&quot;</span><span class="p">)]:</span>
+                <span class="k">return</span> <span class="n">estimator</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad attribute name&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getAttributeNameByEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">:</span> <span class="n">FaceEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get an estimator attribute name bya face estimator</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            estimator: face estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            corresponding attribute name</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError(&quot;Bad estimator&quot;): if attribute name not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">estimatorName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">estimatorName</span> <span class="o">==</span> <span class="s2">&quot;_faceEngine&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">estimator</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">estimatorName</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Estimator&quot;</span><span class="p">)]:</span>
+                <span class="k">return</span> <span class="n">estimatorName</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad estimator&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FaceEstimatorsCollection.initEstimator"><a class="viewcode-back" href="../../../sdk/estimator_collections.html#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.initEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">initEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">:</span> <span class="n">FaceEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an estimator. Create new estimator with help self._faceengine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            estimator: estimator for creating</span>
+<span class="sd">        Raises:</span>
+<span class="sd">             ValueError(&quot;Bad estimator type&quot;): if estimator not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">BasicAttributes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributesEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createBasicAttributesEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">Eye</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eyeEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createEyeEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">Emotions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emotionsEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createEmotionEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">GazeDirection</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gazeDirectionEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createGazeEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">MouthState</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mouthStateEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createMouthEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">WarpQuality</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warpQualityEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createWarpQualityEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">HeadPose</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_headPoseEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createHeadPoseEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">AGS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_AGSEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createAGSEstimator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">estimator</span> <span class="o">==</span> <span class="n">FaceEstimator</span><span class="o">.</span><span class="n">Descriptor</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_descriptorEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createFaceDescriptorEstimator</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad estimator type&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">descriptorEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDescriptorEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get head pose estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptorEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_descriptorEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createFaceDescriptorEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptorEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">headPoseEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HeadPoseEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get head pose estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headPoseEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_headPoseEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createHeadPoseEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headPoseEstimator</span>
+
+    <span class="nd">@headPoseEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">headPoseEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">HeadPoseEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set head pose estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headPoseEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="c1"># pylint: disable=C0103</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">AGSEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AGSEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get ags estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_AGSEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_AGSEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createAGSEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_AGSEstimator</span>
+
+    <span class="c1"># pylint: disable=C0103</span>
+    <span class="nd">@AGSEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">AGSEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">AGSEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set ags estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_AGSEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">basicAttributesEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasicAttributesEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get basic attributes estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributesEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributesEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createBasicAttributesEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributesEstimator</span>
+
+    <span class="nd">@basicAttributesEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">basicAttributesEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">BasicAttributesEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set basic attributes estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributesEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eyeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get eye estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyeEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eyeEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createEyeEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyeEstimator</span>
+
+    <span class="nd">@eyeEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">eyeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">EyeEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set eye estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eyeEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">emotionsEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EmotionsEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get emotions estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotionsEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emotionsEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createEmotionEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotionsEstimator</span>
+
+    <span class="nd">@emotionsEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">emotionsEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">EmotionsEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set emotions estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emotionsEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gazeDirectionEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get gaze direction estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gazeDirectionEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gazeDirectionEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createGazeEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gazeDirectionEstimator</span>
+
+    <span class="nd">@gazeDirectionEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">gazeDirectionEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">GazeEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set gaze direction estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gazeDirectionEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mouthStateEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MouthStateEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get mouth state estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthStateEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mouthStateEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createMouthEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthStateEstimator</span>
+
+    <span class="nd">@mouthStateEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">mouthStateEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">MouthStateEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set mouth state estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mouthStateEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warpQualityEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WarpQualityEstimator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get warp quality estimator.</span>
+
+<span class="sd">        If estimator is initialized it will be returned otherwise it will be initialized and returned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQualityEstimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warpQualityEstimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createWarpQualityEstimator</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQualityEstimator</span>
+
+    <span class="nd">@warpQualityEstimator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">warpQualityEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newEstimator</span><span class="p">:</span> <span class="n">WarpQualityEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set warp quality estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newEstimator: new estimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warpQualityEstimator</span> <span class="o">=</span> <span class="n">newEstimator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">faceEngine</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VLFaceEngine</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get current faceengine.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           self._faceEngine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span>
+
+    <span class="nd">@faceEngine</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">faceEngine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newFaceEngine</span><span class="p">:</span> <span class="n">VLFaceEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set new faceengine. All initialize estimators will be re-initialized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newFaceEngine: new faceengine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">newFaceEngine</span>
+        <span class="k">for</span> <span class="n">estimatorName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">estimatorName</span> <span class="o">==</span> <span class="s2">&quot;_faceEngine&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimatorName</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initEstimator</span><span class="p">(</span><span class="n">FaceEstimatorsCollection</span><span class="o">.</span><span class="n">_getEstimatorByAttributeName</span><span class="p">(</span><span class="n">estimatorName</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">createWarper</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FaceEstimatorsCollection.removeEstimator"><a class="viewcode-back" href="../../../sdk/estimator_collections.html#lunavl.sdk.estimator_collections.FaceEstimatorsCollection.removeEstimator">[docs]</a>    <span class="k">def</span> <span class="nf">removeEstimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">:</span> <span class="n">FaceEstimator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove estimators.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            estimator: estimator for removing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">estimatorName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAttributeNameByEstimator</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimatorName</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

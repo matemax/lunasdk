@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Descriptor matching &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="High level api" href="high_level_api.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Descriptor matching</a><ul>
+<li><a class="reference internal" href="#face-descriptor-matching">Face descriptor matching</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="high_level_api.html" title="Previous Chapter: High level api"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; High level api</span>
+    </a>
+  </li>
+  <li>
+    <a href="../examples.html" title="Next Chapter: Examples"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Examples &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/matching.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="descriptor-matching">
+<h1>Descriptor matching<a class="headerlink" href="#descriptor-matching" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="face-descriptor-matching">
+<span id="face-descriptors-matching"></span><h2>Face descriptor matching<a class="headerlink" href="#face-descriptor-matching" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to match a pair (or more) previously extracted descriptors to find out their similarity. With this
+information, it is possible to implement face search and other analysis applications.</p>
+<p>It is possible to match a pair of descriptors with each other or a single descriptor with a descriptor batch.</p>
+<p>A simple rule to help you decide which storage to opt for:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>when searching among less than a hundred descriptors use separat descriptor object;</p></li>
+<li><p>when searching among bigger number of descriptors usea batch.</p></li>
+</ol>
+</div></blockquote>
+<span class="target" id="module-lunavl.sdk.faceengine.descriptors"></span><p>Module contains a face descriptor estimator</p>
+<p>See <a href="#id1"><span class="problematic" id="id2">`face descriptor`_</span></a>.</p>
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.descriptors.</code><code class="descname">FaceDescriptor</code><span class="sig-paren">(</span><em>coreEstimation</em>, <em>garbageScore=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptor</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor.garbageScore">
+<code class="descname">garbageScore</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor.garbageScore" title="Permalink to this definition">¶</a></dt>
+<dd><p>garbage score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor.asBytes">
+<code class="descname">asBytes</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor.asBytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get descriptor as bytes.</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptor.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dict with keys “descriptor” and “score”</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor.asVector">
+<code class="descname">asVector</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor.asVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert descriptor to list of ints
+:returns: list of ints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor.model">
+<code class="descname">model</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get model of descriptor
+:returns: model version</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptor.rawDescriptor">
+<code class="descname">rawDescriptor</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptor.rawDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get raw descriptors
+:returns: bytes with metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.descriptors.</code><code class="descname">FaceDescriptorBatch</code><span class="sig-paren">(</span><em>coreEstimation</em>, <em>scores=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptorBatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Face descriptor batch.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.scores">
+<code class="descname">scores</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of garbage scores</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>List[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>descriptor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptorBatch.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add descriptor to end of batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>descriptor</strong> – descriptor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptorBatch.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get batch in json like object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of descriptors dict</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[~KT, ~VT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.descriptors.</code><code class="descname">FaceDescriptorFactory</code><span class="sig-paren">(</span><em>faceEngine</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptorFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Face Descriptor factory.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory._faceEngine">
+<code class="descname">_faceEngine</code><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory._faceEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>faceEngine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine" title="lunavl.sdk.faceengine.engine.VLFaceEngine">VLFaceEngine</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptor">
+<code class="descname">generateDescriptor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptorFactory.generateDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate core descriptor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>core descriptor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">IDescriptorPtr</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptorsBatch">
+<code class="descname">generateDescriptorsBatch</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/descriptors.html#FaceDescriptorFactory.generateDescriptorsBatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptorsBatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate core descriptors batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>size</strong> – batch size</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>batch</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">IDescriptorBatchPtr</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-lunavl.sdk.faceengine.matcher"></span><p>Module realize face descriptor match.</p>
+<p>see <a class="reference internal" href="#face-descriptors-matching">face descriptors matching</a>.</p>
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.matcher.FaceMatcher">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.matcher.</code><code class="descname">FaceMatcher</code><span class="sig-paren">(</span><em>coreMatcher</em>, <em>descriptorFactory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/matcher.html#FaceMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.FaceMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base estimator class. Class is  a container for core estimations. Mostly estimate attributes  can be get through
+a corresponding properties.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.matcher.FaceMatcher._coreMatcher">
+<code class="descname">_coreMatcher</code><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.FaceMatcher._coreMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>core matcher</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>IDescriptorMatcherPtr</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.matcher.FaceMatcher.descriptorFactory">
+<code class="descname">descriptorFactory</code><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.FaceMatcher.descriptorFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>face descriptor factory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory" title="lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory">FaceDescriptorFactory</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.matcher.FaceMatcher.match">
+<code class="descname">match</code><span class="sig-paren">(</span><em>reference</em>, <em>candidates</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/matcher.html#FaceMatcher.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.FaceMatcher.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match face descriptor vs face descriptors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of matching results if match by several descriptors otherwise one MatchingResult.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#lunavl.sdk.faceengine.matcher.MatchingResult" title="lunavl.sdk.faceengine.matcher.MatchingResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchingResult</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#lunavl.sdk.faceengine.matcher.MatchingResult" title="lunavl.sdk.faceengine.matcher.MatchingResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchingResult</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.matcher.MatchingResult">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.matcher.</code><code class="descname">MatchingResult</code><span class="sig-paren">(</span><em>distance</em>, <em>similarity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/matcher.html#MatchingResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.MatchingResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure for storing matching results.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.matcher.MatchingResult.distance">
+<code class="descname">distance</code><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.MatchingResult.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>L2 distance between descriptors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.matcher.MatchingResult.similarity">
+<code class="descname">similarity</code><a class="headerlink" href="#lunavl.sdk.faceengine.matcher.MatchingResult.similarity" title="Permalink to this definition">¶</a></dt>
+<dd><p>descriptor similarity [0..1]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

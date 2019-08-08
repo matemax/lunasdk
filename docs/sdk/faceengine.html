@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>FaceEngine &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SDK Image" href="image_utils.html" />
+    <link rel="prev" title="Modules" href="modules.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">FaceEngine</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="modules.html" title="Previous Chapter: Modules"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Modules</span>
+    </a>
+  </li>
+  <li>
+    <a href="image_utils.html" title="Next Chapter: SDK Image"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">SDK Image &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/faceengine.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="module-lunavl.sdk.faceengine.engine">
+<span id="faceengine"></span><h1>FaceEngine<a class="headerlink" href="#module-lunavl.sdk.faceengine.engine" title="Permalink to this headline">¶</a></h1>
+<p>Module realize wraps on facengine objects</p>
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.engine.</code><code class="descname">VLFaceEngine</code><span class="sig-paren">(</span><em>pathToData=None</em>, <em>pathToFaceEngineConf=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraper on FaceEngine.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.dataPath">
+<code class="descname">dataPath</code><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.dataPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>path to a faceengine data folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.configPath">
+<code class="descname">configPath</code><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.configPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>path to a faceengine configuration file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine._faceEngine">
+<code class="descname">_faceEngine</code><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine._faceEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>python C++ binding on IFaceEngine, Root LUNA SDK object interface</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>PyIFaceEngine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createAGSEstimator">
+<code class="descname">createAGSEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createAGSEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createAGSEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximate garbage score estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.ags.AGSEstimator" title="lunavl.sdk.estimators.face_estimators.ags.AGSEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AGSEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createBasicAttributesEstimator">
+<code class="descname">createBasicAttributesEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createBasicAttributesEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createBasicAttributesEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create basic attributes estimator (age, gender, ethnicity)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributesEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicAttributesEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createEmotionEstimator">
+<code class="descname">createEmotionEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createEmotionEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createEmotionEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create emotions estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.EmotionsEstimator" title="lunavl.sdk.estimators.face_estimators.emotions.EmotionsEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmotionsEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createEyeEstimator">
+<code class="descname">createEyeEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createEyeEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createEyeEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create eyes estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator" title="lunavl.sdk.estimators.face_estimators.eyes.EyeEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EyeEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDescriptorEstimator">
+<code class="descname">createFaceDescriptorEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createFaceDescriptorEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDescriptorEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximate garbage score estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.face_descriptor.FaceDescriptorEstimator" title="lunavl.sdk.estimators.face_estimators.face_descriptor.FaceDescriptorEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDescriptorEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDetector">
+<code class="descname">createFaceDetector</code><span class="sig-paren">(</span><em>detectorType</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createFaceDetector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create face detector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>detectorType</strong> – detector type</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>detector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="face_detection.html#lunavl.sdk.faceengine.facedetector.FaceDetector" title="lunavl.sdk.faceengine.facedetector.FaceDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDetector</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createGazeEstimator">
+<code class="descname">createGazeEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createGazeEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createGazeEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create gaze direction estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator" title="lunavl.sdk.estimators.face_estimators.eyes.GazeEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">GazeEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createHeadPoseEstimator">
+<code class="descname">createHeadPoseEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createHeadPoseEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createHeadPoseEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create head pose estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.head_pose.HeadPoseEstimator" title="lunavl.sdk.estimators.face_estimators.head_pose.HeadPoseEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeadPoseEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createMouthEstimator">
+<code class="descname">createMouthEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createMouthEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createMouthEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create mouth state estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStateEstimator" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStateEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouthStateEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createWarpQualityEstimator">
+<code class="descname">createWarpQualityEstimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createWarpQualityEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createWarpQualityEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an image quality estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>estimator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.WarpQualityEstimator" title="lunavl.sdk.estimators.face_estimators.warp_quality.WarpQualityEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">WarpQualityEstimator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.engine.VLFaceEngine.createWarper">
+<code class="descname">createWarper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/engine.html#VLFaceEngine.createWarper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.engine.VLFaceEngine.createWarper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create warper, <a class="reference external" href="warping.html">see</a>:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>warper.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="warping.html#lunavl.sdk.estimators.face_estimators.warper.Warper" title="lunavl.sdk.estimators.face_estimators.warper.Warper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warper</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

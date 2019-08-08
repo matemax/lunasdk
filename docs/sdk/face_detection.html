@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Face detection and landmarks &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Warping" href="warping.html" />
+    <link rel="prev" title="SDK Image" href="sdk_image.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Face detection and landmarks</a><ul>
+<li><a class="reference internal" href="#face-detection">Face detection</a><ul>
+<li><a class="reference internal" href="#detectors">Detectors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#face-alignment">Face alignment</a><ul>
+<li><a class="reference internal" href="#landmarks5">Landmarks5</a></li>
+<li><a class="reference internal" href="#landmarks68">Landmarks68</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="sdk_image.html" title="Previous Chapter: SDK Image"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; SDK Image</span>
+    </a>
+  </li>
+  <li>
+    <a href="warping.html" title="Next Chapter: Warping"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Warping &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/face_detection.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="face-detection-and-landmarks">
+<h1>Face detection and landmarks<a class="headerlink" href="#face-detection-and-landmarks" title="Permalink to this headline">¶</a></h1>
+<p>Luna VL provides methods for faces detection on images and find landmarks on it.</p>
+<div class="section" id="face-detection">
+<h2>Face detection<a class="headerlink" href="#face-detection" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="detectors">
+<h3>Detectors<a class="headerlink" href="#detectors" title="Permalink to this headline">¶</a></h3>
+<p>There are 3 face detectors: <em>FACE_DET_V1, FACE_DET_V2, FACE_DET_V3</em>. <em>FaceDetV1</em> detector is more precise and
+<em>FaceDetV2</em> works two times faster. <em>FaceDetV1</em> and <em>FaceDetV2</em> performance depends on number of faces on image and
+image complexity. <em>FaceDetV3</em> performance depends only on target image resolution. <em>FACE_DET_V3</em> is the latest and most
+precise detector. In terms of performance it is similar to <em>FaceDetV1</em> detector. <em>FaceDetV3</em>  may be slower then
+<em>FaceDetV1</em> on images with one face and much more faster on images with many faces.</p>
+<p>You should create a face detector using the method <em>createFaceDetector</em> of class <em>VLFaceEngine</em> for faces detection.
+You should set detector type when creating detector. Once initialize detector can be using as many times as you like.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We don’t recommend create often new detector because it is very slowly operation.</p>
+</div>
+</div>
+</div>
+<div class="section" id="face-alignment">
+<h2>Face alignment<a class="headerlink" href="#face-alignment" title="Permalink to this headline">¶</a></h2>
+<p>Face alignment is the process of special key points (called “landmarks”) detection on a face. FaceEngine does landmark
+detection at the same time as the face detection since some of the landmarks are by products of that detection.</p>
+<div class="section" id="landmarks5">
+<h3>Landmarks5<a class="headerlink" href="#landmarks5" title="Permalink to this headline">¶</a></h3>
+<p>At the very minimum, just 5 landmarks are required: two for eyes, one for a nose tip and two for mouth corners. Using
+these coordinates, one may warp the source photo image for use with all other FaceEngine
+algorithms. All detector may provide 5 landmarks for each detection without additional computations.</p>
+<p><em>landmarks5</em> contains the following landmarks:</p>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Array index</p></th>
+<th class="head"><p>Landmark location</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Left eye center</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>Right eye center</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>Nose tip</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>Left mouth corner</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>Right mouth corner</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="landmarks68">
+<h3>Landmarks68<a class="headerlink" href="#landmarks68" title="Permalink to this headline">¶</a></h3>
+<p>More advanced 68-points face alignment is also implemented. Use this when you need precise information about face and
+its parts. The 68 landmarks require additional computation time, so don’t use it if you don’t need precise information
+about a face. If you use 68 landmarks, 5 landmarks will be reassigned to more precise subset of 68 landmarks.</p>
+<p><em>landmarks68</em> contains the landmarks according to I-Bug 68-point annotation scheme.</p>
+<img alt="../_images/figure_68_markup.jpg" src="../_images/figure_68_markup.jpg" />
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module realize simple examples following features:</span>
+<span class="sd">    * one face detection</span>
+<span class="sd">    * batch images face detection</span>
+<span class="sd">    * detect landmarks68 and landmarks5</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.engine</span> <span class="k">import</span> <span class="n">VLFaceEngine</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.facedetector</span> <span class="k">import</span> <span class="n">DetectorType</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.image_utils.image</span> <span class="k">import</span> <span class="n">VLImage</span>
+
+
+<span class="k">def</span> <span class="nf">detectOneFace</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detect one face on an image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">faceEngine</span> <span class="o">=</span> <span class="n">VLFaceEngine</span><span class="p">()</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">faceEngine</span><span class="o">.</span><span class="n">createFaceDetector</span><span class="p">(</span><span class="n">DetectorType</span><span class="o">.</span><span class="n">FACE_DET_V1</span><span class="p">)</span>
+
+    <span class="n">imageWithOneFace</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg&#39;</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">detectOne</span><span class="p">(</span><span class="n">imageWithOneFace</span><span class="p">,</span> <span class="n">detect5Landmarks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detect68Landmarks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">())</span>
+
+    <span class="n">imageWithSeveralFaces</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://cdn1.savepice.ru/uploads/2019/4/15/aa970957128d9892f297cdfa5b3fda88-full.jpg&#39;</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">detectOne</span><span class="p">(</span><span class="n">imageWithSeveralFaces</span><span class="p">,</span> <span class="n">detect5Landmarks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detect68Landmarks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">asDict</span><span class="p">())</span>
+
+    <span class="n">imageWithoutFace</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://cdn1.savepice.ru/uploads/2019/4/15/3e3593dc2fd0671c7051b18c99974192-full.jpg&#39;</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">detectOne</span><span class="p">(</span><span class="n">imageWithoutFace</span><span class="p">,</span> <span class="n">detect5Landmarks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detect68Landmarks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">detectOneFace</span><span class="p">()</span>
+</pre></div>
+</div>
+<span class="target" id="module-lunavl.sdk.faceengine.facedetector"></span><p>Module contains function for detection faces on images.</p>
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.facedetector.BoundingBox">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.facedetector.</code><code class="descname">BoundingBox</code><span class="sig-paren">(</span><em>boundingBox</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#BoundingBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.BoundingBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detection bounding box, it is characterized of rect and score:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>rect (Rect[float]): face bounding box</p></li>
+<li><dl class="simple">
+<dt>score (float): face score (0,1), detection score is the measure of classification confidence</dt><dd><p>and not the source image quality. It may be used topick the most “<em>confident</em>” face of many.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.BoundingBox.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#BoundingBox.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.BoundingBox.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to  dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.rect, “score”: self.score}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>{“rect”</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.BoundingBox.rect">
+<code class="descname">rect</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.BoundingBox.rect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rect.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>float rect</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="geometry.html#lunavl.sdk.image_utils.geometry.Rect" title="lunavl.sdk.image_utils.geometry.Rect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rect</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.BoundingBox.score">
+<code class="descname">score</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.BoundingBox.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>number in range [0,1]</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.facedetector.</code><code class="descname">FaceDetection</code><span class="sig-paren">(</span><em>coreDetection</em>, <em>image</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection.boundingBox">
+<code class="descname">boundingBox</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection.boundingBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>face bounding box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.faceengine.facedetector.BoundingBox" title="lunavl.sdk.faceengine.facedetector.BoundingBox">BoundingBox</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection.landmarks5">
+<code class="descname">landmarks5</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection.landmarks5" title="Permalink to this definition">¶</a></dt>
+<dd><p>optional landmarks5</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="#lunavl.sdk.faceengine.facedetector.Landmarks5" title="lunavl.sdk.faceengine.facedetector.Landmarks5">Landmarks5</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection.landmarks68">
+<code class="descname">landmarks68</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection.landmarks68" title="Permalink to this definition">¶</a></dt>
+<dd><p>optional landmarks5</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="#lunavl.sdk.faceengine.facedetector.Landmarks68" title="lunavl.sdk.faceengine.facedetector.Landmarks68">Landmarks68</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection._image">
+<code class="descname">_image</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection._image" title="Permalink to this definition">¶</a></dt>
+<dd><p>source of detection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="sdk_image.html#lunavl.sdk.image_utils.image.VLImage" title="lunavl.sdk.image_utils.image.VLImage">VLImage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetection.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert face detection to dict (json).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>‘rect’, ‘score’. optional keys: ‘landmarks5’, ‘landmarks68’</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict. required keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetection.image">
+<code class="descname">image</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetection.image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get source of detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>source image</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="sdk_image.html#lunavl.sdk.image_utils.image.VLImage" title="lunavl.sdk.image_utils.image.VLImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">VLImage</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.facedetector.</code><code class="descname">FaceDetector</code><span class="sig-paren">(</span><em>detectorPtr</em>, <em>detectorType</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Face detector.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector._detector">
+<code class="descname">_detector</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector._detector" title="Permalink to this definition">¶</a></dt>
+<dd><p>core detector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>IDetectorPtr</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>images</em>, <em>limit=5</em>, <em>detect5Landmarks=True</em>, <em>detect68Landmarks=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetector.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch detect faces on images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – input images list. Format must be R8G8B8</p></li>
+<li><p><strong>limit</strong> – max number of detections per input image</p></li>
+<li><p><strong>detect5Landmarks</strong> – detect or not landmarks5</p></li>
+<li><p><strong>detect68Landmarks</strong> – detect or not landmarks68</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>return list of lists detection, order of detection lists is corresponding to order input images</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>LunaSDKException</strong><strong>(</strong><strong>LunaVLError.InvalidImageFormat</strong><strong>)</strong> – if any image has bad format or detect is failed</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#lunavl.sdk.faceengine.facedetector.FaceDetection" title="lunavl.sdk.faceengine.facedetector.FaceDetection"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDetection</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector.detectOne">
+<code class="descname">detectOne</code><span class="sig-paren">(</span><em>image</em>, <em>detectArea=None</em>, <em>detect5Landmarks=True</em>, <em>detect68Landmarks=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetector.detectOne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector.detectOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect just one best detection on the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – image. Format must be R8G8B8 (todo check)</p></li>
+<li><p><strong>detectArea</strong> – rectangle area which contains face to detect. If not set will be set image.rect</p></li>
+<li><p><strong>detect5Landmarks</strong> – detect or not landmarks5</p></li>
+<li><p><strong>detect68Landmarks</strong> – detect or not landmarks68</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>face detection if face is found otherwise None</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>LunaSDKException</strong> – if detectOne is failed or image format has wrong  the format</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="docutils literal notranslate"><span class="pre">None</span></code>, <a class="reference internal" href="#lunavl.sdk.faceengine.facedetector.FaceDetection" title="lunavl.sdk.faceengine.facedetector.FaceDetection"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDetection</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector.redect">
+<code class="descname">redect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetector.redect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector.redect" title="Permalink to this definition">¶</a></dt>
+<dd><p>todo: wtf
+Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector.redetectOne">
+<code class="descname">redetectOne</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetector.redetectOne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector.redetectOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>todo: wtf
+Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.facedetector.FaceDetector.setDetectionComparer">
+<code class="descname">setDetectionComparer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#FaceDetector.setDetectionComparer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.FaceDetector.setDetectionComparer" title="Permalink to this definition">¶</a></dt>
+<dd><p>todo: wtf
+Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.facedetector.ImageForDetection">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.facedetector.</code><code class="descname">ImageForDetection</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#ImageForDetection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.ImageForDetection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure for the transfer to detector an image and detect an area.</p>
+<dl class="simple">
+<dt>Attributes</dt><dd><p>image (VLImage): image for detection
+detectArea (Rect[float]):</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.ImageForDetection.detectArea">
+<code class="descname">detectArea</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.ImageForDetection.detectArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.facedetector.ImageForDetection.image">
+<code class="descname">image</code><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.ImageForDetection.image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.facedetector.Landmarks5">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.facedetector.</code><code class="descname">Landmarks5</code><span class="sig-paren">(</span><em>coreLandmark5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#Landmarks5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.Landmarks5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.facedetector.Landmarks68">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.facedetector.</code><code class="descname">Landmarks68</code><span class="sig-paren">(</span><em>coreLandmark68</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/facedetector.html#Landmarks68"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.facedetector.Landmarks68" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>SDK Image &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Face detection and landmarks" href="face_detection.html" />
+    <link rel="prev" title="Geometric utils" href="geometry.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">SDK Image</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="geometry.html" title="Previous Chapter: Geometric utils"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Geometric utils</span>
+    </a>
+  </li>
+  <li>
+    <a href="face_detection.html" title="Next Chapter: Face detection and landmarks"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Face detectio... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/sdk_image.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="module-lunavl.sdk.image_utils.image">
+<span id="sdk-image"></span><h1>SDK Image<a class="headerlink" href="#module-lunavl.sdk.image_utils.image" title="Permalink to this headline">¶</a></h1>
+<p>Module realize VLImage - structure for storing image in special format.</p>
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.image.</code><code class="descname">ColorFormat</code><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#ColorFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum for vl luna color formats</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.B8G8R8">
+<code class="descname">B8G8R8</code><em class="property"> = 'B8G8R8'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.B8G8R8" title="Permalink to this definition">¶</a></dt>
+<dd><p>3 channel, 8 bit per channel, B-G-R color order format;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.B8G8R8X8">
+<code class="descname">B8G8R8X8</code><em class="property"> = 'B8G8R8X8'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.B8G8R8X8" title="Permalink to this definition">¶</a></dt>
+<dd><p>3 channel, 8 bit per channel, B-G-R color order format with 8 bit padding before next pixel;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.R16">
+<code class="descname">R16</code><em class="property"> = 'R16'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.R16" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 channel, 8 bit per channel format;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.R8">
+<code class="descname">R8</code><em class="property"> = 'R8'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.R8" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 channel, 8 bit per channel format;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.R8G8B8">
+<code class="descname">R8G8B8</code><em class="property"> = 'R8G8B8'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.R8G8B8" title="Permalink to this definition">¶</a></dt>
+<dd><p>3 channel, 8 bit per channel, R-G-B color order format;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.R8G8B8X8">
+<code class="descname">R8G8B8X8</code><em class="property"> = 'R8G8B8X8'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.R8G8B8X8" title="Permalink to this definition">¶</a></dt>
+<dd><p>3 channel, 8 bit per channel, R-G-B color order format with 8 bit padding before next pixel;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.Unknown">
+<code class="descname">Unknown</code><em class="property"> = 'Unknown'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.Unknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>unknown format</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ColorFormat.coreFormat">
+<code class="descname">coreFormat</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.ColorFormat.coreFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert  format to luna core format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>luna core format</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FormatType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.image.ImageFormat">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.image.</code><code class="descname">ImageFormat</code><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#ImageFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.ImageFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum for image format</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ImageFormat.JPG">
+<code class="descname">JPG</code><em class="property"> = 'jpg'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ImageFormat.JPG" title="Permalink to this definition">¶</a></dt>
+<dd><p>jpg</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ImageFormat.PNG">
+<code class="descname">PNG</code><em class="property"> = 'png'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ImageFormat.PNG" title="Permalink to this definition">¶</a></dt>
+<dd><p>png</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ImageFormat.PPM">
+<code class="descname">PPM</code><em class="property"> = 'ppm'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ImageFormat.PPM" title="Permalink to this definition">¶</a></dt>
+<dd><p>ppm</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.ImageFormat.TIF">
+<code class="descname">TIF</code><em class="property"> = 'tif'</em><a class="headerlink" href="#lunavl.sdk.image_utils.image.ImageFormat.TIF" title="Permalink to this definition">¶</a></dt>
+<dd><p>tif</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.image_utils.image.VLImage">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.image_utils.image.</code><code class="descname">VLImage</code><span class="sig-paren">(</span><em>body</em>, <em>imgFormat=None</em>, <em>filename=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class image.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.coreImage">
+<code class="descname">coreImage</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.coreImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>core image object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>CoreFE.Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.source">
+<code class="descname">source</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>source of image (todo change)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.filename">
+<code class="descname">filename</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>filename of the file which is source of image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.asNPArray">
+<code class="descname">asNPArray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.asNPArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.asNPArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get image as numpy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+<p>todo: doctest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.bitDepth">
+<code class="descname">bitDepth</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.bitDepth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of bits per pixel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>number of bits per pixel.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.channelCount">
+<code class="descname">channelCount</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.channelCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get chanel count of the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>channel count.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">channelCount</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.channelSize">
+<code class="descname">channelSize</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.channelSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get size of one chanel in bites.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>channel size in bytes.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">channelSize</span>
+<span class="go">8</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.channelStep">
+<code class="descname">channelStep</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.channelStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get chanel step.
+todo: more description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>channel size in bytes.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>padding bytes are considered spare channels.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">channelStep</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.computePitch">
+<code class="descname">computePitch</code><span class="sig-paren">(</span><em>rowWidth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.computePitch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.computePitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute row size in bytes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rowWidth</strong> – row width in pixels.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>row size in bytes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.convertToBinaryImg">
+<code class="descname">convertToBinaryImg</code><span class="sig-paren">(</span><em>imageFormat=&lt;ImageFormat.PPM: 'ppm'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.convertToBinaryImg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.convertToBinaryImg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert VL image to binary image
+:param imageFormat: format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.format">
+<code class="descname">format</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>FaceEngine.Image) -&gt; FaceEngine.FormatType</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">image</span><span class="o">.</span><span class="n">format</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&#39;R8G8B8&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.image.ColorFormat" title="lunavl.sdk.image_utils.image.ColorFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColorFormat</span></code></a></p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>getFormat(self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.getByteDepth">
+<code class="descname">getByteDepth</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.getByteDepth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of bytes per pixel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>number of bytes per pixel.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.isBGR">
+<code class="descname">isBGR</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.isBGR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.isBGR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether format image is bgr or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if the image is bgr image otherwise False</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>padding is ignored for padded channels.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isBGR</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.isPadded">
+<code class="descname">isPadded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.isPadded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.isPadded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determinate image format has padding bytes or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>true if image format has padding bytes.</p>
+</dd>
+</dl>
+<p>todo examples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.isValid">
+<code class="descname">isValid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.isValid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.isValid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check image is valid loaded  to core image or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if image is valid otherwise False</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="lunavl.sdk.image_utils.image.VLImage.load">
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>*_</em>, <em>filename=None</em>, <em>url=None</em>, <em>imgFormat=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load imag from numpy array or file or url.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*_</strong> – for remove positional argument</p></li>
+<li><p><strong>filename</strong> – filename</p></li>
+<li><p><strong>url</strong> – url</p></li>
+<li><p><strong>imgFormat</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>vl image</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – if no one argument  did not set.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">VLImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rect</span>
+<span class="go">x = 0, y = 0, width = 1000, height = 1288</span>
+</pre></div>
+</div>
+<p>todo: more doc test</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lunavl.sdk.image_utils.image.VLImage" title="lunavl.sdk.image_utils.image.VLImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">VLImage</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.image_utils.image.VLImage.rect">
+<code class="descname">rect</code><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.rect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rect of image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>rect of the image</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="geometry.html#lunavl.sdk.image_utils.geometry.Rect" title="lunavl.sdk.image_utils.geometry.Rect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rect</span></code></a>[~COORDINATE_TYPE]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.image_utils.image.VLImage.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/image_utils/image.html#VLImage.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.image_utils.image.VLImage.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save image to disk. Support image format: <em>ppm, jpg, png, tif</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – filename</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>todo it</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
