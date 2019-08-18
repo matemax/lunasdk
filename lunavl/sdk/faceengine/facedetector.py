@@ -7,7 +7,7 @@ from typing import Optional, Union, List, NamedTuple, Dict
 from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
-from FaceEngine import ObjectDetectorClassType, DetectionType, Face  # pylint: disable=E0611,E0401
+from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
@@ -27,26 +27,6 @@ class ImageForDetection(NamedTuple):
     """
     image: VLImage
     detectArea: Rect[float]
-
-
-class DetectorType(Enum):
-    """
-    Detector types enum
-    """
-    FACE_DET_DEFAULT = "FACE_DET_DEFAULT"  #: what is default?
-    FACE_DET_V1 = "FACE_DET_V1"  #: todo description
-    FACE_DET_V2 = "FACE_DET_V2"
-    FACE_DET_V3 = "FACE_DET_V3"
-
-    @property
-    def coreDetectorType(self) -> ObjectDetectorClassType:
-        """
-        Convert  self to core detector type
-
-        Returns:
-            ObjectDetectorClassType
-        """
-        return getattr(ObjectDetectorClassType, self.value)
 
 
 class Landmarks5(Landmarks):
