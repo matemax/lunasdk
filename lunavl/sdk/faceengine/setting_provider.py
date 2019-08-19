@@ -1,10 +1,37 @@
+"""
+SDK configuration module.
+"""
 import os
-from collections import namedtuple
 from enum import Enum
 from pathlib import Path
+from typing import Union, Optional, Tuple, Any
+
 import FaceEngine as CoreFE
 from FaceEngine import ObjectDetectorClassType, PyISettingsProvider  # pylint: disable=E0611,E0401
-from typing import Union, Optional, Tuple, Any
+
+
+class BiDirectionEnum(Enum):
+    """
+    Bi direction enum.
+    """
+
+    @classmethod
+    def getEnum(cls, enumValue) -> 'BiDirectionEnum':
+        """
+        Get enum by value.
+
+        Args:
+            enumValue: value
+
+        Returns:
+           element of the enum with value which is equal to the enumValue.
+        Raises:
+              KeyError: if element not found.
+        """
+        for enumMember in cls:
+            if enumMember.value == enumValue:
+                return enumMember
+        raise KeyError("Enum {} does not contain  member with value {}".format(cls.__name__, enumValue))
 
 
 class CpuClass(Enum):
@@ -16,7 +43,7 @@ class CpuClass(Enum):
     arm = "arm"
 
 
-class VerboseLogging(Enum):
+class VerboseLogging(BiDirectionEnum):
     """
     Level of log versobing enum
     """
@@ -27,21 +54,39 @@ class VerboseLogging(Enum):
 
 
 class DeviceClass(Enum):
+    """
+    Device enum
+    """
     cpu = "cpu"
     gpu = "gpu"
 
 
-class Distance(Enum):
+class Distance(BiDirectionEnum):
+    """
+    Descriptor distance type enum.
+    """
     l1 = "L1"
     l2 = "L2"
 
 
 class NMS(Enum):
+    """
+    NMS type enum.
+    """
     mean = "mean"
     best = "best"
 
 
 class Point4:
+    """
+    Point in 4-dimensional space.
+    Attributes:
+        x (float): x coordinate
+        y (float): y coordinate
+        z (float): z coordinate
+        w (float): w coordinate
+    """
+
     def __init__(self, x: float, y: float, z: float, w: float):
         self.x = x
         self.y = y
@@ -49,25 +94,58 @@ class Point4:
         self.w = w
 
     def asTuple(self) -> Tuple[float, float, float, float]:
+        """
+        Convert point to tuple.
+
+        Returns:
+            tuple from coordinate
+        """
         return self.x, self.y, self.z, self.w
 
 
 class Point3:
+    """
+    Point in 3-dimensional space.
+    Attributes:
+        x (float): x coordinate
+        y (float): y coordinate
+        z (float): z coordinate
+    """
+
     def __init__(self, x: float, y: float, z: float):
         self.x = x
         self.y = y
         self.z = z
 
     def asTuple(self) -> Tuple[float, float, float]:
+        """
+        Convert point to tuple.
+
+        Returns:
+            tuple from coordinate
+        """
         return self.x, self.y, self.z
 
 
 class Point2:
+    """
+    Point in 2-dimensional space.
+    Attributes:
+        x (float): x coordinate
+        y (float): y coordinate
+    """
+
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
 
     def asTuple(self) -> Tuple[float, float]:
+        """
+        Convert point to tuple.
+
+        Returns:
+            tuple from coordinate
+        """
         return self.x, self.y
 
 
@@ -92,17 +170,74 @@ class DetectorType(Enum):
 
 
 class BaseSettingsSection:
+    """
+    Base class for a section of settings.
+
+    Proxy model to core settings provider.
+
+    Attributes:
+        _coreSettingProvider (coreSettingProvider): core settings provider
+    """
+    # (str): section name
     sectionName: str
 
     def __init__(self, coreSettingProvider: PyISettingsProvider):
         self._coreSettingProvider = coreSettingProvider
 
-    def setValue(self, name: str, value: Any):
+    def setValue(self, name: str, value: Any) -> None:
+        """
+        Set a value
+
+        Args:
+            name: setting name
+            value: new value
+        """
         self._coreSettingProvider.setValue(self.__class__.sectionName, name,
                                            CoreFE.SettingsProviderValue(value))
 
     def getValue(self, name: str) -> Any:
+        """
+        Get setting value
+        Args:
+            name: setting name
+
+        Returns:
+            a value
+        """
         return self._coreSettingProvider.getValue(self.__class__.sectionName, name)
+
+    def getValueAsString(self, name: str) -> str:
+        """
+        Get setting value as string
+        Args:
+            name: setting name
+
+        Returns:
+            a string
+        """
+        return self.getValue(name).asString()
+
+    def getValueAsInt(self, name: str) -> int:
+        """
+        Get setting value as int
+        Args:
+            name: setting name
+
+        Returns:
+            a int
+        """
+        return self.getValue(name).asInt()
+
+    def getValueAsFloat(self, name: str) -> float:
+        """
+        Get setting value as float
+        Args:
+            name: setting name
+
+        Returns:
+            a float
+        """
+        return self.getValue(name).asFloat()
 
 
 class SystemSettings(BaseSettingsSection):
@@ -116,6 +251,7 @@ class SystemSettings(BaseSettingsSection):
         betaMode (bool): enable experimental features.
         defaultDetectorType (DetectorType): default detector type
     """
+    sectionName = "system"
 
     @property
     def cpuClass(self) -> CpuClass:
@@ -125,7 +261,7 @@ class SystemSettings(BaseSettingsSection):
         Returns:
             cpuClass
         """
-        return CpuClass[self.getValue("cpuClass")]
+        return CpuClass[self.getValueAsString("cpuClass")]
 
     @cpuClass.setter
     def cpuClass(self, value: CpuClass) -> None:
@@ -145,7 +281,7 @@ class SystemSettings(BaseSettingsSection):
         Returns:
             verboseLogging
         """
-        return VerboseLogging[self.getValue("verboseLogging")]
+        return VerboseLogging.getEnum(self.getValueAsInt("verboseLogging"))
 
     @verboseLogging.setter
     def verboseLogging(self, value: VerboseLogging) -> None:
@@ -165,7 +301,7 @@ class SystemSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return bool(self.getValue("betaMode"))
+        return bool(self.getValueAsInt("betaMode"))
 
     @betaMode.setter
     def betaMode(self, value: bool) -> None:
@@ -184,7 +320,7 @@ class SystemSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return DetectorType[self.getValue("defaultDetectorType")]
+        return DetectorType[self.getValueAsString("defaultDetectorType")]
 
     @defaultDetectorType.setter
     def defaultDetectorType(self, value: DetectorType) -> None:
@@ -213,10 +349,11 @@ class FlowerSettings(BaseSettingsSection):
         verboseLogging (VerboseLogging): level of verbose logging
         numComputeStreams (int):  increases performance, but works only with new versions of nvidia drivers
     """
+    sectionName = "flower"
 
     @property
     def deviceClass(self) -> DeviceClass:
-        return DeviceClass[self.getValue("deviceClass")]
+        return DeviceClass[self.getValueAsString("deviceClass")]
 
     @deviceClass.setter
     def deviceClass(self, value: DeviceClass) -> None:
@@ -235,7 +372,7 @@ class FlowerSettings(BaseSettingsSection):
         Returns:
             numThreads
         """
-        return self.getValue("numThreads")
+        return self.getValueAsInt("numThreads")
 
     @numThreads.setter
     def numThreads(self, value: int) -> None:
@@ -254,7 +391,7 @@ class FlowerSettings(BaseSettingsSection):
         Returns:
             verboseLogging
         """
-        return VerboseLogging[self.getValue("verboseLogging")]
+        return VerboseLogging.getEnum(self.getValueAsInt("verboseLogging"))
 
     @verboseLogging.setter
     def verboseLogging(self, value: VerboseLogging) -> None:
@@ -273,7 +410,7 @@ class FlowerSettings(BaseSettingsSection):
         Returns:
             numComputeStreams
         """
-        return self.getValue("numComputeStreams")
+        return self.getValueAsInt("numComputeStreams")
 
     @numComputeStreams.setter
     def numComputeStreams(self, value: int) -> None:
@@ -309,7 +446,7 @@ class DescriptorFactorySettings(BaseSettingsSection):
         Returns:
             model
         """
-        return self.getValue("model")
+        return self.getValueAsInt("model")
 
     @model.setter
     def model(self, value: int) -> None:
@@ -328,7 +465,7 @@ class DescriptorFactorySettings(BaseSettingsSection):
         Returns:
             useMobileNet
         """
-        return bool(self.getValue("useMobileNet"))
+        return bool(self.getValueAsInt("useMobileNet"))
 
     @useMobileNet.setter
     def useMobileNet(self, value: bool) -> None:
@@ -347,7 +484,7 @@ class DescriptorFactorySettings(BaseSettingsSection):
         Returns:
             distance
         """
-        return Distance[self.getValue("distance")]
+        return Distance.getEnum(self.getValueAsString("distance"))
 
     @distance.setter
     def distance(self, value: Distance) -> None:
@@ -366,7 +503,7 @@ class DescriptorFactorySettings(BaseSettingsSection):
         Returns:
             descriptorCountWarningLevel
         """
-        return self.getValue("descriptorCountWarningLevel")
+        return self.getValueAsString("descriptorCountWarningLevel")
 
     @descriptorCountWarningLevel.setter
     def descriptorCountWarningLevel(self, value: str) -> None:
@@ -405,7 +542,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             scoreThreshold
         """
-        return self.getValue("scoreThreshold")
+        return self.getValueAsFloat("scoreThreshold")
 
     @scoreThreshold.setter
     def scoreThreshold(self, value: float) -> None:
@@ -424,7 +561,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             redetectScoreThreshold
         """
-        return self.getValue("RedetectScoreThreshold")
+        return self.getValueAsFloat("RedetectScoreThreshold")
 
     @redetectScoreThreshold.setter
     def redetectScoreThreshold(self, value: float) -> None:
@@ -443,7 +580,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             NMSThreshold
         """
-        return self.getValue("NMSThreshold")
+        return self.getValueAsFloat("NMSThreshold")
 
     @NMSThreshold.setter
     def NMSThreshold(self, value: float) -> None:
@@ -462,7 +599,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             imageSize
         """
-        return self.getValue("imageSize")
+        return self.getValueAsInt("imageSize")
 
     @imageSize.setter
     def imageSize(self, value: int) -> None:
@@ -481,7 +618,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             nms
         """
-        return NMS[self.getValue("nms")]
+        return NMS[self.getValueAsString("nms")]
 
     @nms.setter
     def nms(self, value: NMS) -> None:
@@ -500,7 +637,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             redetectTensorSize
         """
-        return self.getValue("RedetectTensorSize")
+        return self.getValueAsInt("RedetectTensorSize")
 
     @redetectTensorSize.setter
     def redetectTensorSize(self, value: int) -> None:
@@ -519,7 +656,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             redetectFaceTargetSize
         """
-        return self.getValue("RedetectFaceTargetSize")
+        return self.getValueAsInt("RedetectFaceTargetSize")
 
     @redetectFaceTargetSize.setter
     def redetectFaceTargetSize(self, value: int) -> None:
@@ -576,7 +713,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         Returns:
             planPrefix
         """
-        return self.getValue("planPrefix")
+        return self.getValueAsString("planPrefix")
 
     @planPrefix.setter
     def planPrefix(self, value: str) -> None:
@@ -611,7 +748,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         Returns:
             float in [0..1] range
         """
-        return self.getValue("FirstThreshold")
+        return self.getValueAsFloat("FirstThreshold")
 
     @firstThreshold.setter
     def firstThreshold(self, value: float) -> None:
@@ -630,7 +767,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         Returns:
             secondThreshold
         """
-        return self.getValue("SecondThreshold")
+        return self.getValueAsFloat("SecondThreshold")
 
     @secondThreshold.setter
     def secondThreshold(self, value: float) -> None:
@@ -649,7 +786,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         Returns:
             thirdThreshold
         """
-        return self.getValue("ThirdThreshold")
+        return self.getValueAsFloat("ThirdThreshold")
 
     @thirdThreshold.setter
     def thirdThreshold(self, value: float) -> None:
@@ -668,7 +805,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         Returns:
             minSize
         """
-        return self.getValue("minSize")
+        return self.getValueAsInt("minSize")
 
     @minSize.setter
     def minSize(self, value: int) -> None:
@@ -687,7 +824,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         Returns:
             scaleFactor
         """
-        return self.getValue("scaleFactor")
+        return self.getValueAsFloat("scaleFactor")
 
     @scaleFactor.setter
     def scaleFactor(self, value: float) -> None:
@@ -725,7 +862,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         Returns:
             redetectTolerance
         """
-        return self.getValue("redetectTolerance")
+        return self.getValueAsFloat("redetectTolerance")
 
     @redetectTolerance.setter
     def redetectTolerance(self, value: float) -> None:
@@ -773,7 +910,7 @@ class LNetBaseSettings(BaseSettingsSection):
         Returns:
             planName
         """
-        return self.getValue("planName")
+        return self.getValueAsString("planName")
 
     @planName.setter
     def planName(self, value: str) -> None:
@@ -792,7 +929,7 @@ class LNetBaseSettings(BaseSettingsSection):
         Returns:
             size
         """
-        return self.getValue("size")
+        return self.getValueAsInt("size")
 
     @size.setter
     def size(self, value: int) -> None:
@@ -880,7 +1017,7 @@ class QualityEstimatorSettings(BaseSettingsSection):
         Returns:
             size
         """
-        return self.getValue("size")
+        return self.getValueAsInt("size")
 
     @size.setter
     def size(self, value: int) -> None:
@@ -1005,7 +1142,7 @@ class HeadPoseEstimatorSettings(BaseSettingsSection):
         Returns:
             useEstimationByImage
         """
-        return bool(self.getValue("useEstimationByImage"))
+        return bool(self.getValueAsInt("useEstimationByImage"))
 
     @useEstimationByImage.setter
     def useEstimationByImage(self, value: bool) -> None:
@@ -1024,7 +1161,7 @@ class HeadPoseEstimatorSettings(BaseSettingsSection):
         Returns:
             useEstimationByLandmarks
         """
-        return bool(self.getValue("useEstimationByLandmarks"))
+        return bool(self.getValueAsInt("useEstimationByLandmarks"))
 
     @useEstimationByLandmarks.setter
     def useEstimationByLandmarks(self, value: bool) -> None:
@@ -1053,7 +1190,7 @@ class EyeEstimatorSettings(BaseSettingsSection):
         Returns:
             useStatusPlan
         """
-        return bool(self.getValue("useStatusPlan"))
+        return bool(self.getValueAsInt("useStatusPlan"))
 
     @useStatusPlan.setter
     def useStatusPlan(self, value: bool) -> None:
@@ -1084,7 +1221,7 @@ class AttributeEstimatorSettings(BaseSettingsSection):
         Returns:
             genderThreshold
         """
-        return self.getValue("genderThreshold")
+        return self.getValueAsFloat("genderThreshold")
 
     @genderThreshold.setter
     def genderThreshold(self, value: float) -> None:
@@ -1103,7 +1240,7 @@ class AttributeEstimatorSettings(BaseSettingsSection):
         Returns:
             adultThreshold
         """
-        return self.getValue("adultThreshold")
+        return self.getValueAsFloat("adultThreshold")
 
     @adultThreshold.setter
     def adultThreshold(self, value: float) -> None:
@@ -1135,7 +1272,7 @@ class GlassesEstimatorSettings(BaseSettingsSection):
         Returns:
             noGlassesThreshold
         """
-        return self.getValue("noGlassesThreshold")
+        return self.getValueAsFloat("noGlassesThreshold")
 
     @noGlassesThreshold.setter
     def noGlassesThreshold(self, value: float) -> None:
@@ -1154,7 +1291,7 @@ class GlassesEstimatorSettings(BaseSettingsSection):
         Returns:
             eyeGlassesThreshold
         """
-        return self.getValue("eyeGlassesThreshold")
+        return self.getValueAsFloat("eyeGlassesThreshold")
 
     @eyeGlassesThreshold.setter
     def eyeGlassesThreshold(self, value: float) -> None:
@@ -1173,7 +1310,7 @@ class GlassesEstimatorSettings(BaseSettingsSection):
         Returns:
             sunGlassesThreshold
         """
-        return self.getValue("sunGlassesThreshold")
+        return self.getValueAsFloat("sunGlassesThreshold")
 
     @sunGlassesThreshold.setter
     def sunGlassesThreshold(self, value: float) -> None:
@@ -1202,7 +1339,7 @@ class OverlapEstimatorSettings(BaseSettingsSection):
         Returns:
             overlapThreshold
         """
-        return self.getValue("overlapThreshold")
+        return self.getValueAsFloat("overlapThreshold")
 
     @overlapThreshold.setter
     def overlapThreshold(self, value: float) -> None:
@@ -1231,7 +1368,7 @@ class ChildEstimatorSettings(BaseSettingsSection):
         Returns:
             childThreshold
         """
-        return self.getValue("childThreshold")
+        return self.getValueAsFloat("childThreshold")
 
     @childThreshold.setter
     def childThreshold(self, value: float) -> None:
@@ -1262,7 +1399,7 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         Returns:
             cooperativeMode
         """
-        return bool(self.getValue("cooperativeMode"))
+        return bool(self.getValueAsInt("cooperativeMode"))
 
     @cooperativeMode.setter
     def cooperativeMode(self, value: bool) -> None:
@@ -1281,7 +1418,7 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         Returns:
             irCooperativeThreshold
         """
-        return self.getValue("irCooperativeThreshold")
+        return self.getValueAsFloat("irCooperativeThreshold")
 
     @irCooperativeThreshold.setter
     def irCooperativeThreshold(self, value: float) -> None:
@@ -1300,7 +1437,7 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         Returns:
             irNonCooperativeThreshold
         """
-        return self.getValue("irNonCooperativeThreshold")
+        return self.getValueAsFloat("irNonCooperativeThreshold")
 
     @irNonCooperativeThreshold.setter
     def irNonCooperativeThreshold(self, value: float) -> None:
@@ -1332,7 +1469,7 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return self.getValue("headWidthKoeff")
+        return self.getValueAsFloat("headWidthKoeff")
 
     @headWidthKoeff.setter
     def headWidthKoeff(self, value: float) -> None:
@@ -1351,7 +1488,7 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return self.getValue("headHeightKoeff")
+        return self.getValueAsFloat("headHeightKoeff")
 
     @headHeightKoeff.setter
     def headHeightKoeff(self, value: float) -> None:
@@ -1370,7 +1507,7 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return self.getValue("shouldersWidthKoeff")
+        return self.getValueAsFloat("shouldersWidthKoeff")
 
     @shouldersWidthKoeff.setter
     def shouldersWidthKoeff(self, value: float) -> None:
@@ -1389,7 +1526,7 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return self.getValue("shouldersHeightKoeff")
+        return self.getValueAsFloat("shouldersHeightKoeff")
 
     @shouldersHeightKoeff.setter
     def shouldersHeightKoeff(self, value: float) -> None:
@@ -1402,7 +1539,26 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
 
 
 class SettingsProvider:
+    """
+    SDK Setting provider.
+
+    Proxy model.
+
+    Attributes:
+        pathToConfig (str): path to a configuration file. Config file is getting from
+                          the folder'data'  in "FSDK_ROOT".
+        _coreSettingProvider ()
+    """
+
     def __init__(self, pathToConfig: Optional[Union[str, Path]] = None):
+        """
+        Init.
+
+        Args:
+            pathToConfig: path to config.
+        Raises:
+             ValueError: if pathToConfig is None and environment variable *FSDK_ROOT* does not set.
+        """
         if pathToConfig is None:
             if "FSDK_ROOT" in os.environ:
                 self.pathToConfig = Path(os.environ["FSDK_ROOT"]).joinpath("data", "faceengine.conf")
@@ -1414,83 +1570,190 @@ class SettingsProvider:
         else:
             self.pathToConfig = pathToConfig
 
+        # todo: check existance
+
         self._coreSettingProvider = CoreFE.createSettingsProvider(str(self.pathToConfig))
 
     @property
-    def systemSettings(self):
+    def systemSettings(self) -> SystemSettings:
+        """
+        Getter for system settings section.
+
+        Returns:
+            Mutable system section
+        """
         return SystemSettings(self._coreSettingProvider)
 
     @property
-    def flowerSettings(self):
+    def flowerSettings(self) -> FlowerSettings:
+        """
+        Getter for flower settings section.
+
+        Returns:
+            Mutable flower section
+        """
         return FlowerSettings(self._coreSettingProvider)
 
     @property
-    def descriptorFactorySettings(self):
+    def descriptorFactorySettings(self) -> DescriptorFactorySettings:
+        """
+        Getter for descriptor factory settings section.
+
+        Returns:
+            Mutable descriptor factory section
+        """
         return DescriptorFactorySettings(self._coreSettingProvider)
 
     @property
-    def faceDetV3Settings(self):
-        return DescriptorFactorySettings(self._coreSettingProvider)
+    def faceDetV3Settings(self) -> FaceDetV3Settings:
+        """
+        Getter for FaceDetV3 settings section.
+
+        Returns:
+            Mutable FaceDetV3 section
+        """
+        return FaceDetV3Settings(self._coreSettingProvider)
 
     @property
-    def faceDetV1Settings(self):
+    def faceDetV1Settings(self) -> FaceDetV1Settings:
+        """
+        Getter for FaceDetV1 settings section.
+
+        Returns:
+            Mutable FaceDetV1 section
+        """
         return FaceDetV1Settings(self._coreSettingProvider)
 
     @property
-    def faceDetV2Settings(self):
+    def faceDetV2Settings(self) -> FaceDetV2Settings:
+        """
+        Getter for FaceDetV2 settings section.
+
+        Returns:
+            Mutable FaceDetV2 section
+        """
         return FaceDetV2Settings(self._coreSettingProvider)
 
     @property
     def LNetSettings(self):
+        """
+        Getter for LNet settings section.
+
+        Returns:
+            Mutable LNet section
+        """
         return LNetSettings(self._coreSettingProvider)
 
     @property
-    def LNetIRSettings(self):
+    def LNetIRSettings(self) -> LNetIRSettings:
+        """
+        Getter for LNetIR settings section.
+
+        Returns:
+            Mutable LNetIR section
+        """
         return LNetIRSettings(self._coreSettingProvider)
 
     @property
-    def SLNetSettings(self):
+    def SLNetSettings(self) -> SLNetSettings:
+        """
+        Getter for SLNet settings section.
+
+        Returns:
+            Mutable SLNet section
+        """
         return SLNetSettings(self._coreSettingProvider)
 
     @property
-    def qualityEstimatorSettings(self):
+    def qualityEstimatorSettings(self) -> QualityEstimatorSettings:
+        """
+        Getter for QualityEstimator settings section.
+
+        Returns:
+            Mutable QualityEstimator section
+        """
         return QualityEstimatorSettings(self._coreSettingProvider)
 
     @property
-    def headPoseEstimatorSettings(self):
+    def headPoseEstimatorSettings(self) -> HeadPoseEstimatorSettings:
+        """
+        Getter for HeadPoseEstimator settings section.
+
+        Returns:
+            Mutable HeadPoseEstimator section
+        """
         return HeadPoseEstimatorSettings(self._coreSettingProvider)
 
     @property
-    def eyeEstimatorSettings(self):
+    def eyeEstimatorSettings(self) -> EyeEstimatorSettings:
+        """
+        Getter for EyeEstimator settings section.
+
+        Returns:
+            Mutable EyeEstimator section
+        """
         return EyeEstimatorSettings(self._coreSettingProvider)
 
     @property
-    def attributeEstimatorSettings(self):
+    def attributeEstimatorSettings(self) -> AttributeEstimatorSettings:
+        """
+        Getter for AttributeEstimator settings section.
+
+        Returns:
+            Mutable AttributeEstimator section
+        """
         return AttributeEstimatorSettings(self._coreSettingProvider)
 
     @property
-    def glassesEstimatorSettings(self):
+    def glassesEstimatorSettings(self) -> GlassesEstimatorSettings:
+        """
+        Getter for GlassesEstimator settings section.
+
+        Returns:
+            Mutable GlassesEstimator section
+        """
         return GlassesEstimatorSettings(self._coreSettingProvider)
 
     @property
-    def overlapEstimatorSettings(self):
+    def overlapEstimatorSettings(self) -> OverlapEstimatorSettings:
+        """
+        Getter for OverlapEstimator settings section.
+
+        Returns:
+            Mutable OverlapEstimator section
+        """
         return OverlapEstimatorSettings(self._coreSettingProvider)
 
     @property
-    def childEstimatorSettings(self):
+    def childEstimatorSettings(self) -> ChildEstimatorSettings:
+        """
+        Getter for ChildEstimator settings section.
+
+        Returns:
+            Mutable ChildEstimator section
+        """
         return ChildEstimatorSettings(self._coreSettingProvider)
 
-
     @property
-    def livenessIREstimatorSettings(self):
+    def livenessIREstimatorSettings(self) -> LivenessIREstimatorSettings:
+        """
+        Getter for LivenessIREstimator settings section.
+
+        Returns:
+            Mutable LivenessIREstimator section
+        """
         return LivenessIREstimatorSettings(self._coreSettingProvider)
 
-
     @property
-    def headAndShouldersLivenessEstimatorSettings(self):
+    def headAndShouldersLivenessEstimatorSettings(self) -> HeadAndShouldersLivenessEstimatorSettings:
+        """
+        Getter for HeadAndShouldersLivenessEstimator settings section.
+
+        Returns:
+            Mutable HeadAndShouldersLivenessEstimator section
+        """
         return HeadAndShouldersLivenessEstimatorSettings(self._coreSettingProvider)
 
-
-if __name__ == "__main__":
-    provider = SettingsProvider()
-    print(property)
+    @property
+    def coreProvider(self) -> PyISettingsProvider:
+        return self._coreSettingProvider
