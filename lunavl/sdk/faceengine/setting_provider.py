@@ -166,7 +166,11 @@ class DetectorType(Enum):
         Returns:
             ObjectDetectorClassType
         """
-        return getattr(ObjectDetectorClassType, self.value)
+        mapEnumToCoreEnum = {"Default": "FACE_DET_DEFAULT",
+                             "FaceDetV1": "FACE_DET_V1",
+                             "FaceDetV2": "FACE_DET_V2",
+                             "FaceDetV3": "FACE_DET_V3"}
+        return getattr(ObjectDetectorClassType, mapEnumToCoreEnum[self.value])
 
 
 class BaseSettingsSection:
