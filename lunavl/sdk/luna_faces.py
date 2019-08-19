@@ -3,6 +3,7 @@
 from typing import Optional, Union, List, Dict
 
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor
+from lunavl.sdk.faceengine.setting_provider import DetectorType
 from numpy.ma import array
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from FaceEngine import Face  # pylint: disable=E0611,E0401
@@ -16,7 +17,7 @@ from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import FaceDetection, DetectorType, ImageForDetection, Landmarks68, FaceDetector
+from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, Landmarks68, FaceDetector
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 

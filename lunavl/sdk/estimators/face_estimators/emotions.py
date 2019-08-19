@@ -82,7 +82,7 @@ class Emotions(BaseEstimation):
         Returns:
             dict with keys 'predominate_emotion' and 'estimations'
         """
-        return {'predominate_emotion': self.predominateEmotion.name.lower(),
+        return {'predominant_emotion': self.predominateEmotion.name.lower(),
                 'estimations': {
                     'anger': self.anger,
                     'disgust': self.disgust,
