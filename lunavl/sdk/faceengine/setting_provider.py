@@ -250,10 +250,10 @@ class SystemSettings(BaseSettingsSection):
 
     Properties:
 
-        cpuClass (CpuClass): class of cpu by supported instructions
-        verboseLogging (VerboseLogging): Level of log versobing
-        betaMode (bool): enable experimental features.
-        defaultDetectorType (DetectorType): default detector type
+        - cpuClass (CpuClass): class of cpu by supported instructions
+        - verboseLogging (VerboseLogging): Level of log versobing
+        - betaMode (bool): enable experimental features.
+        - defaultDetectorType (DetectorType): default detector type
     """
     sectionName = "system"
 
@@ -436,8 +436,7 @@ class DescriptorFactorySettings(BaseSettingsSection):
         - UseMobileNet (bool): mobile Net is faster but less accurate
         - distance (Distance): distance between descriptors on matching. L1 faster,L2 make better precision.
         - descriptorCountWarningLevel (float): Threshold,that limits the ratio of created  descriptors to the amount,
-                                               defined by your liscence. Warning Level When the threshold is exceeded,
-                                               FSDK prints the warning.
+            defined by your liscence. Warning Level When the threshold is exceeded, FSDK prints the warning.
 
     """
     sectionName = "DescriptorFactory::Settings"

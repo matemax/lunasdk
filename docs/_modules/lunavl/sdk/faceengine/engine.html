@@ -105,7 +105,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;Module realize wraps on facengine objects</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">FaceEngine</span> <span class="k">as</span> <span class="nn">CoreFE</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
 
@@ -122,7 +122,7 @@
 <span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.head_pose</span> <span class="k">import</span> <span class="n">HeadPoseEstimator</span>
 <span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.descriptors</span> <span class="k">import</span> <span class="n">FaceDescriptorFactory</span>
 <span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.matcher</span> <span class="k">import</span> <span class="n">FaceMatcher</span>
-<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.setting_provider</span> <span class="k">import</span> <span class="n">DetectorType</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.setting_provider</span> <span class="k">import</span> <span class="n">DetectorType</span><span class="p">,</span> <span class="n">SettingsProvider</span>
 
 <span class="kn">from</span> <span class="nn">..faceengine.facedetector</span> <span class="k">import</span> <span class="n">FaceDetector</span>
 
@@ -133,11 +133,11 @@
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        dataPath (str): path to a faceengine data folder</span>
-<span class="sd">        configPath (str): path to a faceengine configuration file</span>
+<span class="sd">        provider (SettingsProvider): settings provider</span>
 <span class="sd">        _faceEngine (PyIFaceEngine): python C++ binding on IFaceEngine, Root LUNA SDK object interface</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathToData</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pathToFaceEngineConf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathToData</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">faceEngineConf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SettingsProvider</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Init.</span>
 
@@ -151,17 +151,18 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed on path to faceengine luna data folder, set variable pathToData or set&quot;</span>
                                  <span class="s2">&quot;environment variable *FSDK_ROOT*&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pathToFaceEngineConf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s2">&quot;FSDK_ROOT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-                    <span class="n">pathToFaceEngineConf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;FSDK_ROOT&quot;</span><span class="p">],</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;faceengine.conf&quot;</span><span class="p">)</span>
-                <span class="c1"># else:</span>
-                <span class="c1">#     raise ValueError(&quot;Failed on path to faceengine luna data folder,</span>
-                <span class="c1">#                       set variable pathToFaceEngineConf&quot;</span>
-                <span class="c1">#                      &quot; or set environment variable *FSDK_ROOT*&quot;)</span>
+        <span class="k">if</span> <span class="n">faceEngineConf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">SettingsProvider</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">faceEngineConf</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">SettingsProvider</span><span class="p">(</span><span class="n">faceEngineConf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">faceEngineConf</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span> <span class="o">=</span> <span class="n">pathToData</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">configPath</span> <span class="o">=</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">createSettingsProvider</span><span class="p">(</span><span class="n">pathToFaceEngineConf</span><span class="p">)</span>
         <span class="c1"># todo: validate initialize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">createFaceEngine</span><span class="p">(</span><span class="n">dataPath</span><span class="o">=</span><span class="n">pathToData</span><span class="p">,</span> <span class="n">configPath</span><span class="o">=</span><span class="n">pathToFaceEngineConf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">createFaceEngine</span><span class="p">(</span><span class="n">dataPath</span><span class="o">=</span><span class="n">pathToData</span><span class="p">,</span> <span class="n">configPath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">pathToConfig</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">setSettingsProvider</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">coreProvider</span><span class="p">)</span>
 
 <div class="viewcode-block" id="VLFaceEngine.createFaceDetector"><a class="viewcode-back" href="../../../../sdk/faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine.createFaceDetector">[docs]</a>    <span class="k">def</span> <span class="nf">createFaceDetector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detectorType</span><span class="p">:</span> <span class="n">DetectorType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDetector</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>

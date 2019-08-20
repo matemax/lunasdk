@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.luna_faces &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.luna_faces</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module realize hight level api for estimate face attributes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.face_descriptor</span> <span class="k">import</span> <span class="n">FaceDescriptor</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.setting_provider</span> <span class="k">import</span> <span class="n">DetectorType</span>
+<span class="kn">from</span> <span class="nn">numpy.ma</span> <span class="k">import</span> <span class="n">array</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">CoreImage</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">Face</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimator_collections</span> <span class="k">import</span> <span class="n">FaceEstimatorsCollection</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.basic_attributes</span> <span class="k">import</span> <span class="n">BasicAttributes</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.emotions</span> <span class="k">import</span> <span class="n">Emotions</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.eyes</span> <span class="k">import</span> <span class="n">EyesEstimation</span><span class="p">,</span> <span class="n">GazeEstimation</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.head_pose</span> <span class="k">import</span> <span class="n">HeadPose</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.mouth_state</span> <span class="k">import</span> <span class="n">MouthStates</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warp_quality</span> <span class="k">import</span> <span class="n">Quality</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.face_estimators.warper</span> <span class="k">import</span> <span class="n">Warp</span><span class="p">,</span> <span class="n">WarpedImage</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.engine</span> <span class="k">import</span> <span class="n">VLFaceEngine</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.faceengine.facedetector</span> <span class="k">import</span> <span class="n">FaceDetection</span><span class="p">,</span> <span class="n">ImageForDetection</span><span class="p">,</span> <span class="n">Landmarks68</span><span class="p">,</span> <span class="n">FaceDetector</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.image_utils.geometry</span> <span class="k">import</span> <span class="n">Rect</span>
+<span class="kn">from</span> <span class="nn">lunavl.sdk.image_utils.image</span> <span class="k">import</span> <span class="n">VLImage</span>
+
+
+<div class="viewcode-block" id="VLFaceDetection"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLFaceDetection">[docs]</a><span class="k">class</span> <span class="nc">VLFaceDetection</span><span class="p">(</span><span class="n">FaceDetection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    High level detection object.</span>
+<span class="sd">    Attributes:</span>
+
+<span class="sd">        estimatorCollection (FaceEstimatorsCollection): collection of estimators</span>
+<span class="sd">        _emotions (Optional[Emotions]): lazy load emotions estimations</span>
+<span class="sd">        _eyes (Optional[EyesEstimation]): lazy load eye estimations</span>
+<span class="sd">        _mouthState (Optional[MouthStates]): lazy load mouth state estimation</span>
+<span class="sd">        _basicAttributes (Optional[BasicAttributes]): lazy load basic attribute estimation</span>
+<span class="sd">        _gaze (Optional[GazeEstimation]): lazy load gaze direction estimation</span>
+<span class="sd">        _warpQuality (Optional[Quality]): lazy load warp quality estimation</span>
+<span class="sd">        _headPose (Optional[HeadPose]): lazy load head pose estimation</span>
+<span class="sd">        _ags (Optional[float]): lazy load ags estimation</span>
+<span class="sd">        _transformedLandmarks68 (Optional[Landmarks68]): lazy load transformed landmarks68</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_warp&quot;</span><span class="p">,</span> <span class="s2">&quot;_emotions&quot;</span><span class="p">,</span> <span class="s2">&quot;_eyes&quot;</span><span class="p">,</span> <span class="s2">&quot;_mouthState&quot;</span><span class="p">,</span> <span class="s2">&quot;_basicAttributes&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;_gaze&quot;</span><span class="p">,</span> <span class="s2">&quot;_warpQuality&quot;</span><span class="p">,</span> <span class="s2">&quot;_headPose&quot;</span><span class="p">,</span> <span class="s2">&quot;estimatorCollection&quot;</span><span class="p">,</span> <span class="s2">&quot;_transformedLandmarks68&quot;</span><span class="p">,</span> <span class="s2">&quot;_ags&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;_descriptor&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreDetection</span><span class="p">:</span> <span class="n">Face</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">VLImage</span><span class="p">,</span> <span class="n">estimatorCollection</span><span class="p">:</span> <span class="n">FaceEstimatorsCollection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coreDetection: core detection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreDetection</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Emotions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EyesEstimation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Warp</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MouthStates</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasicAttributes</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gaze</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GazeEstimation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Quality</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headPose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HeadPose</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transformedLandmarks68</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Landmarks68</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ags</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span> <span class="o">=</span> <span class="n">estimatorCollection</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Warp</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get warp from detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            warp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">warper</span><span class="o">.</span><span class="n">warp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">headPose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HeadPose</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a head pose of the detection. Estimation bases on 68 landmarks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            head pose</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headPose</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># todo: wtf, need gotten landmarks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_headPose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">headPoseEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">landmarks68</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headPose</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mouthState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MouthStates</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a mouth state of the detection</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mouth state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">mouthStateEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">emotions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Emotions</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get emotions of the detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            emotions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">emotionsEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get ags of the detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            emotions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">AGSEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ags</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">basicAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasicAttributes</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all basic attributes of the detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            basic attributes (age, gender, ethnicity)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">basicAttributesEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warp</span><span class="p">,</span>
+                                                                                               <span class="n">estimateAge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                                               <span class="n">estimateEthnicity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                                               <span class="n">estimateGender</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warpQuality</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quality</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get quality of warped image which corresponding the detection</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            quality</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">warpQualityEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDescriptor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a face descriptor from warp</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mouth state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span> <span class="o">=</span> <span class="n">VLWarpedImage</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="o">.</span><span class="n">descriptorEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eyes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyesEstimation</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get eyes estimation of the detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            eyes estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformedLandmarks68</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_transformedLandmarks68</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">warper</span><span class="o">.</span> \
+                    <span class="n">makeWarpTransformationWithLandmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;L68&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">eyeEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transformedLandmarks68</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gaze</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeEstimation</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get gaze direction.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            gaze direction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaze</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gaze</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorCollection</span><span class="o">.</span><span class="n">gazeDirectionEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headPose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaze</span>
+
+<div class="viewcode-block" id="VLFaceDetection.asDict"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLFaceDetection.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            All estimated attributes will be added to dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rect&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingBox</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">asDict</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warpQuality</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks5</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;landmarks5&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks5</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks68</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;landmarks68&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks68</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;emotions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;eyes_attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;mouth_attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headPose</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;head_pose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headPose</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaze</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;gaze&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaze</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;basic_attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attributes</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
+
+
+<div class="viewcode-block" id="VLFaceDetector"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLFaceDetector">[docs]</a><span class="k">class</span> <span class="nc">VLFaceDetector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    High level face detector. Return *VLFaceDetection* instead simple *FaceDetection*.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">          estimatorCollection (FaceEstimatorsCollection): face estimator collections for new detections.</span>
+<span class="sd">          _faceDetector (FaceDetector): face detector</span>
+<span class="sd">          faceEngine (VLFaceEngine): face engine for detector and estimators, default *FACE_ENGINE*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: a global instance of FaceEngine for usual creating detectors</span>
+    <span class="n">faceEngine</span><span class="p">:</span> <span class="n">VLFaceEngine</span> <span class="o">=</span> <span class="n">VLFaceEngine</span><span class="p">()</span>
+    <span class="c1">#: estimators collection of class for usual creating detectors</span>
+    <span class="n">estimatorsCollection</span><span class="p">:</span> <span class="n">FaceEstimatorsCollection</span> <span class="o">=</span> <span class="n">FaceEstimatorsCollection</span><span class="p">(</span><span class="n">faceEngine</span><span class="o">=</span><span class="n">faceEngine</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detectorType</span><span class="p">:</span> <span class="n">DetectorType</span> <span class="o">=</span> <span class="n">DetectorType</span><span class="o">.</span><span class="n">FACE_DET_DEFAULT</span><span class="p">,</span>
+                 <span class="n">faceEngine</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VLFaceEngine</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            detectorType: detector type</span>
+<span class="sd">            faceEngine: face engine for detector and estimators</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">faceEngine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">faceEngine</span> <span class="o">=</span> <span class="n">faceEngine</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimatorsCollection</span> <span class="o">=</span> <span class="n">FaceEstimatorsCollection</span><span class="p">(</span><span class="n">faceEngine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">faceEngine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_faceDetector</span><span class="p">:</span> <span class="n">FaceDetector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">faceEngine</span><span class="o">.</span><span class="n">createFaceDetector</span><span class="p">(</span><span class="n">detectorType</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VLFaceDetector.detectOne"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLFaceDetector.detectOne">[docs]</a>    <span class="k">def</span> <span class="nf">detectOne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">VLImage</span><span class="p">,</span> <span class="n">detectArea</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Rect</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">VLFaceDetection</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect just one best detection on the image.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image: image. Format must be R8G8B8 (todo check)</span>
+<span class="sd">            detectArea: rectangle area which contains face to detect. If not set will be set image.rect</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            face detection if face is found otherwise None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">detectRes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceDetector</span><span class="o">.</span><span class="n">detectOne</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">detectArea</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">detectRes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">VLFaceDetection</span><span class="p">(</span><span class="n">detectRes</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">,</span> <span class="n">detectRes</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VLFaceDetector.detect"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLFaceDetector.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VLImage</span><span class="p">,</span> <span class="n">ImageForDetection</span><span class="p">]],</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">VLFaceDetection</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Batch detect faces on images.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            images: input images list. Format must be R8G8B8</span>
+<span class="sd">            limit: max number of detections per input image</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            return list of lists detection, order of detection lists is corresponding to order input images</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">detectRes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faceDetector</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">imageNumber</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">images</span><span class="p">):</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">VLFaceDetection</span><span class="p">(</span><span class="n">detectRes</span><span class="o">.</span><span class="n">coreEstimation</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="p">)</span> <span class="k">for</span> <span class="n">detectRes</span> <span class="ow">in</span>
+                        <span class="n">detectRes</span><span class="p">[</span><span class="n">imageNumber</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
+
+
+<div class="viewcode-block" id="VLWarpedImage"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLWarpedImage">[docs]</a><span class="k">class</span> <span class="nc">VLWarpedImage</span><span class="p">(</span><span class="n">WarpedImage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    High level sample object.</span>
+
+<span class="sd">    Attributes:</span>
+
+<span class="sd">        _emotions (Optional[Emotions]): lazy load emotions estimations</span>
+<span class="sd">        _mouthState (Optional[MouthStates]): lazy load mouth state estimation</span>
+<span class="sd">        _basicAttributes (Optional[BasicAttributes]): lazy load basic attribute estimation</span>
+<span class="sd">        _warpQuality (Optional[Quality]): lazy load warp quality estimation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_emotions&quot;</span><span class="p">,</span> <span class="s2">&quot;_mouthState&quot;</span><span class="p">,</span> <span class="s2">&quot;_basicAttributes&quot;</span><span class="p">,</span> <span class="s2">&quot;_warpQuality&quot;</span><span class="p">,</span> <span class="s2">&quot;_descriptor&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">CoreImage</span><span class="p">],</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">vlImage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VLImage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">vlImage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Emotions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EyesEstimation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MouthStates</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasicAttributes</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Quality</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FaceDescriptor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1">#: estimators collection of class for usual creating detectors</span>
+    <span class="n">estimatorsCollection</span><span class="p">:</span> <span class="n">FaceEstimatorsCollection</span> <span class="o">=</span> <span class="n">FaceEstimatorsCollection</span><span class="p">(</span><span class="n">faceEngine</span><span class="o">=</span><span class="n">VLFaceEngine</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mouthState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MouthStates</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a mouth state of the detection</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mouth state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span> <span class="o">=</span> <span class="n">VLWarpedImage</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="o">.</span><span class="n">mouthStateEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDescriptor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a face descriptor from warp</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mouth state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span> <span class="o">=</span> <span class="n">VLWarpedImage</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="o">.</span><span class="n">descriptorEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">emotions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Emotions</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get emotions of the detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            emotions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span> <span class="o">=</span> <span class="n">VLWarpedImage</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="o">.</span><span class="n">emotionsEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">basicAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasicAttributes</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all basic attributes of the detection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            basic attributes (age, gender, ethnicity)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="n">VLWarpedImage</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="o">.</span><span class="n">basicAttributesEstimator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimateAge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">estimateEthnicity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                       <span class="n">estimateGender</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warpQuality</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quality</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get quality of warped image which corresponding the detection</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            quality</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span> <span class="o">=</span> <span class="n">VLWarpedImage</span><span class="o">.</span><span class="n">estimatorsCollection</span><span class="o">.</span><span class="n">warpQualityEstimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span>
+
+<div class="viewcode-block" id="VLWarpedImage.asDict"><a class="viewcode-back" href="../../../sdk/high_level_api.html#lunavl.sdk.luna_faces.VLWarpedImage.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            All estimated attributes will be added to dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warpQuality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warpQuality</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;emotions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emotions</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;eyes_attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eyes</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;mouth_attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouthState</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;basic_attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basicAttributes</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attributes</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Warp</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Support VLFaceDetection interface.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

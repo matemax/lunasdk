@@ -5,7 +5,7 @@ Modules
    :maxdepth: 2
    :caption: Contents:
 
-
+   configuration
    faceengine
    image_utils
    face_detection

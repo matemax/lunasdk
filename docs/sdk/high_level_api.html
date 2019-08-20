@@ -148,6 +148,516 @@ a face estimator collection as a class attribute for a detections attributes est
 <span class="go">&#39;Happiness&#39;</span>
 </pre></div>
 </div>
+<span class="target" id="module-lunavl.sdk.luna_faces"></span><p>Module realize hight level api for estimate face attributes</p>
+<dl class="class">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.luna_faces.</code><code class="descname">VLFaceDetection</code><span class="sig-paren">(</span><em>coreDetection</em>, <em>image</em>, <em>estimatorCollection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLFaceDetection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection" title="Permalink to this definition">¶</a></dt>
+<dd><p>High level detection object.
+.. attribute:: estimatorCollection</p>
+<blockquote>
+<div><p>collection of estimators</p>
+<dl class="field-list simple">
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>FaceEstimatorsCollection</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._emotions">
+<code class="descname">_emotions</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._emotions" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load emotions estimations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.Emotions" title="lunavl.sdk.estimators.face_estimators.emotions.Emotions">Emotions</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._eyes">
+<code class="descname">_eyes</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._eyes" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load eye estimations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyesEstimation" title="lunavl.sdk.estimators.face_estimators.eyes.EyesEstimation">EyesEstimation</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._mouthState">
+<code class="descname">_mouthState</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._mouthState" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load mouth state estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates">MouthStates</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._basicAttributes">
+<code class="descname">_basicAttributes</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._basicAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load basic attribute estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes">BasicAttributes</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._gaze">
+<code class="descname">_gaze</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._gaze" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load gaze direction estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimation" title="lunavl.sdk.estimators.face_estimators.eyes.GazeEstimation">GazeEstimation</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._warpQuality">
+<code class="descname">_warpQuality</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._warpQuality" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load warp quality estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.Quality" title="lunavl.sdk.estimators.face_estimators.warp_quality.Quality">Quality</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._headPose">
+<code class="descname">_headPose</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._headPose" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load head pose estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.head_pose.HeadPose" title="lunavl.sdk.estimators.face_estimators.head_pose.HeadPose">HeadPose</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._ags">
+<code class="descname">_ags</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._ags" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load ags estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection._transformedLandmarks68">
+<code class="descname">_transformedLandmarks68</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection._transformedLandmarks68" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load transformed landmarks68</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_detection.html#lunavl.sdk.faceengine.facedetector.Landmarks68" title="lunavl.sdk.faceengine.facedetector.Landmarks68">Landmarks68</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.ags">
+<code class="descname">ags</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.ags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ags of the detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>emotions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLFaceDetection.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All estimated attributes will be added to dict</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.basicAttributes">
+<code class="descname">basicAttributes</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.basicAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all basic attributes of the detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>basic attributes (age, gender, ethnicity)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicAttributes</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.descriptor">
+<code class="descname">descriptor</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.descriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a face descriptor from warp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mouth state</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptor" title="lunavl.sdk.faceengine.descriptors.FaceDescriptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDescriptor</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.emotions">
+<code class="descname">emotions</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.emotions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get emotions of the detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>emotions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.Emotions" title="lunavl.sdk.estimators.face_estimators.emotions.Emotions"><code class="xref py py-class docutils literal notranslate"><span class="pre">Emotions</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.eyes">
+<code class="descname">eyes</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.eyes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get eyes estimation of the detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>eyes estimation</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.EyesEstimation" title="lunavl.sdk.estimators.face_estimators.eyes.EyesEstimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">EyesEstimation</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.gaze">
+<code class="descname">gaze</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.gaze" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get gaze direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>gaze direction</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.eyes.GazeEstimation" title="lunavl.sdk.estimators.face_estimators.eyes.GazeEstimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GazeEstimation</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.headPose">
+<code class="descname">headPose</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.headPose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a head pose of the detection. Estimation bases on 68 landmarks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>head pose</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.head_pose.HeadPose" title="lunavl.sdk.estimators.face_estimators.head_pose.HeadPose"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeadPose</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.mouthState">
+<code class="descname">mouthState</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.mouthState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a mouth state of the detection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mouth state</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouthStates</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.warp">
+<code class="descname">warp</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.warp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get warp from detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>warp</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="warping.html#lunavl.sdk.estimators.face_estimators.warper.Warp" title="lunavl.sdk.estimators.face_estimators.warper.Warp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warp</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetection.warpQuality">
+<code class="descname">warpQuality</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetection.warpQuality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get quality of warped image which corresponding the detection
+:returns: quality</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.Quality" title="lunavl.sdk.estimators.face_estimators.warp_quality.Quality"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quality</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.luna_faces.</code><code class="descname">VLFaceDetector</code><span class="sig-paren">(</span><em>detectorType=&lt;DetectorType.FACE_DET_DEFAULT: 'Default'&gt;</em>, <em>faceEngine=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLFaceDetector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>High level face detector. Return <em>VLFaceDetection</em> instead simple <em>FaceDetection</em>.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector.estimatorCollection">
+<code class="descname">estimatorCollection</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector.estimatorCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>face estimator collections for new detections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="estimator_collections.html#lunavl.sdk.estimator_collections.FaceEstimatorsCollection" title="lunavl.sdk.estimator_collections.FaceEstimatorsCollection">FaceEstimatorsCollection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector._faceDetector">
+<code class="descname">_faceDetector</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector._faceDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>face detector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="face_detection.html#lunavl.sdk.faceengine.facedetector.FaceDetector" title="lunavl.sdk.faceengine.facedetector.FaceDetector">FaceDetector</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector.faceEngine">
+<code class="descname">faceEngine</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector.faceEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>face engine for detector and estimators, default <em>FACE_ENGINE</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="faceengine.html#lunavl.sdk.faceengine.engine.VLFaceEngine" title="lunavl.sdk.faceengine.engine.VLFaceEngine">VLFaceEngine</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>images</em>, <em>limit=5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLFaceDetector.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch detect faces on images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – input images list. Format must be R8G8B8</p></li>
+<li><p><strong>limit</strong> – max number of detections per input image</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>return list of lists detection, order of detection lists is corresponding to order input images</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#lunavl.sdk.luna_faces.VLFaceDetection" title="lunavl.sdk.luna_faces.VLFaceDetection"><code class="xref py py-class docutils literal notranslate"><span class="pre">VLFaceDetection</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector.detectOne">
+<code class="descname">detectOne</code><span class="sig-paren">(</span><em>image</em>, <em>detectArea=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLFaceDetector.detectOne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector.detectOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect just one best detection on the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – image. Format must be R8G8B8 (todo check)</p></li>
+<li><p><strong>detectArea</strong> – rectangle area which contains face to detect. If not set will be set image.rect</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>face detection if face is found otherwise None</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="docutils literal notranslate"><span class="pre">None</span></code>, <a class="reference internal" href="#lunavl.sdk.luna_faces.VLFaceDetection" title="lunavl.sdk.luna_faces.VLFaceDetection"><code class="xref py py-class docutils literal notranslate"><span class="pre">VLFaceDetection</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLFaceDetector.estimatorsCollection">
+<code class="descname">estimatorsCollection</code><em class="property"> = &lt;lunavl.sdk.estimator_collections.FaceEstimatorsCollection object&gt;</em><a class="headerlink" href="#lunavl.sdk.luna_faces.VLFaceDetector.estimatorsCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimators collection of class for usual creating detectors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">faceEngine</code><em class="property"> = &lt;lunavl.sdk.faceengine.engine.VLFaceEngine object&gt;</em></dt>
+<dd><p>a global instance of FaceEngine for usual creating detectors</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.luna_faces.</code><code class="descname">VLWarpedImage</code><span class="sig-paren">(</span><em>body</em>, <em>filename=''</em>, <em>vlImage=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLWarpedImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>High level sample object.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage._emotions">
+<code class="descname">_emotions</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage._emotions" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load emotions estimations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.Emotions" title="lunavl.sdk.estimators.face_estimators.emotions.Emotions">Emotions</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage._mouthState">
+<code class="descname">_mouthState</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage._mouthState" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load mouth state estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates">MouthStates</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage._basicAttributes">
+<code class="descname">_basicAttributes</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage._basicAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load basic attribute estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes">BasicAttributes</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage._warpQuality">
+<code class="descname">_warpQuality</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage._warpQuality" title="Permalink to this definition">¶</a></dt>
+<dd><p>lazy load warp quality estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.Quality" title="lunavl.sdk.estimators.face_estimators.warp_quality.Quality">Quality</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.asDict">
+<code class="descname">asDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/luna_faces.html#VLWarpedImage.asDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.asDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All estimated attributes will be added to dict</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.basicAttributes">
+<code class="descname">basicAttributes</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.basicAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all basic attributes of the detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>basic attributes (age, gender, ethnicity)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes" title="lunavl.sdk.estimators.face_estimators.basic_attributes.BasicAttributes"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicAttributes</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.descriptor">
+<code class="descname">descriptor</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.descriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a face descriptor from warp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mouth state</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptor" title="lunavl.sdk.faceengine.descriptors.FaceDescriptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDescriptor</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.emotions">
+<code class="descname">emotions</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.emotions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get emotions of the detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>emotions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.emotions.Emotions" title="lunavl.sdk.estimators.face_estimators.emotions.Emotions"><code class="xref py py-class docutils literal notranslate"><span class="pre">Emotions</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.estimatorsCollection">
+<code class="descname">estimatorsCollection</code><em class="property"> = &lt;lunavl.sdk.estimator_collections.FaceEstimatorsCollection object&gt;</em><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.estimatorsCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimators collection of class for usual creating detectors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.mouthState">
+<code class="descname">mouthState</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.mouthState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a mouth state of the detection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mouth state</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates" title="lunavl.sdk.estimators.face_estimators.mouth_state.MouthStates"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouthStates</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.warp">
+<code class="descname">warp</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.warp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Support VLFaceDetection interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="warping.html#lunavl.sdk.estimators.face_estimators.warper.Warp" title="lunavl.sdk.estimators.face_estimators.warper.Warp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warp</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.luna_faces.VLWarpedImage.warpQuality">
+<code class="descname">warpQuality</code><a class="headerlink" href="#lunavl.sdk.luna_faces.VLWarpedImage.warpQuality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get quality of warped image which corresponding the detection
+:returns: quality</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="face_estimations.html#lunavl.sdk.estimators.face_estimators.warp_quality.Quality" title="lunavl.sdk.estimators.face_estimators.warp_quality.Quality"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quality</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 </div>
