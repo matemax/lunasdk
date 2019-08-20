@@ -35,8 +35,7 @@ class FaceDescriptor(BaseEstimation):
         Returns:
             Dict with keys "descriptor" and "score"
         """
-        return {"descriptor": self.coreEstimation.getData(),
-                "score": self.garbageScore}
+        return {"descriptor": self.coreEstimation.getData(), "score": self.garbageScore}
 
     @property
     def rawDescriptor(self) -> bytes:
@@ -155,7 +154,7 @@ class FaceDescriptorFactory:
         _faceEngine (VLFaceEngine): faceEngine
     """
 
-    def __init__(self, faceEngine: 'VLFaceEngine'):
+    def __init__(self, faceEngine: "VLFaceEngine"):
         self._faceEngine = faceEngine
 
     @CoreExceptionWarp(LunaVLError.CreationDescriptorError)

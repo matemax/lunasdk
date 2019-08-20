@@ -15,6 +15,7 @@ class ErrorInfo:
         desc (str): error description
         detail (str): detail
     """
+
     __slots__ = ["errorCode", "desc", "detail"]
 
     def __init__(self, errorCode: int, desc: str, detail: str):
@@ -54,7 +55,7 @@ class ErrorInfo:
         """
         return "error code: {}, desc: {}, detail: {}".format(self.errorCode, self.desc, self.detail)
 
-    def detalize(self, details: str) -> 'ErrorInfo':
+    def detalize(self, details: str) -> "ErrorInfo":
         return ErrorInfo(self.errorCode, self.desc, details)
 
 
@@ -120,7 +121,7 @@ class LunaVLError:
     DetectFacesError = ErrorInfo(110001, "Detect one face error", "")
 
     @classmethod
-    def fromSDKError(cls, sdkError: FSDKErrorResult) -> 'ErrorInfo':
+    def fromSDKError(cls, sdkError: FSDKErrorResult) -> "ErrorInfo":
         """
         Create error from sdk error
 

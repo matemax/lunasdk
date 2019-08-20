@@ -29,7 +29,7 @@ class Ethnicity(Enum):
     Caucasian = 4
 
     @staticmethod
-    def fromCoreEmotion(coreEthnicity: CoreEthnicity) -> 'Ethnicity':
+    def fromCoreEmotion(coreEthnicity: CoreEthnicity) -> "Ethnicity":
         """
         Get enum element by core ethnicity.
 
@@ -130,8 +130,8 @@ class Ethnicities(BaseEstimation):
                 "asian": self.asian,
                 "indian": self.indian,
                 "caucasian": self.caucasian,
-                "african_american": self.africanAmerican
-            }
+                "african_american": self.africanAmerican,
+            },
         }
 
     @property
@@ -154,7 +154,8 @@ class BasicAttributes(BaseEstimation):
         gender (Optional[float]): gender, number in range [0, 1]
         ethnicity (Optional[Ethnicities]): ethnicity
     """
-    __slots__ = ("ethnicity", 'age', 'gender')
+
+    __slots__ = ("ethnicity", "age", "gender")
 
     #  pylint: disable=W0235
     def __init__(self, coreEstimation: AttributeResult):
@@ -221,8 +222,9 @@ class BasicAttributesEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWarp(LunaVLError.EstimationBasicAttributeError)
-    def estimate(self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool,
-                 estimateEthnicity: bool) -> BasicAttributes:
+    def estimate(
+        self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
+    ) -> BasicAttributes:
         """
         Estimate ethnicity.
 
@@ -245,8 +247,7 @@ class BasicAttributesEstimator(BaseEstimator):
         if estimateEthnicity:
             dtAttributes |= AttributeRequest.estimateEthnicity
 
-        error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage,
-                                                             AttributeRequest(dtAttributes))
+        error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage, AttributeRequest(dtAttributes))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return BasicAttributes(baseAttributes)

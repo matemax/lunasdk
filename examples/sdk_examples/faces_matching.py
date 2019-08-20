@@ -18,13 +18,13 @@ def matchDescriptors():
     warper = faceEngine.createWarper()
     matcher = faceEngine.createFaceMatcher()
 
-    image1 = VLImage.load(filename='C:/temp/test.jpg')
+    image1 = VLImage.load(filename="C:/temp/test.jpg")
 
     faceDetection1 = detector.detectOne(image1)
     warp1 = warper.warp(faceDetection1)
     descriptor1 = extractor.estimate(warp1.warpedImage)
 
-    image2 = VLImage.load(filename='C:/temp/female_caucasian_warp.jpg')
+    image2 = VLImage.load(filename="C:/temp/female_caucasian_warp.jpg")
     faceDetection2 = detector.detectOne(image2)
     warp2 = warper.warp(faceDetection2)
     descriptor2 = extractor.estimate(warp2.warpedImage)

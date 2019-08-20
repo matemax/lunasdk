@@ -37,10 +37,10 @@ class TestImage(BaseTestClass):
         image = VLImage.load(filename=ONE_FACE)
         assert image.rect == Rect(0, 0, 912, 1080)
         assert image.isValid()
-        assert image.source == 'one_face.jpg'
+        assert image.source == "one_face.jpg"
 
     def test_image_load_from_url(self):
-        url = 'https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg'
+        url = "https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg"
         image = VLImage.load(url=url)
         assert image.isValid()
         assert image.rect == Rect(0, 0, 497, 640)

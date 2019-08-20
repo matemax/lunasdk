@@ -58,7 +58,7 @@ class WarpedImage(VLImage):
 
     #  pylint: disable=W0221
     @classmethod
-    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> 'WarpedImage':
+    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> "WarpedImage":
         """
         Load imag from numpy array or file or url.
 
@@ -75,7 +75,7 @@ class WarpedImage(VLImage):
         return warp
 
     @property
-    def warpedImage(self) -> 'WarpedImage':
+    def warpedImage(self) -> "WarpedImage":
         """
         Property for compatibility with *Warp* for outside methods.
         Returns:
@@ -92,6 +92,7 @@ class Warp:
         sourceDetection (FaceDetection): detection which generated warp
         warpedImage (WarpedImage):
     """
+
     __slots__ = ["sourceDetection", "warpedImage"]
 
     def __init__(self, warpedImage: WarpedImage, sourceDetection: FaceDetection):
@@ -113,6 +114,7 @@ class Warper:
     Attributes:
         _coreWarper (IWarperPtr): core warper
     """
+
     __slots__ = ["_coreWarper"]
 
     def __init__(self, coreWarper: IWarperPtr):
@@ -139,8 +141,9 @@ class Warper:
         """
         if faceDetection.landmarks5 is None:
             raise ValueError("detection must contains landmarks5")
-        return self._coreWarper.createTransformation(faceDetection.coreEstimation.detection,
-                                                     faceDetection.landmarks5.coreEstimation)
+        return self._coreWarper.createTransformation(
+            faceDetection.coreEstimation.detection, faceDetection.landmarks5.coreEstimation
+        )
 
     @CoreExceptionWarp(LunaVLError.CreationWarpError)
     def warp(self, faceDetection: FaceDetection) -> Warp:
@@ -164,8 +167,9 @@ class Warper:
 
         return Warp(warpedImage, faceDetection)
 
-    def makeWarpTransformationWithLandmarks(self, faceDetection: FaceDetection,
-                                            typeLandmarks: str) -> Union[Landmarks68, Landmarks5]:
+    def makeWarpTransformationWithLandmarks(
+        self, faceDetection: FaceDetection, typeLandmarks: str
+    ) -> Union[Landmarks68, Landmarks5]:
         """
         Make warp transformation with landmarks
 

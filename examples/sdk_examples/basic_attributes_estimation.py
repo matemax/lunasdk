@@ -12,7 +12,7 @@ def estimateBasicAttributes():
     """
     Estimate emotion from a warped image.
     """
-    image = VLImage.load(filename='C:/temp/test.jpg')
+    image = VLImage.load(filename="C:/temp/test.jpg")
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
@@ -21,9 +21,11 @@ def estimateBasicAttributes():
 
     basicAttributesEstimator = faceEngine.createBasicAttributesEstimator()
 
-    pprint.pprint(basicAttributesEstimator.estimate(warp.warpedImage, estimateAge=True,
-                                                    estimateGender=True,
-                                                    estimateEthnicity=True).asDict())
+    pprint.pprint(
+        basicAttributesEstimator.estimate(
+            warp.warpedImage, estimateAge=True, estimateGender=True, estimateEthnicity=True
+        ).asDict()
+    )
 
 
 if __name__ == "__main__":

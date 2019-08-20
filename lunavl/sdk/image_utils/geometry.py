@@ -10,9 +10,10 @@ from FaceEngine import Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks  
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
-COORDINATE_TYPE = TypeVar('COORDINATE_TYPE', float, int)  #: generic type for allowed values type of coordinates
-LANDMARKS = TypeVar('LANDMARKS', Landmarks5, Landmarks68, IrisLandmarks,
-                    EyelidLandmarks)  #: generic type for allowed values type of landmarks
+COORDINATE_TYPE = TypeVar("COORDINATE_TYPE", float, int)  #: generic type for allowed values type of coordinates
+LANDMARKS = TypeVar(
+    "LANDMARKS", Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks
+)  #: generic type for allowed values type of landmarks
 
 
 class Size(Generic[COORDINATE_TYPE]):
@@ -23,6 +24,7 @@ class Size(Generic[COORDINATE_TYPE]):
         width (CoordinateType): width
         height (CoordinateType): height
     """
+
     __slots__ = ["width", "height"]
 
     def __init__(self, width: COORDINATE_TYPE, height: COORDINATE_TYPE):
@@ -69,6 +71,7 @@ class Point(Generic[COORDINATE_TYPE]):
         x (CoordinateType): x-coordinate
         y (CoordinateType): y-coordinate
     """
+
     __slots__ = ["x", "y"]
 
     def __init__(self, x: COORDINATE_TYPE, y: COORDINATE_TYPE):  # pylint: disable=C0103
@@ -83,7 +86,7 @@ class Point(Generic[COORDINATE_TYPE]):
         self.y = y  # pylint: disable=C0103
 
     @classmethod
-    def fromVector2(cls, vec2: Union[Vector2f, Vector2i]) -> 'Point':
+    def fromVector2(cls, vec2: Union[Vector2f, Vector2i]) -> "Point":
         """
         Create Point from Core Vector2i and Vector2f
 
@@ -142,8 +145,13 @@ class Rect(Generic[COORDINATE_TYPE]):
 
     """
 
-    def __init__(self, x: COORDINATE_TYPE = 0, y: COORDINATE_TYPE = 0,  # pylint: disable=C0103
-                 width: COORDINATE_TYPE = 0, height: COORDINATE_TYPE = 0):
+    def __init__(
+        self,
+        x: COORDINATE_TYPE = 0,
+        y: COORDINATE_TYPE = 0,  # pylint: disable=C0103
+        width: COORDINATE_TYPE = 0,
+        height: COORDINATE_TYPE = 0,
+    ):
         """
         Init. If there are argument of type float coreRect will be type CoreRectF otherwise CoreRectI.
 
@@ -153,14 +161,13 @@ class Rect(Generic[COORDINATE_TYPE]):
             width: width
             height: height
         """
-        if any((isinstance(x, float), isinstance(y, float),
-                isinstance(width, float), isinstance(height, float))):
+        if any((isinstance(x, float), isinstance(y, float), isinstance(width, float), isinstance(height, float))):
             self.coreRect = CoreRectF(x, y, width, height)
         else:
             self.coreRect = CoreRectI(x, y, width, height)
 
     @classmethod
-    def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]) -> 'Rect':
+    def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]) -> "Rect":
         """
         Load rect from core rect
 
@@ -175,7 +182,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         return newRect
 
     @classmethod
-    def initByCorners(cls, topLeftCorner: Point[COORDINATE_TYPE], bottomRightBottom: Point[COORDINATE_TYPE]) -> 'Rect':
+    def initByCorners(cls, topLeftCorner: Point[COORDINATE_TYPE], bottomRightBottom: Point[COORDINATE_TYPE]) -> "Rect":
         """
         Init rect by top left corner, bottom right bottom
 
@@ -396,7 +403,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect.getArea()
 
-    def isInside(self, other: 'Rect') -> bool:
+    def isInside(self, other: "Rect") -> bool:
         """
         Check other rect is inside in this or not
 
@@ -442,7 +449,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return Size(self.width, self.height)
 
-    def __and__(self, other: 'Rect[COORDINATE_TYPE]') -> 'Rect[COORDINATE_TYPE]':
+    def __and__(self, other: "Rect[COORDINATE_TYPE]") -> "Rect[COORDINATE_TYPE]":
         """
         Calculate an intersection of rects.
 
@@ -460,7 +467,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect and other.coreRect
 
-    def __eq__(self, other: 'Rect[COORDINATE_TYPE]') -> bool:
+    def __eq__(self, other: "Rect[COORDINATE_TYPE]") -> bool:
         """
         Compare two rect
 
@@ -481,7 +488,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect == other.coreRect
 
-    def __ne__(self, other: 'Rect[COORDINATE_TYPE]') -> bool:
+    def __ne__(self, other: "Rect[COORDINATE_TYPE]") -> bool:
         """
         Compare two rect
 
@@ -502,8 +509,13 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect != other.coreRect
 
-    def adjust(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE,  # pylint: disable=C0103
-               dh: COORDINATE_TYPE) -> None:
+    def adjust(
+        self,
+        dx: COORDINATE_TYPE,
+        dy: COORDINATE_TYPE,
+        dw: COORDINATE_TYPE,  # pylint: disable=C0103
+        dh: COORDINATE_TYPE,
+    ) -> None:
         """
         Adjusts the rect by given amounts.
 
@@ -516,8 +528,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         self.coreRect.adjust(dx, dy, dw, dh)
 
     # pylint: disable=C0103
-    def adjusted(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE,
-                 dh: COORDINATE_TYPE) -> 'Rect':
+    def adjusted(self, dx: COORDINATE_TYPE, dy: COORDINATE_TYPE, dw: COORDINATE_TYPE, dh: COORDINATE_TYPE) -> "Rect":
         """
         Copies and adjusts the rect by given amounts.
 
@@ -569,6 +580,7 @@ class Landmarks(BaseEstimation):
     Attributes:
         _points (Optional[List[Point[float]]]): lazy load attributes, converted to point list core landmarks
     """
+
     __slots__ = ["_points", "_coreLandmarks"]
 
     def __init__(self, coreLandmarks: LANDMARKS):

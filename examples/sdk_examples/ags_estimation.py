@@ -12,7 +12,7 @@ def estimateAGS():
     """
     Estimate face detection ags.
     """
-    image = VLImage.load(filename='C:/temp/test.jpg')
+    image = VLImage.load(filename="C:/temp/test.jpg")
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)

@@ -22,7 +22,8 @@ class MatchingResult:
         distance (float): L2 distance between descriptors
         similarity (float): descriptor similarity [0..1]
     """
-    __slots__ = ('distance', 'similarity')
+
+    __slots__ = ("distance", "similarity")
 
     def __init__(self, distance: float, similarity: float):
         self.distance = distance
@@ -38,7 +39,8 @@ class FaceMatcher:
         _coreMatcher (IDescriptorMatcherPtr): core matcher
         descriptorFactory (FaceDescriptorFactory): face descriptor factory
     """
-    __slots__ = ('_coreMatcher', 'descriptorFactory')
+
+    __slots__ = ("_coreMatcher", "descriptorFactory")
 
     def __init__(self, coreMatcher: IDescriptorMatcherPtr, descriptorFactory: FaceDescriptorFactory):
         """
@@ -51,9 +53,9 @@ class FaceMatcher:
         self.descriptorFactory = descriptorFactory
 
     @abstractmethod
-    def match(self, reference: FaceDescriptor,
-              candidates: Union[FaceDescriptor, List[FaceDescriptor],
-                                FaceDescriptorBatch]) -> Union[MatchingResult, List[MatchingResult]]:
+    def match(
+        self, reference: FaceDescriptor, candidates: Union[FaceDescriptor, List[FaceDescriptor], FaceDescriptorBatch]
+    ) -> Union[MatchingResult, List[MatchingResult]]:
         """
         Match face descriptor vs face descriptors.
 

@@ -39,9 +39,21 @@ class VLFaceDetection(FaceDetection):
         _transformedLandmarks68 (Optional[Landmarks68]): lazy load transformed landmarks68
 
     """
-    __slots__ = ("_warp", "_emotions", "_eyes", "_mouthState", "_basicAttributes",
-                 "_gaze", "_warpQuality", "_headPose", "estimatorCollection", "_transformedLandmarks68", "_ags",
-                 "_descriptor")
+
+    __slots__ = (
+        "_warp",
+        "_emotions",
+        "_eyes",
+        "_mouthState",
+        "_basicAttributes",
+        "_gaze",
+        "_warpQuality",
+        "_headPose",
+        "estimatorCollection",
+        "_transformedLandmarks68",
+        "_ags",
+        "_descriptor",
+    )
 
     def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
         """
@@ -134,10 +146,9 @@ class VLFaceDetection(FaceDetection):
             basic attributes (age, gender, ethnicity)
         """
         if self._basicAttributes is None:
-            self._basicAttributes = self.estimatorCollection.basicAttributesEstimator.estimate(self.warp,
-                                                                                               estimateAge=True,
-                                                                                               estimateEthnicity=True,
-                                                                                               estimateGender=True)
+            self._basicAttributes = self.estimatorCollection.basicAttributesEstimator.estimate(
+                self.warp, estimateAge=True, estimateEthnicity=True, estimateGender=True
+            )
         return self._basicAttributes
 
     @property
@@ -173,8 +184,9 @@ class VLFaceDetection(FaceDetection):
         """
         if self._eyes is None:
             if self._transformedLandmarks68 is None:
-                self._transformedLandmarks68 = self.estimatorCollection.warper. \
-                    makeWarpTransformationWithLandmarks(self, "L68")
+                self._transformedLandmarks68 = self.estimatorCollection.warper.makeWarpTransformationWithLandmarks(
+                    self, "L68"
+                )
 
             self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._transformedLandmarks68, self.warp)
         return self._eyes
@@ -245,8 +257,9 @@ class VLFaceDetector:
     #: estimators collection of class for usual creating detectors
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
-    def __init__(self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
-                 faceEngine: Optional[VLFaceEngine] = None):
+    def __init__(
+        self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
+    ):
         """
         Init.
 
@@ -287,8 +300,12 @@ class VLFaceDetector:
         detectRes = self._faceDetector.detect(images, limit, True, True)
         res = []
         for imageNumber, image in enumerate(images):
-            res.append([VLFaceDetection(detectRes.coreEstimation, image, self.estimatorsCollection) for detectRes in
-                        detectRes[imageNumber]])
+            res.append(
+                [
+                    VLFaceDetection(detectRes.coreEstimation, image, self.estimatorsCollection)
+                    for detectRes in detectRes[imageNumber]
+                ]
+            )
         return res
 
 
@@ -303,6 +320,7 @@ class VLWarpedImage(WarpedImage):
         _basicAttributes (Optional[BasicAttributes]): lazy load basic attribute estimation
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
     """
+
     __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality", "_descriptor")
 
     def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
@@ -363,8 +381,9 @@ class VLWarpedImage(WarpedImage):
         """
         if self._basicAttributes is None:
             estimator = VLWarpedImage.estimatorsCollection.basicAttributesEstimator
-            self._basicAttributes = estimator.estimate(self, estimateAge=True, estimateEthnicity=True,
-                                                       estimateGender=True)
+            self._basicAttributes = estimator.estimate(
+                self, estimateAge=True, estimateEthnicity=True, estimateGender=True
+            )
         return self._basicAttributes
 
     @property

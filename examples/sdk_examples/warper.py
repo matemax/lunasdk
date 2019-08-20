@@ -14,8 +14,7 @@ def createWarp():
 
     """
     faceEngine = VLFaceEngine()
-    image = VLImage.load(
-        url='https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg')
+    image = VLImage.load(url="https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg")
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
     warper = faceEngine.createWarper()
