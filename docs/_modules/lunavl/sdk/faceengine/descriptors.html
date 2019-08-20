@@ -119,7 +119,7 @@
 <span class="kn">from</span> <span class="nn">lunavl.sdk.estimators.base_estimation</span> <span class="k">import</span> <span class="n">BaseEstimation</span>
 
 
-<div class="viewcode-block" id="FaceDescriptor"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptor">[docs]</a><span class="k">class</span> <span class="nc">FaceDescriptor</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+<div class="viewcode-block" id="FaceDescriptor"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptor">[docs]</a><span class="k">class</span> <span class="nc">FaceDescriptor</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Descriptor</span>
 
@@ -132,7 +132,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coreEstimation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">garbageScore</span> <span class="o">=</span> <span class="n">garbageScore</span>
 
-<div class="viewcode-block" id="FaceDescriptor.asDict"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptor.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]:</span>
+<div class="viewcode-block" id="FaceDescriptor.asDict"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptor.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert to dict</span>
 
@@ -183,7 +183,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coreEstimation</span><span class="o">.</span><span class="n">getModelVersion</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="FaceDescriptorBatch"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch">[docs]</a><span class="k">class</span> <span class="nc">FaceDescriptorBatch</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
+<div class="viewcode-block" id="FaceDescriptorBatch"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch">[docs]</a><span class="k">class</span> <span class="nc">FaceDescriptorBatch</span><span class="p">(</span><span class="n">BaseEstimation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Face descriptor batch.</span>
 
@@ -208,7 +208,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">getMaxCount</span><span class="p">()</span>
 
-<div class="viewcode-block" id="FaceDescriptorBatch.asDict"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<div class="viewcode-block" id="FaceDescriptorBatch.asDict"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.asDict">[docs]</a>    <span class="k">def</span> <span class="nf">asDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get batch in json like object.</span>
 
@@ -240,7 +240,7 @@
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">itemCount</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">FaceDescriptor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreEstimation</span><span class="o">.</span><span class="n">getDescriptorFast</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
 
-<div class="viewcode-block" id="FaceDescriptorBatch.append"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">:</span> <span class="n">FaceDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="FaceDescriptorBatch.append"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorBatch.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">:</span> <span class="n">FaceDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add descriptor to end of batch.</span>
 
@@ -251,7 +251,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">garbageScore</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="FaceDescriptorFactory"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory">[docs]</a><span class="k">class</span> <span class="nc">FaceDescriptorFactory</span><span class="p">:</span>
+<div class="viewcode-block" id="FaceDescriptorFactory"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory">[docs]</a><span class="k">class</span> <span class="nc">FaceDescriptorFactory</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Face Descriptor factory.</span>
 
@@ -262,7 +262,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">faceEngine</span><span class="p">:</span> <span class="s1">&#39;VLFaceEngine&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span> <span class="o">=</span> <span class="n">faceEngine</span>
 
-<div class="viewcode-block" id="FaceDescriptorFactory.generateDescriptor"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptor">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">CreationDescriptorError</span><span class="p">)</span>
+<div class="viewcode-block" id="FaceDescriptorFactory.generateDescriptor"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptor">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">CreationDescriptorError</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">generateDescriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IDescriptorPtr</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate core descriptor</span>
@@ -272,7 +272,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">FaceDescriptor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_faceEngine</span><span class="o">.</span><span class="n">coreFaceEngine</span><span class="o">.</span><span class="n">createDescriptor</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="FaceDescriptorFactory.generateDescriptorsBatch"><a class="viewcode-back" href="../../../../sdk/matching.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptorsBatch">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">CreationDescriptorError</span><span class="p">)</span>
+<div class="viewcode-block" id="FaceDescriptorFactory.generateDescriptorsBatch"><a class="viewcode-back" href="../../../../sdk/face_estimations.html#lunavl.sdk.faceengine.descriptors.FaceDescriptorFactory.generateDescriptorsBatch">[docs]</a>    <span class="nd">@CoreExceptionWarp</span><span class="p">(</span><span class="n">LunaVLError</span><span class="o">.</span><span class="n">CreationDescriptorError</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">generateDescriptorsBatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IDescriptorBatchPtr</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate core descriptors batch.</span>

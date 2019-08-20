@@ -63,7 +63,7 @@ class MouthStates(BaseEstimation):
         Returns:
             {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
         """
-        return {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
+        return {'score': self.mouth, 'occluded': self.occlusion, 'smile': self.smile}
 
 
 class MouthStateEstimator(BaseEstimator):

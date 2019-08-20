@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lunavl.sdk.faceengine.setting_provider &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for lunavl.sdk.faceengine.setting_provider</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">SDK configuration module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">FaceEngine</span> <span class="k">as</span> <span class="nn">CoreFE</span>
+<span class="kn">from</span> <span class="nn">FaceEngine</span> <span class="k">import</span> <span class="n">ObjectDetectorClassType</span><span class="p">,</span> <span class="n">PyISettingsProvider</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+
+<div class="viewcode-block" id="BiDirectionEnum"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BiDirectionEnum">[docs]</a><span class="k">class</span> <span class="nc">BiDirectionEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Bi direction enum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getEnum</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">enumValue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;BiDirectionEnum&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get enum by value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            enumValue: value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           element of the enum with value which is equal to the enumValue.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">              KeyError: if element not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">enumMember</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">enumMember</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">enumValue</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">enumMember</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Enum </span><span class="si">{}</span><span class="s2"> does not contain  member with value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">enumValue</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="CpuClass"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.CpuClass">[docs]</a><span class="k">class</span> <span class="nc">CpuClass</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class of cpu by supported instructions&quot;&quot;&quot;</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+    <span class="n">sse4</span> <span class="o">=</span> <span class="s2">&quot;sse4&quot;</span>
+    <span class="n">avx</span> <span class="o">=</span> <span class="s2">&quot;avx&quot;</span>
+    <span class="n">avx2</span> <span class="o">=</span> <span class="s2">&quot;avx2&quot;</span>
+    <span class="n">arm</span> <span class="o">=</span> <span class="s2">&quot;arm&quot;</span></div>
+
+
+<div class="viewcode-block" id="VerboseLogging"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.VerboseLogging">[docs]</a><span class="k">class</span> <span class="nc">VerboseLogging</span><span class="p">(</span><span class="n">BiDirectionEnum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Level of log versobing enum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">warnings</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="DeviceClass"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.DeviceClass">[docs]</a><span class="k">class</span> <span class="nc">DeviceClass</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Device enum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cpu</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="n">gpu</span> <span class="o">=</span> <span class="s2">&quot;gpu&quot;</span></div>
+
+
+<div class="viewcode-block" id="Distance"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Distance">[docs]</a><span class="k">class</span> <span class="nc">Distance</span><span class="p">(</span><span class="n">BiDirectionEnum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Descriptor distance type enum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l1</span> <span class="o">=</span> <span class="s2">&quot;L1&quot;</span>
+    <span class="n">l2</span> <span class="o">=</span> <span class="s2">&quot;L2&quot;</span></div>
+
+
+<div class="viewcode-block" id="NMS"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.NMS">[docs]</a><span class="k">class</span> <span class="nc">NMS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NMS type enum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
+    <span class="n">best</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span></div>
+
+
+<div class="viewcode-block" id="Point4"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Point4">[docs]</a><span class="k">class</span> <span class="nc">Point4</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Point in 4-dimensional space.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        x (float): x coordinate</span>
+<span class="sd">        y (float): y coordinate</span>
+<span class="sd">        z (float): z coordinate</span>
+<span class="sd">        w (float): w coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>
+
+<div class="viewcode-block" id="Point4.asTuple"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Point4.asTuple">[docs]</a>    <span class="k">def</span> <span class="nf">asTuple</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert point to tuple.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple from coordinate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span></div></div>
+
+
+<div class="viewcode-block" id="Point3"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Point3">[docs]</a><span class="k">class</span> <span class="nc">Point3</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Point in 3-dimensional space.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        x (float): x coordinate</span>
+<span class="sd">        y (float): y coordinate</span>
+<span class="sd">        z (float): z coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
+
+<div class="viewcode-block" id="Point3.asTuple"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Point3.asTuple">[docs]</a>    <span class="k">def</span> <span class="nf">asTuple</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert point to tuple.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple from coordinate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span></div></div>
+
+
+<div class="viewcode-block" id="Point2"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Point2">[docs]</a><span class="k">class</span> <span class="nc">Point2</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Point in 2-dimensional space.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        x (float): x coordinate</span>
+<span class="sd">        y (float): y coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+
+<div class="viewcode-block" id="Point2.asTuple"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.Point2.asTuple">[docs]</a>    <span class="k">def</span> <span class="nf">asTuple</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert point to tuple.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple from coordinate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span></div></div>
+
+
+<div class="viewcode-block" id="DetectorType"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.DetectorType">[docs]</a><span class="k">class</span> <span class="nc">DetectorType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detector types enum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FACE_DET_DEFAULT</span> <span class="o">=</span> <span class="s2">&quot;Default&quot;</span>
+    <span class="n">FACE_DET_V1</span> <span class="o">=</span> <span class="s2">&quot;FaceDetV1&quot;</span>  <span class="c1">#: todo description</span>
+    <span class="n">FACE_DET_V2</span> <span class="o">=</span> <span class="s2">&quot;FaceDetV2&quot;</span>
+    <span class="n">FACE_DET_V3</span> <span class="o">=</span> <span class="s2">&quot;FaceDetV3&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coreDetectorType</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObjectDetectorClassType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert  self to core detector type</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ObjectDetectorClassType</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mapEnumToCoreEnum</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Default&quot;</span><span class="p">:</span> <span class="s2">&quot;FACE_DET_DEFAULT&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;FaceDetV1&quot;</span><span class="p">:</span> <span class="s2">&quot;FACE_DET_V1&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;FaceDetV2&quot;</span><span class="p">:</span> <span class="s2">&quot;FACE_DET_V2&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;FaceDetV3&quot;</span><span class="p">:</span> <span class="s2">&quot;FACE_DET_V3&quot;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ObjectDetectorClassType</span><span class="p">,</span> <span class="n">mapEnumToCoreEnum</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="BaseSettingsSection"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection">[docs]</a><span class="k">class</span> <span class="nc">BaseSettingsSection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for a section of settings.</span>
+
+<span class="sd">    Proxy model to core settings provider.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _coreSettingProvider (coreSettingProvider): core settings provider</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># (str): section name</span>
+    <span class="n">sectionName</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coreSettingProvider</span><span class="p">:</span> <span class="n">PyISettingsProvider</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span> <span class="o">=</span> <span class="n">coreSettingProvider</span>
+
+<div class="viewcode-block" id="BaseSettingsSection.setValue"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.setValue">[docs]</a>    <span class="k">def</span> <span class="nf">setValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set a value</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: setting name</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">sectionName</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
+                                           <span class="n">CoreFE</span><span class="o">.</span><span class="n">SettingsProviderValue</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BaseSettingsSection.getValue"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get setting value</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: setting name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">sectionName</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseSettingsSection.getValueAsString"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsString">[docs]</a>    <span class="k">def</span> <span class="nf">getValueAsString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get setting value as string</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: setting name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">asString</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseSettingsSection.getValueAsInt"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsInt">[docs]</a>    <span class="k">def</span> <span class="nf">getValueAsInt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get setting value as int</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: setting name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">asInt</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseSettingsSection.getValueAsFloat"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsFloat">[docs]</a>    <span class="k">def</span> <span class="nf">getValueAsFloat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get setting value as float</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: setting name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">asFloat</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="SystemSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.SystemSettings">[docs]</a><span class="k">class</span> <span class="nc">SystemSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Common system settings.</span>
+
+<span class="sd">    Properties:</span>
+
+<span class="sd">        - cpuClass (CpuClass): class of cpu by supported instructions</span>
+<span class="sd">        - verboseLogging (VerboseLogging): Level of log versobing</span>
+<span class="sd">        - betaMode (bool): enable experimental features.</span>
+<span class="sd">        - defaultDetectorType (DetectorType): default detector type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cpuClass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CpuClass</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for cpuClass</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            cpuClass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CpuClass</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;cpuClass&quot;</span><span class="p">)]</span>
+
+    <span class="nd">@cpuClass</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">cpuClass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">CpuClass</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for cpuClass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;cpuClass&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">verboseLogging</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VerboseLogging</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for verboseLogging</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            verboseLogging</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">VerboseLogging</span><span class="o">.</span><span class="n">getEnum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;verboseLogging&quot;</span><span class="p">))</span>
+
+    <span class="nd">@verboseLogging</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">verboseLogging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">VerboseLogging</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for cpuClass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;verboseLogging&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">betaMode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for betaMode</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            betaMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;betaMode&quot;</span><span class="p">))</span>
+
+    <span class="nd">@betaMode</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">betaMode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for betaMode</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;betaMode&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">defaultDetectorType</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for defaultDetectorType</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            betaMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DetectorType</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;defaultDetectorType&quot;</span><span class="p">)]</span>
+
+    <span class="nd">@defaultDetectorType</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">defaultDetectorType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">DetectorType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for defaultDetectorType</span>
+<span class="sd">        Args:</span>
+<span class="sd">                value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;defaultDetectorType&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FlowerSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.FlowerSettings">[docs]</a><span class="k">class</span> <span class="nc">FlowerSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Flower library is the default neural network inference engine.</span>
+<span class="sd">    The library is used for:</span>
+
+<span class="sd">        - face detectors;</span>
+
+<span class="sd">        - estimators(attributes, quality);</span>
+
+<span class="sd">        - face descriptors</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        deviceClass (DeviceClass):  execution device type cpu, gpu.</span>
+<span class="sd">        numThreads (int): number of worker threads.</span>
+<span class="sd">        verboseLogging (VerboseLogging): level of verbose logging</span>
+<span class="sd">        numComputeStreams (int):  increases performance, but works only with new versions of nvidia drivers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;flower&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">deviceClass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeviceClass</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DeviceClass</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;deviceClass&quot;</span><span class="p">)]</span>
+
+    <span class="nd">@deviceClass</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">deviceClass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">DeviceClass</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for deviceClass</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;deviceClass&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">numThreads</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for numThreads</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numThreads</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;numThreads&quot;</span><span class="p">)</span>
+
+    <span class="nd">@numThreads</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">numThreads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for numThreads</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;numThreads&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">verboseLogging</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VerboseLogging</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for verboseLogging</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            verboseLogging</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">VerboseLogging</span><span class="o">.</span><span class="n">getEnum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;verboseLogging&quot;</span><span class="p">))</span>
+
+    <span class="nd">@verboseLogging</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">verboseLogging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">VerboseLogging</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for verboseLogging</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;verboseLogging&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">numComputeStreams</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for numComputeStreams</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numComputeStreams</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;numComputeStreams&quot;</span><span class="p">)</span>
+
+    <span class="nd">@numComputeStreams</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">numComputeStreams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for numComputeStreams</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;numComputeStreams&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DescriptorFactorySettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings">[docs]</a><span class="k">class</span> <span class="nc">DescriptorFactorySettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Descriptor factory settings.</span>
+
+<span class="sd">    Properties:</span>
+
+<span class="sd">        - model (int): CNN face descriptor version.</span>
+<span class="sd">        - UseMobileNet (bool): mobile Net is faster but less accurate</span>
+<span class="sd">        - distance (Distance): distance between descriptors on matching. L1 faster,L2 make better precision.</span>
+<span class="sd">        - descriptorCountWarningLevel (float): Threshold,that limits the ratio of created  descriptors to the amount,</span>
+<span class="sd">            defined by your liscence. Warning Level When the threshold is exceeded, FSDK prints the warning.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;DescriptorFactory::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for model</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+
+    <span class="nd">@model</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for model</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">useMobileNet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for useMobileNet</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            useMobileNet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;useMobileNet&quot;</span><span class="p">))</span>
+
+    <span class="nd">@useMobileNet</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">useMobileNet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for useMobileNet</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;useMobileNet&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distance</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for distance</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            distance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Distance</span><span class="o">.</span><span class="n">getEnum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;distance&quot;</span><span class="p">))</span>
+
+    <span class="nd">@distance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Distance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for distance</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">descriptorCountWarningLevel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for descriptorCountWarningLevel</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            descriptorCountWarningLevel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;descriptorCountWarningLevel&quot;</span><span class="p">)</span>
+
+    <span class="nd">@descriptorCountWarningLevel</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">descriptorCountWarningLevel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;descriptorCountWarningLevel&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FaceDetV3Settings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings">[docs]</a><span class="k">class</span> <span class="nc">FaceDetV3Settings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FaceDetV3 detector settings.</span>
+
+<span class="sd">    Properties:</span>
+
+<span class="sd">        - scoreThreshold (float): detection threshold in [0..1] range;</span>
+<span class="sd">        - redetectScoreThreshold (float): redetect face threshold in [0..1] range;</span>
+<span class="sd">        - NMSThreshold (float): overlap threshold for NMS [0..1] range;</span>
+<span class="sd">        - imageSize (int): Target image size for down scaling by load side;</span>
+<span class="sd">        - nms (NMS): type of NMS: mean or best;</span>
+<span class="sd">        - redetectTensorSize (int): target face after preprocessing for redetect;</span>
+<span class="sd">        - redetectFaceTargetSize (int): target face size for redetect;</span>
+<span class="sd">        - paddings (Point4): paddings;</span>
+<span class="sd">        - paddingsIR (Point4): paddingsIR;</span>
+<span class="sd">        - planPrefix (str): planPrefix;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;FaceDetV3::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scoreThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for scoreThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            scoreThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;scoreThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@scoreThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">scoreThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;ScoreThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">redetectScoreThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for redetectScoreThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            redetectScoreThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;RedetectScoreThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@redetectScoreThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">redetectScoreThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for redetectScoreThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;RedetectScoreThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">NMSThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for NMSThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            NMSThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;NMSThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@NMSThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">NMSThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for NMSThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;NMSThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">imageSize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for imageSize</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            imageSize</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;imageSize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@imageSize</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">imageSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for imageSize</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;imageSize&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NMS</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for nms</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            nms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NMS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;nms&quot;</span><span class="p">)]</span>
+
+    <span class="nd">@nms</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">NMS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for nms</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;nms&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">redetectTensorSize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for redetectTensorSize</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            redetectTensorSize</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;RedetectTensorSize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@redetectTensorSize</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">redetectTensorSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for redetectTensorSize</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;RedetectTensorSize&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">redetectFaceTargetSize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for redetectFaceTargetSize</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            redetectFaceTargetSize</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;RedetectFaceTargetSize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@redetectFaceTargetSize</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">redetectFaceTargetSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for redetectFaceTargetSize</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;RedetectFaceTargetSize&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">paddings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point4</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for paddings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            paddings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point4</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;paddings&quot;</span><span class="p">))</span>
+
+    <span class="nd">@paddings</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">paddings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for paddings</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;paddings&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">paddingsIR</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point4</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for paddingsIR</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            paddingsIR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point4</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;paddingsIR&quot;</span><span class="p">))</span>
+
+    <span class="nd">@paddingsIR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">paddingsIR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for paddingsIR</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;paddingsIR&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">planPrefix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for planPrefix</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            planPrefix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;planPrefix&quot;</span><span class="p">)</span>
+
+    <span class="nd">@planPrefix</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">planPrefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for planPrefix</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;planPrefix&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FaceDetV12Settings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings">[docs]</a><span class="k">class</span> <span class="nc">FaceDetV12Settings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Common class for FaceDetV1 and FaceDetV2 detector settings.</span>
+
+<span class="sd">    Properties:</span>
+
+<span class="sd">        - firstThreshold (float): 1-st threshold in [0..1] range;</span>
+<span class="sd">        - secondThreshold (float): 2-st threshold in [0..1] range;</span>
+<span class="sd">        - thirdTThreshold (float): 3-st threshold in [0..1] range;</span>
+<span class="sd">        - minSize (int): minimum face size in pixels;</span>
+<span class="sd">        - scaleFactor (float): image scale factor;</span>
+<span class="sd">        - paddings (Point4): paddings;</span>
+<span class="sd">        - redetectTolerance (float): redetect tolerance;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">firstThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for firstThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float in [0..1] range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;FirstThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@firstThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">firstThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for firstThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value, float in [0..1] range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;FirstThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">secondThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for secondThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            secondThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;SecondThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@secondThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">secondThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for secondThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value, float in [0..1] range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;SecondThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">thirdThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for thirdThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            thirdThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;ThirdThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@thirdThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">thirdThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for thirdThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value, float in [0..1] range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;ThirdThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">minSize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for minSize</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            minSize</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;minSize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@minSize</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">minSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;minSize&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scaleFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for scaleFactor</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            scaleFactor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;scaleFactor&quot;</span><span class="p">)</span>
+
+    <span class="nd">@scaleFactor</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">scaleFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;scaleFactor&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">paddings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point4</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for paddings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            paddings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point4</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;paddings&quot;</span><span class="p">))</span>
+
+    <span class="nd">@paddings</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">paddings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;paddings&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">redetectTolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for redetectTolerance</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            redetectTolerance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;redetectTolerance&quot;</span><span class="p">)</span>
+
+    <span class="nd">@redetectTolerance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">redetectTolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;redetectTolerance&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FaceDetV1Settings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.FaceDetV1Settings">[docs]</a><span class="k">class</span> <span class="nc">FaceDetV1Settings</span><span class="p">(</span><span class="n">FaceDetV12Settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FaceDetV1 settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;FaceDetV1::Settings&quot;</span></div>
+
+
+<div class="viewcode-block" id="FaceDetV2Settings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.FaceDetV2Settings">[docs]</a><span class="k">class</span> <span class="nc">FaceDetV2Settings</span><span class="p">(</span><span class="n">FaceDetV12Settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FaceDetV2 settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;FaceDetV2::Settings&quot;</span></div>
+
+
+<div class="viewcode-block" id="LNetBaseSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.LNetBaseSettings">[docs]</a><span class="k">class</span> <span class="nc">LNetBaseSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for configuration LNet neural network.</span>
+
+<span class="sd">    Properties:</span>
+
+<span class="sd">        - planName (str): plan name</span>
+<span class="sd">        - size (int): size</span>
+<span class="sd">        - mean (Point3): mean</span>
+<span class="sd">        - sigma (Point3): sigma</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">planName</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for planName</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            planName</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsString</span><span class="p">(</span><span class="s2">&quot;planName&quot;</span><span class="p">)</span>
+
+    <span class="nd">@planName</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">planName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for planName</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;planName&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for size</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+
+    <span class="nd">@size</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for size</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point3</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for mean</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
+
+    <span class="nd">@mean</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for mean</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point3</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for sigma</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            sigma</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">))</span>
+
+    <span class="nd">@sigma</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for sigma</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="LNetSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.LNetSettings">[docs]</a><span class="k">class</span> <span class="nc">LNetSettings</span><span class="p">(</span><span class="n">LNetBaseSettings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LNet configuration section&quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;LNet::Settings&quot;</span></div>
+
+
+<div class="viewcode-block" id="LNetIRSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.LNetIRSettings">[docs]</a><span class="k">class</span> <span class="nc">LNetIRSettings</span><span class="p">(</span><span class="n">LNetBaseSettings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LNetIR configuration section&quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;LNetIR::Settings&quot;</span></div>
+
+
+<div class="viewcode-block" id="SLNetSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.SLNetSettings">[docs]</a><span class="k">class</span> <span class="nc">SLNetSettings</span><span class="p">(</span><span class="n">LNetBaseSettings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SLNet configuration section&quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;SLNet::Settings&quot;</span></div>
+
+
+<div class="viewcode-block" id="QualityEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">QualityEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Quality estimator settings section.</span>
+
+<span class="sd">    Properties:</span>
+
+<span class="sd">        - size (int): size</span>
+<span class="sd">        - expLight (Point3): expLight</span>
+<span class="sd">        - expDark (Point3): expDark</span>
+<span class="sd">        - expBlur (Point3):  expBlur</span>
+<span class="sd">        - logGray (Point4): logGray</span>
+<span class="sd">        - platt (Point2): coefficient platt</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;QualityEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for size</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+
+    <span class="nd">@size</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for size</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expLight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point3</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for expLight</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            expLight</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;expLight&quot;</span><span class="p">))</span>
+
+    <span class="nd">@expLight</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">expLight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for expLight</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;expLight&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expDark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point3</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for expDark</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            expDark</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;expDark&quot;</span><span class="p">))</span>
+
+    <span class="nd">@expDark</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">expDark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new expDark</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;expDark&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logGray</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point4</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for logGray</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            logGray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point4</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;logGray&quot;</span><span class="p">))</span>
+
+    <span class="nd">@logGray</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">logGray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for logGray</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;logGray&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expBlur</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point3</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for expBlur</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            expBlur</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;expBlur&quot;</span><span class="p">))</span>
+
+    <span class="nd">@expBlur</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">expBlur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for expBlur</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;expBlur&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">platt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point2</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for platt</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            platt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point2</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;platt&quot;</span><span class="p">))</span>
+
+    <span class="nd">@platt</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">platt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Point2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for platt</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;platt&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">asTuple</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="HeadPoseEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">HeadPoseEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Head pose estimator settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - useEstimationByImage (bool): use head pose estimation by image</span>
+<span class="sd">        - useEstimationByLandmarks (bool): use head pose estimation by landmarks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;HeadPoseEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">useEstimationByImage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for useEstimationByImage</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            useEstimationByImage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;useEstimationByImage&quot;</span><span class="p">))</span>
+
+    <span class="nd">@useEstimationByImage</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">useEstimationByImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for useEstimationByImage</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;useEstimationByImage&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">useEstimationByLandmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for useEstimationByLandmarks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            useEstimationByLandmarks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;useEstimationByLandmarks&quot;</span><span class="p">))</span>
+
+    <span class="nd">@useEstimationByLandmarks</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">useEstimationByLandmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for useEstimationByLandmarks</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;useEstimationByLandmarks&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="EyeEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">EyeEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Eyes estimator settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - useStatusPlan (bool): use  status plan or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;EyeEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">useStatusPlan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for useStatusPlan</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            useStatusPlan</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;useStatusPlan&quot;</span><span class="p">))</span>
+
+    <span class="nd">@useStatusPlan</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">useStatusPlan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for useStatusPlan</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;useStatusPlan&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AttributeEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">AttributeEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attribute estimator settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - genderThreshold (float): gender threshold in [0..1] range</span>
+<span class="sd">        - adultThreshold (float): adult threshold in [0..1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;AttributeEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">genderThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for genderThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            genderThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;genderThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@genderThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">genderThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for genderThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;genderThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">adultThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for adultThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            adultThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;adultThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@adultThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">adultThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for adultThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;adultThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GlassesEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">GlassesEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Glasses estimator settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - noGlassesThreshold (float): no glasses threshold in [0..1] range</span>
+<span class="sd">        - eyeGlassesThreshold (float): eye glasses threshold in [0..1] range</span>
+<span class="sd">        - sunGlassesThreshold (float): sun glasses threshold in [0..1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;GlassesEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">noGlassesThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for noGlassesThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            noGlassesThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;noGlassesThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@noGlassesThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">noGlassesThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for noGlassesThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;noGlassesThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eyeGlassesThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for eyeGlassesThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            eyeGlassesThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;eyeGlassesThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@eyeGlassesThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">eyeGlassesThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for eyeGlassesThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;eyeGlassesThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sunGlassesThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for sunGlassesThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            sunGlassesThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;sunGlassesThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@sunGlassesThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">sunGlassesThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for sunGlassesThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;sunGlassesThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OverlapEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">OverlapEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    OverlapThreshold any object settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - overlapThreshold (float): overlap threshold for any object in [0..1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;OverlapEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">overlapThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for overlapThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            overlapThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;overlapThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@overlapThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">overlapThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for overlapThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;overlapThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChildEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">ChildEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    childThreshold settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - childThreshold (float):  if estimate value less than threshold object is a children.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;ChildEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">childThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for childThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            childThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;childThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@childThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">childThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for childThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;childThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LivenessIREstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">LivenessIREstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    LivenessIREstimator settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - cooperativeMode (bool): whether liveness is checking in cooperative mode</span>
+<span class="sd">        - irCooperativeThreshold (float): liveness threshold for cooperative mode in [0..1] range</span>
+<span class="sd">        - irNonCooperativeThreshold (float): liveness threshold for non cooperative mode in [0..1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;LivenessIREstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cooperativeMode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for cooperativeMode</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            cooperativeMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValueAsInt</span><span class="p">(</span><span class="s2">&quot;cooperativeMode&quot;</span><span class="p">))</span>
+
+    <span class="nd">@cooperativeMode</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">cooperativeMode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for cooperativeMode</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;cooperativeMode&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">irCooperativeThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for irCooperativeThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            irCooperativeThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;irCooperativeThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@irCooperativeThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">irCooperativeThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for irCooperativeThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;irCooperativeThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">irNonCooperativeThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for irNonCooperativeThreshold</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            irNonCooperativeThreshold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;irNonCooperativeThreshold&quot;</span><span class="p">)</span>
+
+    <span class="nd">@irNonCooperativeThreshold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">irNonCooperativeThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for irNonCooperativeThreshold</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;irNonCooperativeThreshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HeadAndShouldersLivenessEstimatorSettings"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings">[docs]</a><span class="k">class</span> <span class="nc">HeadAndShouldersLivenessEstimatorSettings</span><span class="p">(</span><span class="n">BaseSettingsSection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    HeadAndShouldersLiveness settings section.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        - shouldersHeightKoeff (float): shouldersHeightKoeff</span>
+<span class="sd">        - shouldersWidthKoeff (float): shouldersWidthKoeff</span>
+<span class="sd">        - headWidthKoeff (float): headWidthKoeff</span>
+<span class="sd">        - headHeightKoeff (float): headHeightKoeff</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sectionName</span> <span class="o">=</span> <span class="s2">&quot;HeadAndShouldersLivenessEstimator::Settings&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">headWidthKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for betaMode</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            betaMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;headWidthKoeff&quot;</span><span class="p">)</span>
+
+    <span class="nd">@headWidthKoeff</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">headWidthKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;headWidthKoeff&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">headHeightKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for betaMode</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            betaMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;headHeightKoeff&quot;</span><span class="p">)</span>
+
+    <span class="nd">@headHeightKoeff</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">headHeightKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;headHeightKoeff&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shouldersWidthKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for betaMode</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            betaMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;shouldersWidthKoeff&quot;</span><span class="p">)</span>
+
+    <span class="nd">@shouldersWidthKoeff</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">shouldersWidthKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;shouldersWidthKoeff&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shouldersHeightKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for betaMode</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            betaMode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValueAsFloat</span><span class="p">(</span><span class="s2">&quot;shouldersHeightKoeff&quot;</span><span class="p">)</span>
+
+    <span class="nd">@shouldersHeightKoeff</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">shouldersHeightKoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for descriptorCountWarningLevel</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;shouldersHeightKoeff&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SettingsProvider"><a class="viewcode-back" href="../../../../sdk/configuration.html#lunavl.sdk.faceengine.setting_provider.SettingsProvider">[docs]</a><span class="k">class</span> <span class="nc">SettingsProvider</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SDK Setting provider.</span>
+
+<span class="sd">    Proxy model.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        pathToConfig (str): path to a configuration file. Config file is getting from</span>
+<span class="sd">                          the folder&#39;data&#39;  in &quot;FSDK_ROOT&quot;.</span>
+<span class="sd">        _coreSettingProvider ()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathToConfig</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pathToConfig: path to config.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">             ValueError: if pathToConfig is None and environment variable *FSDK_ROOT* does not set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pathToConfig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;FSDK_ROOT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pathToConfig</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;FSDK_ROOT&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;faceengine.conf&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed on path to faceengine luna data folder, set variable pathToData or set&quot;</span>
+                                 <span class="s2">&quot;environment variable *FSDK_ROOT*&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pathToConfig</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pathToConfig</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pathToConfig</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pathToConfig</span> <span class="o">=</span> <span class="n">pathToConfig</span>
+
+        <span class="c1"># todo: check existance</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span> <span class="o">=</span> <span class="n">CoreFE</span><span class="o">.</span><span class="n">createSettingsProvider</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pathToConfig</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">systemSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SystemSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for system settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable system section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SystemSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">flowerSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlowerSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for flower settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable flower section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FlowerSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">descriptorFactorySettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DescriptorFactorySettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for descriptor factory settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable descriptor factory section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DescriptorFactorySettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">faceDetV3Settings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDetV3Settings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for FaceDetV3 settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable FaceDetV3 section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FaceDetV3Settings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">faceDetV1Settings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDetV1Settings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for FaceDetV1 settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable FaceDetV1 section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FaceDetV1Settings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">faceDetV2Settings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FaceDetV2Settings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for FaceDetV2 settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable FaceDetV2 section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FaceDetV2Settings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">LNetSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for LNet settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable LNet section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LNetSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">LNetIRSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LNetIRSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for LNetIR settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable LNetIR section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LNetIRSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SLNetSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SLNetSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for SLNet settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable SLNet section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SLNetSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">qualityEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QualityEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for QualityEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable QualityEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">QualityEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">headPoseEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HeadPoseEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for HeadPoseEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable HeadPoseEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">HeadPoseEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eyeEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for EyeEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable EyeEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">EyeEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">attributeEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttributeEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for AttributeEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable AttributeEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">AttributeEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">glassesEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GlassesEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for GlassesEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable GlassesEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">GlassesEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">overlapEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OverlapEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for OverlapEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable OverlapEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OverlapEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">childEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChildEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for ChildEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable ChildEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ChildEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">livenessIREstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LivenessIREstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for LivenessIREstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable LivenessIREstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LivenessIREstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">headAndShouldersLivenessEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HeadAndShouldersLivenessEstimatorSettings</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for HeadAndShouldersLivenessEstimator settings section.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mutable HeadAndShouldersLivenessEstimator section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">HeadAndShouldersLivenessEstimatorSettings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coreProvider</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyISettingsProvider</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coreSettingProvider</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

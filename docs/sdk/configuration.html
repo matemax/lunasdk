@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Configuration &#8212; lunavl v.0.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FaceEngine" href="faceengine.html" />
+    <link rel="prev" title="Modules" href="modules.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          lunavl</a>
+        <span class="navbar-text navbar-version pull-left"><b>v.0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sdk.html">LUNA SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Configuration</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="modules.html" title="Previous Chapter: Modules"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Modules</span>
+    </a>
+  </li>
+  <li>
+    <a href="faceengine.html" title="Next Chapter: FaceEngine"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">FaceEngine &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/sdk/configuration.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>All default settings is stored in configuration file <em>“faceengine.conf”</em>. Folder <em>“$FSDK_ROOT/data” contains this file.
+You can set up own *”faceengine.conf”</em> in a <em>VLFaceEngine</em> initialization. You can find a detailed information about
+settings in <em>“ConfigurationGuide.pdf”</em>.</p>
+<span class="target" id="module-lunavl.sdk.faceengine.setting_provider"></span><p>SDK configuration module.</p>
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">AttributeEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#AttributeEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attribute estimator settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>genderThreshold (float): gender threshold in [0..1] range</p></li>
+<li><p>adultThreshold (float): adult threshold in [0..1] range</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings.adultThreshold">
+<code class="descname">adultThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings.adultThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for adultThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>adultThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings.genderThreshold">
+<code class="descname">genderThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings.genderThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for genderThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>genderThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">BaseSettingsSection</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BaseSettingsSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for a section of settings.</p>
+<p>Proxy model to core settings provider.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection._coreSettingProvider">
+<code class="descname">_coreSettingProvider</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection._coreSettingProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>core settings provider</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>coreSettingProvider</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValue">
+<code class="descname">getValue</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BaseSettingsSection.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get setting value
+:param name: setting name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a value</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsFloat">
+<code class="descname">getValueAsFloat</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BaseSettingsSection.getValueAsFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsFloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get setting value as float
+:param name: setting name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a float</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsInt">
+<code class="descname">getValueAsInt</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BaseSettingsSection.getValueAsInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsInt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get setting value as int
+:param name: setting name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a int</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsString">
+<code class="descname">getValueAsString</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BaseSettingsSection.getValueAsString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.getValueAsString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get setting value as string
+:param name: setting name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a string</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.setValue">
+<code class="descname">setValue</code><span class="sig-paren">(</span><em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BaseSettingsSection.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BaseSettingsSection.setValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – setting name</p></li>
+<li><p><strong>value</strong> – new value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.BiDirectionEnum">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">BiDirectionEnum</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#BiDirectionEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.BiDirectionEnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bi direction enum.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">ChildEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#ChildEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>childThreshold settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>childThreshold (float):  if estimate value less than threshold object is a children.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings.childThreshold">
+<code class="descname">childThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings.childThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for childThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>childThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.CpuClass">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">CpuClass</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#CpuClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.CpuClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class of cpu by supported instructions</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">DescriptorFactorySettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#DescriptorFactorySettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptor factory settings.</p>
+<p>Properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>model (int): CNN face descriptor version.</p></li>
+<li><p>UseMobileNet (bool): mobile Net is faster but less accurate</p></li>
+<li><p>distance (Distance): distance between descriptors on matching. L1 faster,L2 make better precision.</p></li>
+<li><dl class="simple">
+<dt>descriptorCountWarningLevel (float): Threshold,that limits the ratio of created  descriptors to the amount,</dt><dd><p>defined by your liscence. Warning Level When the threshold is exceeded, FSDK prints the warning.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.descriptorCountWarningLevel">
+<code class="descname">descriptorCountWarningLevel</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.descriptorCountWarningLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for descriptorCountWarningLevel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>descriptorCountWarningLevel</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.distance">
+<code class="descname">distance</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>distance</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Distance" title="lunavl.sdk.faceengine.setting_provider.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.model">
+<code class="descname">model</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>model</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.useMobileNet">
+<code class="descname">useMobileNet</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings.useMobileNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for useMobileNet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>useMobileNet</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.DetectorType">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">DetectorType</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#DetectorType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DetectorType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detector types enum</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.DetectorType.FACE_DET_V1">
+<code class="descname">FACE_DET_V1</code><em class="property"> = 'FaceDetV1'</em><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DetectorType.FACE_DET_V1" title="Permalink to this definition">¶</a></dt>
+<dd><p>todo description</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.DetectorType.coreDetectorType">
+<code class="descname">coreDetectorType</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DetectorType.coreDetectorType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert  self to core detector type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ObjectDetectorClassType</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDetectorClassType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.DeviceClass">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">DeviceClass</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#DeviceClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.DeviceClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Device enum</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.Distance">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">Distance</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptor distance type enum.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">EyeEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#EyeEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Eyes estimator settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>useStatusPlan (bool): use  status plan or not.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings.useStatusPlan">
+<code class="descname">useStatusPlan</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings.useStatusPlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for useStatusPlan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>useStatusPlan</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">FaceDetV12Settings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#FaceDetV12Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common class for FaceDetV1 and FaceDetV2 detector settings.</p>
+<p>Properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>firstThreshold (float): 1-st threshold in [0..1] range;</p></li>
+<li><p>secondThreshold (float): 2-st threshold in [0..1] range;</p></li>
+<li><p>thirdTThreshold (float): 3-st threshold in [0..1] range;</p></li>
+<li><p>minSize (int): minimum face size in pixels;</p></li>
+<li><p>scaleFactor (float): image scale factor;</p></li>
+<li><p>paddings (Point4): paddings;</p></li>
+<li><p>redetectTolerance (float): redetect tolerance;</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.firstThreshold">
+<code class="descname">firstThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.firstThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for firstThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>float in [0..1] range</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.minSize">
+<code class="descname">minSize</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.minSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for minSize</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>minSize</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.paddings">
+<code class="descname">paddings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.paddings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for paddings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>paddings</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point4" title="lunavl.sdk.faceengine.setting_provider.Point4"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point4</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.redetectTolerance">
+<code class="descname">redetectTolerance</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.redetectTolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for redetectTolerance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>redetectTolerance</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.scaleFactor">
+<code class="descname">scaleFactor</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.scaleFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for scaleFactor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>scaleFactor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.secondThreshold">
+<code class="descname">secondThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.secondThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for secondThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>secondThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.thirdThreshold">
+<code class="descname">thirdThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV12Settings.thirdThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for thirdThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>thirdThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV1Settings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">FaceDetV1Settings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#FaceDetV1Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV1Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>FaceDetV1 settings.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV2Settings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">FaceDetV2Settings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#FaceDetV2Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV2Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>FaceDetV2 settings.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">FaceDetV3Settings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#FaceDetV3Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>FaceDetV3 detector settings.</p>
+<p>Properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>scoreThreshold (float): detection threshold in [0..1] range;</p></li>
+<li><p>redetectScoreThreshold (float): redetect face threshold in [0..1] range;</p></li>
+<li><p>NMSThreshold (float): overlap threshold for NMS [0..1] range;</p></li>
+<li><p>imageSize (int): Target image size for down scaling by load side;</p></li>
+<li><p>nms (NMS): type of NMS: mean or best;</p></li>
+<li><p>redetectTensorSize (int): target face after preprocessing for redetect;</p></li>
+<li><p>redetectFaceTargetSize (int): target face size for redetect;</p></li>
+<li><p>paddings (Point4): paddings;</p></li>
+<li><p>paddingsIR (Point4): paddingsIR;</p></li>
+<li><p>planPrefix (str): planPrefix;</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.NMSThreshold">
+<code class="descname">NMSThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.NMSThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for NMSThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>NMSThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.imageSize">
+<code class="descname">imageSize</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.imageSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for imageSize</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>imageSize</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.nms">
+<code class="descname">nms</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.nms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for nms</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>nms</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.NMS" title="lunavl.sdk.faceengine.setting_provider.NMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">NMS</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.paddings">
+<code class="descname">paddings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.paddings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for paddings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>paddings</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point4" title="lunavl.sdk.faceengine.setting_provider.Point4"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point4</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.paddingsIR">
+<code class="descname">paddingsIR</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.paddingsIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for paddingsIR</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>paddingsIR</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point4" title="lunavl.sdk.faceengine.setting_provider.Point4"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point4</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.planPrefix">
+<code class="descname">planPrefix</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.planPrefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for planPrefix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>planPrefix</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.redetectFaceTargetSize">
+<code class="descname">redetectFaceTargetSize</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.redetectFaceTargetSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for redetectFaceTargetSize</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>redetectFaceTargetSize</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.redetectScoreThreshold">
+<code class="descname">redetectScoreThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.redetectScoreThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for redetectScoreThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>redetectScoreThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.redetectTensorSize">
+<code class="descname">redetectTensorSize</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.redetectTensorSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for redetectTensorSize</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>redetectTensorSize</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.scoreThreshold">
+<code class="descname">scoreThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings.scoreThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for scoreThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>scoreThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.FlowerSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">FlowerSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#FlowerSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FlowerSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flower library is the default neural network inference engine.
+The library is used for:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>face detectors;</p></li>
+<li><p>estimators(attributes, quality);</p></li>
+<li><p>face descriptors</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Properties:</dt><dd><p>deviceClass (DeviceClass):  execution device type cpu, gpu.
+numThreads (int): number of worker threads.
+verboseLogging (VerboseLogging): level of verbose logging
+numComputeStreams (int):  increases performance, but works only with new versions of nvidia drivers</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FlowerSettings.numComputeStreams">
+<code class="descname">numComputeStreams</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FlowerSettings.numComputeStreams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for numComputeStreams</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numComputeStreams</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FlowerSettings.numThreads">
+<code class="descname">numThreads</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FlowerSettings.numThreads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for numThreads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numThreads</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.FlowerSettings.verboseLogging">
+<code class="descname">verboseLogging</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.FlowerSettings.verboseLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for verboseLogging</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>verboseLogging</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.VerboseLogging" title="lunavl.sdk.faceengine.setting_provider.VerboseLogging"><code class="xref py py-class docutils literal notranslate"><span class="pre">VerboseLogging</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">GlassesEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#GlassesEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Glasses estimator settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>noGlassesThreshold (float): no glasses threshold in [0..1] range</p></li>
+<li><p>eyeGlassesThreshold (float): eye glasses threshold in [0..1] range</p></li>
+<li><p>sunGlassesThreshold (float): sun glasses threshold in [0..1] range</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings.eyeGlassesThreshold">
+<code class="descname">eyeGlassesThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings.eyeGlassesThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for eyeGlassesThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>eyeGlassesThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings.noGlassesThreshold">
+<code class="descname">noGlassesThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings.noGlassesThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for noGlassesThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>noGlassesThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings.sunGlassesThreshold">
+<code class="descname">sunGlassesThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings.sunGlassesThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for sunGlassesThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sunGlassesThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">HeadAndShouldersLivenessEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#HeadAndShouldersLivenessEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>HeadAndShouldersLiveness settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>shouldersHeightKoeff (float): shouldersHeightKoeff</p></li>
+<li><p>shouldersWidthKoeff (float): shouldersWidthKoeff</p></li>
+<li><p>headWidthKoeff (float): headWidthKoeff</p></li>
+<li><p>headHeightKoeff (float): headHeightKoeff</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.headHeightKoeff">
+<code class="descname">headHeightKoeff</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.headHeightKoeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for betaMode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>betaMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.headWidthKoeff">
+<code class="descname">headWidthKoeff</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.headWidthKoeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for betaMode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>betaMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.shouldersHeightKoeff">
+<code class="descname">shouldersHeightKoeff</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.shouldersHeightKoeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for betaMode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>betaMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.shouldersWidthKoeff">
+<code class="descname">shouldersWidthKoeff</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings.shouldersWidthKoeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for betaMode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>betaMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">HeadPoseEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#HeadPoseEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Head pose estimator settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>useEstimationByImage (bool): use head pose estimation by image</p></li>
+<li><p>useEstimationByLandmarks (bool): use head pose estimation by landmarks</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings.useEstimationByImage">
+<code class="descname">useEstimationByImage</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings.useEstimationByImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for useEstimationByImage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>useEstimationByImage</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings.useEstimationByLandmarks">
+<code class="descname">useEstimationByLandmarks</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings.useEstimationByLandmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for useEstimationByLandmarks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>useEstimationByLandmarks</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetBaseSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">LNetBaseSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#LNetBaseSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetBaseSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for configuration LNet neural network.</p>
+<p>Properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>planName (str): plan name</p></li>
+<li><p>size (int): size</p></li>
+<li><p>mean (Point3): mean</p></li>
+<li><p>sigma (Point3): sigma</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.mean">
+<code class="descname">mean</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for mean</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mean</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point3" title="lunavl.sdk.faceengine.setting_provider.Point3"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point3</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.planName">
+<code class="descname">planName</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.planName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for planName</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>planName</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.sigma">
+<code class="descname">sigma</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for sigma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sigma</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point3" title="lunavl.sdk.faceengine.setting_provider.Point3"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point3</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.size">
+<code class="descname">size</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetBaseSettings.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>size</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetIRSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">LNetIRSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#LNetIRSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetIRSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>LNetIR configuration section</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.LNetSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">LNetSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#LNetSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LNetSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>LNet configuration section</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">LivenessIREstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#LivenessIREstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>LivenessIREstimator settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>cooperativeMode (bool): whether liveness is checking in cooperative mode</p></li>
+<li><p>irCooperativeThreshold (float): liveness threshold for cooperative mode in [0..1] range</p></li>
+<li><p>irNonCooperativeThreshold (float): liveness threshold for non cooperative mode in [0..1] range</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings.cooperativeMode">
+<code class="descname">cooperativeMode</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings.cooperativeMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for cooperativeMode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>cooperativeMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings.irCooperativeThreshold">
+<code class="descname">irCooperativeThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings.irCooperativeThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for irCooperativeThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>irCooperativeThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings.irNonCooperativeThreshold">
+<code class="descname">irNonCooperativeThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings.irNonCooperativeThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for irNonCooperativeThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>irNonCooperativeThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.NMS">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">NMS</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#NMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.NMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>NMS type enum.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">OverlapEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#OverlapEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>OverlapThreshold any object settings section.</p>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>overlapThreshold (float): overlap threshold for any object in [0..1] range</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings.overlapThreshold">
+<code class="descname">overlapThreshold</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings.overlapThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for overlapThreshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>overlapThreshold</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point2">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">Point2</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Point2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Point in 2-dimensional space.
+.. attribute:: x</p>
+<blockquote>
+<div><p>x coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point2.y">
+<code class="descname">y</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point2.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point2.asTuple">
+<code class="descname">asTuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Point2.asTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point2.asTuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert point to tuple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple from coordinate</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point3">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">Point3</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Point3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Point in 3-dimensional space.
+.. attribute:: x</p>
+<blockquote>
+<div><p>x coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point3.y">
+<code class="descname">y</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point3.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point3.z">
+<code class="descname">z</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point3.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>z coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point3.asTuple">
+<code class="descname">asTuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Point3.asTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point3.asTuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert point to tuple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple from coordinate</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point4">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">Point4</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Point4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Point in 4-dimensional space.
+.. attribute:: x</p>
+<blockquote>
+<div><p>x coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point4.y">
+<code class="descname">y</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point4.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point4.z">
+<code class="descname">z</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point4.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>z coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point4.w">
+<code class="descname">w</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point4.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>w coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lunavl.sdk.faceengine.setting_provider.Point4.asTuple">
+<code class="descname">asTuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#Point4.asTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.Point4.asTuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert point to tuple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple from coordinate</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">QualityEstimatorSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#QualityEstimatorSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quality estimator settings section.</p>
+<p>Properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>size (int): size</p></li>
+<li><p>expLight (Point3): expLight</p></li>
+<li><p>expDark (Point3): expDark</p></li>
+<li><p>expBlur (Point3):  expBlur</p></li>
+<li><p>logGray (Point4): logGray</p></li>
+<li><p>platt (Point2): coefficient platt</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.expBlur">
+<code class="descname">expBlur</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.expBlur" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for expBlur</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>expBlur</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point3" title="lunavl.sdk.faceengine.setting_provider.Point3"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point3</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.expDark">
+<code class="descname">expDark</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.expDark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for expDark</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>expDark</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point3" title="lunavl.sdk.faceengine.setting_provider.Point3"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point3</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.expLight">
+<code class="descname">expLight</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.expLight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for expLight</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>expLight</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point3" title="lunavl.sdk.faceengine.setting_provider.Point3"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point3</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.logGray">
+<code class="descname">logGray</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.logGray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for logGray</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>logGray</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point4" title="lunavl.sdk.faceengine.setting_provider.Point4"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point4</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.platt">
+<code class="descname">platt</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.platt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for platt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>platt</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.Point2" title="lunavl.sdk.faceengine.setting_provider.Point2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point2</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.size">
+<code class="descname">size</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>size</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.SLNetSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">SLNetSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#SLNetSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SLNetSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>SLNet configuration section</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">SettingsProvider</code><span class="sig-paren">(</span><em>pathToConfig=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#SettingsProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>SDK Setting provider.</p>
+<p>Proxy model.</p>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.pathToConfig">
+<code class="descname">pathToConfig</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.pathToConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>path to a configuration file. Config file is getting from
+the folder’data’  in “FSDK_ROOT”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider._coreSettingProvider">
+<code class="descname">_coreSettingProvider</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider._coreSettingProvider" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.LNetIRSettings">
+<code class="descname">LNetIRSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.LNetIRSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for LNetIR settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable LNetIR section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.LNetIRSettings" title="lunavl.sdk.faceengine.setting_provider.LNetIRSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">LNetIRSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.LNetSettings">
+<code class="descname">LNetSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.LNetSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for LNet settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable LNet section</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.SLNetSettings">
+<code class="descname">SLNetSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.SLNetSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for SLNet settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable SLNet section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.SLNetSettings" title="lunavl.sdk.faceengine.setting_provider.SLNetSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">SLNetSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.attributeEstimatorSettings">
+<code class="descname">attributeEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.attributeEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for AttributeEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable AttributeEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.AttributeEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.childEstimatorSettings">
+<code class="descname">childEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.childEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for ChildEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable ChildEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.ChildEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChildEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.descriptorFactorySettings">
+<code class="descname">descriptorFactorySettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.descriptorFactorySettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for descriptor factory settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable descriptor factory section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings" title="lunavl.sdk.faceengine.setting_provider.DescriptorFactorySettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">DescriptorFactorySettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.eyeEstimatorSettings">
+<code class="descname">eyeEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.eyeEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for EyeEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable EyeEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.EyeEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">EyeEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.faceDetV1Settings">
+<code class="descname">faceDetV1Settings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.faceDetV1Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for FaceDetV1 settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable FaceDetV1 section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV1Settings" title="lunavl.sdk.faceengine.setting_provider.FaceDetV1Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDetV1Settings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.faceDetV2Settings">
+<code class="descname">faceDetV2Settings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.faceDetV2Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for FaceDetV2 settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable FaceDetV2 section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV2Settings" title="lunavl.sdk.faceengine.setting_provider.FaceDetV2Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDetV2Settings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.faceDetV3Settings">
+<code class="descname">faceDetV3Settings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.faceDetV3Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for FaceDetV3 settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable FaceDetV3 section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings" title="lunavl.sdk.faceengine.setting_provider.FaceDetV3Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">FaceDetV3Settings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.flowerSettings">
+<code class="descname">flowerSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.flowerSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for flower settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable flower section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.FlowerSettings" title="lunavl.sdk.faceengine.setting_provider.FlowerSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">FlowerSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.glassesEstimatorSettings">
+<code class="descname">glassesEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.glassesEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for GlassesEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable GlassesEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.GlassesEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">GlassesEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.headAndShouldersLivenessEstimatorSettings">
+<code class="descname">headAndShouldersLivenessEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.headAndShouldersLivenessEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for HeadAndShouldersLivenessEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable HeadAndShouldersLivenessEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.HeadAndShouldersLivenessEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeadAndShouldersLivenessEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.headPoseEstimatorSettings">
+<code class="descname">headPoseEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.headPoseEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for HeadPoseEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable HeadPoseEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.HeadPoseEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeadPoseEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.livenessIREstimatorSettings">
+<code class="descname">livenessIREstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.livenessIREstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for LivenessIREstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable LivenessIREstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.LivenessIREstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">LivenessIREstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.overlapEstimatorSettings">
+<code class="descname">overlapEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.overlapEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for OverlapEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable OverlapEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.OverlapEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverlapEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.qualityEstimatorSettings">
+<code class="descname">qualityEstimatorSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.qualityEstimatorSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for QualityEstimator settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable QualityEstimator section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings" title="lunavl.sdk.faceengine.setting_provider.QualityEstimatorSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">QualityEstimatorSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SettingsProvider.systemSettings">
+<code class="descname">systemSettings</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SettingsProvider.systemSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for system settings section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mutable system section</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.SystemSettings" title="lunavl.sdk.faceengine.setting_provider.SystemSettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">SystemSettings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.SystemSettings">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">SystemSettings</code><span class="sig-paren">(</span><em>coreSettingProvider</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#SystemSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SystemSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common system settings.</p>
+<p>Properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>cpuClass (CpuClass): class of cpu by supported instructions</p></li>
+<li><p>verboseLogging (VerboseLogging): Level of log versobing</p></li>
+<li><p>betaMode (bool): enable experimental features.</p></li>
+<li><p>defaultDetectorType (DetectorType): default detector type</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SystemSettings.betaMode">
+<code class="descname">betaMode</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SystemSettings.betaMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for betaMode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>betaMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SystemSettings.cpuClass">
+<code class="descname">cpuClass</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SystemSettings.cpuClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for cpuClass</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>cpuClass</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.CpuClass" title="lunavl.sdk.faceengine.setting_provider.CpuClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">CpuClass</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SystemSettings.defaultDetectorType">
+<code class="descname">defaultDetectorType</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SystemSettings.defaultDetectorType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for defaultDetectorType</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>betaMode</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.DetectorType" title="lunavl.sdk.faceengine.setting_provider.DetectorType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DetectorType</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lunavl.sdk.faceengine.setting_provider.SystemSettings.verboseLogging">
+<code class="descname">verboseLogging</code><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.SystemSettings.verboseLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for verboseLogging</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>verboseLogging</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lunavl.sdk.faceengine.setting_provider.VerboseLogging" title="lunavl.sdk.faceengine.setting_provider.VerboseLogging"><code class="xref py py-class docutils literal notranslate"><span class="pre">VerboseLogging</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lunavl.sdk.faceengine.setting_provider.VerboseLogging">
+<em class="property">class </em><code class="descclassname">lunavl.sdk.faceengine.setting_provider.</code><code class="descname">VerboseLogging</code><a class="reference internal" href="../_modules/lunavl/sdk/faceengine/setting_provider.html#VerboseLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lunavl.sdk.faceengine.setting_provider.VerboseLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Level of log versobing enum</p>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, matemax.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
