@@ -25,7 +25,7 @@ class Size(Generic[COORDINATE_TYPE]):
         height (CoordinateType): height
     """
 
-    __slots__ = ["width", "height"]
+    __slots__ = ("width", "height")
 
     def __init__(self, width: COORDINATE_TYPE, height: COORDINATE_TYPE):
         """
