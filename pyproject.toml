@@ -14,3 +14,8 @@ sphinx = ">=2.0.0"
 pytest = ">=4.4"
 pytest-subtests = "*"
 sphinx-autodoc-typehints = "*"
+pip install pre-commit = "*"
+
+[tool.black]
+line-length = 120
+target-version = ['py37', 'py36']
