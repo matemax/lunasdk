@@ -15,34 +15,36 @@ class ImageFormat(Enum):
     """
     Enum for image format
     """
+
     #: jpg
-    JPG = 'jpg'
+    JPG = "jpg"
     #: png
-    PNG = 'png'
+    PNG = "png"
     #: ppm
-    PPM = 'ppm'
+    PPM = "ppm"
     #: tif
-    TIF = 'tif'
+    TIF = "tif"
 
 
 class ColorFormat(Enum):
     """
     Enum for vl luna color formats
     """
+
     #: 3 channel, 8 bit per channel, B-G-R color order format;
-    B8G8R8 = 'B8G8R8'
+    B8G8R8 = "B8G8R8"
     #: 3 channel, 8 bit per channel, B-G-R color order format with 8 bit padding before next pixel;
-    B8G8R8X8 = 'B8G8R8X8'
+    B8G8R8X8 = "B8G8R8X8"
     #: 1 channel, 8 bit per channel format;
-    R16 = 'R16'
+    R16 = "R16"
     #: 1 channel, 8 bit per channel format;
-    R8 = 'R8'
+    R8 = "R8"
     #: 3 channel, 8 bit per channel, R-G-B color order format;
-    R8G8B8 = 'R8G8B8'
+    R8G8B8 = "R8G8B8"
     #: 3 channel, 8 bit per channel, R-G-B color order format with 8 bit padding before next pixel;
-    R8G8B8X8 = 'R8G8B8X8'
+    R8G8B8X8 = "R8G8B8X8"
     #: unknown format
-    Unknown = 'Unknown'
+    Unknown = "Unknown"
 
     @property
     def coreFormat(self) -> FormatType:
@@ -55,7 +57,7 @@ class ColorFormat(Enum):
         return getattr(FormatType, self.value)
 
     @staticmethod
-    def convertCoreFormat(imageFormat: FormatType) -> 'ColorFormat':
+    def convertCoreFormat(imageFormat: FormatType) -> "ColorFormat":
         """
         Convert FormatType to Format
 
@@ -78,10 +80,12 @@ class VLImage:
         source (str): source of image (todo change)
         filename (str): filename of the file which is source of image
     """
+
     __slots__ = ("coreImage", "source", "filename")
 
-    def __init__(self, body: Union[bytes, ndarray, CoreImage], imgFormat: Optional[ColorFormat] = None,
-                 filename: str = ""):
+    def __init__(
+        self, body: Union[bytes, ndarray, CoreImage], imgFormat: Optional[ColorFormat] = None, filename: str = ""
+    ):
         """
         Init.
 
@@ -111,8 +115,9 @@ class VLImage:
         self.filename = filename
 
     @classmethod
-    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None,
-             imgFormat: Optional[ColorFormat] = None) -> 'VLImage':
+    def load(
+        cls, *_, filename: Optional[str] = None, url: Optional[str] = None, imgFormat: Optional[ColorFormat] = None
+    ) -> "VLImage":
 
         """
         Load imag from numpy array or file or url.

@@ -17,6 +17,7 @@ class Emotion(Enum):
     """
     Emotions enum
     """
+
     #: Anger
     Anger = 1
     #: Disgust
@@ -33,7 +34,7 @@ class Emotion(Enum):
     Surprise = 7
 
     @staticmethod
-    def fromCoreEmotion(coreEmotion: CoreEmotions) -> 'Emotion':
+    def fromCoreEmotion(coreEmotion: CoreEmotions) -> "Emotion":
         """
         Get enum element by core emotion.
 
@@ -82,16 +83,18 @@ class Emotions(BaseEstimation):
         Returns:
             dict with keys 'predominate_emotion' and 'estimations'
         """
-        return {'predominant_emotion': self.predominateEmotion.name.lower(),
-                'estimations': {
-                    'anger': self.anger,
-                    'disgust': self.disgust,
-                    'fear': self.fear,
-                    'happiness': self.happiness,
-                    'sadness': self.sadness,
-                    'surprise': self.surprise,
-                    'neutral': self.neutral,
-                }}
+        return {
+            "predominant_emotion": self.predominateEmotion.name.lower(),
+            "estimations": {
+                "anger": self.anger,
+                "disgust": self.disgust,
+                "fear": self.fear,
+                "happiness": self.happiness,
+                "sadness": self.sadness,
+                "surprise": self.surprise,
+                "neutral": self.neutral,
+            },
+        }
 
     @property
     def anger(self) -> float:

@@ -12,6 +12,7 @@ class BaseEstimation(ABC):
     Attributes:
         _coreEstimation: core estimation
     """
+
     __slots__ = ("_coreEstimation",)
 
     def __init__(self, coreEstimation):
@@ -54,7 +55,8 @@ class BaseEstimator(ABC):
     Attributes:
         _coreEstimator: core estimator
     """
-    __slots__ = ('_coreEstimator',)
+
+    __slots__ = ("_coreEstimator",)
 
     def __init__(self, coreEstimator):
         """

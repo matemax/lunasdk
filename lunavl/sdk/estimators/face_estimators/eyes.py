@@ -11,7 +11,7 @@ from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint
 from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
-from FaceEngine import EyeAngles, GazeEstimation as CoreGazeEstimation   # pylint: disable=E0611,E0401
+from FaceEngine import EyeAngles, GazeEstimation as CoreGazeEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
 
@@ -27,6 +27,7 @@ class EyeState(Enum):
     """
     Enum for eye states.
     """
+
     #: eye is opened
     Open = 1
     #: eye is occluded
@@ -35,7 +36,7 @@ class EyeState(Enum):
     Closed = 3
 
     @staticmethod
-    def fromCoreEmotion(coreEyeState: CoreEyeState) -> 'EyeState':
+    def fromCoreEmotion(coreEyeState: CoreEyeState) -> "EyeState":
         """
         Get enum element by core emotion.
 
@@ -89,6 +90,7 @@ class Eye(BaseEstimation):
         - eyelid
         - iris
     """
+
     __slots__ = ("irisLandmarks", "eyelidLandMarks", "state")
 
     #  pylint: disable=W0235
@@ -132,9 +134,11 @@ class Eye(BaseEstimation):
             {"iris_landmarks": self.irisLandmarks.asDict(), "eyelid_landmarks": self.eyelidLandMarks.asDict(),
              "state": self.state.name.lower()}
         """
-        return {"iris_landmarks": self.irisLandmarks.asDict(),
-                "eyelid_landmarks": self.eyelidLandMarks.asDict(),
-                "state": self.state.name.lower()}
+        return {
+            "iris_landmarks": self.irisLandmarks.asDict(),
+            "eyelid_landmarks": self.eyelidLandMarks.asDict(),
+            "state": self.state.name.lower(),
+        }
 
 
 class EyesEstimation(BaseEstimation):
@@ -145,6 +149,7 @@ class EyesEstimation(BaseEstimation):
         leftEye (Eye): estimation for left eye
         rightEye (Eye): estimation for right eye
     """
+
     __slots__ = ("leftEye", "rightEye")
 
     def __init__(self, coreEstimation: CoreEyesEstimation):
@@ -165,8 +170,7 @@ class EyesEstimation(BaseEstimation):
         Returns:
             {'yaw': self.leftEye, 'pitch': self.rightEye}
         """
-        return {"left_eye": self.leftEye.asDict(),
-                "right_eye": self.rightEye.asDict()}
+        return {"left_eye": self.leftEye.asDict(), "right_eye": self.rightEye.asDict()}
 
 
 class EyeEstimator(BaseEstimator):
@@ -186,8 +190,9 @@ class EyeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
-    def estimate(self, transformedLandmarks: Union[Landmarks5, Landmarks68],
-                 warp: Union[Warp, WarpedImage]) -> EyesEstimation:
+    def estimate(
+        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
+    ) -> EyesEstimation:
         """
         Estimate mouth state on warp.
 
@@ -202,11 +207,9 @@ class EyeEstimator(BaseEstimator):
         """
         cropper = EyeCropper()
         if isinstance(transformedLandmarks, Landmarks5):
-            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage,
-                                                transformedLandmarks.coreEstimation)
+            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
         else:
-            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage,
-                                                 transformedLandmarks.coreEstimation)
+            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
         error, eyesEstimation = self._coreEstimator.estimate(warp.warpedImage.coreImage, eyeRects)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -256,7 +259,7 @@ class GazeDirection(BaseEstimation):
         Returns:
             {'yaw': self.yaw, 'pitch': self.pitch}
         """
-        return {'yaw': self.yaw, 'pitch': self.pitch}
+        return {"yaw": self.yaw, "pitch": self.pitch}
 
 
 class GazeEstimation(BaseEstimation):
@@ -267,6 +270,7 @@ class GazeEstimation(BaseEstimation):
         leftEye (GazeDirection): left eye gaze direction
         rightEye (GazeDirection): right eye gaze direction
     """
+
     __slots__ = ("leftEye", "rightEye")
 
     def __init__(self, coreEstimation: CoreGazeEstimation):

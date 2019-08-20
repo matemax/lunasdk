@@ -11,7 +11,7 @@ def estimateAll():
     Estimate all attributes
     """
     detector = VLFaceDetector()
-    image = VLImage.load( filename='C:/temp/test.jpg')
+    image = VLImage.load(filename="C:/temp/test.jpg")
     detection = detector.detectOne(image)
     pprint.pprint(detection.basicAttributes.asDict())
     pprint.pprint(detection.emotions.asDict())

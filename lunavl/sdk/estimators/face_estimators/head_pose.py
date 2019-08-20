@@ -18,12 +18,13 @@ class FrontalType(Enum):
     """
     Enum for frontal types
     """
+
     TURNED = "FrontalFace0"  #: Non-frontal face
     FRONTAL = "FrontalFace1"  #: Good for recognition; Doesn't descrease recall and looks fine
     BY_GOST = "FrontalFace2"  #: GOST/ISO angles
 
     @classmethod
-    def fromCoreFrontalType(cls, frontalFaceType: FrontalFaceType) -> 'FrontalType':
+    def fromCoreFrontalType(cls, frontalFaceType: FrontalFaceType) -> "FrontalType":
         """
         Create frontal type by core frontal type
 
@@ -114,6 +115,7 @@ class HeadPoseEstimator(BaseEstimator):
     """
     HeadPoseEstimator.
     """
+
     #  pylint: disable=W0235
     def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
         """

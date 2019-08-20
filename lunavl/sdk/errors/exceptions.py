@@ -42,5 +42,7 @@ def CoreExceptionWarp(error: ErrorInfo):
                 return res
             except RuntimeError as e:
                 raise LunaSDKException(error.detalize(str(e)), exception=e)
+
         return wrap
+
     return realWarp

@@ -12,7 +12,7 @@ def estimateEyes():
     """
     Estimate emotion from a warped image.
     """
-    image = VLImage.load(filename='C:/temp/test.jpg')
+    image = VLImage.load(filename="C:/temp/test.jpg")
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)

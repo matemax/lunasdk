@@ -16,7 +16,7 @@ class BiDirectionEnum(Enum):
     """
 
     @classmethod
-    def getEnum(cls, enumValue) -> 'BiDirectionEnum':
+    def getEnum(cls, enumValue) -> "BiDirectionEnum":
         """
         Get enum by value.
 
@@ -36,6 +36,7 @@ class BiDirectionEnum(Enum):
 
 class CpuClass(Enum):
     """Class of cpu by supported instructions"""
+
     auto = "auto"
     sse4 = "sse4"
     avx = "avx"
@@ -47,6 +48,7 @@ class VerboseLogging(BiDirectionEnum):
     """
     Level of log versobing enum
     """
+
     error = 0
     warnings = 1
     info = 2
@@ -57,6 +59,7 @@ class DeviceClass(Enum):
     """
     Device enum
     """
+
     cpu = "cpu"
     gpu = "gpu"
 
@@ -65,6 +68,7 @@ class Distance(BiDirectionEnum):
     """
     Descriptor distance type enum.
     """
+
     l1 = "L1"
     l2 = "L2"
 
@@ -73,6 +77,7 @@ class NMS(Enum):
     """
     NMS type enum.
     """
+
     mean = "mean"
     best = "best"
 
@@ -153,6 +158,7 @@ class DetectorType(Enum):
     """
     Detector types enum
     """
+
     FACE_DET_DEFAULT = "Default"
     FACE_DET_V1 = "FaceDetV1"  #: todo description
     FACE_DET_V2 = "FaceDetV2"
@@ -166,10 +172,12 @@ class DetectorType(Enum):
         Returns:
             ObjectDetectorClassType
         """
-        mapEnumToCoreEnum = {"Default": "FACE_DET_DEFAULT",
-                             "FaceDetV1": "FACE_DET_V1",
-                             "FaceDetV2": "FACE_DET_V2",
-                             "FaceDetV3": "FACE_DET_V3"}
+        mapEnumToCoreEnum = {
+            "Default": "FACE_DET_DEFAULT",
+            "FaceDetV1": "FACE_DET_V1",
+            "FaceDetV2": "FACE_DET_V2",
+            "FaceDetV3": "FACE_DET_V3",
+        }
         return getattr(ObjectDetectorClassType, mapEnumToCoreEnum[self.value])
 
 
@@ -182,6 +190,7 @@ class BaseSettingsSection:
     Attributes:
         _coreSettingProvider (coreSettingProvider): core settings provider
     """
+
     # (str): section name
     sectionName: str
 
@@ -196,8 +205,7 @@ class BaseSettingsSection:
             name: setting name
             value: new value
         """
-        self._coreSettingProvider.setValue(self.__class__.sectionName, name,
-                                           CoreFE.SettingsProviderValue(value))
+        self._coreSettingProvider.setValue(self.__class__.sectionName, name, CoreFE.SettingsProviderValue(value))
 
     def getValue(self, name: str) -> Any:
         """
@@ -255,6 +263,7 @@ class SystemSettings(BaseSettingsSection):
         - betaMode (bool): enable experimental features.
         - defaultDetectorType (DetectorType): default detector type
     """
+
     sectionName = "system"
 
     @property
@@ -353,6 +362,7 @@ class FlowerSettings(BaseSettingsSection):
         verboseLogging (VerboseLogging): level of verbose logging
         numComputeStreams (int):  increases performance, but works only with new versions of nvidia drivers
     """
+
     sectionName = "flower"
 
     @property
@@ -439,6 +449,7 @@ class DescriptorFactorySettings(BaseSettingsSection):
             defined by your liscence. Warning Level When the threshold is exceeded, FSDK prints the warning.
 
     """
+
     sectionName = "DescriptorFactory::Settings"
 
     @property
@@ -535,6 +546,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         - paddingsIR (Point4): paddingsIR;
         - planPrefix (str): planPrefix;
     """
+
     sectionName = "FaceDetV3::Settings"
 
     @property
@@ -881,6 +893,7 @@ class FaceDetV1Settings(FaceDetV12Settings):
     """
     FaceDetV1 settings.
     """
+
     sectionName = "FaceDetV1::Settings"
 
 
@@ -888,6 +901,7 @@ class FaceDetV2Settings(FaceDetV12Settings):
     """
     FaceDetV2 settings.
     """
+
     sectionName = "FaceDetV2::Settings"
 
 
@@ -984,16 +998,19 @@ class LNetBaseSettings(BaseSettingsSection):
 
 class LNetSettings(LNetBaseSettings):
     """LNet configuration section"""
+
     sectionName = "LNet::Settings"
 
 
 class LNetIRSettings(LNetBaseSettings):
     """LNetIR configuration section"""
+
     sectionName = "LNetIR::Settings"
 
 
 class SLNetSettings(LNetBaseSettings):
     """SLNet configuration section"""
+
     sectionName = "SLNet::Settings"
 
 
@@ -1010,6 +1027,7 @@ class QualityEstimatorSettings(BaseSettingsSection):
         - logGray (Point4): logGray
         - platt (Point2): coefficient platt
     """
+
     sectionName = "QualityEstimator::Settings"
 
     @property
@@ -1135,6 +1153,7 @@ class HeadPoseEstimatorSettings(BaseSettingsSection):
         - useEstimationByImage (bool): use head pose estimation by image
         - useEstimationByLandmarks (bool): use head pose estimation by landmarks
     """
+
     sectionName = "HeadPoseEstimator::Settings"
 
     @property
@@ -1183,6 +1202,7 @@ class EyeEstimatorSettings(BaseSettingsSection):
     Properties:
         - useStatusPlan (bool): use  status plan or not.
     """
+
     sectionName = "EyeEstimator::Settings"
 
     @property
@@ -1332,6 +1352,7 @@ class OverlapEstimatorSettings(BaseSettingsSection):
     Properties:
         - overlapThreshold (float): overlap threshold for any object in [0..1] range
     """
+
     sectionName = "OverlapEstimator::Settings"
 
     @property
@@ -1361,6 +1382,7 @@ class ChildEstimatorSettings(BaseSettingsSection):
     Properties:
         - childThreshold (float):  if estimate value less than threshold object is a children.
     """
+
     sectionName = "ChildEstimator::Settings"
 
     @property
@@ -1392,6 +1414,7 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         - irCooperativeThreshold (float): liveness threshold for cooperative mode in [0..1] range
         - irNonCooperativeThreshold (float): liveness threshold for non cooperative mode in [0..1] range
     """
+
     sectionName = "LivenessIREstimator::Settings"
 
     @property
@@ -1462,6 +1485,7 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         - headWidthKoeff (float): headWidthKoeff
         - headHeightKoeff (float): headHeightKoeff
     """
+
     sectionName = "HeadAndShouldersLivenessEstimator::Settings"
 
     @property
@@ -1566,8 +1590,10 @@ class SettingsProvider:
             if "FSDK_ROOT" in os.environ:
                 self.pathToConfig = Path(os.environ["FSDK_ROOT"]).joinpath("data", "faceengine.conf")
             else:
-                raise ValueError("Failed on path to faceengine luna data folder, set variable pathToData or set"
-                                 "environment variable *FSDK_ROOT*")
+                raise ValueError(
+                    "Failed on path to faceengine luna data folder, set variable pathToData or set"
+                    "environment variable *FSDK_ROOT*"
+                )
         elif isinstance(pathToConfig, str):
             self.pathToConfig = Path(pathToConfig)
         else:

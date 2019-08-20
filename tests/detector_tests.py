@@ -3,8 +3,14 @@ from collections import namedtuple
 
 import pytest
 
-from lunavl.sdk.faceengine.facedetector import DetectorType, FaceDetector, Landmarks5, Landmarks68, FaceDetection, \
-    ImageForDetection
+from lunavl.sdk.faceengine.facedetector import (
+    DetectorType,
+    FaceDetector,
+    Landmarks5,
+    Landmarks68,
+    FaceDetection,
+    ImageForDetection,
+)
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -15,6 +21,7 @@ class TestDetector(BaseTestClass):
     """
     Test of detector.
     """
+
     detector: FaceDetector = None
 
     @classmethod
@@ -33,8 +40,11 @@ class TestDetector(BaseTestClass):
 
         Case = namedtuple("Case", ("type", "score"))
 
-        cases = [Case(DetectorType.FACE_DET_V1, 0.9983), Case(DetectorType.FACE_DET_V2, 0.9913),
-                 Case(DetectorType.FACE_DET_V3, 0.9999)]
+        cases = [
+            Case(DetectorType.FACE_DET_V1, 0.9983),
+            Case(DetectorType.FACE_DET_V2, 0.9913),
+            Case(DetectorType.FACE_DET_V3, 0.9999),
+        ]
 
         for case in cases:
             with self.subTest(detectorType=case.type):
@@ -63,22 +73,27 @@ class TestDetector(BaseTestClass):
         image = VLImage.load(filename=ONE_FACE)
 
         Case = namedtuple("Case", ("detect5Landmarks", "detect68Landmarks"))
-        cases = [Case(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False),
-                                                                                                (True, False))]
+        cases = [
+            Case(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False), (True, False))
+        ]
 
         for case in cases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
                 for func in ("detect", "detectOne"):
                     with self.subTest(funcName=func):
                         if func == "detectOne":
-                            detection = TestDetector.detector.detectOne(image=image,
-                                                                        detect68Landmarks=case.detect68Landmarks,
-                                                                        detect5Landmarks=case.detect5Landmarks)
+                            detection = TestDetector.detector.detectOne(
+                                image=image,
+                                detect68Landmarks=case.detect68Landmarks,
+                                detect5Landmarks=case.detect5Landmarks,
+                            )
 
                         else:
-                            detection = TestDetector.detector.detect(images=[image],
-                                                                     detect68Landmarks=case.detect68Landmarks,
-                                                                     detect5Landmarks=case.detect5Landmarks)[0][0]
+                            detection = TestDetector.detector.detect(
+                                images=[image],
+                                detect68Landmarks=case.detect68Landmarks,
+                                detect5Landmarks=case.detect5Landmarks,
+                            )[0][0]
 
                         if case.detect5Landmarks:
                             assert isinstance(detection.landmarks5, Landmarks5)
@@ -142,8 +157,9 @@ class TestDetector(BaseTestClass):
         image = VLImage.load(filename=ONE_FACE)
         area1 = Rect(0, 0, 100, 100)
         area2 = Rect(100, 100, image.rect.width - 100, image.rect.height - 100)
-        detections = TestDetector.detector.detect(images=[ImageForDetection(image, area1),
-                                                          ImageForDetection(image, area2), image, ])
+        detections = TestDetector.detector.detect(
+            images=[ImageForDetection(image, area1), ImageForDetection(image, area2), image]
+        )
         assert 3 == len(detections)
         assert 0 == len(detections[0])
         assert 1 == len(detections[1])

@@ -12,7 +12,7 @@ def estimateDescriptor():
     """
     Estimate face descriptor.
     """
-    image = VLImage.load(filename='C:/temp/test.jpg')
+    image = VLImage.load(filename="C:/temp/test.jpg")
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
@@ -23,8 +23,9 @@ def estimateDescriptor():
 
     pprint.pprint(extractor.estimate(warp.warpedImage))
     pprint.pprint(extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage]))
-    batch, aggregateDescriptor = extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage],
-                                                                    aggregate=True)
+    batch, aggregateDescriptor = extractor.estimateDescriptorsBatch(
+        [warp.warpedImage, warp.warpedImage], aggregate=True
+    )
     pprint.pprint(batch)
     pprint.pprint(aggregateDescriptor)
 

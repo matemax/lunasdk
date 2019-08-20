@@ -25,6 +25,7 @@ class ImageForDetection(NamedTuple):
         image (VLImage): image for detection
         detectArea (Rect[float]):
     """
+
     image: VLImage
     detectArea: Rect[float]
 
@@ -119,8 +120,17 @@ class FaceDetection(BaseEstimation):
         _image (VLImage): source of detection
 
     """
-    __slots__ = ("boundingBox", "landmarks5", "landmarks68", "_coreDetection", "_image", "_emotions",
-                 "_quality", "_mouthState")
+
+    __slots__ = (
+        "boundingBox",
+        "landmarks5",
+        "landmarks68",
+        "_coreDetection",
+        "_image",
+        "_emotions",
+        "_quality",
+        "_mouthState",
+    )
 
     def __init__(self, coreDetection: Face, image: VLImage):
         """
@@ -180,6 +190,7 @@ class FaceDetector:
         _detector (IDetectorPtr): core detector
 
     """
+
     __slots__ = ["_detector", "detectorType"]
 
     def __init__(self, detectorPtr, detectorType: DetectionType):
@@ -208,8 +219,13 @@ class FaceDetector:
         return DetectionType(toDetect)
 
     @CoreExceptionWarp(LunaVLError.DetectOneFaceError)
-    def detectOne(self, image: VLImage, detectArea: Optional[Rect[float]] = None, detect5Landmarks: bool = True,
-                  detect68Landmarks: bool = False) -> Union[None, FaceDetection]:
+    def detectOne(
+        self,
+        image: VLImage,
+        detectArea: Optional[Rect[float]] = None,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
+    ) -> Union[None, FaceDetection]:
         """
         Detect just one best detection on the image.
 
@@ -224,8 +240,9 @@ class FaceDetector:
             LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
         if image.format != ColorFormat.R8G8B8:
-            details = "Bad image format for detection,  format: {}, image: {}".format(image.format.value,
-                                                                                      image.filename)
+            details = "Bad image format for detection,  format: {}, image: {}".format(
+                image.format.value, image.filename
+            )
             raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
 
         if detectArea is None:
@@ -233,8 +250,9 @@ class FaceDetector:
         else:
             _detectArea = detectArea.coreRect
 
-        error, detectRes = self._detector.detectOne(image.coreImage, _detectArea,
-                                                    self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        error, detectRes = self._detector.detectOne(
+            image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+        )
         if error.isError:
             if error.FSDKError == FSDKError.BufferIsEmpty:
                 return None
@@ -243,8 +261,13 @@ class FaceDetector:
         return FaceDetection(coreDetection, image)
 
     @CoreExceptionWarp(LunaVLError.DetectFacesError)
-    def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detect5Landmarks: bool = True,
-               detect68Landmarks: bool = False) -> List[List[FaceDetection]]:
+    def detect(
+        self,
+        images: List[Union[VLImage, ImageForDetection]],
+        limit: int = 5,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
+    ) -> List[List[FaceDetection]]:
         """
         Batch detect faces on images.
 
@@ -274,8 +297,9 @@ class FaceDetector:
                 raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
             imgs.append(img.coreImage)
 
-        error, detectRes = self._detector.detect(imgs, detectAreas, limit,
-                                                 self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        error, detectRes = self._detector.detect(
+            imgs, detectAreas, limit, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+        )
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         res = []

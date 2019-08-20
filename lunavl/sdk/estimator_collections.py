@@ -18,6 +18,7 @@ class FaceEstimator(Enum):
     """
     Enum for face estimators.
     """
+
     #: head pose estimator
     HeadPose = 1
     #: eye estimation (eyelid, iris landmarks and state)
@@ -54,12 +55,24 @@ class FaceEstimatorsCollection:
         _descriptorEstimator (Optional[FaceDescriptorEstimator]): lazy load face descriptor estimator
         warper (Optional[Warper]): warper
     """
-    __slots__ = ("_headPoseEstimator", "_eyeEstimator", "_gazeDirectionEstimator", "_mouthStateEstimator",
-                 "_warpQualityEstimator", "_basicAttributesEstimator", "_emotionsEstimator", "_faceEngine",
-                 "_AGSEstimator", "warper", "_descriptorEstimator")
 
-    def __init__(self, startEstimators: Optional[List[FaceEstimator]] = None,
-                 faceEngine: Optional[VLFaceEngine] = None):
+    __slots__ = (
+        "_headPoseEstimator",
+        "_eyeEstimator",
+        "_gazeDirectionEstimator",
+        "_mouthStateEstimator",
+        "_warpQualityEstimator",
+        "_basicAttributesEstimator",
+        "_emotionsEstimator",
+        "_faceEngine",
+        "_AGSEstimator",
+        "warper",
+        "_descriptorEstimator",
+    )
+
+    def __init__(
+        self, startEstimators: Optional[List[FaceEstimator]] = None, faceEngine: Optional[VLFaceEngine] = None
+    ):
         """
         Init.
 
@@ -100,7 +113,7 @@ class FaceEstimatorsCollection:
             ValueError("Bad attribute name"): if face estimator not found
         """
         for estimator in FaceEstimator:
-            if estimator.name.lower() == estimatorAttributeName[1: -len("Estimator")]:
+            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:
                 return estimator
         raise ValueError("Bad attribute name")
 
@@ -119,7 +132,7 @@ class FaceEstimatorsCollection:
         for estimatorName in self.__slots__:
             if estimatorName == "_faceEngine":
                 continue
-            if estimator.name.lower() == estimatorName[1: -len("Estimator")]:
+            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:
                 return estimatorName
         raise ValueError("Bad estimator")
 
