@@ -6,7 +6,7 @@ description = "Python interface for VisionLabs Luna platform"
 authors = ["VisionLabs <m.limonov@visionlabs.ru>"]
 repository = "https://github.com/matemax/lunasdk"
 [tool.poetry.dependencies]
-python = ">=3.5"
+python = ">=3.6"
 numpy = "*"
 requests = "*"
 [tool.poetry.dev-dependencies]
@@ -14,9 +14,9 @@ sphinx = ">=2.0.0"
 pytest = ">=4.4"
 pytest-subtests = "*"
 sphinx-autodoc-typehints = "*"
-pre-commit = "*"
-black = "*"
+pre-commit = "^1.18"
+black = {version = "^18.3-alpha.0",allows-prereleases = true}
 
 [tool.black]
 line-length = 120
-target-version = ['py37', 'py36']
+target-version = ['py37', 'py36', 'py35']
