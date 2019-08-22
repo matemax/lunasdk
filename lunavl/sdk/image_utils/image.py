@@ -100,7 +100,7 @@ class VLImage:
             filename: user mark a source of image
         Raises:
             TypeError: if body has incorrect type
-            LunaSDKException: if failed to load image to fsdk:Image
+            LunaSDKException: if failed to load image to sdk Image
         """
         if imgFormat is None:
             imgFormat = ColorFormat.R8G8B8
