@@ -3,11 +3,9 @@ Module realize face descriptor match.
 
 see `face descriptors matching`_.
 """
-from abc import abstractmethod
 from typing import List, Union
 
 from FaceEngine import IDescriptorMatcherPtr  # pylint: disable=E0611,E0401
-
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
@@ -52,7 +50,6 @@ class FaceMatcher:
         self._coreMatcher = coreMatcher
         self.descriptorFactory = descriptorFactory
 
-    @abstractmethod
     def match(
         self, reference: FaceDescriptor, candidates: Union[FaceDescriptor, List[FaceDescriptor], FaceDescriptorBatch]
     ) -> Union[MatchingResult, List[MatchingResult]]:

@@ -1,13 +1,12 @@
 """
 Module contains function for detection faces on images.
 """
-from enum import Enum
-from typing import Optional, Union, List, NamedTuple, Dict
+from typing import Optional, Union, List, NamedTuple, Dict, Any
 
 from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611,E0401
+from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
-from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
@@ -101,7 +100,7 @@ class BoundingBox(BaseEstimation):
         """
         return Rect.fromCoreRect(self._coreEstimation.rect)
 
-    def asDict(self) -> dict:
+    def asDict(self) -> Dict[str, Union[Dict[str, float], float]]:
         """
         Convert to  dict.
 
@@ -145,12 +144,12 @@ class FaceDetection(BaseEstimation):
         if coreDetection.landmarks5_opt.isValid():
             self.landmarks5: Optional[Landmarks5] = Landmarks5(coreDetection.landmarks5_opt.value())
         else:
-            self.landmarks5: Optional[Landmarks5] = None
+            self.landmarks5 = None
 
         if coreDetection.landmarks68_opt.isValid():
             self.landmarks68: Optional[Landmarks68] = Landmarks68(coreDetection.landmarks68_opt.value())
         else:
-            self.landmarks68: Optional[Landmarks68] = None
+            self.landmarks68 = None
         self._image = image
         self._emotions = None
         self._quality = None
@@ -166,7 +165,7 @@ class FaceDetection(BaseEstimation):
         """
         return self._image
 
-    def asDict(self) -> Dict[str, Union[dict, list]]:
+    def asDict(self) -> Dict[str, Any]:
         """
         Convert face detection to dict (json).
 
@@ -304,7 +303,10 @@ class FaceDetector:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
-            res.append([FaceDetection(coreDetection, images[numberImage]) for coreDetection in imageDetections])
+            image_ = images[numberImage]
+            image = image_ if isinstance(image_, VLImage) else image_.image
+            res.append([FaceDetection(coreDetection, image) for coreDetection in imageDetections])
+
         return res
 
     def redetectOne(self):

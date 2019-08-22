@@ -154,7 +154,7 @@ class FaceDescriptorFactory:
         _faceEngine (VLFaceEngine): faceEngine
     """
 
-    def __init__(self, faceEngine: "VLFaceEngine"):
+    def __init__(self, faceEngine: "VLFaceEngine"):  # type: ignore # noqa: F821
         self._faceEngine = faceEngine
 
     @CoreExceptionWarp(LunaVLError.CreationDescriptorError)
