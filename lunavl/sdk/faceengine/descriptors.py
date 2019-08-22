@@ -35,7 +35,7 @@ class FaceDescriptor(BaseEstimation):
         Returns:
             Dict with keys "descriptor" and "score"
         """
-        return {"descriptor": self.coreEstimation.getData(), "score": self.garbageScore}
+        return {"descriptor": self.coreEstimation.getData(), "score": self.garbageScore, "version": self.model}
 
     @property
     def rawDescriptor(self) -> bytes:
