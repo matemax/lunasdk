@@ -3,7 +3,7 @@
 See `basic attributes`_.
 """
 from enum import Enum
-from typing import Union
+from typing import Union, Dict, Any
 
 from FaceEngine import IAttributeEstimatorPtr, AttributeRequest, AttributeResult  # pylint: disable=E0611,E0401
 from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint: disable=E0611,E0401
@@ -182,26 +182,18 @@ class BasicAttributes(BaseEstimation):
         else:
             self.gender = coreEstimation.gender_opt.value()
 
-    def asDict(self) -> dict:
+    def asDict(self) -> Dict[str, Any]:
         """
         Convert to dict.
 
         Returns:
             dict with keys "ethnicity", "gender", "age"
         """
-        res = {}
-        if self.ethnicity is not None:
-            res["ethnicities"] = self.ethnicity.asDict()
-        else:
-            res["ethnicities"] = None
-        if self.age is not None:
-            res["age"] = round(self.age)
-        else:
-            res["age"] = None
-        if self.gender is not None:
-            res["gender"] = round(self.gender)
-        else:
-            res["gender"] = None
+        res = {
+            "ethnicities": self.ethnicity.asDict() if self.ethnicity is not None else None,
+            "age": round(self.age) if self.age is not None else None,
+            "gender": round(self.gender) if self.gender is not None else None,
+        }
         return res
 
 

@@ -32,7 +32,9 @@ class FaceDescriptorEstimator(BaseEstimator):
         self.descriptorFactory = faceDescriptorFactory
 
     #  pylint: disable=W0221
-    def estimate(self, warp: Union[Warp, WarpedImage], descriptor: Optional[FaceDescriptor] = None) -> FaceDescriptor:
+    def estimate(  # type: ignore
+        self, warp: Union[Warp, WarpedImage], descriptor: Optional[FaceDescriptor] = None
+    ) -> FaceDescriptor:  # type: ignore
         """
         Estimate face descriptor from a warp image.
 

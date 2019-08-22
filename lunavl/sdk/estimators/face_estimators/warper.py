@@ -58,7 +58,7 @@ class WarpedImage(VLImage):
 
     #  pylint: disable=W0221
     @classmethod
-    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> "WarpedImage":
+    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> "WarpedImage":  # type: ignore
         """
         Load imag from numpy array or file or url.
 
@@ -185,8 +185,12 @@ class Warper:
         """
         transformation = self._createWarpTransformation(faceDetection)
         if typeLandmarks == "L68":
+            if faceDetection.landmarks68 is None:
+                raise ValueError("landmarks68 does not estimated")
             error, warp = self._coreWarper.warp(faceDetection.landmarks68.coreEstimation, transformation)
         elif typeLandmarks == "L5":
+            if faceDetection.landmarks5 is None:
+                raise ValueError("landmarks5 does not estimated")
             error, warp = self._coreWarper.warp(faceDetection.landmarks5.coreEstimation, transformation)
         else:
             raise ValueError("Invalid value of typeLandmarks, must be 'L68' or 'L5'")

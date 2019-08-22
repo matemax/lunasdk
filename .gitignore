@@ -4,3 +4,4 @@
 docs/html*
 lunavl.egg*
 .vscode/*
+.mypy_*

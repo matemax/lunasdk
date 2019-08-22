@@ -1,7 +1,7 @@
 """
 Module contains geometric structures (Rect, Point, Size)
 """
-from typing import TypeVar, Generic, Union, List
+from typing import TypeVar, Generic, Union, List, Optional, Dict
 
 from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
 from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
@@ -21,8 +21,8 @@ class Size(Generic[COORDINATE_TYPE]):
     Rect size.
 
     Attributes:
-        width (CoordinateType): width
-        height (CoordinateType): height
+        width (COORDINATE_TYPE): width
+        height (COORDINATE_TYPE): height
     """
 
     __slots__ = ("width", "height")
@@ -35,8 +35,8 @@ class Size(Generic[COORDINATE_TYPE]):
             width: width
             height: height
         """
-        self.width = width
-        self.height = height
+        self.width: COORDINATE_TYPE = width
+        self.height: COORDINATE_TYPE = height
 
     def __repr__(self) -> str:
         """
@@ -82,8 +82,8 @@ class Point(Generic[COORDINATE_TYPE]):
             x: x
             y: y
         """
-        self.x = x  # pylint: disable=C0103
-        self.y = y  # pylint: disable=C0103
+        self.x: COORDINATE_TYPE = x  # pylint: disable=C0103
+        self.y: COORDINATE_TYPE = y  # pylint: disable=C0103
 
     @classmethod
     def fromVector2(cls, vec2: Union[Vector2f, Vector2i]) -> "Point":
@@ -467,7 +467,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         """
         return self.coreRect and other.coreRect
 
-    def __eq__(self, other: "Rect[COORDINATE_TYPE]") -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compare two rect
 
@@ -476,6 +476,8 @@ class Rect(Generic[COORDINATE_TYPE]):
 
         Returns:
             True if x, y, width, height other rect are equal x, y, width, height this rect
+        Raises:
+            NotImplemented: if other type is not Rect
 
 
         >>> first = Rect(1, 2, 3, 4)
@@ -486,9 +488,11 @@ class Rect(Generic[COORDINATE_TYPE]):
         >>> first == third
         True
         """
+        if not isinstance(other, Rect):
+            raise NotImplementedError
         return self.coreRect == other.coreRect
 
-    def __ne__(self, other: "Rect[COORDINATE_TYPE]") -> bool:
+    def __ne__(self, other: object) -> bool:
         """
         Compare two rect
 
@@ -507,6 +511,8 @@ class Rect(Generic[COORDINATE_TYPE]):
         >>> first != third
         False
         """
+        if not isinstance(other, Rect):
+            return False
         return self.coreRect != other.coreRect
 
     def adjust(
@@ -545,7 +551,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         newRect.coreRect = self.coreRect.adjusted(dx, dy, dw, dh)
         return newRect
 
-    def asDict(self) -> dict:
+    def asDict(self) -> Dict[str, COORDINATE_TYPE]:
         """
         Convert rect to dict
 
@@ -591,7 +597,7 @@ class Landmarks(BaseEstimation):
             coreLandmarks (LANDMARKS): core landmarks
         """
         super().__init__(coreLandmarks)
-        self._points = None
+        self._points: Optional[List[Point[float]]] = None
 
     @property
     def points(self) -> List[Point[float]]:

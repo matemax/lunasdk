@@ -4,10 +4,12 @@ SDK configuration module.
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Union, Optional, Tuple, Any
+from typing import Union, Optional, Tuple, Any, TypeVar, Type
 
 import FaceEngine as CoreFE
 from FaceEngine import ObjectDetectorClassType, PyISettingsProvider  # pylint: disable=E0611,E0401
+
+BI_ENUM = TypeVar("BI_ENUM", bound="BiDirectionEnum")
 
 
 class BiDirectionEnum(Enum):
@@ -16,7 +18,7 @@ class BiDirectionEnum(Enum):
     """
 
     @classmethod
-    def getEnum(cls, enumValue) -> "BiDirectionEnum":
+    def getEnum(cls: Type[BI_ENUM], enumValue: Union[int, str]) -> BI_ENUM:
         """
         Get enum by value.
 
@@ -1664,7 +1666,7 @@ class SettingsProvider:
         return FaceDetV2Settings(self._coreSettingProvider)
 
     @property
-    def LNetSettings(self):
+    def lNetSettings(self) -> LNetSettings:
         """
         Getter for LNet settings section.
 
@@ -1674,7 +1676,7 @@ class SettingsProvider:
         return LNetSettings(self._coreSettingProvider)
 
     @property
-    def LNetIRSettings(self) -> LNetIRSettings:
+    def lNetIRSettings(self) -> LNetIRSettings:
         """
         Getter for LNetIR settings section.
 
@@ -1684,7 +1686,7 @@ class SettingsProvider:
         return LNetIRSettings(self._coreSettingProvider)
 
     @property
-    def SLNetSettings(self) -> SLNetSettings:
+    def slNetSettings(self) -> SLNetSettings:
         """
         Getter for SLNet settings section.
 
