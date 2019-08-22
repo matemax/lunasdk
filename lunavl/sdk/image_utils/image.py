@@ -8,6 +8,8 @@ import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 from numpy import ndarray
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from .geometry import Rect
 
 
@@ -84,7 +86,10 @@ class VLImage:
     __slots__ = ("coreImage", "source", "filename")
 
     def __init__(
-        self, body: Union[bytes, ndarray, CoreImage], imgFormat: Optional[ColorFormat] = None, filename: str = ""
+        self,
+        body: Union[bytes, bytearray, ndarray, CoreImage],
+        imgFormat: Optional[ColorFormat] = None,
+        filename: str = "",
     ):
         """
         Init.
@@ -93,6 +98,9 @@ class VLImage:
             body: body of image - bytes numpy array or core image
             imgFormat: img format
             filename: user mark a source of image
+        Raises:
+            TypeError: if body has incorrect type
+            LunaSDKException: if failed to load image to fsdk:Image
         """
         if imgFormat is None:
             imgFormat = ColorFormat.R8G8B8
@@ -101,15 +109,18 @@ class VLImage:
         if isinstance(body, CoreImage):
             self.coreImage = body
         elif isinstance(body, bytes):
-            loadResult = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
-            if loadResult.isError:
-                #: todo: raise correct error.
-                raise ValueError
+            error = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
+        elif isinstance(body, bytearray):
+            error = self.coreImage.loadFromMemory(bytes(body), len(body), imgFormat.coreFormat)
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, ndarray):
             #: todo, format ?????
             self.coreImage.setData(body, imgFormat.coreFormat)
         else:
-            raise TypeError("wtf  image type")
+            raise TypeError("Bad image type")
 
         self.source = body
         self.filename = filename
