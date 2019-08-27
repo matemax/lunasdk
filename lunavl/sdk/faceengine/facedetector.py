@@ -242,7 +242,7 @@ class FaceDetector:
             details = "Bad image format for detection,  format: {}, image: {}".format(
                 image.format.value, image.filename
             )
-            raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
+            raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
 
         if detectArea is None:
             _detectArea = image.coreImage.getRect()
@@ -293,7 +293,7 @@ class FaceDetector:
                 detectAreas.append(image.detectArea.coreRect)
             if img.format != ColorFormat.R8G8B8:
                 details = "Bad image format for detection, format {}, img {}".format(img.format.value, img.filename)
-                raise LunaSDKException(LunaVLError.InvalidImageFormat.detalize(details))
+                raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
             imgs.append(img.coreImage)
 
         error, detectRes = self._detector.detect(

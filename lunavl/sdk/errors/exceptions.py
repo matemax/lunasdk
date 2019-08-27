@@ -41,7 +41,7 @@ def CoreExceptionWarp(error: ErrorInfo):
                 res = func(*func_args, **func_kwargs)
                 return res
             except RuntimeError as e:
-                raise LunaSDKException(error.detalize(str(e)), exception=e)
+                raise LunaSDKException(error.format(str(e)), exception=e)
 
         return wrap
 

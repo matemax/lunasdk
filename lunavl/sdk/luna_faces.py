@@ -210,7 +210,14 @@ class VLFaceDetection(FaceDetection):
         Returns:
             All estimated attributes will be added to dict
         """
-        res = {"rect": self.boundingBox.rect.asDict()}
+        res = {
+            "rect": {
+                "x": int(self.boundingBox.rect.x),
+                "y": int(self.boundingBox.rect.y),
+                "width": int(self.boundingBox.rect.width),
+                "height": int(self.boundingBox.rect.height),
+            }
+        }
         if self._warpQuality is not None:
             res["quality"] = self.warpQuality.asDict()
         if self.landmarks5 is not None:

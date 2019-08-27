@@ -16,7 +16,7 @@ class ErrorInfo:
         detail (str): detail
     """
 
-    __slots__ = ["errorCode", "desc", "detail"]
+    __slots__ = ["errorCode", "description", "detail"]
 
     def __init__(self, errorCode: int, desc: str, detail: str):
         """
@@ -28,7 +28,7 @@ class ErrorInfo:
             detail: detail
         """
         self.errorCode = errorCode
-        self.desc = desc
+        self.description = desc
         self.detail = detail
 
     def asDict(self) -> Dict[str, Union[int, str]]:
@@ -41,7 +41,7 @@ class ErrorInfo:
         >>> ErrorInfo(123, "Test", "Test error").asDict()
         {'error_code': 123, 'desc': 'Test', 'detail': 'Test error'}
         """
-        return {"error_code": self.errorCode, "desc": self.desc, "detail": self.detail}
+        return {"error_code": self.errorCode, "desc": self.description, "detail": self.detail}
 
     def __repr__(self) -> str:
         """
@@ -53,10 +53,10 @@ class ErrorInfo:
         >>> ErrorInfo(123, "Test", "Test error")
         error code: 123, desc: Test, detail: Test error
         """
-        return "error code: {}, desc: {}, detail: {}".format(self.errorCode, self.desc, self.detail)
+        return "error code: {}, desc: {}, detail: {}".format(self.errorCode, self.description, self.detail)
 
-    def detalize(self, details: str) -> "ErrorInfo":
-        return ErrorInfo(self.errorCode, self.desc, details)
+    def format(self, details: str) -> "ErrorInfo":
+        return ErrorInfo(self.errorCode, self.description, details)
 
 
 class LunaVLError:
@@ -133,8 +133,16 @@ class LunaVLError:
         """
 
         errorClassErrors = inspect.getmembers(cls, lambda err: isinstance(err, ErrorInfo))
-        for errorName, errorVal in errorClassErrors:
-            if errorName == sdkError.FSDKError.name:
-                return ErrorInfo(errorVal.errorCode, errorVal.desc, sdkError.what)
 
-        return ErrorInfo(cls.UnknownError.errorCode, cls.UnknownError.desc, sdkError.what)
+        def getError(sdkError: FSDKErrorResult):
+            attrs = dir(sdkError)
+            for attr in attrs:
+                if attr.endswith("Error") and attr != "isError":
+                    return getattr(sdkError, attr)
+
+        error = getError(sdkError)
+        for errorName, errorVal in errorClassErrors:
+            if errorName == error.name:
+                return ErrorInfo(errorVal.errorCode, errorVal.description, sdkError.what)
+
+        return ErrorInfo(cls.UnknownError.errorCode, cls.UnknownError.description, sdkError.what)
