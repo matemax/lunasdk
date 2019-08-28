@@ -609,7 +609,7 @@ class Landmarks(BaseEstimation):
         """
         if self._points is None:
             self._points = [Point.fromVector2(self._coreEstimation[index]) for index in
-                            enumerate(len(self._coreEstimation))]
+                            range(len(self._coreEstimation))]
         return self._points
 
     def asDict(self) -> List[List[float]]:
