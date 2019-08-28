@@ -608,7 +608,8 @@ class Landmarks(BaseEstimation):
             list of points
         """
         if self._points is None:
-            self._points = [Point.fromVector2(point) for point in self._coreEstimation]
+            self._points = [Point.fromVector2(self._coreEstimation[index]) for index in
+                            enumerate(len(self._coreEstimation))]
         return self._points
 
     def asDict(self) -> List[List[float]]:
