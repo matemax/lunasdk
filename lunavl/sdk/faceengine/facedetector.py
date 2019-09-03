@@ -174,10 +174,13 @@ class FaceDetection(BaseEstimation):
         """
         res = {"rect": self.boundingBox.rect.asDict(), "score": self.boundingBox.score}
         if self.landmarks5 is not None:
-            res["landmarks5"] = [point.asDict() for point in self.landmarks5.points]
+            coreLandmarks5 = self.landmarks5.coreEstimation
+            res["landmarks5"] = tuple((coreLandmarks5[index].x,
+                                       coreLandmarks5[index].y) for index in range(5))
         if self.landmarks68 is not None:
-            res["landmarks68"] = [point.asDict() for point in self.landmarks68.points]
-        # TODO: may be nullable landmarks5?
+            coreLandmarks68 = self.landmarks68.coreEstimation
+            res["landmarks68"] = tuple((coreLandmarks68[index].x,
+                                        coreLandmarks68[index].y) for index in range(68))
         return res
 
 
@@ -187,10 +190,11 @@ class FaceDetector:
 
     Attributes:
         _detector (IDetectorPtr): core detector
+        detectorType (DetectionType): detector type
 
     """
 
-    __slots__ = ["_detector", "detectorType"]
+    __slots__ = ("_detector", "detectorType")
 
     def __init__(self, detectorPtr, detectorType: DetectionType):
         self._detector = detectorPtr

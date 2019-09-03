@@ -97,7 +97,8 @@ class VLFaceDetection(FaceDetection):
             head pose
         """
         if self._headPose is None:
-            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(self.boundingBox)
+            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(self.boundingBox,
+                                                                                              self.image)
         return self._headPose
 
     @property

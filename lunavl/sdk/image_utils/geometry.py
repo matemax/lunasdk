@@ -612,11 +612,11 @@ class Landmarks(BaseEstimation):
                                   range(len(self._coreEstimation))))
         return self._points
 
-    def asDict(self) -> Tuple[Tuple[float, float]]:
+    def asDict(self) -> Tuple[Tuple[float, float], ...]:
         """
         Convert to dict
 
         Returns:
             list to list points
         """
-        return tuple((point.asDict() for point in self.points))
+        return tuple(((point.x, point.y) for point in self.coreEstimation))
