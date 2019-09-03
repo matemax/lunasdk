@@ -1,7 +1,7 @@
 """
 Module contains geometric structures (Rect, Point, Size)
 """
-from typing import TypeVar, Generic, Union, List, Optional, Dict
+from typing import TypeVar, Generic, Union, List, Optional, Dict, Tuple
 
 from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
 from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
@@ -118,7 +118,7 @@ class Point(Generic[COORDINATE_TYPE]):
             return Vector2i(self.x, self.y)
         return Vector2f(self.x, self.y)
 
-    def asDict(self) -> List[COORDINATE_TYPE]:
+    def asDict(self) -> Tuple[COORDINATE_TYPE, COORDINATE_TYPE]:
         """
         Convert point to list
 
@@ -126,11 +126,11 @@ class Point(Generic[COORDINATE_TYPE]):
             [self.x, self.y]
 
         >>> Point(1, 2).asDict()
-        [1, 2]
+        (1, 2)
         >>> Point(1.0, 2.0).asDict()
-        [1.0, 2.0]
+        (1.0, 2.0)
         """
-        return [self.x, self.y]
+        return self.x, self.y
 
     def __repr__(self):
         return "x = {}, y = {}".format(self.x, self.y)
@@ -600,7 +600,7 @@ class Landmarks(BaseEstimation):
         self._points: Optional[List[Point[float]]] = None
 
     @property
-    def points(self) -> List[Point[float]]:
+    def points(self) -> Tuple[Point[float], ...]:
         """
         Lazy load of points.
 
@@ -608,15 +608,15 @@ class Landmarks(BaseEstimation):
             list of points
         """
         if self._points is None:
-            self._points = [Point.fromVector2(self._coreEstimation[index]) for index in
-                            range(len(self._coreEstimation))]
+            self._points = tuple((Point.fromVector2(self._coreEstimation[index]) for index in
+                                  range(len(self._coreEstimation))))
         return self._points
 
-    def asDict(self) -> List[List[float]]:
+    def asDict(self) -> Tuple[Tuple[float, float]]:
         """
         Convert to dict
 
         Returns:
             list to list points
         """
-        return [point.asDict() for point in self.points]
+        return tuple((point.asDict() for point in self.points))
