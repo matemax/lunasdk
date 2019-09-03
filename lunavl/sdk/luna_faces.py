@@ -91,14 +91,13 @@ class VLFaceDetection(FaceDetection):
     @property
     def headPose(self) -> HeadPose:
         """
-        Get a head pose of the detection. Estimation bases on 68 landmarks
+        Get a head pose of the detection. Estimation bases on an original and a bounding box
 
         Returns:
             head pose
         """
         if self._headPose is None:
-            # todo: wtf, need gotten landmarks
-            self._headPose = self.estimatorCollection.headPoseEstimator.estimate(self.landmarks68)
+            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(self.boundingBox)
         return self._headPose
 
     @property
