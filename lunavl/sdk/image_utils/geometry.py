@@ -619,4 +619,6 @@ class Landmarks(BaseEstimation):
         Returns:
             list to list points
         """
-        return tuple(((point.x, point.y) for point in self.coreEstimation))
+        pointCount = len(self._coreEstimation)
+        points = self.coreEstimation
+        return tuple(((points[index].x, points[index].y) for index in range(pointCount)))
