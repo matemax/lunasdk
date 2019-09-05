@@ -191,7 +191,7 @@ class EyeEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
     def estimate(
-        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
+            self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
     ) -> EyesEstimation:
         """
         Estimate mouth state on warp.
@@ -214,6 +214,23 @@ class EyeEstimator(BaseEstimator):
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return EyesEstimation(eyesEstimation)
+
+
+def _isNotNan(value: float) -> bool:
+    """
+    Check float is Nan or not
+    Args:
+        value: float
+    Returns:
+        value == value
+    >>> f = float('nan')
+    >>> _isNotNan(f)
+    False
+    >>> f = float(0.5)
+    >>> _isNotNan(f)
+    True
+    """
+    return value == value
 
 
 class GazeDirection(BaseEstimation):
@@ -259,7 +276,8 @@ class GazeDirection(BaseEstimation):
         Returns:
             {'yaw': self.yaw, 'pitch': self.pitch}
         """
-        return {"yaw": self.yaw, "pitch": self.pitch}
+        return {"yaw": self.yaw if _isNotNan(self.yaw) else None,
+                "pitch": self.pitch if _isNotNan(self.pitch) else None}
 
 
 class GazeEstimation(BaseEstimation):
