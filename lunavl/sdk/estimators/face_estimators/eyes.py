@@ -5,13 +5,13 @@ See `eyes`_ and `gaze direction`_.
 
 """
 from enum import Enum
-from typing import Union
+from typing import Union, Dict
 
 from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
 from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
-from FaceEngine import EyeAngles, GazeEstimation as CoreGazeEstimation  # pylint: disable=E0611,E0401
+from FaceEngine import GazeEstimation as CoreGazeEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
 
@@ -243,7 +243,7 @@ class GazeDirection(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimation: EyeAngles):
+    def __init__(self, coreEstimation):
         """
         Init.
         """
@@ -280,38 +280,6 @@ class GazeDirection(BaseEstimation):
                 "pitch": self.pitch if _isNotNan(self.pitch) else None}
 
 
-class GazeEstimation(BaseEstimation):
-    """
-    Gaze estimation.
-
-    Attributes:
-        leftEye (GazeDirection): left eye gaze direction
-        rightEye (GazeDirection): right eye gaze direction
-    """
-
-    __slots__ = ("leftEye", "rightEye")
-
-    def __init__(self, coreEstimation: CoreGazeEstimation):
-        """
-        Init.
-
-        Args:
-            coreEstimation: core estimation
-        """
-        super().__init__(coreEstimation)
-        self.leftEye = GazeDirection(coreEstimation.leftEye)
-        self.rightEye = GazeDirection(coreEstimation.rightEye)
-
-    def asDict(self) -> dict:
-        """
-        Convert self to a dict.
-
-        Returns:
-            {"left_eye": self.leftEye.asDict(), "right_eye": self.rightEye.asDict()}
-        """
-        return {"left_eye": self.leftEye.asDict(), "right_eye": self.rightEye.asDict()}
-
-
 class GazeEstimator(BaseEstimator):
     """
     Gaze direction estimator.
@@ -329,19 +297,21 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
-    def estimate(self, headPose: HeadPose, eyesEstimation: EyesEstimation) -> GazeEstimation:
+    def estimate(self,
+                 transformedLandmarks: Union[Landmarks5, Landmarks68],
+                 warp: Union[Warp, WarpedImage]) -> GazeDirection:
         """
         Estimate a gaze direction
 
         Args:
-            headPose: head pose (calculated using landmarks68)
-            eyesEstimation: eyes estimation
+            warp: warped image
+            transformedLandmarks: transformed landmarks
         Returns:
             estimated states
         Raises:
             LunaSDKException: if estimation failed
         """
-        error, gaze = self._coreEstimator.estimate(headPose.coreEstimation, eyesEstimation.coreEstimation)
+        error, gaze = self._coreEstimator.estimate(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return GazeEstimation(gaze)
+        return GazeDirection(gaze)

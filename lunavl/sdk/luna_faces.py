@@ -2,24 +2,23 @@
 """
 from typing import Optional, Union, List, Dict
 
-from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor
-from lunavl.sdk.faceengine.setting_provider import DetectorType
-from numpy.ma import array
-from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from FaceEngine import Face  # pylint: disable=E0611,E0401
-
+from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
-from lunavl.sdk.estimators.face_estimators.eyes import EyesEstimation, GazeEstimation
+from lunavl.sdk.estimators.face_estimators.eyes import EyesEstimation, GazeDirection
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, Landmarks68, FaceDetector
+from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, FaceDetector, Landmarks5
+from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
+from numpy.ma import array
 
 
 class VLFaceDetection(FaceDetection):
@@ -36,7 +35,7 @@ class VLFaceDetection(FaceDetection):
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
         _headPose (Optional[HeadPose]): lazy load head pose estimation
         _ags (Optional[float]): lazy load ags estimation
-        _transformedLandmarks68 (Optional[Landmarks68]): lazy load transformed landmarks68
+        _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
 
     """
 
@@ -50,7 +49,7 @@ class VLFaceDetection(FaceDetection):
         "_warpQuality",
         "_headPose",
         "estimatorCollection",
-        "_transformedLandmarks68",
+        "_transformedLandmarks5",
         "_ags",
         "_descriptor",
     )
@@ -68,10 +67,10 @@ class VLFaceDetection(FaceDetection):
         self._warp: Optional[Warp] = None
         self._mouthState: Optional[MouthStates] = None
         self._basicAttributes: Optional[BasicAttributes] = None
-        self._gaze: Optional[GazeEstimation] = None
+        self._gaze: Optional[GazeDirection] = None
         self._warpQuality: Optional[Quality] = None
         self._headPose: Optional[HeadPose] = None
-        self._transformedLandmarks68: Optional[Landmarks68] = None
+        self._transformedLandmarks5: Optional[Landmarks5] = None
         self._ags = None
         self._descriptor = None
         self.estimatorCollection = estimatorCollection
@@ -183,16 +182,16 @@ class VLFaceDetection(FaceDetection):
             eyes estimation
         """
         if self._eyes is None:
-            if self._transformedLandmarks68 is None:
-                self._transformedLandmarks68 = self.estimatorCollection.warper.makeWarpTransformationWithLandmarks(
-                    self, "L68"
+            if self._transformedLandmarks5 is None:
+                self._transformedLandmarks5 = self.estimatorCollection.warper.makeWarpTransformationWithLandmarks(
+                    self, "L5"
                 )
 
-            self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._transformedLandmarks68, self.warp)
+            self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._transformedLandmarks5, self.warp)
         return self._eyes
 
     @property
-    def gaze(self) -> GazeEstimation:
+    def gaze(self) -> GazeDirection:
         """
         Get gaze direction.
 
@@ -200,7 +199,8 @@ class VLFaceDetection(FaceDetection):
             gaze direction
         """
         if self._gaze is None:
-            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self.headPose, self.eyes)
+            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self._transformedLandmarks5,
+                                                                                  self.warp)
         return self._gaze
 
     def asDict(self) -> Dict[str, Union[dict, list, float]]:
