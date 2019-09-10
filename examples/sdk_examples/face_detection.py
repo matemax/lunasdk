@@ -9,6 +9,7 @@ import pprint
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
+from resources import EXAMPLE_WITHOUT_FACES, EXAMPLE_SEVERAL_FACES, EXAMPLE_O
 
 
 def detectOneFace():
@@ -19,20 +20,21 @@ def detectOneFace():
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
 
     imageWithOneFace = VLImage.load(
-        url="https://cdn1.savepice.ru/uploads/2019/4/15/194734af15c4fcd06dec6db86bbeb7cd-full.jpg"
+        filename=EXAMPLE_O
     )
     pprint.pprint(detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False).asDict())
 
     imageWithSeveralFaces = VLImage.load(
-        url="https://cdn1.savepice.ru/uploads/2019/4/15/aa970957128d9892f297cdfa5b3fda88-full.jpg"
+        filename=EXAMPLE_SEVERAL_FACES
     )
     pprint.pprint(detector.detectOne(imageWithSeveralFaces, detect5Landmarks=False, detect68Landmarks=False).asDict())
 
+    severalFaces = detector.detect([imageWithSeveralFaces], detect5Landmarks=False, detect68Landmarks=False)
+    pprint.pprint([face.asDict() for face in severalFaces[0]])
     imageWithoutFace = VLImage.load(
-        url="https://cdn1.savepice.ru/uploads/2019/4/15/3e3593dc2fd0671c7051b18c99974192-full.jpg"
+        filename=EXAMPLE_WITHOUT_FACES
     )
     pprint.pprint(detector.detectOne(imageWithoutFace, detect5Landmarks=False, detect68Landmarks=False) is None)
-
 
 if __name__ == "__main__":
     detectOneFace()

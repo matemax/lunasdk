@@ -5,6 +5,7 @@ Face descriptor estimate example
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
+from resources import EXAMPLE_O, EXAMPLE_1
 
 
 def matchDescriptors():
@@ -18,13 +19,13 @@ def matchDescriptors():
     warper = faceEngine.createWarper()
     matcher = faceEngine.createFaceMatcher()
 
-    image1 = VLImage.load(filename="C:/temp/test.jpg")
+    image1 = VLImage.load(filename=EXAMPLE_O)
 
     faceDetection1 = detector.detectOne(image1)
     warp1 = warper.warp(faceDetection1)
     descriptor1 = extractor.estimate(warp1.warpedImage)
 
-    image2 = VLImage.load(filename="C:/temp/female_caucasian_warp.jpg")
+    image2 = VLImage.load(filename=EXAMPLE_1)
     faceDetection2 = detector.detectOne(image2)
     warp2 = warper.warp(faceDetection2)
     descriptor2 = extractor.estimate(warp2.warpedImage)
