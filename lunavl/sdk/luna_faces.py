@@ -173,6 +173,19 @@ class VLFaceDetection(FaceDetection):
             self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(self.warp)
         return self._descriptor
 
+    def _getTransformedLandmarks5(self) -> Landmarks5:
+        """
+        Get transformed landmarks5 for warping.
+
+        Returns:
+            landmarks5
+        """
+        if self._transformedLandmarks5 is None:
+            self._transformedLandmarks5 = self.estimatorCollection.warper.makeWarpTransformationWithLandmarks(
+                self, "L5"
+            )
+        return self._transformedLandmarks5
+
     @property
     def eyes(self) -> EyesEstimation:
         """
@@ -182,12 +195,7 @@ class VLFaceDetection(FaceDetection):
             eyes estimation
         """
         if self._eyes is None:
-            if self._transformedLandmarks5 is None:
-                self._transformedLandmarks5 = self.estimatorCollection.warper.makeWarpTransformationWithLandmarks(
-                    self, "L5"
-                )
-
-            self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._transformedLandmarks5, self.warp)
+            self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._getTransformedLandmarks5(), self.warp)
         return self._eyes
 
     @property
@@ -199,7 +207,7 @@ class VLFaceDetection(FaceDetection):
             gaze direction
         """
         if self._gaze is None:
-            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self._transformedLandmarks5,
+            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self._getTransformedLandmarks5(),
                                                                                   self.warp)
         return self._gaze
 
