@@ -131,7 +131,7 @@ class FaceDetection(BaseEstimation):
         "_mouthState",
     )
 
-    def __init__(self, coreDetection: Face, image: VLImage):
+    def __init__(self, coreDetection: Face, image: Union[VLImage, ImageForDetection]):
         """
         Init.
 

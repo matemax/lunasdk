@@ -159,11 +159,15 @@ class Warper:
             LunaSDKException: if creation failed
         """
         transformation = self._createWarpTransformation(faceDetection)
-        error, warp = self._coreWarper.warp(faceDetection.image.coreImage, transformation)
+        if isinstance(faceDetection.image, VLImage):
+            image = faceDetection.image
+        else:
+            image = faceDetection.image.image
+        error, warp = self._coreWarper.warp(image.coreImage, transformation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
-        warpedImage = WarpedImage(body=warp, filename=faceDetection.image.filename)
+        warpedImage = WarpedImage(body=warp, filename=image.filename)
 
         return Warp(warpedImage, faceDetection)
 
