@@ -317,7 +317,8 @@ class VLFaceDetector:
         for imageNumber, image in enumerate(images):
             res.append(
                 [
-                    VLFaceDetection(detectRes.coreEstimation, image, self.estimatorsCollection)
+                    VLFaceDetection(detectRes.coreEstimation, image if isinstance(image, VLImage) else image.image,
+                                    self.estimatorsCollection)
                     for detectRes in detectRes[imageNumber]
                 ]
             )
