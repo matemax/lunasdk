@@ -3,7 +3,7 @@ Module contains function for detection faces on images.
 """
 from typing import Optional, Union, List, NamedTuple, Dict, Any
 
-from FaceEngine import DetectionFloat, FSDKError  # pylint: disable=E0611,E0401
+from FaceEngine import DetectionFloat, FSDKError, dtBBox  # pylint: disable=E0611,E0401
 from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
@@ -22,11 +22,37 @@ class ImageForDetection(NamedTuple):
 
     Attributes
         image (VLImage): image for detection
-        detectArea (Rect[float]):
+        detectArea (Rect[float]): area for face detection
     """
 
     image: VLImage
     detectArea: Rect[float]
+
+
+class ImageForRedetections(NamedTuple):
+    """
+    Structure for the transfer to redetector an image and detect an area.
+
+    Attributes
+        image (VLImage): image for detection
+        detectAreas (List[Rect[float]]): faces' bounding boxes
+    """
+
+    image: VLImage
+    BBoxes: List[Rect[float]]
+
+
+class ImageForRedetection(NamedTuple):
+    """
+    Structure for the transfer to redetector an image and detect an area.
+
+    Attributes
+        image (VLImage): image for detection
+        BBox (List[Rect[float]]): face bounding box
+    """
+
+    image: VLImage
+    BBox: Rect[float]
 
 
 class Landmarks5(Landmarks):
@@ -313,21 +339,30 @@ class FaceDetector:
 
         return res
 
-    def redetectOne(self):
+    def redetectOne(self, image: ImageForRedetection):
         """
         todo: wtf
         Returns:
 
         """
-        pass
+        # todo remove \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        image = ImageForRedetection(image.image, DetectionFloat(image.BBox.coreRect, 1.0))
+        # todo remove ///////////////////////////////////////
 
-    def redect(self):
-        """
-        todo: wtf
-        Returns:
+        error, detectRes = self._detector.redetectOne(image.image.coreImage, image.BBox, DetectionType(dtBBox))
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return detectRes
 
-        """
-        pass
+    def redetect(self, images: List[ImageForRedetection]):
+        def faceFactory(image: ImageForRedetection) -> Face:
+            face = Face(image.image.coreImage, DetectionFloat(image.BBox.coreRect, 1.0))
+            return face
+        faces = [faceFactory(image) for image in images]
+        error, detectRes = self._detector.redetect(faces, DetectionType(dtBBox))
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return detectRes
 
     def setDetectionComparer(self):
         """

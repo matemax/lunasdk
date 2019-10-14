@@ -134,11 +134,11 @@ class LunaVLError:
 
         errorClassErrors = inspect.getmembers(cls, lambda err: isinstance(err, ErrorInfo))
 
-        def getError(sdkError: FSDKErrorResult):
-            attrs = dir(sdkError)
+        def getError(sdkError_: FSDKErrorResult):
+            attrs = dir(sdkError_)
             for attr in attrs:
                 if attr.endswith("Error") and attr != "isError":
-                    return getattr(sdkError, attr)
+                    return getattr(sdkError_, attr)
 
         error = getError(sdkError)
         for errorName, errorVal in errorClassErrors:
