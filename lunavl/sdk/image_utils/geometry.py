@@ -166,6 +166,24 @@ class Rect(Generic[COORDINATE_TYPE]):
         else:
             self.coreRect = CoreRectI(x, y, width, height)
 
+    @property
+    def coreRectI(self) -> CoreRectI:
+        """
+        Create and return FaceEngine.Rect object.
+        """
+        if isinstance(self.coreRect, CoreRectI):
+            return self.coreRect
+        return CoreRectI(*map(int, (self.x, self.y, self.width, self.height)))
+
+    @property
+    def coreRectF(self):
+        """
+        Create and return FaceEngine.RectFloat object.
+        """
+        if isinstance(self.coreRect, CoreRectF):
+            return self.coreRect
+        return CoreRectF(*map(float, (self.x, self.y, self.width, self.height)))
+
     @classmethod
     def fromCoreRect(cls, rect: Union[CoreRectF, CoreRectI]) -> "Rect":
         """
@@ -177,8 +195,7 @@ class Rect(Generic[COORDINATE_TYPE]):
         Returns:
             new rect
         """
-        newRect = cls()
-        newRect.coreRect = rect
+        newRect = cls(x=rect.x, y=rect.y, width=rect.width, height=rect.height)
         return newRect
 
     @classmethod

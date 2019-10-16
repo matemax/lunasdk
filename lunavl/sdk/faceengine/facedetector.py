@@ -29,19 +29,6 @@ class ImageForDetection(NamedTuple):
     detectArea: Rect[float]
 
 
-class ImageForRedetections(NamedTuple):
-    """
-    Structure for the transfer to redetector an image and detect an area.
-
-    Attributes
-        image (VLImage): image for detection
-        detectAreas (List[Rect[float]]): faces' bounding boxes
-    """
-
-    image: VLImage
-    BBoxes: List[Rect[float]]
-
-
 class ImageForRedetection(NamedTuple):
     """
     Structure for the transfer to redetector an image and detect an area.
@@ -277,7 +264,7 @@ class FaceDetector:
         if detectArea is None:
             _detectArea = image.coreImage.getRect()
         else:
-            _detectArea = detectArea.coreRect
+            _detectArea = detectArea.coreRectI
 
         error, detectRes = self._detector.detectOne(
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
@@ -320,7 +307,7 @@ class FaceDetector:
                 detectAreas.append(image.coreImage.getRect())
             else:
                 img = image.image
-                detectAreas.append(image.detectArea.coreRect)
+                detectAreas.append(image.detectArea.coreRectI)
             if img.format != ColorFormat.R8G8B8:
                 details = "Bad image format for detection, format {}, img {}".format(img.format.value, img.filename)
                 raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
@@ -339,24 +326,43 @@ class FaceDetector:
 
         return res
 
-    def redetectOne(self, image: ImageForRedetection):
+    def redetectOne(self, image: ImageForRedetection) -> DetectionFloat:
         """
-        todo: wtf
-        Returns:
+        Redetect one image.
 
+        Args:
+            image: image with a bounding box
+
+        Returns:
+            detection
+        Raises:
+            LunaSDKException if an error occurs
         """
-        # todo remove \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        image = ImageForRedetection(image.image, DetectionFloat(image.BBox.coreRect, 1.0))
+        # todo remove \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ on 3.9.0 release
+        image = ImageForRedetection(image.image, DetectionFloat(image.BBox.coreRectF, 1.0))
         # todo remove ///////////////////////////////////////
 
         error, detectRes = self._detector.redetectOne(image.image.coreImage, image.BBox, DetectionType(dtBBox))
+        # error, detectRes = self._detector.redetectOne(image.image.coreImage, image.BBox.coreRectF,
+        #                                               DetectionType(dtBBox))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return detectRes
 
-    def redetect(self, images: List[ImageForRedetection]):
+    def redetect(self, images: List[ImageForRedetection]) -> List[DetectionFloat]:
+        """
+        Redetect several images.
+
+        Args:
+            images: images with a bounding boxes
+
+        Returns:
+            detections
+        Raises:
+            LunaSDKException if an error occurs
+        """
         def faceFactory(image: ImageForRedetection) -> Face:
-            face = Face(image.image.coreImage, DetectionFloat(image.BBox.coreRect, 1.0))
+            face = Face(image.image.coreImage, DetectionFloat(image.BBox.coreRectF, 1.0))
             return face
         faces = [faceFactory(image) for image in images]
         error, detectRes = self._detector.redetect(faces, DetectionType(dtBBox))
