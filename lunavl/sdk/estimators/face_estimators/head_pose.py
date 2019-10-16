@@ -8,7 +8,7 @@ from typing import Dict
 
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWarp
+from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.faceengine.facedetector import Landmarks68, BoundingBox
 from lunavl.sdk.image_utils.image import VLImage
@@ -126,7 +126,7 @@ class HeadPoseEstimator(BaseEstimator):
         """
         super().__init__(coreHeadPoseEstimator)
 
-    @CoreExceptionWarp(LunaVLError.EstimationAGSError)
+    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
     def estimateBy68Landmarks(self, landmarks68: Landmarks68) -> HeadPose:
         """
         Estimate head pose by 68 landmarks.
@@ -153,7 +153,7 @@ class HeadPoseEstimator(BaseEstimator):
         """
         return self.estimateBy68Landmarks(landmarks68)
 
-    @CoreExceptionWarp(LunaVLError.EstimationHeadPoseError)
+    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
     def estimateByBoundingBox(self, detection: BoundingBox, imageWithDetection: VLImage) -> HeadPose:
         """
         Estimate head pose by detection.

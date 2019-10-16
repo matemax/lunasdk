@@ -337,7 +337,11 @@ class VLFaceDetector:
         Returns:
             return list of detection, order of detections is corresponding to order input bounding boxes
         """
-        redetections = (self._faceDetector.redetectOne(ImageForRedetection(image, BBox)) for BBox in BBoxes)
+        redetections = (self._faceDetector.redetectOne(
+                ImageForRedetection(image, BBox),
+                detect5Landmarks=True,
+                detect68Landmarks=True
+        ) for BBox in BBoxes)
 
         res = []
         for imageNumber, redetection in enumerate(redetections):
@@ -364,7 +368,7 @@ class VLFaceDetector:
                 flatToImgIdx[len(flatImages)] = imageIdx
                 flatImages.append(newImage)
 
-        redetections = self._faceDetector.redetect(flatImages)
+        redetections = self._faceDetector.redetect(flatImages, True, True)
 
         # [redetection1, redetection2, redetection3] -> [[redetection1, redetection2], [redetection3]]
         res = [[] for _ in range(len(imagesAndBBoxes))]

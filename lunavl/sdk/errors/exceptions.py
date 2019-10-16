@@ -24,7 +24,7 @@ class LunaSDKException(Exception):
         self.context = context
 
 
-def CoreExceptionWarp(error: ErrorInfo):
+def CoreExceptionWrap(error: ErrorInfo):
     """
     Decorator catch runtime exceptions from core (as supposed)  and converts it to LunaSDKException.
 
