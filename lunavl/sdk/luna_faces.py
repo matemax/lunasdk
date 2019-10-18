@@ -340,9 +340,9 @@ class VLFaceDetector:
         if isinstance(image, VLFaceDetection):
             image = VLFaceDetection.image
         redetections: Iterable[FaceDetection] = (self._faceDetector.redetectOne(
-                ImageForRedetection(image, bBox),
-                detect5Landmarks=True,
-                detect68Landmarks=True
+            ImageForRedetection(image, bBox),
+            detect5Landmarks=True,
+            detect68Landmarks=True
         ) for bBox in bBoxes)
 
         res = [VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
@@ -374,7 +374,7 @@ class VLFaceDetector:
         # [redetection1, redetection2, redetection3] -> [[redetection1, redetection2], [redetection3]]
         res = [[] for _ in range(len(imagesAndBBoxes))]
         for detIdx, redetection in enumerate(redetections):
-            res[flatToImgIdx[detIdx]].append(VLFaceDetection(redetection.coreEstimation, redetection.image, 
+            res[flatToImgIdx[detIdx]].append(VLFaceDetection(redetection.coreEstimation, redetection.image,
                                                              self.estimatorsCollection))
         return res
 
