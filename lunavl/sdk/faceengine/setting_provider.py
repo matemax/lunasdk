@@ -156,7 +156,7 @@ class Point2:
         return self.x, self.y
 
 
-class DetectorType(Enum):
+class DetectorType(BiDirectionEnum):
     """
     Detector types enum
     """
@@ -335,7 +335,7 @@ class SystemSettings(BaseSettingsSection):
         Returns:
             betaMode
         """
-        return DetectorType[self.getValueAsString("defaultDetectorType")]
+        return DetectorType.getEnum(self.getValueAsString("defaultDetectorType"))
 
     @defaultDetectorType.setter
     def defaultDetectorType(self, value: DetectorType) -> None:
