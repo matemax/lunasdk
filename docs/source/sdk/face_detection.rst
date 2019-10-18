@@ -23,6 +23,13 @@ You should set detector type when creating detector. Once initialize detector ca
 
     We don’t recommend create often new detector because it is very slowly operation.
 
+Redection
+~~~~~~~~~
+
+If we have only an image and a face bounding box on this image we can run a redect for fast creating the detection
+structure with landmarks. Also you can ran redect if face bounding box belongs to other image but a face shift is small.
+For example you have frames sequence with a face. You can detect face on the first frame and fast redetect this face on
+next frames.
 
 Face alignment
 --------------
@@ -72,6 +79,7 @@ Examples
 
 .. literalinclude:: ../../../examples/sdk_examples/face_detection.py
 
+.. literalinclude:: ../../../examples/sdk_examples/face_redetection.py
 
 .. automodule:: lunavl.sdk.faceengine.facedetector
     :members:
