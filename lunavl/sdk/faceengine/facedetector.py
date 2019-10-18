@@ -359,7 +359,10 @@ class FaceDetector:
         ...
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
-    def redetectOne(self, image, *, bBox=None, detection=None, detect5Landmarks=True, detect68Landmarks=False):
+    def redetectOne(self, image, *,
+                    bBox: Optional[Rect] = None,
+                    detection: Optional[FaceDetection] = None,
+                    detect5Landmarks=True, detect68Landmarks=False):
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
 
@@ -390,7 +393,7 @@ class FaceDetector:
                                                           self._getDetectionType(detect5Landmarks, detect68Landmarks))
             vlImage = image
         elif isinstance(image, VLImage) and (bBox is None) and (detection is not None):
-            error, detectRes = self._detector.redetectOne(image.coreImage, detection,
+            error, detectRes = self._detector.redetectOne(image.coreImage, detection.coreEstimation.detection.rect,
                                                           self._getDetectionType(detect5Landmarks, detect68Landmarks))
             vlImage = image
         else:
