@@ -1,9 +1,12 @@
 """Module realize hight level api for estimate face attributes
 """
-from typing import Optional, Union, List, Dict
+from collections import defaultdict
+from typing import Optional, Union, List, Dict, Tuple, Iterable
 
-from FaceEngine import Face  # pylint: disable=E0611,E0401
+from FaceEngine import Face, DetectionType, dtBBox, DetectionFloat  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
+from numpy.ma import array
+
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
@@ -14,11 +17,11 @@ from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, FaceDetector, Landmarks5
+from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, FaceDetector, Landmarks5, \
+    ImageForRedetection
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
-from numpy.ma import array
 
 
 class VLFaceDetection(FaceDetection):
@@ -262,7 +265,7 @@ class VLFaceDetector:
     High level face detector. Return *VLFaceDetection* instead simple *FaceDetection*.
 
     Attributes:
-          estimatorCollection (FaceEstimatorsCollection): face estimator collections for new detections.
+          estimatorsCollection (FaceEstimatorsCollection): face estimator collections for new detections.
           _faceDetector (FaceDetector): face detector
           faceEngine (VLFaceEngine): face engine for detector and estimators, default *FACE_ENGINE*.
     """
@@ -273,7 +276,7 @@ class VLFaceDetector:
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def __init__(
-        self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
+            self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
     ):
         """
         Init.
@@ -287,7 +290,7 @@ class VLFaceDetector:
             self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
 
-    def detectOne(self, image: VLImage, detectArea: Optional[Rect[float]] = None) -> Union[None, VLFaceDetection]:
+    def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
         Detect just one best detection on the image.
 
@@ -310,7 +313,7 @@ class VLFaceDetector:
             images: input images list. Format must be R8G8B8
             limit: max number of detections per input image
         Returns:
-            return list of lists detection, order of detection lists is corresponding to order input images
+            return list of lists detection, order of detection lists is corresponding to order of input images
         """
         detectRes = self._faceDetector.detect(images, limit, True, True)
         res = []
@@ -322,6 +325,57 @@ class VLFaceDetector:
                     for detectRes in detectRes[imageNumber]
                 ]
             )
+        return res
+
+    def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBoxes: List[Rect]) -> List[VLFaceDetection]:
+        """
+        Redetect faces on an image. If VLFaceDetection is provided, only VLImage from that object will be used.
+
+        Args:
+            image: input image. Image format must be R8G8B8
+            bBoxes: bounding boxes
+        Returns:
+            return list of detection, order of detections is corresponding to order input bounding boxes
+        """
+        if isinstance(image, VLFaceDetection):
+            image = VLFaceDetection.image
+        redetections: Iterable[FaceDetection] = (self._faceDetector.redetectOne(
+            ImageForRedetection(image, bBox),
+            detect5Landmarks=True,
+            detect68Landmarks=True
+        ) for bBox in bBoxes)
+
+        res = [VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+               for redetection in redetections]
+        return res
+
+    def redetect(self, imagesAndBBoxes: List[Tuple[VLImage, List[Rect]]]) -> List[List[VLFaceDetection]]:
+        """
+        Redetect faces on images.
+
+        Args:
+            imagesAndBBoxes: input tuples: [(VLImage, [bBox1, bBox2])]. Image format must be R8G8B8
+
+        Returns:
+            detections: [[redetection]]. Order of detection lists is corresponding to order of input images.
+                Order of detections is corresponding to order of input bounding boxes.
+        """
+        # [image1[bbox1, bbox2], image2[bbox3]] -> [image1[bbox1], image1[bbox2], image2[bbox3]]
+        flatToImgIdx: Dict[int, int] = {}
+        flatImages: List[ImageForRedetection] = []
+        for imageIdx, (image, bBoxes) in enumerate(imagesAndBBoxes):
+            for bBox in bBoxes:
+                newImage = ImageForRedetection(image, bBox)
+                flatToImgIdx[len(flatImages)] = imageIdx
+                flatImages.append(newImage)
+
+        redetections: List[FaceDetection] = self._faceDetector.redetect(flatImages, True, True)
+
+        # [redetection1, redetection2, redetection3] -> [[redetection1, redetection2], [redetection3]]
+        res = [[] for _ in range(len(imagesAndBBoxes))]
+        for detIdx, redetection in enumerate(redetections):
+            res[flatToImgIdx[detIdx]].append(VLFaceDetection(redetection.coreEstimation, redetection.image,
+                                                             self.estimatorsCollection))
         return res
 
 

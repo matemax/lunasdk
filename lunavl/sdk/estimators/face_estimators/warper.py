@@ -3,7 +3,7 @@
 from typing import Union, Optional
 
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWarp
+from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from numpy.ma import array
 
 from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
@@ -126,7 +126,7 @@ class Warper:
         """
         self._coreWarper = coreWarper
 
-    @CoreExceptionWarp(LunaVLError.WarpTransformationError)
+    @CoreExceptionWrap(LunaVLError.WarpTransformationError)
     def _createWarpTransformation(self, faceDetection: FaceDetection) -> Transformation:
         """
         Create warp transformation.
@@ -145,7 +145,7 @@ class Warper:
             faceDetection.coreEstimation.detection, faceDetection.landmarks5.coreEstimation
         )
 
-    @CoreExceptionWarp(LunaVLError.CreationWarpError)
+    @CoreExceptionWrap(LunaVLError.CreationWarpError)
     def warp(self, faceDetection: FaceDetection) -> Warp:
         """
         Create warp from detection.

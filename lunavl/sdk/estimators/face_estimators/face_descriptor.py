@@ -9,7 +9,7 @@ from typing import Union, Optional, List, Tuple
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWarp
+from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.estimators.base_estimation import BaseEstimator
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
@@ -59,7 +59,7 @@ class FaceDescriptorEstimator(BaseEstimator):
         descriptor.garbageScore = optionalGS.value
         return descriptor
 
-    @CoreExceptionWarp(LunaVLError.EstimationBatchDescriptorError)
+    @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
         self,
         warps: List[Union[Warp, WarpedImage]],

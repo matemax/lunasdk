@@ -13,7 +13,7 @@ from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E06
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
 from FaceEngine import GazeEstimation as CoreGazeEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
@@ -189,7 +189,7 @@ class EyeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
+    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(
             self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
     ) -> EyesEstimation:
@@ -296,7 +296,7 @@ class GazeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWarp(LunaVLError.EstimationEyesGazeError)
+    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(self,
                  transformedLandmarks: Union[Landmarks5, Landmarks68],
                  warp: Union[Warp, WarpedImage]) -> GazeDirection:

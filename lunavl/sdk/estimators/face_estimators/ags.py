@@ -6,7 +6,7 @@ from typing import Optional
 
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimator
 from lunavl.sdk.faceengine.facedetector import BoundingBox, FaceDetection
@@ -29,7 +29,7 @@ class AGSEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWarp(LunaVLError.EstimationAGSError)
+    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
     def estimate(
         self,
         detection: Optional[FaceDetection] = None,

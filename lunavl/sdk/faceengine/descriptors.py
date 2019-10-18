@@ -11,7 +11,7 @@ from typing import Union, Optional
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWarp
+from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
 
@@ -157,7 +157,7 @@ class FaceDescriptorFactory:
     def __init__(self, faceEngine: "VLFaceEngine"):  # type: ignore # noqa: F821
         self._faceEngine = faceEngine
 
-    @CoreExceptionWarp(LunaVLError.CreationDescriptorError)
+    @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptor(self) -> IDescriptorPtr:
         """
         Generate core descriptor
@@ -167,7 +167,7 @@ class FaceDescriptorFactory:
         """
         return FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor())
 
-    @CoreExceptionWarp(LunaVLError.CreationDescriptorError)
+    @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptorsBatch(self, size: int) -> IDescriptorBatchPtr:
         """
         Generate core descriptors batch.

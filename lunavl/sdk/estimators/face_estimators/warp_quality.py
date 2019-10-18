@@ -4,9 +4,9 @@ See `warp quality`_.
 """
 from typing import Dict, Union
 
-from FaceEngine import Quality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import SubjectiveQuality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWarp, LunaSDKException
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
@@ -100,7 +100,7 @@ class WarpQualityEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWarp(LunaVLError.EstimationWarpQualityError)
+    @CoreExceptionWrap(LunaVLError.EstimationWarpQualityError)
     def estimate(self, warp: Union[Warp, WarpedImage]) -> Quality:
         """
         Estimate quality from a warp.
