@@ -52,7 +52,7 @@ class Quality(BaseEstimation):
         Returns:
             float in range(0, 1)
         """
-        return self._coreEstimation.dark
+        return self._coreEstimation.darkness
 
     @property
     def gray(self) -> float:
