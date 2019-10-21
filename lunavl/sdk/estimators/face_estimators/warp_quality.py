@@ -62,7 +62,8 @@ class Quality(BaseEstimation):
         Returns:
             float in range(0, 1)
         """
-        return self._coreEstimation.gray
+        #: todo: need support new quality
+        return self._coreEstimation.illumination
 
     @property
     def light(self) -> float:
