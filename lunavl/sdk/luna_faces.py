@@ -335,7 +335,7 @@ class VLFaceDetector:
             image: input image. Image format must be R8G8B8
             bBox: bounding box
         Returns:
-            return list of detection, order of detections is corresponding to order input bounding boxes
+            return detection or None if face not found
         """
         if isinstance(image, VLFaceDetection):
             image = VLFaceDetection.image
