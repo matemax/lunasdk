@@ -327,29 +327,28 @@ class VLFaceDetector:
             )
         return res
 
-    def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBoxes: List[Rect]) -> List[VLFaceDetection]:
+    def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBox: Rect) -> Union[VLFaceDetection, None]:
         """
         Redetect faces on an image. If VLFaceDetection is provided, only VLImage from that object will be used.
 
         Args:
             image: input image. Image format must be R8G8B8
-            bBoxes: bounding boxes
+            bBox: bounding box
         Returns:
             return list of detection, order of detections is corresponding to order input bounding boxes
         """
         if isinstance(image, VLFaceDetection):
             image = VLFaceDetection.image
-        redetections: Iterable[FaceDetection] = (self._faceDetector.redetectOne(
-            ImageForRedetection(image, bBox),
+        redetection: Union[None, FaceDetection] = self._faceDetector.redetectOne(
+            image, bBox=bBox,
             detect5Landmarks=True,
             detect68Landmarks=True
-        ) for bBox in bBoxes)
+        )
+        if redetection:
+            return VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+        return None
 
-        res = [VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
-               for redetection in redetections]
-        return res
-
-    def redetect(self, imagesAndBBoxes: List[Tuple[VLImage, List[Rect]]]) -> List[List[VLFaceDetection]]:
+    def redetect(self, imagesAndBBoxes: List[ImageForRedetection]) -> List[List[Union[VLFaceDetection, None]]]:
         """
         Redetect faces on images.
 
@@ -360,22 +359,15 @@ class VLFaceDetector:
             detections: [[redetection]]. Order of detection lists is corresponding to order of input images.
                 Order of detections is corresponding to order of input bounding boxes.
         """
-        # [image1[bbox1, bbox2], image2[bbox3]] -> [image1[bbox1], image1[bbox2], image2[bbox3]]
-        flatToImgIdx: Dict[int, int] = {}
-        flatImages: List[ImageForRedetection] = []
-        for imageIdx, (image, bBoxes) in enumerate(imagesAndBBoxes):
-            for bBox in bBoxes:
-                newImage = ImageForRedetection(image, bBox)
-                flatToImgIdx[len(flatImages)] = imageIdx
-                flatImages.append(newImage)
 
-        redetections: List[FaceDetection] = self._faceDetector.redetect(flatImages, True, True)
-
-        # [redetection1, redetection2, redetection3] -> [[redetection1, redetection2], [redetection3]]
-        res = [[] for _ in range(len(imagesAndBBoxes))]
-        for detIdx, redetection in enumerate(redetections):
-            res[flatToImgIdx[detIdx]].append(VLFaceDetection(redetection.coreEstimation, redetection.image,
-                                                             self.estimatorsCollection))
+        redetections: List[List[Union[FaceDetection, None]]] = self._faceDetector.redetect(imagesAndBBoxes, True, True)
+        res = []
+        for redetectionsOfImage in redetections:
+            imageRes = [VLFaceDetection(redetection.coreEstimation,
+                                        redetection.image,
+                                        self.estimatorsCollection) if redetection else None for redetection in
+                        redetectionsOfImage]
+            res.append(imageRes)
         return res
 
 
