@@ -33,7 +33,7 @@ class FaceDescriptorEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     def estimate(  # type: ignore
-        self, warp: Union[Warp, WarpedImage], descriptor: Optional[FaceDescriptor] = None
+            self, warp: Union[Warp, WarpedImage], descriptor: Optional[FaceDescriptor] = None
     ) -> FaceDescriptor:
         """
         Estimate face descriptor from a warp image.
@@ -53,10 +53,10 @@ class FaceDescriptorEstimator(BaseEstimator):
         else:
             coreDescriptor = descriptor.coreEstimation
 
-        optionalGS = self._coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
-        if optionalGS.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(optionalGS))
-        descriptor.garbageScore = optionalGS.value
+        error, optionalGS = self._coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        descriptor.garbageScore = optionalGS
         return descriptor
 
     @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
@@ -85,16 +85,15 @@ class FaceDescriptorEstimator(BaseEstimator):
         if aggregate:
             aggregatedDescriptor = self.descriptorFactory.generateDescriptor()
 
-            optionalGSAggregateDescriptor, scores = self._coreEstimator.extractFromWarpedImageBatch(
+            error, optionalGSAggregateDescriptor, scores = self._coreEstimator.extractFromWarpedImageBatch(
                 [warp.warpedImage.coreImage for warp in warps],
                 descriptorBatch.coreEstimation,
                 aggregatedDescriptor.coreEstimation,
                 len(warps),
             )
-            if optionalGSAggregateDescriptor.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(optionalGSAggregateDescriptor))
-            descriptorBatch.scores = scores
-            aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor.value
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor
         else:
             aggregatedDescriptor = None
             error, scores = self._coreEstimator.extractFromWarpedImageBatch(

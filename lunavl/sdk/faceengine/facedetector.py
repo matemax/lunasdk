@@ -35,11 +35,11 @@ class ImageForRedetection(NamedTuple):
 
     Attributes
         image (VLImage): image for detection
-        BBox (Rect): face bounding box
+        bBoxes (Rect): face bounding boxes
     """
 
     image: VLImage
-    bBox: Rect
+    bBoxes: List[Rect]
 
 
 class Landmarks5(Landmarks):
@@ -270,9 +270,9 @@ class FaceDetector:
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
         if error.isError:
-            if error.FSDKError == FSDKError.BufferIsEmpty:
-                return None
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+        if not detectRes.isValid():
+            return None
         coreDetection = detectRes
         return FaceDetection(coreDetection, image)
 
@@ -329,16 +329,6 @@ class FaceDetector:
     @overload
     def redetectOne(
             self,
-            image: ImageForRedetection,
-            *,
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
-    ) -> DetectionFloat:
-        ...
-
-    @overload
-    def redetectOne(
-            self,
             image: VLImage,
             *,
             bBox: Optional[Rect],
@@ -359,7 +349,10 @@ class FaceDetector:
         ...
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
-    def redetectOne(self, image, *, bBox=None, detection=None, detect5Landmarks=True, detect68Landmarks=False):
+    def redetectOne(self, image, *,
+                    bBox: Optional[Rect] = None,
+                    detection: Optional[FaceDetection] = None,
+                    detect5Landmarks=True, detect68Landmarks=False) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
 
@@ -372,25 +365,16 @@ class FaceDetector:
             detect68Landmarks: detect or not landmarks68
 
         Returns:
-            detection
+            detection if face found otherwise None
         Raises:
             LunaSDKException if an error occurs
         """
-        if isinstance(image, ImageForRedetection) and (bBox is detection is None):
-            # todo remove \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ on 3.9.0 release
-            imageForRedetection = ImageForRedetection(image.image, DetectionFloat(image.bBox.coreRectF, 1.0))
-            # todo remove ///////////////////////////////////////
-            error, detectRes = self._detector.redetectOne(imageForRedetection.image.coreImage, imageForRedetection.bBox,
-                                                          self._getDetectionType(detect5Landmarks, detect68Landmarks))
-            # error, detectRes = self._detector.redetectOne(image.image.coreImage, image.BBox.coreRectF,
-            #                                               self._getDetectionType(detect5Landmarks, detect68Landmarks))
-            vlImage = image.image
-        elif isinstance(image, VLImage) and (bBox is not None) and (detection is None):
+        if isinstance(image, VLImage) and (bBox is not None) and (detection is None):
             error, detectRes = self._detector.redetectOne(image.coreImage, bBox.coreRectF,
                                                           self._getDetectionType(detect5Landmarks, detect68Landmarks))
             vlImage = image
         elif isinstance(image, VLImage) and (bBox is None) and (detection is not None):
-            error, detectRes = self._detector.redetectOne(image.coreImage, detection,
+            error, detectRes = self._detector.redetectOne(image.coreImage, detection.coreEstimation.detection.rect,
                                                           self._getDetectionType(detect5Landmarks, detect68Landmarks))
             vlImage = image
         else:
@@ -398,7 +382,9 @@ class FaceDetector:
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return FaceDetection(detectRes, vlImage)
+        if detectRes.isValid():
+            return FaceDetection(detectRes, vlImage)
+        return None
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
@@ -406,7 +392,7 @@ class FaceDetector:
             images: List[ImageForRedetection],
             detect5Landmarks: bool = True,
             detect68Landmarks: bool = False,
-    ) -> List[FaceDetection]:
+    ) -> List[List[Union[FaceDetection, None]]]:
         """
         Redetect face on each image.image in area, restricted with image.bBox.
 
@@ -421,16 +407,29 @@ class FaceDetector:
             LunaSDKException if an error occurs
         """
 
-        def faceFactory(image: ImageForRedetection) -> Face:
-            face = Face(image.image.coreImage, DetectionFloat(image.bBox.coreRectF, 1.0))
-            return face
+        def facesFactory(image: ImageForRedetection) -> List[Face]:
+            faces = [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
+            return faces
 
-        faces = [faceFactory(image) for image in images]
+        faces = []
+        for image in images:
+            faces.extend(facesFactory(image))
         error, detectRes = self._detector.redetect(faces, self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        res = [FaceDetection(coreDetection, imageForRedetection.image)
-               for coreDetection, imageForRedetection in zip(detectRes, images)]
+
+        detectIter = iter(detectRes)
+        res = []
+        for image in images:
+            imageRes = []
+            for _ in range(len(image.bBoxes)):
+                detection = next(detectIter)
+                if detection.isValid():
+                    imageRes.append(FaceDetection(detection, image.image))
+                else:
+                    imageRes.append(None)
+            res.append(imageRes)
+
         return res
 
     def setDetectionComparer(self):
