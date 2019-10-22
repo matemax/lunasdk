@@ -270,9 +270,9 @@ class FaceDetector:
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
         if error.isError:
-            if error.FSDKError == FSDKError.BufferIsEmpty:
-                return None
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+        if not detectRes.isValid():
+            return None
         coreDetection = detectRes
         return FaceDetection(coreDetection, image)
 
