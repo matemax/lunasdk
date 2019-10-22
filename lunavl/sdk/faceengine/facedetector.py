@@ -407,13 +407,13 @@ class FaceDetector:
             LunaSDKException if an error occurs
         """
 
-        def faceFactory(image: ImageForRedetection) -> List[Face]:
+        def facesFactory(image: ImageForRedetection) -> List[Face]:
             faces = [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
             return faces
 
         faces = []
         for image in images:
-            faces.extend(faceFactory(image))
+            faces.extend(facesFactory(image))
         error, detectRes = self._detector.redetect(faces, self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

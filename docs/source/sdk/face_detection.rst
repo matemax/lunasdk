@@ -26,10 +26,10 @@ You should set detector type when creating detector. Once initialize detector ca
 Redection
 ~~~~~~~~~
 
-If we have only an image and a face bounding box on this image we can run a redect for fast creating the detection
-structure with landmarks. Also you can ran redect if face bounding box belongs to other image but a face shift is small.
-For example you have frames sequence with a face. You can detect face on the first frame and fast redetect this face on
-next frames.
+If there is only one image with a face bounding box on it, you can run the redetect method for a faster face detect
+(face detection structure creation), with landmarks. Also, you can run redetect if the face bounding box belongs to
+another image and a face shift was small. For example, you have frame sequence with the same face. You can detect face
+on the first frame and redetect this face fast on the next frames.
 
 Face alignment
 --------------
