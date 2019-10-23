@@ -20,7 +20,8 @@ class Quality(BaseEstimation):
 
         - dark
         - blur
-        - gray
+        - illumination
+        - specularity
         - light
     """
 
@@ -55,15 +56,24 @@ class Quality(BaseEstimation):
         return self._coreEstimation.darkness
 
     @property
-    def gray(self) -> float:
+    def illumination(self) -> float:
         """
-        Get gray.
+        Get illumination.
 
         Returns:
             float in range(0, 1)
         """
-        #: todo: need support new quality
         return self._coreEstimation.illumination
+
+    @property
+    def specularity(self) -> float:
+        """
+        Get specularity.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.specularity
 
     @property
     def light(self) -> float:
@@ -80,9 +90,11 @@ class Quality(BaseEstimation):
         Convert to dict.
 
         Returns:
-            {"darkness": self.dark, "lightning": self.light, "saturation": self.gray, "blurness": self.blur}
+            {"blurriness": self.blur, "dark": self.dark, "illumination": self.illumination,
+             "specularity": self.specularity, "light": self.light}
         """
-        return {"dark": self.dark, "light": self.light, "saturation": self.gray, "blurriness": self.blur}
+        return {"blurriness": self.blur, "dark": self.dark, "illumination": self.illumination,
+                "specularity": self.specularity, "light": self.light}
 
 
 class WarpQualityEstimator(BaseEstimator):
