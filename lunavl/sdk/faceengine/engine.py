@@ -69,7 +69,8 @@ class VLFaceEngine:
 
         self.dataPath = pathToData
         # todo: validate initialize
-        self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData, configPath=str(self.faceEngineProvider.pathToConfig))
+        self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData,
+                                                   configPath=str(self.faceEngineProvider.pathToConfig))
 
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
