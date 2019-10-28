@@ -190,7 +190,7 @@ class BaseSettingsSection:
     Proxy model to core settings provider.
 
     Attributes:
-        _coreSettingProvider (coreSettingProvider): core settings provider
+        _coreSettingProvider (PyISettingsProvider): core settings faceEngineProvider
     """
 
     # (str): section name
@@ -259,34 +259,12 @@ class SystemSettings(BaseSettingsSection):
     Common system settings.
 
     Properties:
-
-        - cpuClass (CpuClass): class of cpu by supported instructions
         - verboseLogging (VerboseLogging): Level of log versobing
         - betaMode (bool): enable experimental features.
         - defaultDetectorType (DetectorType): default detector type
     """
 
     sectionName = "system"
-
-    @property
-    def cpuClass(self) -> CpuClass:
-        """
-        Getter for cpuClass
-
-        Returns:
-            cpuClass
-        """
-        return CpuClass[self.getValueAsString("cpuClass")]
-
-    @cpuClass.setter
-    def cpuClass(self, value: CpuClass) -> None:
-        """
-        Setter for cpuClass.
-
-        Args:
-            value: new value
-        """
-        self.setValue("cpuClass", value.value)
 
     @property
     def verboseLogging(self) -> VerboseLogging:
@@ -347,28 +325,34 @@ class SystemSettings(BaseSettingsSection):
         self.setValue("defaultDetectorType", value.value)
 
 
-class FlowerSettings(BaseSettingsSection):
+class RuntimeSettings(BaseSettingsSection):
     """
     Flower library is the default neural network inference engine.
     The library is used for:
 
         - face detectors;
-
         - estimators(attributes, quality);
-
         - face descriptors
 
     Properties:
+        cpuClass (CpuClass): class of cpu by supported instructions
         deviceClass (DeviceClass):  execution device type cpu, gpu.
         numThreads (int): number of worker threads.
         verboseLogging (VerboseLogging): level of verbose logging
         numComputeStreams (int):  increases performance, but works only with new versions of nvidia drivers
     """
 
-    sectionName = "flower"
+    sectionName = "Runtime"
 
     @property
     def deviceClass(self) -> DeviceClass:
+        """
+        Get device class.
+
+        Returns:
+            device class
+        """
+
         return DeviceClass[self.getValueAsString("deviceClass")]
 
     @deviceClass.setter
@@ -379,6 +363,26 @@ class FlowerSettings(BaseSettingsSection):
             value: new value
         """
         self.setValue("deviceClass", value.value)
+
+    @property
+    def cpuClass(self) -> CpuClass:
+        """
+        Getter for cpuClass
+
+        Returns:
+            cpuClass
+        """
+        return CpuClass[self.getValueAsString("cpuClass")]
+
+    @cpuClass.setter
+    def cpuClass(self, value: CpuClass) -> None:
+        """
+        Setter for cpuClass.
+
+        Args:
+            value: new value
+        """
+        self.setValue("cpuClass", value.value)
 
     @property
     def numThreads(self) -> int:
@@ -1567,17 +1571,19 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         self.setValue("shouldersHeightKoeff", value)
 
 
-class SettingsProvider:
+class BaseSettingsProvider:
     """
-    SDK Setting provider.
+    Runtime SDK Setting faceEngineProvider.
 
     Proxy model.
 
     Attributes:
         pathToConfig (str): path to a configuration file. Config file is getting from
                           the folder'data'  in "FSDK_ROOT".
-        _coreSettingProvider ()
+        _coreSettingProvider (PyISettingsProvider): core settings provider
     """
+    # default configuration filename.
+    defaultConfName = ""
 
     def __init__(self, pathToConfig: Optional[Union[str, Path]] = None):
         """
@@ -1590,7 +1596,7 @@ class SettingsProvider:
         """
         if pathToConfig is None:
             if "FSDK_ROOT" in os.environ:
-                self.pathToConfig = Path(os.environ["FSDK_ROOT"]).joinpath("data", "faceengine.conf")
+                self.pathToConfig = Path(os.environ["FSDK_ROOT"]).joinpath("data", self.defaultConfName)
             else:
                 raise ValueError(
                     "Failed on path to faceengine luna data folder, set variable pathToData or set"
@@ -1606,6 +1612,25 @@ class SettingsProvider:
         self._coreSettingProvider = CoreFE.createSettingsProvider(str(self.pathToConfig))
 
     @property
+    def coreProvider(self) -> PyISettingsProvider:
+        """
+        Get core settings provider
+        Returns:
+            _coreSettingProvider
+        """
+        return self._coreSettingProvider
+
+
+class FaceEngineSettingsProvider(BaseSettingsProvider):
+    """
+    SDK Setting faceEngineProvider.
+
+    Proxy model.
+    """
+    # default configuration filename.
+    defaultConfName = "faceengine.conf"
+
+    @property
     def systemSettings(self) -> SystemSettings:
         """
         Getter for system settings section.
@@ -1614,16 +1639,6 @@ class SettingsProvider:
             Mutable system section
         """
         return SystemSettings(self._coreSettingProvider)
-
-    @property
-    def flowerSettings(self) -> FlowerSettings:
-        """
-        Getter for flower settings section.
-
-        Returns:
-            Mutable flower section
-        """
-        return FlowerSettings(self._coreSettingProvider)
 
     @property
     def descriptorFactorySettings(self) -> DescriptorFactorySettings:
@@ -1785,6 +1800,21 @@ class SettingsProvider:
         """
         return HeadAndShouldersLivenessEstimatorSettings(self._coreSettingProvider)
 
+
+class RuntimeSettingsProvider(BaseSettingsProvider):
+    """
+    Runtime SDK Setting faceEngineProvider.
+
+    Proxy model.
+    """
+    defaultConfName = "runtime.conf"
+
     @property
-    def coreProvider(self) -> PyISettingsProvider:
-        return self._coreSettingProvider
+    def runtimeSettings(self) -> RuntimeSettings:
+        """
+        Getter for runtime settings section.
+
+        Returns:
+            Mutable runtime section
+        """
+        return RuntimeSettings(self._coreSettingProvider)
