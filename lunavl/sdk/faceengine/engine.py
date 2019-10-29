@@ -18,7 +18,7 @@ from lunavl.sdk.estimators.face_estimators.warper import Warper
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
 from lunavl.sdk.faceengine.descriptors import FaceDescriptorFactory
 from lunavl.sdk.faceengine.matcher import FaceMatcher
-from lunavl.sdk.faceengine.setting_provider import DetectorType, SettingsProvider
+from lunavl.sdk.faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 
 from ..faceengine.facedetector import FaceDetector
 
@@ -29,17 +29,21 @@ class VLFaceEngine:
 
     Attributes:
         dataPath (str): path to a faceengine data folder
-        provider (SettingsProvider): settings provider
+        faceEngineProvider (FaceEngineSettingsProvider): face engine settings provider
+        runtimeProvider (RuntimeSettingsProvider): runtime settings provider
         _faceEngine (PyIFaceEngine): python C++ binding on IFaceEngine, Root LUNA SDK object interface
     """
 
-    def __init__(self, pathToData: Optional[str] = None, faceEngineConf: Optional[Union[str, SettingsProvider]] = None):
+    def __init__(self, pathToData: Optional[str] = None,
+                 faceEngineConf: Optional[Union[str, FaceEngineSettingsProvider]] = None,
+                 runtimeConf: Optional[Union[str, RuntimeSettingsProvider]] = None):
         """
         Init.
 
         Args:
             pathToData: path to a faceengine data folder
-            pathToFaceEngineConf:  path to a faceengine configuration file
+            faceEngineConf:  path to a faceengine configuration file
+            runtimeConf:  path to a runtime configuration file
         """
         if pathToData is None:
             if "FSDK_ROOT" in os.environ:
@@ -50,17 +54,26 @@ class VLFaceEngine:
                     "environment variable *FSDK_ROOT*"
                 )
         if faceEngineConf is None:
-            self.provider = SettingsProvider()
+            self.faceEngineProvider = FaceEngineSettingsProvider()
         elif isinstance(faceEngineConf, str):
-            self.provider = SettingsProvider(faceEngineConf)
+            self.faceEngineProvider = FaceEngineSettingsProvider(faceEngineConf)
         else:
-            self.provider = faceEngineConf
+            self.faceEngineProvider = faceEngineConf
+
+        if runtimeConf is None:
+            self.runtimeProvider = RuntimeSettingsProvider()
+        elif isinstance(runtimeConf, str):
+            self.runtimeProvider = RuntimeSettingsProvider(runtimeConf)
+        else:
+            self.runtimeProvider = runtimeConf
 
         self.dataPath = pathToData
         # todo: validate initialize
-        self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData, configPath=str(self.provider.pathToConfig))
+        self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData,
+                                                   configPath=str(self.faceEngineProvider.pathToConfig))
 
-        self._faceEngine.setSettingsProvider(self.provider.coreProvider)
+        self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
+        self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
 
     def createFaceDetector(self, detectorType: DetectorType) -> FaceDetector:
         """
