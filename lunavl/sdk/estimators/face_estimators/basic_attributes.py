@@ -3,7 +3,7 @@
 See `basic attributes`_.
 """
 from enum import Enum
-from typing import Union, Dict, Any
+from typing import Union, Dict, Any, List, Tuple
 
 from FaceEngine import IAttributeEstimatorPtr, AttributeRequest, AttributeResult  # pylint: disable=E0611,E0401
 from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint: disable=E0611,E0401
@@ -215,10 +215,10 @@ class BasicAttributesEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationBasicAttributeError)
     def estimate(
-        self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
+            self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
     ) -> BasicAttributes:
         """
-        Estimate ethnicity.
+        Estimate a basic attributes (age, gender, ethnicity) from warped images.
 
         Args:
             warp: warped image
@@ -227,7 +227,7 @@ class BasicAttributesEstimator(BaseEstimator):
             estimateEthnicity: estimate ethnicity or not
 
         Returns:
-            estimated ethnicity
+            estimated age, gender, ethnicity
         Raises:
             LunaSDKException: if estimation failed
         """
@@ -243,3 +243,44 @@ class BasicAttributesEstimator(BaseEstimator):
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return BasicAttributes(baseAttributes)
+
+    @CoreExceptionWrap(LunaVLError.BatchEstimationBasicAttributeError)
+    def estimateBasicAttributesBatch(
+            self, warps: List[Union[Warp, WarpedImage]],
+            estimateAge: bool, estimateGender: bool, estimateEthnicity: bool,
+            aggregate: bool = False,
+    ) -> Tuple[List[BasicAttributes], Union[None, BasicAttributes]]:
+        """
+        Batch estimation a basic attributes from warped images.
+
+        Args:
+            warps: warped images
+            estimateAge: estimate age or not
+            estimateGender: estimate gender or not
+            estimateEthnicity: estimate ethnicity or not
+            aggregate:  aggregate attributes to one or not
+
+        Returns:
+            tuple, first element - list estimated attributes in corresponding order,
+            second - optional aggregated attributes.
+        Raises:
+            LunaSDKException: if estimation failed
+        """
+        dtAttributes = 0
+        if estimateAge:
+            dtAttributes |= AttributeRequest.estimateAge
+        if estimateGender:
+            dtAttributes |= AttributeRequest.estimateGender
+        if estimateEthnicity:
+            dtAttributes |= AttributeRequest.estimateEthnicity
+
+        images = [warp.warpedImage.coreImage for warp in warps]
+
+        error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
+        if aggregate:
+            return attributes, BasicAttributes(aggregateAttribute)
+        else:
+            return attributes, None
