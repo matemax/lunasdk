@@ -50,8 +50,8 @@ class TestDetector(BaseTestClass):
         return error
 
     def test_detect_landmarks(self):
-        image = VLImage.load(filename=ONE_FACE)
-        detectOne = TestDetector.detector.detectOne(image=image)
+        imageWithOneFace = VLImage.load(filename=ONE_FACE)
+        detectOne = TestDetector.detector.detectOne(image=imageWithOneFace)
         Case = namedtuple("Case", ("detect5Landmarks", "detect68Landmarks"))
         cases = [
             Case(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False), (True, False))
@@ -63,14 +63,14 @@ class TestDetector(BaseTestClass):
                     with self.subTest(funcName=func):
                         if func == "redetectOne":
                             response = TestDetector.detector.redetectOne(
-                                image=image,
+                                image=imageWithOneFace,
                                 detection=detectOne,
                                 detect68Landmarks=case.detect68Landmarks,
                                 detect5Landmarks=case.detect5Landmarks,
                             )
                         else:
                             response = TestDetector.detector.redetect(
-                                images=[ImageForRedetection(image=image, bBoxes=[detectOne.boundingBox.rect])],
+                                images=[ImageForRedetection(image=imageWithOneFace, bBoxes=[detectOne.boundingBox.rect])],
                                 detect68Landmarks=case.detect68Landmarks,
                                 detect5Landmarks=case.detect5Landmarks,
                             )[0][0]
@@ -85,14 +85,14 @@ class TestDetector(BaseTestClass):
                             assert response.landmarks68 is None
 
     def test_redetect_one_image(self):
-        image = VLImage.load(filename=ONE_FACE)
-        detection = TestDetector.detector.detectOne(image=image)
+        imageWithOneFace = VLImage.load(filename=ONE_FACE)
+        detection = TestDetector.detector.detectOne(image=imageWithOneFace)
         for parameter in ("bBox", "detection"):
             if parameter == "bBox":
-                response = TestDetector.detector.redetectOne(image=image,
+                response = TestDetector.detector.redetectOne(image=imageWithOneFace,
                                                              bBox=detection.boundingBox.rect)
             else:
-                response = TestDetector.detector.redetectOne(image=image,
+                response = TestDetector.detector.redetectOne(image=imageWithOneFace,
                                                              detection=detection)
         assert isinstance(response, FaceDetection)
 
@@ -106,7 +106,7 @@ class TestDetector(BaseTestClass):
                                                                                       for face in detectSeveral[0]]),
                                                           ImageForRedetection(image=imageWithOneFace,
                                                                               bBoxes=[detectOne.boundingBox.rect])])
-        [isinstance(face, FaceDetection) for face in (*redetect[0], *redetect[1])]
+        assert all(isinstance(face, FaceDetection) for item in redetect for face in item)
         assert 2 == len(redetect)
         assert 5 == len(redetect[0])
         assert 1 == len(redetect[1])
