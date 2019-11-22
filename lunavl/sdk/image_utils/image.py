@@ -154,14 +154,14 @@ class VLImage:
             with path.open("rb") as file:
                 body = file.read()
                 img = cls(body, imgFormat)
-                img.source = path.name
+                img.filename = path.name
                 return img
 
         if url is not None:
             response = requests.get(url=url)
             if response.status_code == 200:
                 img = cls(response.content, imgFormat)
-                img.source = url
+                img.filename = url
                 return img
         raise ValueError
 

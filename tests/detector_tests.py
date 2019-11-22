@@ -1,20 +1,25 @@
 import itertools
+import os
 from collections import namedtuple
+from typing import Optional
 
 import pytest
 
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.faceengine.facedetector import (
-    DetectorType,
     FaceDetector,
     Landmarks5,
     Landmarks68,
     FaceDetection,
     ImageForDetection,
-)
+    BoundingBox)
+from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE, SEVERAL_FACES, MANY_FACES, NO_FACES
+
+TEXT_FILE_PATH = os.path.join(os.path.dirname(__file__), "data", "test_type.txt")
 
 
 class TestDetector(BaseTestClass):
@@ -27,7 +32,38 @@ class TestDetector(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        try:
+            os.remove(TEXT_FILE_PATH)
+        except FileNotFoundError:
+            pass
+
+    @staticmethod
+    def createTextFile():
+        with open(TEXT_FILE_PATH, "w") as w:
+            w.write("test type image")
+        if os.path.isfile(TEXT_FILE_PATH):
+            return TEXT_FILE_PATH
+
+    @staticmethod
+    def getErrorDetectOne(imageVl: VLImage, detectArea: Optional[Rect] = None):
+        with pytest.raises(LunaSDKException) as ex:
+            TestDetector.detector.detectOne(image=imageVl, detectArea=detectArea)
+        error = {"error_code": ex.value.error.errorCode, "desc": ex.value.error.description,
+                 "detail": ex.value.error.detail}
+        return error
+
+    @staticmethod
+    def getErrorDetect(imageVl: VLImage, detectArea: Optional[Rect] = None):
+        with pytest.raises(LunaSDKException) as ex:
+            TestDetector.detector.detect(images=[ImageForDetection(imageVl, detectArea)])
+        error = {"error_code": ex.value.error.errorCode, "desc": ex.value.error.description,
+                 "detail": ex.value.error.detail}
+        return error
 
     def test_detect_one_face(self):
         image = VLImage.load(filename=ONE_FACE)
@@ -124,7 +160,7 @@ class TestDetector(BaseTestClass):
         assert 5 == len(detections)
 
         detections = TestDetector.detector.detect(images=[image], limit=20)[0]
-        assert 19 == len(detections)
+        assert 20 == len(detections)
 
     @pytest.mark.skip("core bug")
     def test_detect_limit_bad_param(self):
@@ -142,7 +178,24 @@ class TestDetector(BaseTestClass):
         assert detection is None
 
     def test_detect_bad_image_type(self):
-        pass
+        with pytest.raises(LunaSDKException) as ex:
+            VLImage.load(filename=self.createTextFile())
+        assert ex.value.error.errorCode == 100033
+        assert ex.value.error.description == "Unsupported image type"
+        assert ex.value.error.detail == "Unsupported type"
+
+    def test_detect_bad_image_color_format(self):
+        image = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
+
+        for func in ("detect", "detectOne"):
+            with self.subTest(funcName=func):
+                if func == "detectOne":
+                    error = self.getErrorDetectOne(image)
+                else:
+                    error = self.getErrorDetect(image, detectArea=image.rect)
+                assert error["error_code"] == 100011
+                assert error["desc"] == "Invalid image format"
+                assert error["detail"] == "Bad image format for detection, format: B8G8R8, image: one_face.jpg"
 
     def test_detect_by_area_one_face(self):
         image = VLImage.load(filename=ONE_FACE)
@@ -151,7 +204,7 @@ class TestDetector(BaseTestClass):
         assert detection is None
         area = Rect(100, 100, image.rect.width - 100, image.rect.height - 100)
         detection = TestDetector.detector.detectOne(image=image, detectArea=area)
-        isinstance(detection, FaceDetection)
+        assert isinstance(detection, FaceDetection)
 
     def test_detect_by_area_and_not(self):
         image = VLImage.load(filename=ONE_FACE)
@@ -163,10 +216,18 @@ class TestDetector(BaseTestClass):
         assert 3 == len(detections)
         assert 0 == len(detections[0])
         assert 1 == len(detections[1])
-        assert 1 == len(detections[1])
+        assert 1 == len(detections[2])
 
-    # @pytest.mark.skip("core bug")
     def test_detect_by_bad_area(self):
         image = VLImage.load(filename=ONE_FACE)
         area = Rect(100, 100, image.rect.width, image.rect.height)
-        detections = TestDetector.detector.detectOne(image=image, detectArea=area)
+        error = self.getErrorDetectOne(image, detectArea=area)
+        assert error["error_code"] == 100005
+        assert error["desc"] == "Internal error"
+        assert error["detail"] == "Internal error"
+
+    def test_check_bounding_box(self):
+        image = VLImage.load(filename=ONE_FACE)
+        detection = TestDetector.detector.detectOne(image=image).boundingBox
+        assert isinstance(detection, BoundingBox)
+        assert detection.rect.isValid()
