@@ -4,6 +4,7 @@ from typing import Optional
 
 import pytest
 
+from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.faceengine.facedetector import (
     FaceDetector,
@@ -15,7 +16,7 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, SEVERAL_FACES
+from tests.resources import SEVERAL_FACES, CLEAN_ONE_FACE
 
 
 class TestDetector(BaseTestClass):
@@ -28,7 +29,7 @@ class TestDetector(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
     @staticmethod
     def getErrorRedetectOne(imageVl: VLImage, detection: Optional[FaceDetection] = None, bBox: Optional[Rect] = None):
@@ -37,20 +38,16 @@ class TestDetector(BaseTestClass):
                 TestDetector.detector.redetectOne(image=imageVl, detection=detection)
             else:
                 TestDetector.detector.redetectOne(image=imageVl, bBox=bBox)
-        error = {"error_code": ex.value.error.errorCode, "desc": ex.value.error.description,
-                 "detail": ex.value.error.detail}
-        return error
+        return ex
 
     @staticmethod
     def getErrorRedetect(imageVl: VLImage, bBoxes):
         with pytest.raises(LunaSDKException) as ex:
             TestDetector.detector.redetect(images=[ImageForRedetection(image=imageVl, bBoxes=bBoxes)])
-        error = {"error_code": ex.value.error.errorCode, "desc": ex.value.error.description,
-                 "detail": ex.value.error.detail}
-        return error
+        return ex
 
     def test_detect_landmarks(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
         detectOne = TestDetector.detector.detectOne(image=imageWithOneFace)
         Case = namedtuple("Case", ("detect5Landmarks", "detect68Landmarks"))
         cases = [
@@ -70,7 +67,8 @@ class TestDetector(BaseTestClass):
                             )
                         else:
                             response = TestDetector.detector.redetect(
-                                images=[ImageForRedetection(image=imageWithOneFace, bBoxes=[detectOne.boundingBox.rect])],
+                                images=[ImageForRedetection(image=imageWithOneFace,
+                                                            bBoxes=[detectOne.boundingBox.rect])],
                                 detect68Landmarks=case.detect68Landmarks,
                                 detect5Landmarks=case.detect5Landmarks,
                             )[0][0]
@@ -85,7 +83,7 @@ class TestDetector(BaseTestClass):
                             assert response.landmarks68 is None
 
     def test_redetect_one_image(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
         detection = TestDetector.detector.detectOne(image=imageWithOneFace)
         for parameter in ("bBox", "detection"):
             if parameter == "bBox":
@@ -97,7 +95,7 @@ class TestDetector(BaseTestClass):
         assert isinstance(response, FaceDetection)
 
     def test_batch_redetect(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
         imageWithSeveralFace = VLImage.load(filename=SEVERAL_FACES)
         detectOne = TestDetector.detector.detectOne(image=imageWithOneFace)
         detectSeveral = TestDetector.detector.detect(images=[imageWithSeveralFace])
@@ -112,30 +110,24 @@ class TestDetector(BaseTestClass):
         assert 1 == len(redetect[1])
 
     def test_redetect_face_with_wrong_area(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
         redetectOne = TestDetector.detector.redetectOne(image=imageWithOneFace, bBox=Rect(0, 0, 100, 100))
         redetect = TestDetector.detector.redetect(images=[ImageForRedetection(image=imageWithOneFace,
                                                                               bBoxes=[Rect(0, 0, 100, 100)])])
         assert redetectOne is None
         assert redetect[0][0] is None
 
-    def test_redetect_face_with_invalid_rect(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
-        error = self.getErrorRedetectOne(imageVl=imageWithOneFace, bBox=Rect())
-        assert error["error_code"] == 100016
-        assert error["desc"] == "Invalid rectangle"
-        assert error["detail"] == "Invalid rectangle"
+    def test_redetect_one_face_invalid_rectangle(self):
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
+        exceptionInfo = self.getErrorRedetectOne(imageVl=imageWithOneFace, bBox=Rect(0.666, 0.666, 0.666, 0.666))
+        self.assertLunaVlError(exceptionInfo, 100013, LunaVLError.InvalidInput)
+
+    def test_redetect_face_invalid_rectangle(self):
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
+        exceptionInfo = self.getErrorRedetect(imageVl=imageWithOneFace, bBoxes=[Rect()])
+        self.assertLunaVlError(exceptionInfo, 99999, LunaVLError.UnknownError)
 
     def test_redetect_face_without_detection_and_bbox(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
-        error = self.getErrorRedetectOne(imageVl=imageWithOneFace)
-        assert error["error_code"] == 110019
-        assert error["desc"] == "Detect one face error"
-        assert error["detail"] == ""
-
-    def test_redetect_unknown_fsdk_error(self):
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
-        error = self.getErrorRedetect(imageVl=imageWithOneFace, bBoxes=[Rect()])
-        assert error["error_code"] == 99999
-        assert error["desc"] == "Unknown fsdk core error"
-        assert error["detail"] == "Unknown error"
+        imageWithOneFace = VLImage.load(filename=CLEAN_ONE_FACE)
+        exceptionInfo = self.getErrorRedetectOne(imageVl=imageWithOneFace)
+        self.assertLunaVlError(exceptionInfo, 110019, LunaVLError.DetectFacesError)

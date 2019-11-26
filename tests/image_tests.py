@@ -4,6 +4,8 @@ import pytest
 import numpy as np
 import FaceEngine as fe
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 from tests.base import BaseTestClass
@@ -58,6 +60,11 @@ class TestImage(BaseTestClass):
             else:
                 with pytest.raises(FileNotFoundError):
                     assert VLImage.load(filename=filename)
+
+    def test_bad_image_type(self):
+        with pytest.raises(LunaSDKException) as ex:
+            VLImage(body=b'some text', filename="bytes")
+        self.assertLunaVlError(ex, 100033, LunaVLError.InvalidType)
 
     def test_check_ndarray_type(self):
         image = VLImage.load(filename=ONE_FACE)

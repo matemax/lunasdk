@@ -2,6 +2,7 @@ from typing import Union, List
 
 import pytest
 
+from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator, BasicAttributes
 from lunavl.sdk.estimators.face_estimators.warper import Warper, Warp
@@ -30,7 +31,8 @@ class TestEstimate(BaseTestClass):
         cls.estimator = cls.faceEngine.createBasicAttributesEstimator()
 
     @staticmethod
-    def getBasicAttributeError(warp: Union[Warp, List], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool):
+    def getBasicAttributeError(warp: Union[Warp, List], estimateAge: bool, estimateGender: bool,
+                               estimateEthnicity: bool):
         with pytest.raises(LunaSDKException) as ex:
             if isinstance(warp, list):
                 TestEstimate.estimator.estimateBasicAttributesBatch(warps=warp,
@@ -40,9 +42,7 @@ class TestEstimate(BaseTestClass):
             else:
                 TestEstimate.estimator.estimate(warp=warp, estimateAge=estimateAge, estimateEthnicity=estimateEthnicity,
                                                 estimateGender=estimateGender)
-        error = {"error_code": ex.value.error.errorCode, "desc": ex.value.error.description,
-                 "detail": ex.value.error.detail}
-        return error
+        return ex
 
     def test_estimate_basic_attributes(self):
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
@@ -53,19 +53,18 @@ class TestEstimate(BaseTestClass):
                                                         estimateEthnicity=True,
                                                         estimateGender=True)
         assert isinstance(estimateBasic, BasicAttributes)
-        assert estimateBasic.asDict()['ethnicities'] is not None
-        assert estimateBasic.asDict()['age'] is not None
-        assert estimateBasic.asDict()['gender'] in (0, 1)
+        assert estimateBasic.ethnicity is not None
+        assert estimateBasic.age is not None
+        assert estimateBasic.gender in (0, 1)
 
     def test_estimation_basic_bad_optional_attr(self):
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
         detect = TestEstimate.detector.detectOne(image=imageWithOneFace)
         warp = TestEstimate.warper.warp(detect)
         assert warp.warpedImage.assertWarp() is None
-        error = self.getBasicAttributeError(warp=warp, estimateAge=False, estimateEthnicity=True, estimateGender=True)
-        assert error["error_code"] == 110006
-        assert error["desc"] == "Estimation basic attributes error"
-        assert error["detail"] == "bad_optional_access"
+        exceptionInfo = self.getBasicAttributeError(warp=warp, estimateAge=False, estimateEthnicity=True,
+                                                    estimateGender=True)
+        self.assertLunaVlError(exceptionInfo, 110006, LunaVLError.EstimationBasicAttributeError)
 
     def test_estimation_basic_attr_batch(self):
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
@@ -92,8 +91,7 @@ class TestEstimate(BaseTestClass):
         detect = TestEstimate.detector.detectOne(image=imageWithOneFace)
         warp = TestEstimate.warper.warp(detect)
         assert warp.warpedImage.assertWarp() is None
-        error = self.getBasicAttributeError(warp=[warp, warp.warpedImage], estimateAge=False, estimateEthnicity=True,
-                                            estimateGender=True)
-        assert error["error_code"] == 110007, error
-        assert error["desc"] == "Batch estimation basic attributes error"
-        assert error["detail"] == "bad_optional_access"
+        exceptionInfo = self.getBasicAttributeError(warp=[warp, warp.warpedImage], estimateAge=False,
+                                                    estimateEthnicity=True,
+                                                    estimateGender=True)
+        self.assertLunaVlError(exceptionInfo, 110007, LunaVLError.BatchEstimationBasicAttributeError)
