@@ -91,22 +91,22 @@ class TestDetector(BaseTestClass):
             assert 0 <= detection.boundingBox.score < 1, "score out of range [0,1]"
 
     def test_bounding_box_as_dict(self):
-        for detect in self.getDetections():
-            assert jsonschema.validate(detect.boundingBox.asDict(), REQUIRED_FACE_DETECTION) is None, detect.asDict()
-            assert detect.boundingBox.rect.isValid()
+        for detection in self.getDetections():
+            assert jsonschema.validate(detection.boundingBox.asDict(), REQUIRED_FACE_DETECTION) is None, detection.asDict()
+            assert detection.boundingBox.rect.isValid()
 
     def test_face_detection_as_dict(self):
-        for detect in self.getDetections(detect5Landmarks=False, detect68Landmarks=False):
-            assert jsonschema.validate(detect.asDict(), REQUIRED_FACE_DETECTION) is None, detect.asDict()
-        for detect in self.getDetections(detect5Landmarks=True, detect68Landmarks=True):
-            currentSchema = json.loads(json.dumps(detect.asDict()))
-            assert jsonschema.validate(currentSchema, REQUIRED_FACE_DETECTION) is None, detect.asDict()
+        for detection in self.getDetections(detect5Landmarks=False, detect68Landmarks=False):
+            assert jsonschema.validate(detection.asDict(), REQUIRED_FACE_DETECTION) is None, detection.asDict()
+        for detection in self.getDetections(detect5Landmarks=True, detect68Landmarks=True):
+            currentSchema = json.loads(json.dumps(detection.asDict()))
+            assert jsonschema.validate(currentSchema, REQUIRED_FACE_DETECTION) is None, detection.asDict()
 
     def test_different_detectors(self):
         for subTest, detector, score in self.detectorSubTest():
             with subTest:
-                for detectType in ("detect", "detectOne"):
-                    if detectType == "detectOne":
+                for detectionFunction in ("detect", "detectOne"):
+                    if detectionFunction == "detectOne":
                         detection = detector.detectOne(image=VLIMAGE_ONE_FACE)
                     else:
                         detection = detector.detect(images=[VLIMAGE_ONE_FACE])[0][0]
@@ -167,9 +167,9 @@ class TestDetector(BaseTestClass):
         ]
         for case in cases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
-                for func in ("detect", "detectOne"):
-                    with self.subTest(funcName=func):
-                        if func == "detectOne":
+                for detectionFunction in ("detect", "detectOne"):
+                    with self.subTest(funcName=detectionFunction):
+                        if detectionFunction == "detectOne":
                             detection = TestDetector.detector.detectOne(
                                 image=VLIMAGE_ONE_FACE,
                                 detect68Landmarks=case.detect68Landmarks,
@@ -206,17 +206,17 @@ class TestDetector(BaseTestClass):
 
     @pytest.mark.skip("core bug")
     def test_detect_limit_bad_param(self):
-        image = VLImage.load(filename=MANY_FACES)
-        detections = TestDetector.detector.detect(images=[image], limit=-1)[0]
+        imageWithManyFaces = VLImage.load(filename=MANY_FACES)
+        detections = TestDetector.detector.detect(images=[imageWithManyFaces], limit=-1)[0]
 
     def test_detect_bad_image_color_format(self):
         imageWithOneFaces = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
         errorDetail = "Bad image format for detection, format: B8G8R8, image: one_face.jpg"
         for subTest, detector, score in self.detectorSubTest():
             with subTest:
-                for detectType in ("detect", "detectOne"):
+                for detectionFunction in ("detect", "detectOne"):
                     with pytest.raises(LunaSDKException) as exceptionInfo:
-                        if detectType == "detectOne":
+                        if detectionFunction == "detectOne":
                             detector.detectOne(image=imageWithOneFaces)
                         else:
                             detector.detect(images=[ImageForDetection(imageWithOneFaces, imageWithOneFaces.rect)])
@@ -239,8 +239,8 @@ class TestDetector(BaseTestClass):
         badArea = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)
         for subTest, detector, score in self.detectorSubTest():
             with subTest:
-                for detectType in ("detect", "detectOne"):
-                    if detectType == "detectOne":
+                for detectionFunction in ("detect", "detectOne"):
+                    if detectionFunction == "detectOne":
                         with pytest.raises(LunaSDKException) as exceptionInfo:
                             detector.detectOne(VLIMAGE_ONE_FACE, detectArea=badArea)
                         self.assertLunaVlError(exceptionInfo, 100005, LunaVLError.Internal)
@@ -250,9 +250,9 @@ class TestDetector(BaseTestClass):
                         self.assertLunaVlError(exceptionInfo, 100016, LunaVLError.InvalidRect)
 
     def test_detect_excess_memory_usage(self):
-        for item in ("default", "ImageForDetection"):
+        for typeImageForDetection in ("vlImage", "ImageForDetection"):
             with pytest.raises(LunaSDKException) as exceptionInfo:
-                if item == "default":
+                if typeImageForDetection == "vlImage":
                     TestDetector.detector.detect(images=[VLIMAGE_ONE_FACE] * 20)
                 else:
                     TestDetector.detector.detect(images=[ImageForDetection(VLIMAGE_ONE_FACE, GOOD_AREA)] * 20)
