@@ -1,11 +1,14 @@
 import unittest
 from collections import namedtuple
-from typing import List
+from typing import List, Union, Generator, Tuple
+from unittest.case import _SubTest
+
 from _pytest._code import ExceptionInfo
-from lunavl.sdk.image_utils.geometry import Rect, Point
+
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.faceengine.engine import VLFaceEngine, DetectorType
-from lunavl.sdk.faceengine.facedetector import FaceDetection
+from lunavl.sdk.faceengine.facedetector import FaceDetection, FaceDetector
+from lunavl.sdk.image_utils.geometry import Point, Rect
 from lunavl.sdk.image_utils.image import VLImage
 
 
@@ -39,7 +42,7 @@ class BaseTestClass(unittest.TestCase):
             assert exceptionInfo.value.error.detail == expectedError.detail, exceptionInfo.value
 
     @staticmethod
-    def assertDetectionTrue(detection: FaceDetection, imageVl: List[VLImage]):
+    def assertDetectionTrue(detection: Union[FaceDetection, List[List[FaceDetection]]], imageVl: List[VLImage]):
         """
         Assert FaceDetection is true
 
@@ -54,7 +57,7 @@ class BaseTestClass(unittest.TestCase):
 
         for detection in listOfFaceDetection:
             assert isinstance(detection, FaceDetection), detection
-            assert detection.image in imageVl, ""
+            assert detection.image in imageVl, "Detection image does not match VLImage"
             assert detection.boundingBox.rect.isValid()
 
     @staticmethod
@@ -69,7 +72,16 @@ class BaseTestClass(unittest.TestCase):
             assert isinstance(point, Point), "Landmarks does not contains Point"
             assert isinstance(point.x, float) and isinstance(point.y, float), "point coordinate is not float"
 
-    def detectorSubTest(self):
+    @staticmethod
+    def checkRectAttr(defaultRect: Rect, isImage: bool = False):
+        for rectType in ("coreRectI", "coreRectF"):
+            assert all(isinstance(getattr(defaultRect.__getattribute__(rectType), f"{coordinate}"),
+                                  float if rectType == "coreRectF" else int)
+                       for coordinate in ("x", "y", "height", "width"))
+        assert all(isinstance(getattr(defaultRect, f"{x}"), int if isImage else float)
+                   for x in ("x", "y", "height", "width"))
+
+    def detectorSubTest(self) -> Generator[None, Tuple[_SubTest, FaceDetector, float], None]:
         """
         Generator for sub tests from FaceDetector
         """

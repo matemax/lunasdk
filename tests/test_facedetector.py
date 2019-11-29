@@ -1,7 +1,7 @@
 import itertools
 import json
 from collections import namedtuple
-from typing import Tuple, Union, List, Dict
+from typing import Tuple
 
 import jsonschema
 import pytest
@@ -13,7 +13,7 @@ from lunavl.sdk.faceengine.facedetector import (
     Landmarks5,
     Landmarks68,
     FaceDetection,
-    ImageForDetection, BoundingBox)
+    ImageForDetection)
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
@@ -82,17 +82,15 @@ class TestDetector(BaseTestClass):
     def test_valid_bounding_box(self):
         for detection in self.getDetections(detect68Landmarks=True):
             self.assertDetectionTrue(detection, [VLIMAGE_ONE_FACE])
-            rectBBox = detection.boundingBox.rect
-            assert rectBBox.isValid(), "Invalid width and height"
-            assert all((isinstance(rectBBox.x, float), isinstance(rectBBox.y, float),
-                        isinstance(rectBBox.width, float), isinstance(rectBBox.height, float)))
+            self.checkRectAttr(detection.boundingBox.rect)
 
             assert isinstance(detection.boundingBox.score, float), "score is not float"
             assert 0 <= detection.boundingBox.score < 1, "score out of range [0,1]"
 
     def test_bounding_box_as_dict(self):
         for detection in self.getDetections():
-            assert jsonschema.validate(detection.boundingBox.asDict(), REQUIRED_FACE_DETECTION) is None, detection.asDict()
+            assert jsonschema.validate(detection.boundingBox.asDict(),
+                                       REQUIRED_FACE_DETECTION) is None, detection.asDict()
             assert detection.boundingBox.rect.isValid()
 
     def test_face_detection_as_dict(self):
