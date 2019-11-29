@@ -41,5 +41,3 @@ REQUIRED_FACE_DETECTION = {
     "additionalProperties": False,
     "required": ["rect", "score"]
 }
-
-
