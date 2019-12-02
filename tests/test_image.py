@@ -79,9 +79,9 @@ class TestImage(BaseTestClass):
                     assert VLImage.load(filename=filename)
 
     def test_bad_image_type(self):
-        with pytest.raises(LunaSDKException) as ex:
+        with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage(body=b'some text', filename="bytes")
-        self.assertLunaVlError(ex, 100033, LunaVLError.InvalidType)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidType)
 
     def test_check_ndarray_type(self):
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
@@ -101,7 +101,7 @@ class TestImage(BaseTestClass):
     def test_unknown_image_format(self):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat("Unknown"))
-        self.assertLunaVlError(exceptionInfo, 100029, LunaVLError.InvalidFormat)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidFormat)
 
     def test_save_image(self):
         for ext in "ppm,jpg,png,tif".split(','):
