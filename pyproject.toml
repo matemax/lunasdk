@@ -9,6 +9,7 @@ repository = "https://github.com/matemax/lunasdk"
 python = ">=3.6"
 numpy = "*"
 requests = "*"
+jsonschema = "^3.2"
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
 pytest = ">=4.4"
