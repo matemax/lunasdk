@@ -1,3 +1,4 @@
+import io
 from collections import namedtuple
 from pathlib import Path
 
@@ -133,7 +134,7 @@ class TestImage(BaseTestClass):
         """
         Test save image to directory
         """
-        for ext in "ppm,jpg,png,tif".split(','):
+        for ext in "ppm,jpg,png,tif,bmp".split(','):
             pathToTestImage = PATH_TO_IMAGE.parent.joinpath(f"test_image.{ext}")
             VLImage(body=PATH_TO_IMAGE.read_bytes()).save(str(pathToTestImage))
             self.garbageList.append(pathToTestImage)
@@ -158,3 +159,11 @@ class TestImage(BaseTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R16)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidConversion)
+
+    def test_invalid_image_data_size(self):
+        """
+        Test invalid image data size
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            VLImage(body=b'', imgFormat=ColorFormat.R8G8B8)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDataSize)

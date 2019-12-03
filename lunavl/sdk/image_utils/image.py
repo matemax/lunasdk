@@ -79,7 +79,7 @@ class VLImage:
 
     Attributes:
         coreImage (CoreFE.Image): core image object
-        source (str): source of image (todo change)
+        source (Union[bytes, bytearray, ndarray, CoreImage]): body of image
         filename (str): filename of the file which is source of image
     """
 

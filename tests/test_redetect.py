@@ -1,6 +1,3 @@
-import itertools
-from collections import namedtuple
-
 import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
@@ -18,6 +15,8 @@ from tests.resources import SEVERAL_FACES, CLEAN_ONE_FACE
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
+INVALID_RECT = Rect(0, 0, 0, 0)
+ERROR_CORE_RECT = Rect(0.1, 0.1, 0.1, 0.1)  # anything out of range (0.1, 1)
 
 
 class TestDetector(BaseTestClass):
@@ -32,56 +31,64 @@ class TestDetector(BaseTestClass):
         super().setup_class()
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
-    def test_redetect_landmarks(self):
+    def test_get_landmarks_for_redetect_one(self):
         """
-        Test validate an instance of landmarks
+        Test get and check landmark instances for re-detection of one face
         """
         detectOne = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
-
-        Case = namedtuple("Case", ("detect5Landmarks", "detect68Landmarks"))
-        cases = [
-            Case(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False), (True, False))
-        ]
-        for case in cases:
+        for case in self.landmarksCases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
-                for redetectFunction in ("redetect", "redetectOne"):
-                    with self.subTest(funcName=redetectFunction):
-                        if redetectFunction == "redetectOne":
-                            response = TestDetector.detector.redetectOne(
-                                image=VLIMAGE_ONE_FACE,
-                                detection=detectOne,
-                                detect68Landmarks=case.detect68Landmarks,
-                                detect5Landmarks=case.detect5Landmarks,
-                            )
-                        else:
-                            response = TestDetector.detector.redetect(
-                                images=[ImageForRedetection(image=VLIMAGE_ONE_FACE,
-                                                            bBoxes=[detectOne.boundingBox.rect])],
-                                detect68Landmarks=case.detect68Landmarks,
-                                detect5Landmarks=case.detect5Landmarks,
-                            )[0][0]
-                        if case.detect5Landmarks:
-                            assert isinstance(response.landmarks5, Landmarks5)
-                        else:
-                            assert response.landmarks5 is None
-                        if case.detect68Landmarks:
-                            assert isinstance(response.landmarks68, Landmarks68)
-                        else:
-                            assert response.landmarks68 is None
+                redetect = TestDetector.detector.redetectOne(image=VLIMAGE_ONE_FACE, detection=detectOne,
+                                                             detect68Landmarks=case.detect68Landmarks,
+                                                             detect5Landmarks=case.detect5Landmarks)
+                if case.detect5Landmarks:
+                    assert isinstance(redetect.landmarks5, Landmarks5)
+                else:
+                    assert redetect.landmarks5 is None
+                if case.detect68Landmarks:
+                    assert isinstance(redetect.landmarks68, Landmarks68)
+                else:
+                    assert redetect.landmarks68 is None
 
-    def test_redetect_one_with_different_detection_options(self):
+    def test_get_landmarks_for_batch_redetect(self):
         """
-        Test re-detection of one face with different detection options
+        Test get and check landmark instances for batch re-detection
+        """
+        detectOne = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
+        for case in self.landmarksCases:
+            with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
+                redetect = TestDetector.detector.redetect(images=[
+                    ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[detectOne.boundingBox.rect])],
+                    detect68Landmarks=case.detect68Landmarks,
+                    detect5Landmarks=case.detect5Landmarks)[0][0]
+                if case.detect5Landmarks:
+                    assert isinstance(redetect.landmarks5, Landmarks5)
+                else:
+                    assert redetect.landmarks5 is None
+                if case.detect68Landmarks:
+                    assert isinstance(redetect.landmarks68, Landmarks68)
+                else:
+                    assert redetect.landmarks68 is None
+
+    def test_redetect_one_with_bbox_option(self):
+        """
+        Test re-detection of one face with bounding box option
         """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detectOne(image=VLIMAGE_ONE_FACE)
-                for optionDetect in ("bBox", "detection"):
-                    if optionDetect == "bBox":
-                        redetect = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection.boundingBox.rect)
-                    else:
-                        redetect = detector.redetectOne(image=VLIMAGE_ONE_FACE, detection=detection)
-                    self.assertFaceDetection(redetect, VLIMAGE_ONE_FACE)
+                redetect = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection.boundingBox.rect)
+                self.assertFaceDetection(redetect, VLIMAGE_ONE_FACE)
+
+    def test_redetect_one_with_detection_option(self):
+        """
+        Test re-detection of one face with detection options
+        """
+        for subTest, detector in self.detectorSubTest():
+            with subTest:
+                detection = detector.detectOne(image=VLIMAGE_ONE_FACE)
+                redetect = detector.redetectOne(image=VLIMAGE_ONE_FACE, detection=detection)
+                self.assertFaceDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_redetect_with_one_face(self):
         """
@@ -132,7 +139,7 @@ class TestDetector(BaseTestClass):
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:
-                    detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=Rect(0.666, 0.666, 0.666, 0.666))
+                    detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=INVALID_RECT)
                 if detector.detectorType.name == 'FACE_DET_V3':
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
                 else:
@@ -145,8 +152,7 @@ class TestDetector(BaseTestClass):
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:
-                    detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(),
-                                                                                                  Rect(0, 0, 0, 0)])])
+                    detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[INVALID_RECT])])
                 self.assertLunaVlError(exceptionInfo, LunaVLError.UnknownError)
 
     def test_redetect_one_without_detection_and_bbox(self):
@@ -158,3 +164,9 @@ class TestDetector(BaseTestClass):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.redetectOne(image=VLIMAGE_ONE_FACE)
                 self.assertLunaVlError(exceptionInfo, LunaVLError.DetectFacesError)
+
+    @pytest.mark.skip("core bug")
+    def test_rect_float(self):
+        for subTest, detector in self.detectorSubTest():
+            with subTest:
+                detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])

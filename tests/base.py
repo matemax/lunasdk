@@ -1,3 +1,4 @@
+import itertools
 import unittest
 from collections import namedtuple
 from typing import List, Union, Generator, Tuple
@@ -27,6 +28,10 @@ class BaseTestClass(unittest.TestCase):
             Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2)),
             Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)),
         ]
+        CaseLandmarks = namedtuple("CaseLandmarks", ("detect5Landmarks", "detect68Landmarks"))
+        cls.landmarksCases = [
+            CaseLandmarks(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False),
+                                                                                                    (True, False))]
 
     @staticmethod
     def assertLunaVlError(exceptionInfo: ExceptionInfo, expectedError: ErrorInfo):
