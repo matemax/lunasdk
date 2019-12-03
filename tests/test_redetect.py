@@ -32,7 +32,10 @@ class TestDetector(BaseTestClass):
         super().setup_class()
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
-    def test_redetect_landmarks_option(self):
+    def test_redetect_landmarks(self):
+        """
+        Test validate an instance of landmarks
+        """
         detectOne = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
 
         Case = namedtuple("Case", ("detect5Landmarks", "detect68Landmarks"))
@@ -66,7 +69,10 @@ class TestDetector(BaseTestClass):
                         else:
                             assert response.landmarks68 is None
 
-    def test_redetect_one_with_different_options(self):
+    def test_redetect_one_with_different_detection_options(self):
+        """
+        Test re-detection of one face with different detection options
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detectOne(image=VLIMAGE_ONE_FACE)
@@ -78,6 +84,9 @@ class TestDetector(BaseTestClass):
                     self.assertFaceDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_redetect_with_one_face(self):
+        """
+        Test re-detection with one face image
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detectOne(image=VLIMAGE_ONE_FACE)
@@ -86,6 +95,9 @@ class TestDetector(BaseTestClass):
                 self.assertFaceDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect(self):
+        """
+        Test re-detection batch of images
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE)
@@ -101,7 +113,10 @@ class TestDetector(BaseTestClass):
                 assert 5 == len(redetect[0])
                 assert 1 == len(redetect[1])
 
-    def test_redetect_face_with_wrong_area(self):
+    def test_redetect_by_area_without_face(self):
+        """
+        Test re-detection by area without face
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=Rect(0, 0, 100, 100))
@@ -110,7 +125,10 @@ class TestDetector(BaseTestClass):
                 assert redetectOne is None
                 assert redetect is None
 
-    def test_redetect_one_face_invalid_rectangle(self):
+    def test_redetect_one_invalid_rectangle(self):
+        """
+        Test re-detection of one face with an invalid rect
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:
@@ -120,14 +138,21 @@ class TestDetector(BaseTestClass):
                 else:
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
 
-    def test_redetect_face_invalid_rectangle(self):
+    def test_redetect_invalid_rectangle(self):
+        """
+        Test batch re-detection with an invalid rect
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:
-                    detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect()])])
+                    detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(),
+                                                                                                  Rect(0, 0, 0, 0)])])
                 self.assertLunaVlError(exceptionInfo, LunaVLError.UnknownError)
 
-    def test_redetect_face_without_detection_and_bbox(self):
+    def test_redetect_one_without_detection_and_bbox(self):
+        """
+        Test re-detection of one face without bounding box and face detection
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:

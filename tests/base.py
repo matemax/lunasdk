@@ -17,12 +17,15 @@ class BaseTestClass(unittest.TestCase):
 
     @classmethod
     def setup_class(cls):
+        """
+        Create list of face detector
+        """
         cls.faceEngine = VLFaceEngine()
-        faceDetector = namedtuple("faceDetector", ("detector",))
-        cls.Detectors = [
-            faceDetector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)),
-            faceDetector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2)),
-            faceDetector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)),
+        Detector = namedtuple("Detector", ("type",))
+        cls.detectors = [
+            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)),
+            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2)),
+            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)),
         ]
 
     @staticmethod
@@ -56,7 +59,7 @@ class BaseTestClass(unittest.TestCase):
         for detection in listOfFaceDetection:
             assert isinstance(detection, FaceDetection), detection
             assert detection.image == imageVl, "Detection image does not match VLImage"
-            assert detection.boundingBox.rect.isValid()
+            assert detection.boundingBox.rect.isValid(), "Invalid rect"
 
     @staticmethod
     def assertLandmarksPoints(landmarksPoints: tuple):
@@ -79,9 +82,6 @@ class BaseTestClass(unittest.TestCase):
         Args:
             defaultRect: rect object
             isImage: checks rect image if true
-
-        Returns:
-
         """
         for rectType in ("coreRectI", "coreRectF"):
             assert all(isinstance(getattr(defaultRect.__getattribute__(rectType), f"{coordinate}"),
@@ -90,11 +90,11 @@ class BaseTestClass(unittest.TestCase):
         assert all(isinstance(getattr(defaultRect, f"{coordinate}"), int if isImage else float)
                    for coordinate in ("x", "y", "height", "width"))
 
-    def detectorSubTest(self) -> Generator[None, Tuple[_SubTest, FaceDetector, float], None]:
+    def detectorSubTest(self) -> Generator[None, Tuple[_SubTest, FaceDetector], None]:
         """
         Generator for sub tests from FaceDetector
         """
-        for testDetector in self.Detectors:
+        for testDetector in self.detectors:
             subTest = self.subTest(testDetector=testDetector)
-            detector = testDetector.detector
+            detector = testDetector.type
             yield subTest, detector

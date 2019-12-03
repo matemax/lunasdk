@@ -36,7 +36,10 @@ class TestDetector(BaseTestClass):
         super().setup_class()
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
-    def test_image_for_detection(self):
+    def test_image_detection_with_transfer_option(self):
+        """
+        Test structure image for detection
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detect(images=[ImageForDetection(VLIMAGE_ONE_FACE, GOOD_AREA)])
@@ -44,6 +47,9 @@ class TestDetector(BaseTestClass):
                 assert 1 == len(detection)
 
     def test_check_landmarks_points(self):
+        """
+        Test validation landmarks points
+        """
         detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE, detect68Landmarks=True)
         self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
@@ -53,6 +59,9 @@ class TestDetector(BaseTestClass):
         assert 68 == len(detection.landmarks68.points)
 
     def test_landmarks_as_dict(self):
+        """
+        Test conversion landmarks to dictionary
+        """
         detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
 
         currentLandmarks5 = json.loads(json.dumps(detection.landmarks5.asDict()))
@@ -60,6 +69,9 @@ class TestDetector(BaseTestClass):
             f"{currentLandmarks5} does not match with schema {LANDMARKS5}"
 
     def test_valid_bounding_box(self):
+        """
+        Test validate bounding box attributes (rect and score)
+        """
         detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
         self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
@@ -68,6 +80,9 @@ class TestDetector(BaseTestClass):
         assert 0 <= detection.boundingBox.score < 1, "score out of range [0,1]"
 
     def test_bounding_box_as_dict(self):
+        """
+        Test conversion bounding box to dictionary
+        """
         boundingBox = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE).boundingBox
 
         assert jsonschema.validate(boundingBox.asDict(), REQUIRED_FACE_DETECTION) is None, \
@@ -75,6 +90,9 @@ class TestDetector(BaseTestClass):
         assert boundingBox.rect.isValid()
 
     def test_face_detection_as_dict(self):
+        """
+        Test conversion result face detection to dictionary
+        """
         detectAsDict = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE, detect5Landmarks=True,
                                                        detect68Landmarks=True).asDict()
         currentSchema = json.loads(json.dumps(detectAsDict))
@@ -82,6 +100,9 @@ class TestDetector(BaseTestClass):
             f"{currentSchema} does not match with schema {REQUIRED_FACE_DETECTION}"
 
     def test_detection_with_default_detector_type(self):
+        """
+        Test face detection with default detector type
+        """
         for detectionFunction in ("detect", "detectOne"):
             with self.subTest(detectionFunction=detectionFunction):
                 if detectionFunction == "detectOne":
@@ -90,7 +111,10 @@ class TestDetector(BaseTestClass):
                     detection = TestDetector.detector.detect(images=[VLIMAGE_ONE_FACE])[0]
                 self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
-    def test_different_detectors(self):
+    def test_different_type_detector(self):
+        """
+        Test face detection using different type of detector
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 for detectionFunction in ("detect", "detectOne"):
@@ -101,37 +125,52 @@ class TestDetector(BaseTestClass):
                             detection = detector.detect(images=[VLIMAGE_ONE_FACE])[0]
                         self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
-    def test_detect_one_faces_on_image_with_several_faces(self):
+    def test_detect_one_with_image_of_several_faces(self):
+        """
+        Test detection of one face with image of several faces
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detectOne(image=VLIMAGE_SEVERAL_FACE)
                 self.assertFaceDetection(detection, VLIMAGE_SEVERAL_FACE)
 
-    def test_detect_one_faces_on_image_without_faces(self):
+    def test_detect_one_with_image_without_faces(self):
+        """
+        Test detection of one face with image without faces
+        """
         imageWithoutFace = VLImage.load(filename=NO_FACES)
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detectOne(image=imageWithoutFace)
                 assert detection is None, detection
 
-    def test_detect_image_without_faces(self):
+    def test_batch_detect_with_image_without_faces(self):
+        """
+        Test batch face detection with image without faces
+        """
         imageWithoutFace = VLImage.load(filename=NO_FACES)
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detect(images=[imageWithoutFace])
                 assert 0 == len(detection[0])
 
-    def test_detect_by_area_one_face(self):
-        area = Rect(0, 0, 100, 100)
+    def test_detect_one_by_area(self):
+        """
+        Test detection of one face by area with and without face
+        """
+        areaWithoutFace = Rect(0, 0, 100, 100)
         for subTest, detector in self.detectorSubTest():
             with subTest:
-                detection = detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=area)
+                detection = detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=areaWithoutFace)
                 assert detection is None, detection
 
                 detection = detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=GOOD_AREA)
                 self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
-    def test_detect_several_faces(self):
+    def test_batch_detect_with_image_of_several_faces(self):
+        """
+        Test batch face detection with image of several faces
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detect(images=[VLIMAGE_SEVERAL_FACE])
@@ -139,7 +178,10 @@ class TestDetector(BaseTestClass):
                 assert 1 == len(detection)
                 assert 5 == len(detection[0])
 
-    def test_batch_detect(self):
+    def test_batch_detect_of_multiple_images(self):
+        """
+        Test batch detection of multiple images
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detection = detector.detect(images=[VLIMAGE_SEVERAL_FACE, VLIMAGE_ONE_FACE])
@@ -150,6 +192,9 @@ class TestDetector(BaseTestClass):
                 assert 1 == len(detection[1])
 
     def test_detect_landmarks(self):
+        """
+        Test validate an instance of landmarks
+        """
         Case = namedtuple("Case", ("detect5Landmarks", "detect68Landmarks"))
         cases = [
             Case(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False), (True, False))
@@ -180,7 +225,10 @@ class TestDetector(BaseTestClass):
                         else:
                             assert detection.landmarks68 is None, detection.landmarks68
 
-    def test_detect_limit(self):
+    def test_batch_detect_limit(self):
+        """
+        Test checking detection limit for an image
+        """
         imageWithManyFaces = VLImage.load(filename=MANY_FACES)
         for subTest, detector in self.detectorSubTest():
             with subTest:
@@ -198,7 +246,10 @@ class TestDetector(BaseTestClass):
         imageWithManyFaces = VLImage.load(filename=MANY_FACES)
         detections = TestDetector.detector.detect(images=[imageWithManyFaces], limit=-1)[0]
 
-    def test_detect_bad_image_color_format(self):
+    def test_detect_invalid_image_format(self):
+        """
+        Test invalid image format detection
+        """
         imageWithOneFaces = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
         errorDetail = "Bad image format for detection, format: B8G8R8, image: one_face.jpg"
         for subTest, detector in self.detectorSubTest():
@@ -211,7 +262,10 @@ class TestDetector(BaseTestClass):
                             detector.detect(images=[ImageForDetection(imageWithOneFaces, imageWithOneFaces.rect)])
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(details=errorDetail))
 
-    def test_detect_by_area_and_not(self):
+    def test_batch_detect_by_area(self):
+        """
+        Test batch face detection by area with and without face
+        """
         areaWithoutFace = Rect(0, 0, 100, 100)
         for subTest, detector in self.detectorSubTest():
             with subTest:
@@ -223,7 +277,10 @@ class TestDetector(BaseTestClass):
                 assert 1 == len(detection[1])
                 assert 1 == len(detection[2])
 
-    def test_detect_rect_is_out_of_bounds(self):
+    def test_bad_area_detection(self):
+        """
+        Test bad area face detection
+        """
         badArea = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)
         for subTest, detector in self.detectorSubTest():
             with subTest:
@@ -237,7 +294,10 @@ class TestDetector(BaseTestClass):
                             detector.detect(images=[ImageForDetection(VLIMAGE_ONE_FACE, badArea)])
                         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
-    def test_detect_excess_memory_usage(self):
+    def test_excessive_image_list_detection(self):
+        """
+        Test excessive image list detection
+        """
         for typeImageForDetection in ("vlImage", "ImageForDetection"):
             with self.subTest(typeImageForDetection=typeImageForDetection):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
@@ -248,13 +308,19 @@ class TestDetector(BaseTestClass):
                 self.assertLunaVlError(exceptionInfo, LunaVLError.Internal)
 
     def test_detect_one_invalid_rectangle(self):
+        """
+        Test detection of one face with an invalid rect
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(VLIMAGE_ONE_FACE, detectArea=Rect())
                 self.assertLunaVlError(exceptionInfo, LunaVLError.Internal)
 
-    def test_detect_invalid_rectangle(self):
+    def test_batch_detect_invalid_rectangle(self):
+        """
+        Test batch face detection with an invalid rect
+        """
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 with pytest.raises(LunaSDKException) as exceptionInfo:

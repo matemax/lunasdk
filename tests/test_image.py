@@ -33,6 +33,9 @@ class TestImage(BaseTestClass):
             Path.unlink(path)
 
     def test_image_initialize(self):
+        """
+        Test create VLImage with image body
+        """
         binaryBody = PATH_TO_IMAGE.read_bytes()
         bytearrayBody = bytearray(binaryBody)
         imageWithOneFace = Image.open(ONE_FACE)
@@ -50,45 +53,65 @@ class TestImage(BaseTestClass):
                 assert case.initType == imageVl.filename
                 assert imageVl.rect == Rect(0, 0, 912, 1080)
 
-    def test_image_load_from_file(self):
+    def test_load_image_from_file(self):
+        """
+        Test load image from file
+        """
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
         assert imageWithOneFace.isValid()
         assert imageWithOneFace.rect == Rect(0, 0, 912, 1080)
         assert imageWithOneFace.filename == "one_face.jpg"
 
     def test_image_rect(self):
+        """
+        Test validate image rect
+        """
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
         self.checkRectAttr(imageWithOneFace.rect, isImage=True)
 
-    def test_image_load_from_url(self):
+    def test_load_image_from_url(self):
+        """
+        Test load image from url
+        """
         url = "https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg"
         imageWithOneFace = VLImage.load(url=url)
         assert imageWithOneFace.isValid()
         assert imageWithOneFace.rect == Rect(0, 0, 1000, 1288)
         assert imageWithOneFace.filename == url
 
-    def test_image_bad_filename_or_url(self):
-        url = "https://st.kp.yandex.net/images/"
-        filename = 'test.jpg'
+    def test_not_set_image_filename_or_url(self):
+        """
+        Test check load image if filename or url is not set
+        """
         for loadType in ("url", "filename"):
-            if loadType == "url":
-                with pytest.raises(ValueError):
-                    assert VLImage.load(url=url)
-            else:
-                with pytest.raises(FileNotFoundError):
-                    assert VLImage.load(filename=filename)
+            with self.subTest(loadType=loadType):
+                if loadType == "url":
+                    with pytest.raises(ValueError):
+                        assert VLImage.load(url=None)
+                else:
+                    with pytest.raises(ValueError):
+                        assert VLImage.load(filename=None)
 
-    def test_bad_image_type(self):
+    def test_invalid_image_type(self):
+        """
+        Test invalid image type
+        """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage(body=b'some text', filename="bytes")
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidType)
 
     def test_check_ndarray_type(self):
+        """
+        Test check numpy array conversion
+        """
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
         assert imageWithOneFace.isValid()
         assert (np.asarray(Image.open(ONE_FACE)) == imageWithOneFace.asNPArray()).all()
 
-    def test_convert_color_format_and_check_bgr(self):
+    def test_convert_color_format(self):
+        """
+        Test check color format conversion
+        """
         imageFormat = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
         assert imageFormat.isValid()
         assert imageFormat.format.name == "B8G8R8"
@@ -99,13 +122,39 @@ class TestImage(BaseTestClass):
         assert (bgrImageArray == imageFormat.asNPArray()).all()
 
     def test_unknown_image_format(self):
+        """
+        Test check load image if color format is unknown
+        """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat("Unknown"))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidFormat)
 
     def test_save_image(self):
+        """
+        Test save image to directory
+        """
         for ext in "ppm,jpg,png,tif".split(','):
             pathToTestImage = PATH_TO_IMAGE.parent.joinpath(f"test_image.{ext}")
             VLImage(body=PATH_TO_IMAGE.read_bytes()).save(str(pathToTestImage))
             self.garbageList.append(pathToTestImage)
             VLImage.load(filename=str(pathToTestImage)).isValid()
+
+    def test_image_format_padded_or_not(self):
+        """
+        Test check image format has padded bytes or not
+        """
+        for color in ("B8G8R8X8", "R8G8B8X8", "B8G8R8", "R8"):
+            with self.subTest(colorFormat=color):
+                imageFormat = VLImage.load(filename=ONE_FACE, imgFormat=getattr(ColorFormat, color))
+                if len(color) > 6:
+                    assert imageFormat.isPadded()
+                else:
+                    assert imageFormat.isPadded() is False
+
+    def test_invalid_image_conversion(self):
+        """
+        Test convert image to one channel format
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R16)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidConversion)
