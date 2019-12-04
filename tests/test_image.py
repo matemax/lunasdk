@@ -1,4 +1,3 @@
-import io
 from collections import namedtuple
 from pathlib import Path
 
@@ -10,11 +9,12 @@ from PIL import Image
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage, ColorFormat
+from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 
 PATH_TO_IMAGE = Path(ONE_FACE)
+SINGLE_CHANNEL_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"))
 
 
 class TestImage(BaseTestClass):
@@ -68,7 +68,7 @@ class TestImage(BaseTestClass):
         Test validate image rect
         """
         imageWithOneFace = VLImage.load(filename=ONE_FACE)
-        self.checkRectAttr(imageWithOneFace.rect, isImage=True)
+        self.checkRectAttr(imageWithOneFace.rect)
 
     def test_load_image_from_url(self):
         """
@@ -113,14 +113,14 @@ class TestImage(BaseTestClass):
         """
         Test check color format conversion
         """
-        imageFormat = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
-        assert imageFormat.isValid()
-        assert imageFormat.format.name == "B8G8R8"
+        colorImage = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
+        assert colorImage.isValid()
+        assert colorImage.format == ColorFormat.B8G8R8
 
         R, G, B = VLImage.load(filename=ONE_FACE).asNPArray().T
         bgrImageArray = np.array((B, G, R)).T
-        assert imageFormat.isBGR()
-        assert (bgrImageArray == imageFormat.asNPArray()).all()
+        assert colorImage.isBGR()
+        assert (bgrImageArray == colorImage.asNPArray()).all()
 
     def test_unknown_image_format(self):
         """
@@ -134,23 +134,27 @@ class TestImage(BaseTestClass):
         """
         Test save image to directory
         """
-        for ext in "ppm,jpg,png,tif,bmp".split(','):
-            pathToTestImage = PATH_TO_IMAGE.parent.joinpath(f"test_image.{ext}")
+        for ext in ImageFormat:
+            pathToTestImage = PATH_TO_IMAGE.parent.joinpath(f"test_image.{ext.value}")
             VLImage(body=PATH_TO_IMAGE.read_bytes()).save(str(pathToTestImage))
             self.garbageList.append(pathToTestImage)
             VLImage.load(filename=str(pathToTestImage)).isValid()
 
-    def test_image_format_padded_or_not(self):
+    def test_image_format_padded(self):
         """
-        Test check image format has padded bytes or not
+        Test check image format has padded bytes
         """
-        for color in ("B8G8R8X8", "R8G8B8X8", "B8G8R8", "R8"):
-            with self.subTest(colorFormat=color):
-                imageFormat = VLImage.load(filename=ONE_FACE, imgFormat=getattr(ColorFormat, color))
-                if len(color) > 6:
-                    assert imageFormat.isPadded()
-                else:
-                    assert imageFormat.isPadded() is False
+        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R8G8B8X8).isPadded()
+        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8X8).isPadded()
+
+    def test_image_format_not_padded(self):
+        """
+        Test check image format with no padded bytes
+        """
+        assert VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=ColorFormat.R16).isPadded() is False
+        assert VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=ColorFormat.R8).isPadded() is False
+        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R8G8B8).isPadded() is False
+        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8).isPadded() is False
 
     def test_invalid_image_conversion(self):
         """

@@ -1,8 +1,8 @@
 FLOAT = {"type": "number"}
 COORDINATE_TYPE = {"type": "number", "minimum": 0}
-LANDMARKS_ITEM = {"type": "array", "maxItems": 2, "minItems": 2, "items": [FLOAT]}
+LANDMARKS_ITEM = {"type": "array", "maxItems": 2, "minItems": 2, "items": FLOAT}
 
-TYPE_SCORE = {"type": "number", "minimum": 0, "exclusiveMaximum": 1}
+TYPE_SCORE = {"type": "number", "minimum": 0, "maximum": 1, "exclusiveMaximum": True}
 
 TYPE_RECT = {
     "type": "object",
