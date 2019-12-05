@@ -303,11 +303,11 @@ class VLImage:
         Args:
             filename: filename
         Raises:
-            todo it
+            LunaSDKException: if failed to save image to sdk Image
         """
         saveRes = self.coreImage.save(filename)
         if saveRes.isError:
-            raise ValueError
+            raise LunaSDKException(LunaVLError.fromSDKError(saveRes))
 
     def convertToBinaryImg(self, imageFormat: ImageFormat = ImageFormat.PPM) -> bytes:
         """
