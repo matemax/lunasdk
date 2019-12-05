@@ -15,4 +15,4 @@ repos:
     sha: v1.0.4
     hooks:
     -   id: python-bandit-vulnerability-check
-        args: [--recursive, lunavl]
+        args: [--recursive,  -s, "B101"]
