@@ -4,17 +4,13 @@ from PIL import Image
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.facedetector import (
-    FaceDetector,
-    Landmarks5,
-    Landmarks68,
-    ImageForDetection)
+from lunavl.sdk.faceengine.facedetector import FaceDetector, ImageForDetection
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
-from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, SEVERAL_FACES, MANY_FACES, NO_FACES, DRAFT_VALIDATOR
-from tests.schemas import REQUIRED_FACE_DETECTION, LANDMARKS5
+from tests.detect_test_class import DetectTestClass
+from tests.resources import ONE_FACE, SEVERAL_FACES, MANY_FACES, NO_FACES
+from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 
 SINGLE_CHANNEL_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"))
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)
@@ -24,7 +20,7 @@ OUTSIDE_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect
 AREA_WITHOUT_FACE = Rect(50, 50, 100, 100)
 
 
-class TestDetector(BaseTestClass):
+class TestDetector(DetectTestClass):
     """
     Test of detector.
     """
@@ -61,10 +57,10 @@ class TestDetector(BaseTestClass):
         Test conversion landmarks to dictionary
         """
         currentLandmarks5 = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE).landmarks5.asDict()
-        jsonValidator = DRAFT_VALIDATOR(schema=LANDMARKS5)
 
-        assert jsonValidator.validate(currentLandmarks5) is None, \
-            f"{currentLandmarks5} does not match with schema {LANDMARKS5}"
+        assert (
+            jsonValidator(schema=LANDMARKS5).validate(currentLandmarks5) is None
+        ), f"{currentLandmarks5} does not match with schema {LANDMARKS5}"
 
     def test_valid_bounding_box(self):
         """
@@ -80,10 +76,10 @@ class TestDetector(BaseTestClass):
         Test conversion bounding box to dictionary
         """
         boundingBox = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE).boundingBox.asDict()
-        jsonValidator = DRAFT_VALIDATOR(schema=REQUIRED_FACE_DETECTION)
 
-        assert jsonValidator.validate(boundingBox) is None, \
-            f"{boundingBox} does not match with schema {REQUIRED_FACE_DETECTION}"
+        assert (
+            jsonValidator(schema=REQUIRED_FACE_DETECTION).validate(boundingBox) is None
+        ), f"{boundingBox} does not match with schema {REQUIRED_FACE_DETECTION}"
 
     def test_face_detection_as_dict(self):
         """
@@ -91,12 +87,14 @@ class TestDetector(BaseTestClass):
         """
         for case in self.landmarksCases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
-                detectAsDict = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE,
-                                                               detect5Landmarks=case.detect5Landmarks,
-                                                               detect68Landmarks=case.detect68Landmarks).asDict()
-                jsonValidator = DRAFT_VALIDATOR(schema=REQUIRED_FACE_DETECTION)
-                assert jsonValidator.validate(detectAsDict) is None, \
-                    f"{detectAsDict} does not match with schema {REQUIRED_FACE_DETECTION}"
+                detectAsDict = TestDetector.detector.detectOne(
+                    image=VLIMAGE_ONE_FACE,
+                    detect5Landmarks=case.detect5Landmarks,
+                    detect68Landmarks=case.detect68Landmarks,
+                ).asDict()
+                assert (
+                    jsonValidator(schema=REQUIRED_FACE_DETECTION).validate(detectAsDict) is None
+                ), f"{detectAsDict} does not match with schema {REQUIRED_FACE_DETECTION}"
 
     def test_detection_with_default_detector_type(self):
         """
@@ -205,17 +203,16 @@ class TestDetector(BaseTestClass):
         """
         for case in self.landmarksCases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
-                detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE,
-                                                            detect68Landmarks=case.detect68Landmarks,
-                                                            detect5Landmarks=case.detect5Landmarks)
-                if case.detect5Landmarks:
-                    assert isinstance(detection.landmarks5, Landmarks5), detection.landmarks5
-                else:
-                    assert detection.landmarks5 is None, detection.landmarks5
-                if case.detect68Landmarks:
-                    assert isinstance(detection.landmarks68, Landmarks68), detection.landmarks68
-                else:
-                    assert detection.landmarks68 is None, detection.landmarks68
+                for subTest, detector in self.detectorSubTest():
+                    with subTest:
+                        detection = detector.detectOne(
+                            image=VLIMAGE_ONE_FACE,
+                            detect68Landmarks=case.detect68Landmarks,
+                            detect5Landmarks=case.detect5Landmarks,
+                        )
+                        self.assertDetectionLandmarks(
+                            detection=detection, landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks
+                        )
 
     def test_get_landmarks_for_batch_detect(self):
         """
@@ -223,17 +220,16 @@ class TestDetector(BaseTestClass):
         """
         for case in self.landmarksCases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
-                detection = TestDetector.detector.detect(images=[VLIMAGE_ONE_FACE],
-                                                         detect68Landmarks=case.detect68Landmarks,
-                                                         detect5Landmarks=case.detect5Landmarks)[0][0]
-                if case.detect5Landmarks:
-                    assert isinstance(detection.landmarks5, Landmarks5), detection.landmarks5
-                else:
-                    assert detection.landmarks5 is None, detection.landmarks5
-                if case.detect68Landmarks:
-                    assert isinstance(detection.landmarks68, Landmarks68), detection.landmarks68
-                else:
-                    assert detection.landmarks68 is None, detection.landmarks68
+                for subTest, detector in self.detectorSubTest():
+                    with subTest:
+                        detection = detector.detect(
+                            images=[VLIMAGE_ONE_FACE],
+                            detect68Landmarks=case.detect68Landmarks,
+                            detect5Landmarks=case.detect5Landmarks,
+                        )[0][0]
+                        self.assertDetectionLandmarks(
+                            detection=detection, landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks
+                        )
 
     def test_batch_detect_limit(self):
         """
@@ -246,7 +242,7 @@ class TestDetector(BaseTestClass):
                 assert 5 == len(detection)
 
                 detection = detector.detect(images=[imageWithManyFaces], limit=20)[0]
-                if detector.detectorType.name == 'FACE_DET_V3':
+                if detector.detectorType.name == "FACE_DET_V3":
                     assert 20 == len(detection)
                 else:
                     assert 19 == len(detection)
@@ -295,8 +291,9 @@ class TestDetector(BaseTestClass):
         """
         for subTest, detector in self.detectorSubTest():
             with subTest:
-                detection = detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE,
-                                                                      detectArea=AREA_WITHOUT_FACE)])
+                detection = detector.detect(
+                    images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=AREA_WITHOUT_FACE)]
+                )
                 assert 1 == len(detection)
                 assert 0 == len(detection[0])
 
@@ -306,8 +303,7 @@ class TestDetector(BaseTestClass):
         """
         for subTest, detector in self.detectorSubTest():
             with subTest:
-                detection = detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE,
-                                                                      detectArea=GOOD_AREA)])
+                detection = detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=GOOD_AREA)])
                 assert 1 == len(detection[0])
                 self.assertFaceDetection(detection[0], VLIMAGE_ONE_FACE)
 

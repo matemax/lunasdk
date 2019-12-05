@@ -1,16 +1,10 @@
-import itertools
 import unittest
-from collections import namedtuple
-from typing import List, Union, Generator, Tuple
-from unittest.case import _SubTest
 
 from _pytest._code import ExceptionInfo
 
 from lunavl.sdk.errors.errors import ErrorInfo
-from lunavl.sdk.faceengine.engine import VLFaceEngine, DetectorType
-from lunavl.sdk.faceengine.facedetector import FaceDetection, FaceDetector, BoundingBox
-from lunavl.sdk.image_utils.geometry import Point, Rect
-from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.faceengine.engine import VLFaceEngine
+from lunavl.sdk.image_utils.geometry import Rect
 
 
 class BaseTestClass(unittest.TestCase):
@@ -18,20 +12,7 @@ class BaseTestClass(unittest.TestCase):
 
     @classmethod
     def setup_class(cls):
-        """
-        Create list of face detector
-        """
         cls.faceEngine = VLFaceEngine()
-        Detector = namedtuple("Detector", ("type",))
-        cls.detectors = [
-            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)),
-            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2)),
-            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)),
-        ]
-        CaseLandmarks = namedtuple("CaseLandmarks", ("detect5Landmarks", "detect68Landmarks"))
-        cls.landmarksCases = [
-            CaseLandmarks(landmarks5, landmarks68) for landmarks5, landmarks68 in itertools.product((True, False),
-                                                                                                    (True, False))]
 
     @staticmethod
     def assertLunaVlError(exceptionInfo: ExceptionInfo, expectedError: ErrorInfo):
@@ -47,37 +28,6 @@ class BaseTestClass(unittest.TestCase):
         if expectedError.detail != "":
             assert exceptionInfo.value.error.detail == expectedError.detail, exceptionInfo.value
 
-    def assertFaceDetection(self, detection: Union[FaceDetection, List[FaceDetection]], imageVl: VLImage):
-        """
-        Function checks if an instance is FaceDetection class
-
-        Args:
-            detection: face detection
-            imageVl: class image
-        """
-        if isinstance(detection, list):
-            listOfFaceDetection = [faceDetection for faceDetection in detection]
-        else:
-            listOfFaceDetection = [detection]
-
-        for detection in listOfFaceDetection:
-            assert isinstance(detection, FaceDetection), f"{detection.__class__} is not {FaceDetection}"
-            assert detection.image == imageVl, "Detection image does not match VLImage"
-            self.assertBoundingBox(detection.boundingBox)
-
-    @staticmethod
-    def assertLandmarksPoints(landmarksPoints: tuple):
-        """
-        Assert landmarks points
-
-        Args:
-            landmarksPoints: tuple of landmarks points
-        """
-        assert isinstance(landmarksPoints, tuple), f"{landmarksPoints} points is not tuple"
-        for point in landmarksPoints:
-            assert isinstance(point, Point), "Landmarks does not contains Point"
-            assert isinstance(point.x, float) and isinstance(point.y, float), "point coordinate is not float"
-
     @staticmethod
     def checkRectAttr(defaultRect: Rect):
         """
@@ -87,28 +37,10 @@ class BaseTestClass(unittest.TestCase):
             defaultRect: rect object
         """
         for rectType in ("coreRectI", "coreRectF"):
-            assert all(isinstance(getattr(defaultRect.__getattribute__(rectType), f"{coordinate}"),
-                                  float if rectType == "coreRectF" else int)
-                       for coordinate in ("x", "y", "height", "width"))
-
-    def assertBoundingBox(self, boundingBox: BoundingBox):
-        """
-        Assert attributes of Bounding box class
-
-        Args:
-            boundingBox: bounding box
-        """
-        assert isinstance(boundingBox, BoundingBox), f"{boundingBox} is not {BoundingBox}"
-        self.checkRectAttr(boundingBox.rect)
-
-        assert isinstance(boundingBox.score, float), f"{boundingBox.score} is not float"
-        assert 0 <= boundingBox.score < 1, "score out of range [0,1]"
-
-    def detectorSubTest(self) -> Generator[None, Tuple[_SubTest, FaceDetector], None]:
-        """
-        Generator for sub tests from FaceDetector
-        """
-        for testDetector in self.detectors:
-            subTest = self.subTest(testDetector=testDetector)
-            detector = testDetector.type
-            yield subTest, detector
+            assert all(
+                isinstance(
+                    getattr(defaultRect.__getattribute__(rectType), f"{coordinate}"),
+                    float if rectType == "coreRectF" else int,
+                )
+                for coordinate in ("x", "y", "height", "width")
+            )

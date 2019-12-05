@@ -1,3 +1,4 @@
+import os
 from collections import namedtuple
 from pathlib import Path
 
@@ -13,14 +14,15 @@ from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 
-PATH_TO_IMAGE = Path(ONE_FACE)
 SINGLE_CHANNEL_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"))
+ONE_16_BIT_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"), dtype=np.uint16)
 
 
 class TestImage(BaseTestClass):
     """
     Test of image.
     """
+
     garbageList = None
 
     @classmethod
@@ -37,7 +39,7 @@ class TestImage(BaseTestClass):
         """
         Test create VLImage with image body
         """
-        binaryBody = PATH_TO_IMAGE.read_bytes()
+        binaryBody = Path(ONE_FACE).read_bytes()
         bytearrayBody = bytearray(binaryBody)
         imageWithOneFace = Image.open(ONE_FACE)
         npBody = np.asarray(imageWithOneFace)
@@ -45,8 +47,12 @@ class TestImage(BaseTestClass):
         coreBody.load(ONE_FACE)
 
         InitCase = namedtuple("InitCase", ("initType", "body"))
-        cases = (InitCase("bytes", binaryBody), InitCase("numpy array", npBody), InitCase("byte array", bytearrayBody),
-                 InitCase("core", coreBody))
+        cases = (
+            InitCase("bytes", binaryBody),
+            InitCase("numpy array", npBody),
+            InitCase("byte array", bytearrayBody),
+            InitCase("core", coreBody),
+        )
         for case in cases:
             with self.subTest(initType=case.initType):
                 imageVl = VLImage(body=case.body, filename=case.initType)
@@ -98,7 +104,7 @@ class TestImage(BaseTestClass):
         Test invalid image type
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            VLImage(body=b'some text', filename="bytes")
+            VLImage(body=b"some text", filename="bytes")
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidType)
 
     def test_check_ndarray_type(self):
@@ -135,8 +141,8 @@ class TestImage(BaseTestClass):
         Test save image to directory
         """
         for ext in ImageFormat:
-            pathToTestImage = PATH_TO_IMAGE.parent.joinpath(f"test_image.{ext.value}")
-            VLImage(body=PATH_TO_IMAGE.read_bytes()).save(str(pathToTestImage))
+            pathToTestImage = Path(ONE_FACE).parent.joinpath(f"image_test.{ext.value}")
+            VLImage(body=Path(ONE_FACE).read_bytes()).save(str(pathToTestImage))
             self.garbageList.append(pathToTestImage)
             VLImage.load(filename=str(pathToTestImage)).isValid()
 
@@ -168,6 +174,26 @@ class TestImage(BaseTestClass):
         """
         Test invalid image data size
         """
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            VLImage(body=b'', imgFormat=ColorFormat.R8G8B8)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDataSize)
+        for body in (b"", bytearray()):
+            with self.subTest(body=body):
+                with pytest.raises(LunaSDKException) as exceptionInfo:
+                    VLImage(body=body, filename="bytes")
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDataSize)
+
+    def test_bad_image_type(self):
+        """
+        Test bad image body type
+        """
+        with pytest.raises(TypeError):
+            VLImage(body=VLImage.coreImage, filename="coreImage")
+
+    @pytest.mark.skip("core bug")
+    def test_failed_to_save_jpeg_format(self):
+        """
+        Test saving single channel image with different color format
+        """
+        for color in [ColorFormat.R16, ColorFormat.R8G8B8X8, ColorFormat.B8G8R8X8]:
+            with self.subTest(colorFormat=color):
+                with pytest.raises(LunaSDKException) as exceptionInfo:
+                    VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=color).save(f"test_jpeg.jpg")
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidBitmap)
