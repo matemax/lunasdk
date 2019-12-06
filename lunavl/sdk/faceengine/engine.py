@@ -180,7 +180,9 @@ class VLFaceEngine:
     def createFaceDescriptorFactory(self) -> FaceDescriptorFactory:
         return FaceDescriptorFactory(self)
 
-    def createFaceMatcher(self) -> FaceMatcher:
+    def createFaceMatcher(self, version: Optional[int] = None) -> FaceMatcher:
+        if version is not None:
+            return FaceMatcher(self._faceEngine.createMatcher(version), self.createFaceDescriptorFactory())
         return FaceMatcher(self._faceEngine.createMatcher(), self.createFaceDescriptorFactory())
 
     @property
