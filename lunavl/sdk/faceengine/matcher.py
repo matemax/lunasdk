@@ -62,14 +62,14 @@ class FaceMatcher:
             List of matching results if match by several descriptors otherwise one MatchingResult.
         """
         if isinstance(reference, bytes):
-            reference = self.descriptorFactory.generateDescriptorFromBytes(reference)
+            reference = self.descriptorFactory.generateDescriptor(reference)
         if isinstance(candidates, bytes):
-            candidates = self.descriptorFactory.generateDescriptorFromBytes(candidates)
+            candidates = self.descriptorFactory.generateDescriptor(candidates)
         elif isinstance(candidates, list):
             candidates = candidates[:]
             for idx in range(len(candidates)):
                 if isinstance(candidates[idx], bytes):
-                    candidates[idx] = self.descriptorFactory.generateDescriptorFromBytes(candidates[idx])
+                    candidates[idx] = self.descriptorFactory.generateDescriptor(candidates[idx])
 
         if isinstance(candidates, FaceDescriptor):
             error, result = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
