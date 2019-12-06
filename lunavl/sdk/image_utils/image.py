@@ -19,13 +19,15 @@ class ImageFormat(Enum):
     """
 
     #: jpg
-    JPG = "jpg"
+    JPEG = "jpg"
     #: png
     PNG = "png"
     #: ppm
     PPM = "ppm"
     #: tif
-    TIF = "tif"
+    TIFF = "tif"
+    #: bmp
+    BMP = "bmp"
 
 
 class ColorFormat(Enum):
@@ -79,7 +81,7 @@ class VLImage:
 
     Attributes:
         coreImage (CoreFE.Image): core image object
-        source (str): source of image (todo change)
+        source (Union[bytes, bytearray, ndarray, CoreImage]): body of image
         filename (str): filename of the file which is source of image
     """
 
@@ -154,14 +156,14 @@ class VLImage:
             with path.open("rb") as file:
                 body = file.read()
                 img = cls(body, imgFormat)
-                img.source = path.name
+                img.filename = path.name
                 return img
 
         if url is not None:
             response = requests.get(url=url)
             if response.status_code == 200:
                 img = cls(response.content, imgFormat)
-                img.source = url
+                img.filename = url
                 return img
         raise ValueError
 
@@ -303,11 +305,11 @@ class VLImage:
         Args:
             filename: filename
         Raises:
-            todo it
+            LunaSDKException: if failed to save image to sdk Image
         """
         saveRes = self.coreImage.save(filename)
         if saveRes.isError:
-            raise ValueError
+            raise LunaSDKException(LunaVLError.fromSDKError(saveRes))
 
     def convertToBinaryImg(self, imageFormat: ImageFormat = ImageFormat.PPM) -> bytes:
         """

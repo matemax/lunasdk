@@ -4,8 +4,7 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from collections import Iterator
-from typing import Dict, List
+from typing import Dict, List, Iterator
 from typing import Union, Optional
 
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr  # pylint: disable=E0611,E0401
@@ -126,7 +125,7 @@ class FaceDescriptorBatch(BaseEstimation):
 
     def __iter__(self) -> Iterator:
         """
-        Iterator by by batch.
+        Iterator by batch.
 
         Returns:
             iterator by descriptors.
