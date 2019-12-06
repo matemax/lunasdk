@@ -51,7 +51,9 @@ class FaceMatcher:
         self.descriptorFactory = descriptorFactory
 
     def match(
-        self, reference: FaceDescriptor, candidates: Union[FaceDescriptor, List[FaceDescriptor], FaceDescriptorBatch]
+            self,
+            reference: Union[FaceDescriptor, bytes],
+            candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch]
     ) -> Union[MatchingResult, List[MatchingResult]]:
         """
         Match face descriptor vs face descriptors.
@@ -59,11 +61,21 @@ class FaceMatcher:
         Returns:
             List of matching results if match by several descriptors otherwise one MatchingResult.
         """
+        if isinstance(reference, bytes):
+            reference = self.descriptorFactory.generateDescriptor(reference)
+        if isinstance(candidates, bytes):
+            candidates = self.descriptorFactory.generateDescriptor(candidates)
+        elif isinstance(candidates, list):
+            candidates = candidates[:]
+            for idx in range(len(candidates)):
+                if isinstance(candidates[idx], bytes):
+                    candidates[idx] = self.descriptorFactory.generateDescriptor(candidates[idx])
+
         if isinstance(candidates, FaceDescriptor):
-            error = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
+            error, result = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
             if error.isError:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
-            return error.value
+            return result
         elif isinstance(candidates, FaceDescriptorBatch):
             error, matchResults = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
             if error.isError:
