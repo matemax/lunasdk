@@ -185,6 +185,9 @@ class FaceDescriptorFactory:
 
         Returns:
             a core descriptor
+
+        Raises:
+            ValueError if garbageScore is not empty and descriptor is empty
         """
         if garbageScore is not None and descriptor is None:
             raise ValueError('Do not specify `garbageScore` unexpected')
