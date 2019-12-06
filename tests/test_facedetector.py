@@ -25,12 +25,12 @@ class TestDetector(DetectTestClass):
     Test of detector.
     """
 
-    detector: FaceDetector = None
+    defaultDetector: FaceDetector = None
 
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.defaultDetector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
     def test_image_detection_with_transfer_option(self):
         """
@@ -46,7 +46,7 @@ class TestDetector(DetectTestClass):
         """
         Test validation landmarks points
         """
-        detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE, detect68Landmarks=True)
+        detection = TestDetector.defaultDetector.detectOne(image=VLIMAGE_ONE_FACE, detect68Landmarks=True)
         self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
         self.assertLandmarksPoints(detection.landmarks5.points)
@@ -56,7 +56,7 @@ class TestDetector(DetectTestClass):
         """
         Test conversion landmarks to dictionary
         """
-        currentLandmarks5 = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE).landmarks5.asDict()
+        currentLandmarks5 = TestDetector.defaultDetector.detectOne(image=VLIMAGE_ONE_FACE).landmarks5.asDict()
 
         assert (
             jsonValidator(schema=LANDMARKS5).validate(currentLandmarks5) is None
@@ -66,16 +66,16 @@ class TestDetector(DetectTestClass):
         """
         Test validate bounding box (rect and score)
         """
-        detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
+        detection = TestDetector.defaultDetector.detectOne(image=VLIMAGE_ONE_FACE)
         self.assertBoundingBox(detection.boundingBox)
-        detection = TestDetector.detector.detect(images=[VLIMAGE_ONE_FACE])[0][0]
+        detection = TestDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE])[0][0]
         self.assertBoundingBox(detection.boundingBox)
 
     def test_bounding_box_as_dict(self):
         """
         Test conversion bounding box to dictionary
         """
-        boundingBox = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE).boundingBox.asDict()
+        boundingBox = TestDetector.defaultDetector.detectOne(image=VLIMAGE_ONE_FACE).boundingBox.asDict()
 
         assert (
             jsonValidator(schema=REQUIRED_FACE_DETECTION).validate(boundingBox) is None
@@ -87,7 +87,7 @@ class TestDetector(DetectTestClass):
         """
         for case in self.landmarksCases:
             with self.subTest(landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks):
-                detectAsDict = TestDetector.detector.detectOne(
+                detectAsDict = TestDetector.defaultDetector.detectOne(
                     image=VLIMAGE_ONE_FACE,
                     detect5Landmarks=case.detect5Landmarks,
                     detect68Landmarks=case.detect68Landmarks,
@@ -103,9 +103,9 @@ class TestDetector(DetectTestClass):
         for detectionFunction in ("detect", "detectOne"):
             with self.subTest(detectionFunction=detectionFunction):
                 if detectionFunction == "detectOne":
-                    detection = TestDetector.detector.detectOne(image=VLIMAGE_ONE_FACE)
+                    detection = TestDetector.defaultDetector.detectOne(image=VLIMAGE_ONE_FACE)
                 else:
-                    detection = TestDetector.detector.detect(images=[VLIMAGE_ONE_FACE])[0]
+                    detection = TestDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE])[0]
                 self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
 
     def test_detect_one_using_different_type_detector(self):
@@ -282,7 +282,7 @@ class TestDetector(DetectTestClass):
             for subTest, detector in self.detectorSubTest():
                 with subTest:
                     with pytest.raises(LunaSDKException) as exceptionInfo:
-                        detector.detect(images=[ImageForDetection(image=colorImage, detectArea=GOOD_AREA)])
+                        detector.detect(images=[colorImage])
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(details=errorDetail))
 
     def test_batch_detect_by_area_without_face(self):
@@ -307,7 +307,6 @@ class TestDetector(DetectTestClass):
                 assert 1 == len(detection[0])
                 self.assertFaceDetection(detection[0], VLIMAGE_ONE_FACE)
 
-    @pytest.mark.skip("core bug: returns internal error")
     def test_bad_area_detection(self):
         """
         Test detection of one face in area outside image
@@ -328,16 +327,14 @@ class TestDetector(DetectTestClass):
                     detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)])
                 self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
-    @pytest.mark.skip("core bug: returns internal error")
     def test_excessive_image_list_detection(self):
         """
         Test excessive image list detection
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestDetector.detector.detect(images=[VLIMAGE_ONE_FACE] * 20)
+            TestDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 20)
         self.assertLunaVlError(exceptionInfo, LunaVLError.Internal)
 
-    @pytest.mark.skip("core bug: returns internal error")
     def test_detect_one_invalid_rectangle(self):
         """
         Test detection of one face with an invalid rect
@@ -357,3 +354,17 @@ class TestDetector(DetectTestClass):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=Rect())])
                 self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+
+    def test_match_detection_one_image(self):
+        """
+        Test match of values at different detections (detectOne and detect) with one image
+        """
+        for subTest, detector in self.detectorSubTest():
+            with subTest:
+                detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE, detect68Landmarks=True)
+                batchDetect = detector.detect(images=[VLIMAGE_ONE_FACE] * 3, detect68Landmarks=True)
+                for detection in batchDetect:
+                    for face in detection:
+                        assert face.boundingBox.asDict() == detectOne.boundingBox.asDict()
+                        assert face.landmarks5.asDict() == detectOne.landmarks5.asDict()
+                        assert face.landmarks68.asDict() == detectOne.landmarks68.asDict()

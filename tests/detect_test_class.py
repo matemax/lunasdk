@@ -18,7 +18,7 @@ class DetectTestClass(BaseTestClass):
         """
         Create list of face detector
         """
-        cls.faceEngine = VLFaceEngine()
+        super().setup_class()
         Detector = namedtuple("Detector", ("type",))
         cls.detectors = [
             Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)),

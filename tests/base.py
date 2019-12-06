@@ -12,6 +12,7 @@ class BaseTestClass(unittest.TestCase):
 
     @classmethod
     def setup_class(cls):
+        super().setUpClass()
         cls.faceEngine = VLFaceEngine()
 
     @staticmethod

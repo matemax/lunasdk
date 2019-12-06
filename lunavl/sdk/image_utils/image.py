@@ -19,13 +19,15 @@ class ImageFormat(Enum):
     """
 
     #: jpg
-    JPG = "jpg"
+    JPEG = "jpg"
     #: png
     PNG = "png"
     #: ppm
     PPM = "ppm"
     #: tif
-    TIF = "tif"
+    TIFF = "tif"
+    #: bmp
+    BMP = "bmp"
 
 
 class ColorFormat(Enum):

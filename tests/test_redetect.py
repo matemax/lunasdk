@@ -130,7 +130,6 @@ class TestDetector(DetectTestClass):
                 assert redetectOne is None
                 assert redetect is None
 
-    @pytest.mark.skip("core bug: different types of errors")
     def test_redetect_one_invalid_rectangle(self):
         """
         Test re-detection of one face with an invalid rect
@@ -144,7 +143,6 @@ class TestDetector(DetectTestClass):
                 else:
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
 
-    @pytest.mark.skip("core bug: returns unknown error")
     def test_redetect_invalid_rectangle(self):
         """
         Test batch re-detection with an invalid rect
@@ -173,3 +171,22 @@ class TestDetector(DetectTestClass):
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+
+    @pytest.mark.skip("different values with detector_type_v3")
+    def test_match_redetect_one_image(self):
+        """
+        Test match of values at different re-detections (redetectOne and redetect) with one image
+        """
+        for subTest, detector in self.detectorSubTest():
+            with subTest:
+                bBoxRect = detector.detectOne(image=VLIMAGE_ONE_FACE).boundingBox.rect
+                redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=bBoxRect,
+                                                   detect68Landmarks=True)
+                batchRedetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE,
+                                                                              bBoxes=[bBoxRect])] * 3,
+                                                  detect68Landmarks=True)
+                for redetect in batchRedetect:
+                    for face in redetect:
+                        assert face.boundingBox.asDict() == redetectOne.boundingBox.asDict()
+                        assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
+                        assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()

@@ -3,6 +3,7 @@ from collections import namedtuple
 from pathlib import Path
 
 import FaceEngine as fe
+from lunavl.sdk.faceengine.setting_provider import DetectorType
 import numpy as np
 import pytest
 from PIL import Image
@@ -22,17 +23,14 @@ class TestImage(BaseTestClass):
     """
     Test of image.
     """
-
-    garbageList = None
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-        cls.garbageList = []
+        cls.garbageImagesList = []
 
     @classmethod
     def tearDownClass(cls) -> None:
-        for path in cls.garbageList:
+        for path in cls.garbageImagesList:
             Path.unlink(path)
 
     def test_image_initialize(self):
@@ -138,13 +136,18 @@ class TestImage(BaseTestClass):
 
     def test_save_image(self):
         """
-        Test save image to directory
+        Test save image to directory and check format
         """
         for ext in ImageFormat:
-            pathToTestImage = Path(ONE_FACE).parent.joinpath(f"image_test.{ext.value}")
-            VLImage(body=Path(ONE_FACE).read_bytes()).save(str(pathToTestImage))
-            self.garbageList.append(pathToTestImage)
-            VLImage.load(filename=str(pathToTestImage)).isValid()
+            with self.subTest(extension=ext):
+                pathToTestImage = Path(ONE_FACE).parent.joinpath(f"image_test.{ext.value}")
+                VLImage(body=Path(ONE_FACE).read_bytes()).save(pathToTestImage.as_posix())
+
+                VLImage.load(filename=pathToTestImage.as_posix()).isValid()
+                pillowImage = Image.open(pathToTestImage.as_posix())
+                if pillowImage.verify() is None:
+                    assert pillowImage.format == ext.name
+                self.garbageImagesList.append(pathToTestImage)
 
     def test_image_format_padded(self):
         """
@@ -187,7 +190,6 @@ class TestImage(BaseTestClass):
         with pytest.raises(TypeError):
             VLImage(body=VLImage.coreImage, filename="coreImage")
 
-    @pytest.mark.skip("core bug")
     def test_failed_to_save_jpeg_format(self):
         """
         Test saving single channel image with different color format
@@ -197,3 +199,12 @@ class TestImage(BaseTestClass):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=color).save(f"test_jpeg.jpg")
                 self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidBitmap)
+
+    def test_zero_numpy_array_image(self):
+        """
+        Test image validation with a zero array
+        """
+        zeroArray = np.zeros(shape=(2, 2))
+        blackImage = VLImage(body=zeroArray, filename="array")
+        assert blackImage.isValid()
+        self.checkRectAttr(blackImage.rect)
