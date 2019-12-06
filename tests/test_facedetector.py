@@ -25,7 +25,7 @@ class TestDetector(DetectTestClass):
     """
     Test of detector.
     """
-
+    #: Face detector with default detector type
     defaultDetector: FaceDetector = None
 
     @classmethod
