@@ -9,10 +9,11 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 from tests.detect_test_class import DetectTestClass
-from tests.resources import ONE_FACE, SEVERAL_FACES, MANY_FACES, NO_FACES
+from tests.resources import ONE_FACE, SEVERAL_FACES, MANY_FACES, NO_FACES, SMALL_IMAGE
 from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 
 SINGLE_CHANNEL_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"))
+VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
 GOOD_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width - 100, VLIMAGE_ONE_FACE.rect.height - 100)
@@ -359,12 +360,13 @@ class TestDetector(DetectTestClass):
         """
         Test match of values at different detections (detectOne and detect) with one image
         """
-        for subTest, detector in self.detectorSubTest():
-            with subTest:
-                detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE, detect68Landmarks=True)
-                batchDetect = detector.detect(images=[VLIMAGE_ONE_FACE] * 3, detect68Landmarks=True)
-                for detection in batchDetect:
-                    for face in detection:
-                        assert face.boundingBox.asDict() == detectOne.boundingBox.asDict()
-                        assert face.landmarks5.asDict() == detectOne.landmarks5.asDict()
-                        assert face.landmarks68.asDict() == detectOne.landmarks68.asDict()
+        for image in (VLIMAGE_ONE_FACE, VLIMAGE_SMALL):
+            for subTest, detector in self.detectorSubTest():
+                with subTest:
+                    detectOne = detector.detectOne(image=image, detect68Landmarks=True)
+                    batchDetect = detector.detect(images=[image] * 3, detect68Landmarks=True)
+                    for detection in batchDetect:
+                        for face in detection:
+                            assert face.boundingBox.asDict() == detectOne.boundingBox.asDict()
+                            assert face.landmarks5.asDict() == detectOne.landmarks5.asDict()
+                            assert face.landmarks68.asDict() == detectOne.landmarks68.asDict()

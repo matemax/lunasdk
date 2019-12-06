@@ -7,8 +7,9 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import DetectTestClass
-from tests.resources import SEVERAL_FACES, CLEAN_ONE_FACE
+from tests.resources import SEVERAL_FACES, CLEAN_ONE_FACE, SMALL_IMAGE
 
+VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
 INVALID_RECT = Rect(0, 0, 0, 0)
@@ -172,21 +173,23 @@ class TestDetector(DetectTestClass):
             with subTest:
                 detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
 
-    @pytest.mark.skip("different values with detector_type_v3")
     def test_match_redetect_one_image(self):
         """
         Test match of values at different re-detections (redetectOne and redetect) with one image
         """
-        for subTest, detector in self.detectorSubTest():
-            with subTest:
-                bBoxRect = detector.detectOne(image=VLIMAGE_ONE_FACE).boundingBox.rect
-                redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=bBoxRect,
-                                                   detect68Landmarks=True)
-                batchRedetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE,
-                                                                              bBoxes=[bBoxRect])] * 3,
-                                                  detect68Landmarks=True)
-                for redetect in batchRedetect:
-                    for face in redetect:
-                        assert face.boundingBox.asDict() == redetectOne.boundingBox.asDict()
-                        assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
-                        assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()
+        for image in (VLIMAGE_ONE_FACE, VLIMAGE_SMALL):
+            for subTest, detector in self.detectorSubTest():
+                with subTest:
+                    if detector.detectorType.name == "FACE_DET_V3":
+                        self.skipTest("Skip for FaceDetV3. Different value")
+                    else:
+                        bBoxRect = detector.detectOne(image=image).boundingBox.rect
+                        redetectOne = detector.redetectOne(image=image, bBox=bBoxRect, detect68Landmarks=True)
+                        batchRedetect = detector.redetect(
+                            images=[ImageForRedetection(image=image, bBoxes=[bBoxRect])] * 3, detect68Landmarks=True
+                        )
+                        for redetect in batchRedetect:
+                            for face in redetect:
+                                assert face.boundingBox.asDict() == redetectOne.boundingBox.asDict()
+                                assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
+                                assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()

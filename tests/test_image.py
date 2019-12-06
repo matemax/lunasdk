@@ -1,9 +1,7 @@
-import os
 from collections import namedtuple
 from pathlib import Path
 
 import FaceEngine as fe
-from lunavl.sdk.faceengine.setting_provider import DetectorType
 import numpy as np
 import pytest
 from PIL import Image
@@ -23,6 +21,7 @@ class TestImage(BaseTestClass):
     """
     Test of image.
     """
+
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
