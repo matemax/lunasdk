@@ -141,12 +141,14 @@ class TestImage(BaseTestClass):
             with self.subTest(extension=ext):
                 pathToTestImage = Path(ONE_FACE).parent.joinpath(f"image_test.{ext.value}")
                 VLImage(body=Path(ONE_FACE).read_bytes()).save(pathToTestImage.as_posix())
+                self.garbageImagesList.append(pathToTestImage)
 
                 VLImage.load(filename=pathToTestImage.as_posix()).isValid()
                 pillowImage = Image.open(pathToTestImage.as_posix())
                 if pillowImage.verify() is None:
                     assert pillowImage.format == ext.name
-                self.garbageImagesList.append(pathToTestImage)
+                else:
+                    raise TypeError("Invalid Image")
 
     def test_image_format_padded(self):
         """

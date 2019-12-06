@@ -182,14 +182,14 @@ class TestDetector(DetectTestClass):
                 with subTest:
                     if detector.detectorType.name == "FACE_DET_V3":
                         self.skipTest("Skip for FaceDetV3. Different value")
-                    else:
-                        bBoxRect = detector.detectOne(image=image).boundingBox.rect
-                        redetectOne = detector.redetectOne(image=image, bBox=bBoxRect, detect68Landmarks=True)
-                        batchRedetect = detector.redetect(
-                            images=[ImageForRedetection(image=image, bBoxes=[bBoxRect])] * 3, detect68Landmarks=True
-                        )
-                        for redetect in batchRedetect:
-                            for face in redetect:
-                                assert face.boundingBox.asDict() == redetectOne.boundingBox.asDict()
-                                assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
-                                assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()
+                        continue
+                    bBoxRect = detector.detectOne(image=image).boundingBox.rect
+                    redetectOne = detector.redetectOne(image=image, bBox=bBoxRect, detect68Landmarks=True)
+                    batchRedetect = detector.redetect(
+                        images=[ImageForRedetection(image=image, bBoxes=[bBoxRect])] * 3, detect68Landmarks=True
+                    )
+                    for redetect in batchRedetect:
+                        for face in redetect:
+                            assert face.boundingBox.asDict() == redetectOne.boundingBox.asDict()
+                            assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
+                            assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()
