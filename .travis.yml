@@ -1,0 +1,12 @@
+language: python
+
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+install:
+  - pip install poetry=='1.0.0b8'
+  - poetry install
+
+script: poetry run black --check $(pwd)

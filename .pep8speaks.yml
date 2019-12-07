@@ -5,3 +5,5 @@ scanner:
 
 pycodestyle:  # Same as scanner.linter value. Other option is flake8
     max-line-length: 120  # Default is 79 in PEP 8
+    ignore:
+        - E203 # stupid flake (https://github.com/psf/black/issues/315)

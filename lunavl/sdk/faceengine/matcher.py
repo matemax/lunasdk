@@ -51,9 +51,9 @@ class FaceMatcher:
         self.descriptorFactory = descriptorFactory
 
     def match(
-            self,
-            reference: Union[FaceDescriptor, bytes],
-            candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch]
+        self,
+        reference: Union[FaceDescriptor, bytes],
+        candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch],
     ) -> Union[MatchingResult, List[MatchingResult]]:
         """
         Match face descriptor vs face descriptors.

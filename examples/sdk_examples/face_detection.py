@@ -21,25 +21,22 @@ def detectFaces():
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
 
-    imageWithOneFace = VLImage.load(
-        filename=EXAMPLE_O
-    )
+    imageWithOneFace = VLImage.load(filename=EXAMPLE_O)
     pprint.pprint(detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False).asDict())
-    imageWithSeveralFaces = VLImage.load(
-        filename=EXAMPLE_SEVERAL_FACES
-    )
+    imageWithSeveralFaces = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
     pprint.pprint(detector.detectOne(imageWithSeveralFaces, detect5Landmarks=False, detect68Landmarks=False).asDict())
 
     severalFaces = detector.detect([imageWithSeveralFaces], detect5Landmarks=False, detect68Landmarks=False)
     pprint.pprint([face.asDict() for face in severalFaces[0]])
 
-    imageWithoutFace = VLImage.load(
-        filename=EXAMPLE_WITHOUT_FACES
-    )
+    imageWithoutFace = VLImage.load(filename=EXAMPLE_WITHOUT_FACES)
     pprint.pprint(detector.detectOne(imageWithoutFace, detect5Landmarks=False, detect68Landmarks=False) is None)
 
-    severalFaces = detector.detect([ImageForDetection(imageWithSeveralFaces, Rect(1, 1, 300.0, 300.0))],
-                                   detect5Landmarks=False, detect68Landmarks=False)
+    severalFaces = detector.detect(
+        [ImageForDetection(imageWithSeveralFaces, Rect(1, 1, 300.0, 300.0))],
+        detect5Landmarks=False,
+        detect68Landmarks=False,
+    )
     pprint.pprint(severalFaces)
 
 

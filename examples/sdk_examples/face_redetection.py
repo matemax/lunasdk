@@ -20,24 +20,24 @@ def detectFaces():
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
 
-    imageWithOneFace = VLImage.load(
-        filename=EXAMPLE_O
-    )
+    imageWithOneFace = VLImage.load(filename=EXAMPLE_O)
     pprint.pprint(detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False).asDict())
     detection = detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False)
     pprint.pprint(detector.redetectOne(image=imageWithOneFace, detection=detection))
     pprint.pprint(detector.redetectOne(image=imageWithOneFace, bBox=detection.boundingBox.rect))
 
-    imageWithSeveralFaces = VLImage.load(
-        filename=EXAMPLE_SEVERAL_FACES
-    )
+    imageWithSeveralFaces = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
     severalFaces = detector.detect([imageWithSeveralFaces], detect5Landmarks=False, detect68Landmarks=False)
 
-    pprint.pprint(detector.redetect(
-        images=[ImageForRedetection(imageWithSeveralFaces, [face.boundingBox.rect
-                                                            for face in severalFaces[0]]),
+    pprint.pprint(
+        detector.redetect(
+            images=[
+                ImageForRedetection(imageWithSeveralFaces, [face.boundingBox.rect for face in severalFaces[0]]),
                 ImageForRedetection(imageWithOneFace, [detection.boundingBox.rect]),
-                ImageForRedetection(imageWithOneFace, [Rect(0, 0, 1, 1)])]))
+                ImageForRedetection(imageWithOneFace, [Rect(0, 0, 1, 1)]),
+            ]
+        )
+    )
 
 
 if __name__ == "__main__":

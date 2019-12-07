@@ -45,7 +45,7 @@ def matchDescriptors():
     faceEngine = VLFaceEngine()
     version = 54
     matcher = faceEngine.createFaceMatcher(version=version)
-    magicPrefix = b"dp\x00\x00" + version.to_bytes(length=4, byteorder='little')
+    magicPrefix = b"dp\x00\x00" + version.to_bytes(length=4, byteorder="little")
     descriptor1 = magicPrefix + bytes([126, 128] * 256)  # length is 8 + 512
     descriptor2 = magicPrefix + bytes([128, 126] * 256)  # length is 8 + 512
 

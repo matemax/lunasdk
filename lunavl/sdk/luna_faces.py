@@ -17,8 +17,13 @@ from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, FaceDetector, Landmarks5, \
-    ImageForRedetection
+from lunavl.sdk.faceengine.facedetector import (
+    FaceDetection,
+    ImageForDetection,
+    FaceDetector,
+    Landmarks5,
+    ImageForRedetection,
+)
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
@@ -99,8 +104,9 @@ class VLFaceDetection(FaceDetection):
             head pose
         """
         if self._headPose is None:
-            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(self.boundingBox,
-                                                                                              self.image)
+            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(
+                self.boundingBox, self.image
+            )
         return self._headPose
 
     @property
@@ -210,8 +216,9 @@ class VLFaceDetection(FaceDetection):
             gaze direction
         """
         if self._gaze is None:
-            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self._getTransformedLandmarks5(),
-                                                                                  self.warp)
+            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(
+                self._getTransformedLandmarks5(), self.warp
+            )
         return self._gaze
 
     def asDict(self) -> Dict[str, Union[dict, list, float]]:
@@ -276,7 +283,7 @@ class VLFaceDetector:
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def __init__(
-            self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
+        self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
     ):
         """
         Init.
@@ -320,8 +327,11 @@ class VLFaceDetector:
         for imageNumber, image in enumerate(images):
             res.append(
                 [
-                    VLFaceDetection(detectRes.coreEstimation, image if isinstance(image, VLImage) else image.image,
-                                    self.estimatorsCollection)
+                    VLFaceDetection(
+                        detectRes.coreEstimation,
+                        image if isinstance(image, VLImage) else image.image,
+                        self.estimatorsCollection,
+                    )
                     for detectRes in detectRes[imageNumber]
                 ]
             )
@@ -340,9 +350,7 @@ class VLFaceDetector:
         if isinstance(image, VLFaceDetection):
             image = VLFaceDetection.image
         redetection: Union[None, FaceDetection] = self._faceDetector.redetectOne(
-            image, bBox=bBox,
-            detect5Landmarks=True,
-            detect68Landmarks=True
+            image, bBox=bBox, detect5Landmarks=True, detect68Landmarks=True
         )
         if redetection:
             return VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
@@ -363,10 +371,12 @@ class VLFaceDetector:
         redetections: List[List[Union[FaceDetection, None]]] = self._faceDetector.redetect(imagesAndBBoxes, True, True)
         res = []
         for redetectionsOfImage in redetections:
-            imageRes = [VLFaceDetection(redetection.coreEstimation,
-                                        redetection.image,
-                                        self.estimatorsCollection) if redetection else None for redetection in
-                        redetectionsOfImage]
+            imageRes = [
+                VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+                if redetection
+                else None
+                for redetection in redetectionsOfImage
+            ]
             res.append(imageRes)
         return res
 

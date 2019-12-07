@@ -104,16 +104,18 @@ class FaceEstimatorsCollection:
     def _getEstimatorByAttributeName(estimatorAttributeName: str) -> FaceEstimator:
         """
         Get face estimator by attribute name which corresponding to estimator
+
         Args:
-            estimatorAttributeName: name
+            estimatorAttributeName:  attribute estimator name
 
         Returns:
             corresponding face estimator
+
         Raises:
-            ValueError("Bad attribute name"): if face estimator not found
+            ValueError: if face estimator not found
         """
         for estimator in FaceEstimator:
-            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:
+            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:  # noqa: E203
                 return estimator
         raise ValueError("Bad attribute name")
 
@@ -126,13 +128,14 @@ class FaceEstimatorsCollection:
 
         Returns:
             corresponding attribute name
+
         Raises:
-            ValueError("Bad estimator"): if attribute name not found
+            ValueError: if attribute name not found
         """
         for estimatorName in self.__slots__:
             if estimatorName == "_faceEngine":
                 continue
-            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:
+            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:  # noqa: E203
                 return estimatorName
         raise ValueError("Bad estimator")
 
@@ -143,7 +146,7 @@ class FaceEstimatorsCollection:
         Args:
             estimator: estimator for creating
         Raises:
-             ValueError("Bad estimator type"): if estimator not found
+            ValueError: if estimator not found
         """
         if estimator == FaceEstimator.BasicAttributes:
             self._basicAttributesEstimator = self._faceEngine.createBasicAttributesEstimator()

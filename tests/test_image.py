@@ -21,6 +21,7 @@ class TestImage(BaseTestClass):
     """
     Test of image.
     """
+
     #: list with paths to test images
     garbageImagesList = None
 

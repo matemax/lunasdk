@@ -93,8 +93,13 @@ class Quality(BaseEstimation):
             {"blurriness": self.blur, "dark": self.dark, "illumination": self.illumination,
              "specularity": self.specularity, "light": self.light}
         """
-        return {"blurriness": self.blur, "dark": self.dark, "illumination": self.illumination,
-                "specularity": self.specularity, "light": self.light}
+        return {
+            "blurriness": self.blur,
+            "dark": self.dark,
+            "illumination": self.illumination,
+            "specularity": self.specularity,
+            "light": self.light,
+        }
 
 
 class WarpQualityEstimator(BaseEstimator):
