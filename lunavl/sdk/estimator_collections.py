@@ -115,7 +115,7 @@ class FaceEstimatorsCollection:
             ValueError: if face estimator not found
         """
         for estimator in FaceEstimator:
-            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:
+            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:  # noqa: E203
                 return estimator
         raise ValueError("Bad attribute name")
 
@@ -135,7 +135,7 @@ class FaceEstimatorsCollection:
         for estimatorName in self.__slots__:
             if estimatorName == "_faceEngine":
                 continue
-            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:
+            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:  # noqa: E203
                 return estimatorName
         raise ValueError("Bad estimator")
 
