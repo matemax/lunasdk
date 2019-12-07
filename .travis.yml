@@ -5,6 +5,11 @@ python:
   - "3.7"
   - "3.8"
 
+os:
+  - linux
+  - windows
+  - osx
+
 install:
   - pip install poetry=='1.0.0b8'
   - poetry install
