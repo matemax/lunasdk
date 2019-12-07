@@ -34,9 +34,12 @@ class VLFaceEngine:
         _faceEngine (PyIFaceEngine): python C++ binding on IFaceEngine, Root LUNA SDK object interface
     """
 
-    def __init__(self, pathToData: Optional[str] = None,
-                 faceEngineConf: Optional[Union[str, FaceEngineSettingsProvider]] = None,
-                 runtimeConf: Optional[Union[str, RuntimeSettingsProvider]] = None):
+    def __init__(
+        self,
+        pathToData: Optional[str] = None,
+        faceEngineConf: Optional[Union[str, FaceEngineSettingsProvider]] = None,
+        runtimeConf: Optional[Union[str, RuntimeSettingsProvider]] = None,
+    ):
         """
         Init.
 
@@ -69,8 +72,9 @@ class VLFaceEngine:
 
         self.dataPath = pathToData
         # todo: validate initialize
-        self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData,
-                                                   configPath=str(self.faceEngineProvider.pathToConfig))
+        self._faceEngine = CoreFE.createFaceEngine(
+            dataPath=pathToData, configPath=str(self.faceEngineProvider.pathToConfig)
+        )
 
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)

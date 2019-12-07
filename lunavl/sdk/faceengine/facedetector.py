@@ -188,12 +188,10 @@ class FaceDetection(BaseEstimation):
         res = {"rect": self.boundingBox.rect.asDict(), "score": self.boundingBox.score}
         if self.landmarks5 is not None:
             coreLandmarks5 = self.landmarks5.coreEstimation
-            res["landmarks5"] = tuple((coreLandmarks5[index].x,
-                                       coreLandmarks5[index].y) for index in range(5))
+            res["landmarks5"] = tuple((coreLandmarks5[index].x, coreLandmarks5[index].y) for index in range(5))
         if self.landmarks68 is not None:
             coreLandmarks68 = self.landmarks68.coreEstimation
-            res["landmarks68"] = tuple((coreLandmarks68[index].x,
-                                        coreLandmarks68[index].y) for index in range(68))
+            res["landmarks68"] = tuple((coreLandmarks68[index].x, coreLandmarks68[index].y) for index in range(68))
         return res
 
 
@@ -236,11 +234,11 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectOneFaceError)
     def detectOne(
-            self,
-            image: VLImage,
-            detectArea: Optional[Rect] = None,
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self,
+        image: VLImage,
+        detectArea: Optional[Rect] = None,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
     ) -> Union[None, FaceDetection]:
         """
         Detect just one best detection on the image.
@@ -256,9 +254,7 @@ class FaceDetector:
             LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
         if image.format != ColorFormat.R8G8B8:
-            details = "Bad image format for detection, format: {}, image: {}".format(
-                image.format.value, image.filename
-            )
+            details = "Bad image format for detection, format: {}, image: {}".format(image.format.value, image.filename)
             raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
 
         if detectArea is None:
@@ -278,11 +274,11 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
-            self,
-            images: List[Union[VLImage, ImageForDetection]],
-            limit: int = 5,
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self,
+        images: List[Union[VLImage, ImageForDetection]],
+        limit: int = 5,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
     ) -> List[List[FaceDetection]]:
         """
         Batch detect faces on images.
@@ -328,31 +324,31 @@ class FaceDetector:
 
     @overload
     def redetectOne(
-            self,
-            image: VLImage,
-            *,
-            bBox: Optional[Rect],
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self, image: VLImage, *, bBox: Optional[Rect], detect5Landmarks: bool = True, detect68Landmarks: bool = False
     ) -> DetectionFloat:
         ...
 
     @overload
     def redetectOne(
-            self,
-            image: VLImage,
-            *,
-            detection: Optional[FaceDetection],
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self,
+        image: VLImage,
+        *,
+        detection: Optional[FaceDetection],
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
     ) -> DetectionFloat:
         ...
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
-    def redetectOne(self, image, *,
-                    bBox: Optional[Rect] = None,
-                    detection: Optional[FaceDetection] = None,
-                    detect5Landmarks=True, detect68Landmarks=False) -> Union[None, FaceDetection]:
+    def redetectOne(
+        self,
+        image,
+        *,
+        bBox: Optional[Rect] = None,
+        detection: Optional[FaceDetection] = None,
+        detect5Landmarks=True,
+        detect68Landmarks=False,
+    ) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
 
@@ -370,12 +366,16 @@ class FaceDetector:
             LunaSDKException if an error occurs
         """
         if isinstance(image, VLImage) and (bBox is not None) and (detection is None):
-            error, detectRes = self._detector.redetectOne(image.coreImage, bBox.coreRectF,
-                                                          self._getDetectionType(detect5Landmarks, detect68Landmarks))
+            error, detectRes = self._detector.redetectOne(
+                image.coreImage, bBox.coreRectF, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+            )
             vlImage = image
         elif isinstance(image, VLImage) and (bBox is None) and (detection is not None):
-            error, detectRes = self._detector.redetectOne(image.coreImage, detection.coreEstimation.detection.rect,
-                                                          self._getDetectionType(detect5Landmarks, detect68Landmarks))
+            error, detectRes = self._detector.redetectOne(
+                image.coreImage,
+                detection.coreEstimation.detection.rect,
+                self._getDetectionType(detect5Landmarks, detect68Landmarks),
+            )
             vlImage = image
         else:
             raise NotImplementedError
@@ -388,10 +388,7 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
-            self,
-            images: List[ImageForRedetection],
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self, images: List[ImageForRedetection], detect5Landmarks: bool = True, detect68Landmarks: bool = False
     ) -> List[List[Union[FaceDetection, None]]]:
         """
         Redetect face on each image.image in area, restricted with image.bBox.
