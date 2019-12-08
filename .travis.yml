@@ -13,5 +13,5 @@ jobs:
       script: poetry run black --check $(pwd)
       python: "3.8"
     - stage: mypy
-      script: poetry ru mypy $(pwd)/lunavl
+      script: poetry run mypy $(pwd)/lunavl
       python: "3.6"
