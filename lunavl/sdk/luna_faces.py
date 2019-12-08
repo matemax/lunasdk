@@ -498,7 +498,7 @@ class VLWarpedImage(WarpedImage):
         return res
 
     @property
-    def warp(self) -> Warp:
+    def warp(self) -> WarpedImage:
         """
         Support VLFaceDetection interface.
 
