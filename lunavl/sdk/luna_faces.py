@@ -226,7 +226,7 @@ class VLFaceDetection(FaceDetection):
         Returns:
             All estimated attributes will be added to dict
         """
-        res:  Dict[str, Union[str, dict, list, float, tuple]] = {
+        res: Dict[str, Union[str, dict, list, float, tuple]] = {
             "rect": {
                 "x": int(self.boundingBox.rect.x),
                 "y": int(self.boundingBox.rect.y),

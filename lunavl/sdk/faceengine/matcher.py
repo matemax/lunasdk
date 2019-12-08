@@ -51,9 +51,9 @@ class FaceMatcher:
         self.descriptorFactory: FaceDescriptorFactory = descriptorFactory
 
     def match(
-            self,
-            reference: Union[FaceDescriptor, bytes],
-            candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch],
+        self,
+        reference: Union[FaceDescriptor, bytes],
+        candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch],
     ) -> Union[MatchingResult, List[MatchingResult]]:
         """
         Match face descriptor vs face descriptors.
@@ -79,11 +79,13 @@ class FaceMatcher:
             candidatesForMatcher = candidates
 
         if isinstance(candidatesForMatcher, FaceDescriptor):
-            error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation,
-                                                          candidatesForMatcher.coreEstimation)
+            error, matchResults = self._coreMatcher.match(
+                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
+            )
         elif isinstance(candidatesForMatcher, FaceDescriptorBatch):
-            error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation,
-                                                          candidatesForMatcher.coreEstimation)
+            error, matchResults = self._coreMatcher.match(
+                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
+            )
         else:
             batch = self.descriptorFactory.generateDescriptorsBatch(len(candidatesForMatcher))
             for candidate in candidatesForMatcher:
