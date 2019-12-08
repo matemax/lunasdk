@@ -147,7 +147,7 @@ class HeadPoseEstimator(BaseEstimator):
         return HeadPose(headPoseEstimation)
 
     #  pylint: disable=W0221
-    def estimate(self, landmarks68: Landmarks68) -> HeadPose:
+    def estimate(self, landmarks68: Landmarks68) -> HeadPose:  # type: ignore
         """
         Realize interface of a abstract  estimator. Call estimateBy68Landmarks
         """

@@ -8,10 +8,15 @@ from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
 from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException, CoreExceptionWrap
+from ..estimators.face_estimators.emotions import Emotions
+from ..estimators.base_estimation import BaseEstimation
+from ..estimators.face_estimators.mouth_state import MouthStates
+from ..estimators.face_estimators.warp_quality import Quality
+
+
 from ..image_utils.geometry import Rect, Landmarks
 from ..image_utils.image import VLImage, ColorFormat
 
@@ -164,9 +169,9 @@ class FaceDetection(BaseEstimation):
         else:
             self.landmarks68 = None
         self._image = image
-        self._emotions = None
-        self._quality = None
-        self._mouthState = None
+        self._emotions: Optional[Emotions] = None
+        self._quality: Optional[Quality] = None
+        self._mouthState: Optional[MouthStates] = None
 
     @property
     def image(self) -> VLImage:
@@ -418,10 +423,10 @@ class FaceDetector:
         detectIter = iter(detectRes)
         res = []
         for image in images:
-            imageRes = []
+            imageRes: List[Union[FaceDetection, None]] = []
             for _ in range(len(image.bBoxes)):
                 detection = next(detectIter)
-                if detection.isValid():
+                if not detection.isValid():
                     imageRes.append(FaceDetection(detection, image.image))
                 else:
                     imageRes.append(None)
