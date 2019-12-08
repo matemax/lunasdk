@@ -426,7 +426,7 @@ class FaceDetector:
             imageRes: List[Union[FaceDetection, None]] = []
             for _ in range(len(image.bBoxes)):
                 detection = next(detectIter)
-                if not detection.isValid():
+                if detection.isValid():
                     imageRes.append(FaceDetection(detection, image.image))
                 else:
                     imageRes.append(None)
