@@ -29,8 +29,8 @@ You can install this package several path:
 ## Setup
 
 We get a path to folder with neural network models and path to a FaceEngine configuration file  from environment 
-variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by default. You can specify these path's 
-in initialization *VLFaceEngine*. 
+variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by default. You can also specify these paths 
+within *VLFaceEngine* initialization. 
 
 ## Getting Started
 
