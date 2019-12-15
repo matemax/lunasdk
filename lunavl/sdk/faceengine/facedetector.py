@@ -3,7 +3,7 @@ Module contains function for detection faces on images.
 """
 from typing import Optional, Union, List, NamedTuple, Dict, Any, overload
 
-from FaceEngine import DetectionFloat, FSDKError, dtBBox  # pylint: disable=E0611,E0401
+from FaceEngine import DetectionFloat  # pylint: disable=E0611,E0401
 from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
@@ -11,12 +11,7 @@ from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E040
 
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException, CoreExceptionWrap
-from ..estimators.face_estimators.emotions import Emotions
 from ..estimators.base_estimation import BaseEstimation
-from ..estimators.face_estimators.mouth_state import MouthStates
-from ..estimators.face_estimators.warp_quality import Quality
-
-
 from ..image_utils.geometry import Rect, Landmarks
 from ..image_utils.image import VLImage, ColorFormat
 
@@ -138,16 +133,7 @@ class FaceDetection(BaseEstimation):
 
     """
 
-    __slots__ = (
-        "boundingBox",
-        "landmarks5",
-        "landmarks68",
-        "_coreDetection",
-        "_image",
-        "_emotions",
-        "_quality",
-        "_mouthState",
-    )
+    __slots__ = ("boundingBox", "landmarks5", "landmarks68", "_coreDetection", "_image")
 
     def __init__(self, coreDetection: Face, image: VLImage):
         """
@@ -169,9 +155,6 @@ class FaceDetection(BaseEstimation):
         else:
             self.landmarks68 = None
         self._image = image
-        self._emotions: Optional[Emotions] = None
-        self._quality: Optional[Quality] = None
-        self._mouthState: Optional[MouthStates] = None
 
     @property
     def image(self) -> VLImage:
@@ -327,13 +310,13 @@ class FaceDetector:
 
         return res
 
-    @overload
+    @overload  # noqa: F811
     def redetectOne(
         self, image: VLImage, *, bBox: Optional[Rect], detect5Landmarks: bool = True, detect68Landmarks: bool = False
     ) -> DetectionFloat:
         ...
 
-    @overload
+    @overload  # noqa: F811
     def redetectOne(
         self,
         image: VLImage,
@@ -344,7 +327,7 @@ class FaceDetector:
     ) -> DetectionFloat:
         ...
 
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
+    @CoreExceptionWrap(LunaVLError.DetectFacesError)  # noqa: F811
     def redetectOne(
         self,
         image,

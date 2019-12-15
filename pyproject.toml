@@ -22,6 +22,7 @@ pre-commit = "^1.18"
 black = {version = "^18.3-alpha.0",allows-prereleases = true}
 jsonschema = "^3.2.0"
 mypy = "^0.750"
+flake8 = "^3.7.9"
 
 [tool.black]
 line-length = 120
