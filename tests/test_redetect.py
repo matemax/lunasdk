@@ -220,6 +220,7 @@ class TestDetector(DetectTestClass):
                         detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])])
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
                 else:
-                    redetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE,
-                                                                             bBoxes=[OUTSIDE_AREA])])
+                    redetect = detector.redetect(
+                        images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
+                    )
                     assert redetect[0][0] is None
