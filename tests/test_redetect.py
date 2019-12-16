@@ -205,8 +205,9 @@ class TestDetector(DetectTestClass):
                     with pytest.raises(LunaSDKException) as exceptionInfo:
                         detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
-                    continue
-                detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
+                else:
+                    redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
+                    assert redetectOne is None
 
     def test_batch_redetect_in_area_outside_image(self):
         """
@@ -218,5 +219,7 @@ class TestDetector(DetectTestClass):
                     with pytest.raises(LunaSDKException) as exceptionInfo:
                         detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])])
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
-                    continue
-                detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])])
+                else:
+                    redetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE,
+                                                                             bBoxes=[OUTSIDE_AREA])])
+                    assert redetect[0][0] is None
