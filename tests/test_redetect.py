@@ -202,9 +202,8 @@ class TestDetector(DetectTestClass):
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 if detector.detectorType.name == "FACE_DET_V3":
-                    with pytest.raises(LunaSDKException) as exceptionInfo:
-                        detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
-                    self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+                    redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
+                    self.assertFaceDetection(redetectOne, VLIMAGE_ONE_FACE)
                 else:
                     redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
                     assert redetectOne is None
@@ -216,9 +215,10 @@ class TestDetector(DetectTestClass):
         for subTest, detector in self.detectorSubTest():
             with subTest:
                 if detector.detectorType.name == "FACE_DET_V3":
-                    with pytest.raises(LunaSDKException) as exceptionInfo:
-                        detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])])
-                    self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+                    redetect = detector.redetect(
+                        images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
+                    )
+                    self.assertFaceDetection(redetect[0], VLIMAGE_ONE_FACE)
                 else:
                     redetect = detector.redetect(
                         images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
