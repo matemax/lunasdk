@@ -14,6 +14,7 @@ VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
 INVALID_RECT = Rect(0, 0, 0, 0)
 ERROR_CORE_RECT = Rect(0.1, 0.1, 0.1, 0.1)  # anything out of range (0.1, 1)
+OUTSIDE_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)
 
 
 class TestDetector(DetectTestClass):
@@ -193,3 +194,33 @@ class TestDetector(DetectTestClass):
                             assert face.boundingBox.asDict() == redetectOne.boundingBox.asDict()
                             assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
                             assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()
+
+    def test_redetect_one_in_area_outside_image(self):
+        """
+        Test re-detection of one face in area outside image
+        """
+        for subTest, detector in self.detectorSubTest():
+            with subTest:
+                if detector.detectorType.name == "FACE_DET_V3":
+                    redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
+                    self.assertFaceDetection(redetectOne, VLIMAGE_ONE_FACE)
+                else:
+                    redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
+                    assert redetectOne is None
+
+    def test_batch_redetect_in_area_outside_image(self):
+        """
+        Test batch re-detection in area outside image
+        """
+        for subTest, detector in self.detectorSubTest():
+            with subTest:
+                if detector.detectorType.name == "FACE_DET_V3":
+                    redetect = detector.redetect(
+                        images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
+                    )
+                    self.assertFaceDetection(redetect[0], VLIMAGE_ONE_FACE)
+                else:
+                    redetect = detector.redetect(
+                        images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
+                    )
+                    assert redetect[0][0] is None
