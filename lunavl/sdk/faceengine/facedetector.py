@@ -361,7 +361,7 @@ class FaceDetector:
         elif isinstance(image, VLImage) and (bBox is None) and (detection is not None):
             error, detectRes = self._detector.redetectOne(
                 image.coreImage,
-                detection.coreEstimation.detection.rect,
+                detection.boundingBox.rect.coreRectF,
                 self._getDetectionType(detect5Landmarks, detect68Landmarks),
             )
             vlImage = image
@@ -399,7 +399,8 @@ class FaceDetector:
         faces = []
         for image in images:
             faces.extend(facesFactory(image))
-        error, detectRes = self._detector.redetect(faces, self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        error, detectRes, errorsLists = self._detector.redetect(faces, self._getDetectionType(detect5Landmarks,
+                                                                                              detect68Landmarks))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
