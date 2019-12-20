@@ -100,6 +100,7 @@ class LunaVLError:
     InvalidMemory = ErrorInfo(100032, "Error at image memory opening", "")
     InvalidType = ErrorInfo(100033, "Unsupported image type", "")
     InvalidWidth = ErrorInfo(100034, "Invalid image width", "")
+    BatchedInternalError = ErrorInfo(100035, "Baching error", "")
 
     CreationDescriptorError = ErrorInfo(110001, "Creation descriptor error", "")
     CreationBatchDescriptorsError = ErrorInfo(110002, "Creation descriptor error", "")
