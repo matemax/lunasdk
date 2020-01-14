@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 from PIL import Image
 
@@ -12,7 +11,7 @@ from tests.detect_test_class import DetectTestClass
 from tests.resources import ONE_FACE, SEVERAL_FACES, MANY_FACES, NO_FACES, SMALL_IMAGE
 from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 
-SINGLE_CHANNEL_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"))
+SINGLE_CHANNEL_IMAGE = Image.open(ONE_FACE).convert("L")
 VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
@@ -27,7 +26,7 @@ class TestDetector(DetectTestClass):
     """
 
     #: Face detector with default detector type
-    defaultDetector: FaceDetector = None
+    defaultDetector: FaceDetector
 
     @classmethod
     def setup_class(cls):
@@ -263,7 +262,7 @@ class TestDetector(DetectTestClass):
         """
         Test invalid image format detection
         """
-        imageWithOneFaces = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
+        imageWithOneFaces = VLImage.load(filename=ONE_FACE, colorFormat=ColorFormat.B8G8R8)
         errorDetail = "Bad image format for detection, format: B8G8R8, image: one_face.jpg"
         for subTest, detector in self.detectorSubTest():
             with subTest:
@@ -277,9 +276,9 @@ class TestDetector(DetectTestClass):
         """
         for colorFormat in [ColorFormat.R8, ColorFormat.R16, ColorFormat.B8G8R8, ColorFormat.B8G8R8X8]:
             if colorFormat.name == "R8" or colorFormat.name == "R16":
-                colorImage = VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=colorFormat)
+                colorImage = VLImage(body=SINGLE_CHANNEL_IMAGE, colorFormat=colorFormat)
             else:
-                colorImage = VLImage.load(filename=ONE_FACE, imgFormat=colorFormat)
+                colorImage = VLImage.load(filename=ONE_FACE, colorFormat=colorFormat)
             errorDetail = f"Bad image format for detection, format: {colorFormat.value}, image: {colorImage.filename}"
             for subTest, detector in self.detectorSubTest():
                 with subTest:

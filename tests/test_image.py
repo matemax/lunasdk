@@ -1,5 +1,7 @@
+import os
 from collections import namedtuple
 from pathlib import Path
+from typing import Dict, List, Union
 
 import FaceEngine as fe
 import numpy as np
@@ -13,8 +15,9 @@ from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 
-SINGLE_CHANNEL_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"))
-ONE_16_BIT_IMAGE = np.asarray(Image.open(ONE_FACE).convert("L"), dtype=np.uint16)
+SINGLE_CHANNEL_IMAGE = Image.open(ONE_FACE).convert("L")
+IMAGE = Image.open(ONE_FACE)
+RESTRICTED_COLOR_FORMATS = {ColorFormat.R16, ColorFormat.Unknown}
 
 
 class TestImage(BaseTestClass):
@@ -23,7 +26,7 @@ class TestImage(BaseTestClass):
     """
 
     #: list with paths to test images
-    garbageImagesList = None
+    garbageImagesList: List[Union[Path, str]]
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -32,8 +35,42 @@ class TestImage(BaseTestClass):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        super().tearDownClass()
         for path in cls.garbageImagesList:
-            Path.unlink(path)
+            if isinstance(path, Path):
+                Path.unlink(path)
+            elif isinstance(path, str):
+                os.remove(path)
+            else:
+                raise NotImplemented(f"{type(path)}")
+
+    @staticmethod
+    def getColorToImageMap() -> Dict[ColorFormat, VLImage]:
+        """
+        Get all available images.
+
+        Returns:
+            color format to vl image map
+        """
+        restrictedColorFormats = {ColorFormat.R16, ColorFormat.Unknown}
+        allColorFormats = set(ColorFormat) - restrictedColorFormats
+        baseImage = VLImage(IMAGE)
+
+        failColorFormats = {ColorFormat.R8G8B8X8, ColorFormat.B8G8R8X8}
+        R, G, B = baseImage.asNPArray().T
+        X = np.ndarray(B.shape)
+        bgrxImage = VLImage.fromNumpyArray(np.array((B, G, R, X)).T, ColorFormat.B8G8R8X8)
+
+        allImages = {
+            colorFormat: VLImage(IMAGE.convert("RGBX"))
+            if colorFormat == ColorFormat.R8G8B8X8
+            else bgrxImage
+            if colorFormat == ColorFormat.B8G8R8X8
+            else VLImage(baseImage.coreImage, colorFormat=colorFormat)
+            for colorFormat in allColorFormats
+        }
+        assert None not in allImages.values(), f"Unsupported type"
+        return allImages
 
     def test_image_initialize(self):
         """
@@ -42,16 +79,15 @@ class TestImage(BaseTestClass):
         binaryBody = Path(ONE_FACE).read_bytes()
         bytearrayBody = bytearray(binaryBody)
         imageWithOneFace = Image.open(ONE_FACE)
-        npBody = np.asarray(imageWithOneFace)
         coreBody = fe.Image()
         coreBody.load(ONE_FACE)
 
         InitCase = namedtuple("InitCase", ("initType", "body"))
         cases = (
             InitCase("bytes", binaryBody),
-            InitCase("numpy array", npBody),
             InitCase("byte array", bytearrayBody),
             InitCase("core", coreBody),
+            InitCase("pillow img", imageWithOneFace),
         )
         for case in cases:
             with self.subTest(initType=case.initType):
@@ -119,7 +155,7 @@ class TestImage(BaseTestClass):
         """
         Test check color format conversion
         """
-        colorImage = VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8)
+        colorImage = VLImage.load(filename=ONE_FACE, colorFormat=ColorFormat.B8G8R8)
         assert colorImage.isValid()
         assert colorImage.format == ColorFormat.B8G8R8
 
@@ -133,7 +169,7 @@ class TestImage(BaseTestClass):
         Test check load image if color format is unknown
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat("Unknown"))
+            VLImage.load(filename=ONE_FACE, colorFormat=ColorFormat("Unknown"))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidFormat)
 
     def test_save_image(self):
@@ -153,35 +189,31 @@ class TestImage(BaseTestClass):
                 else:
                     raise TypeError("Invalid Image")
 
-    def test_image_format_padded(self):
+    def test_image_format_padding(self):
         """
-        Test check image format has padded bytes
+        Test check padded bytes in all image format
         """
-        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R8G8B8X8).isPadded()
-        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8X8).isPadded()
+        paddedFormats = (ColorFormat.R8G8B8X8, ColorFormat.B8G8R8X8)
 
-    def test_image_format_not_padded(self):
-        """
-        Test check image format with no padded bytes
-        """
-        assert VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=ColorFormat.R16).isPadded() is False
-        assert VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=ColorFormat.R8).isPadded() is False
-        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R8G8B8).isPadded() is False
-        assert VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.B8G8R8).isPadded() is False
+        for colorFormat, image in self.getColorToImageMap().items():
+            with self.subTest(colorFormat=colorFormat.name):
+                assert (colorFormat in paddedFormats) == image.isPadded()
 
     def test_invalid_image_conversion(self):
         """
         Test convert image to one channel format
         """
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            VLImage.load(filename=ONE_FACE, imgFormat=ColorFormat.R16)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidConversion)
+        for colorFormat in RESTRICTED_COLOR_FORMATS - {ColorFormat.Unknown}:
+            with self.subTest(colorFormat=colorFormat):
+                with pytest.raises(LunaSDKException) as exceptionInfo:
+                    VLImage.load(filename=ONE_FACE, colorFormat=colorFormat)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidConversion)
 
     def test_invalid_image_data_size(self):
         """
         Test invalid image data size
         """
-        for body in (b"", bytearray()):
+        for body in (b"", bytearray(), b"1234", b"JPEG"):
             with self.subTest(body=body):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     VLImage(body=body, filename="bytes")
@@ -194,21 +226,46 @@ class TestImage(BaseTestClass):
         with pytest.raises(TypeError):
             VLImage(body=VLImage.coreImage, filename="coreImage")
 
-    def test_failed_to_save_jpeg_format(self):
+    def test_save_jpeg_in_all_formats(self):
         """
         Test saving single channel image with different color format
         """
-        for color in [ColorFormat.R16, ColorFormat.R8G8B8X8, ColorFormat.B8G8R8X8]:
+        IMG_PATH = os.path.abspath("test_jpeg.jpg")
+        self.garbageImagesList.append(IMG_PATH)
+        allColorFormats = set(ColorFormat) - RESTRICTED_COLOR_FORMATS
+        failColorFormats = {ColorFormat.B8G8R8X8, ColorFormat.R8G8B8X8}
+        for color in allColorFormats:
             with self.subTest(colorFormat=color):
-                with pytest.raises(LunaSDKException) as exceptionInfo:
-                    VLImage(body=SINGLE_CHANNEL_IMAGE, imgFormat=color).save(f"test_jpeg.jpg")
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidBitmap)
+                if color not in failColorFormats:
+                    VLImage(body=IMAGE).save(IMG_PATH, colorFormat=color)
+                    im = Image.open(IMG_PATH)
+                    im.load()
+                    if color != ColorFormat.B8G8R8:
+                        self.assertEqual(color, ColorFormat.load(im.mode))
+                else:
+                    with pytest.raises(LunaSDKException) as exceptionInfo:
+                        VLImage(body=IMAGE).save(IMG_PATH, colorFormat=color)
+                    self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidBitmap)
 
-    def test_zero_numpy_array_image(self):
+    def test_zero_numpy_array(self):
         """
-        Test image validation with a zero array
+        Test image validation with a zero array:
+            (0, 0, 0), (0, 0, 0), (0, 0, 0)
+            (0, 0, 0), (0, 0, 0), (0, 0, 0)
+            (0, 0, 0), (0, 0, 0), (0, 0, 0)
         """
-        zeroArray = np.zeros(shape=(2, 2))
-        blackImage = VLImage(body=zeroArray, filename="array")
+        zeroArray = np.zeros(shape=(3, 3, 3))
+        blackImage = VLImage.fromNumpyArray(arr=zeroArray, inputColorFormat="RGB", filename="array")
         assert blackImage.isValid()
         self.checkRectAttr(blackImage.rect)
+
+    def test_convert(self):
+        """
+        Test convert image combinations (every to every).
+        """
+        allImages = self.getColorToImageMap()
+        for source in allImages:
+            sourceImage = allImages[source]
+            for target in allImages:
+                with self.subTest(source=source.name, target=target.name):
+                    sourceImage.convert(target)

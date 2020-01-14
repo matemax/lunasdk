@@ -8,7 +8,7 @@ from lunavl.sdk.image_utils.geometry import Rect
 
 
 class BaseTestClass(unittest.TestCase):
-    faceEngine: VLFaceEngine = None
+    faceEngine: VLFaceEngine
 
     @classmethod
     def setup_class(cls):

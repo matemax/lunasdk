@@ -1,7 +1,6 @@
 import itertools
 from collections import namedtuple
-from typing import List, Union, Generator, Tuple
-from unittest.case import _SubTest
+from typing import List, Union, Tuple, ContextManager, Iterator, Type
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine, DetectorType
 from lunavl.sdk.faceengine.facedetector import FaceDetection, FaceDetector, BoundingBox, Landmarks5, Landmarks68
@@ -9,9 +8,12 @@ from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 
+Detector: Type[Tuple[FaceDetector]] = namedtuple("Detector", ("type",))
+
 
 class DetectTestClass(BaseTestClass):
-    faceEngine: VLFaceEngine = None
+    faceEngine: VLFaceEngine
+    detectors: List[Detector]
 
     @classmethod
     def setup_class(cls):
@@ -19,7 +21,6 @@ class DetectTestClass(BaseTestClass):
         Create list of face detector
         """
         super().setup_class()
-        Detector = namedtuple("Detector", ("type",))
         cls.detectors = [
             Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)),
             Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2)),
@@ -90,7 +91,7 @@ class DetectTestClass(BaseTestClass):
         assert isinstance(boundingBox.score, float), f"{boundingBox.score} is not float"
         assert 0 <= boundingBox.score < 1, "score out of range [0,1]"
 
-    def detectorSubTest(self) -> Generator[None, Tuple[_SubTest, FaceDetector], None]:
+    def detectorSubTest(self) -> Iterator[Tuple[ContextManager, FaceDetector]]:
         """
         Generator for sub tests from FaceDetector
         """
