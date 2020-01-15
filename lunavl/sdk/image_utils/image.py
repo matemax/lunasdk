@@ -170,7 +170,7 @@ class VLImage:
             array = np.array(body)
             colorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array, colorFormat=colorFormat, imgFormat=colorFormat
+                ndarray=array, inputColorFormat=colorFormat, colorFormat=colorFormat
             )
         else:
             raise TypeError("Bad image type")
@@ -220,27 +220,28 @@ class VLImage:
 
     @staticmethod
     def _coreImageFromNumpyArray(
-        ndarray: np.ndarray, colorFormat: ColorFormat, imgFormat: Optional[ColorFormat] = None
+        ndarray: np.ndarray, inputColorFormat: ColorFormat, colorFormat: Optional[ColorFormat] = None
     ) -> CoreImage:
         """
         Load VLImage from numpy array into `self`.
 
         Args:
             ndarray: numpy pixel array
-            colorFormat: numpy pixel array format
+            inputColorFormat: numpy pixel array format
+            colorFormat: pixel format to cast into
 
         Returns:
             core image instance
         """
-        coreImage0 = CoreImage()
-        coreImage0.setData(ndarray, colorFormat.coreFormat)
-        if imgFormat is None or coreImage0.getFormat() == imgFormat:
-            return coreImage0
+        baseCoreImage = CoreImage()
+        baseCoreImage.setData(ndarray, inputColorFormat.coreFormat)
+        if colorFormat is None or baseCoreImage.getFormat() == colorFormat.coreFormat:
+            return baseCoreImage
 
-        error, coreImage1 = coreImage0.convert(imgFormat.coreFormat)
+        error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return coreImage1
+        return convertedCoreImage
 
     @classmethod
     def fromNumpyArray(
@@ -265,7 +266,9 @@ class VLImage:
         if isinstance(inputColorFormat, str):
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
-        coreImage = cls._coreImageFromNumpyArray(ndarray=arr, colorFormat=inputColorFormat, imgFormat=colorFormat)
+        coreImage = cls._coreImageFromNumpyArray(
+            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
+        )
         return cls(coreImage, filename=filename)
 
     @property
@@ -369,10 +372,14 @@ class VLImage:
         """
         Get image as numpy array.
 
+        !!!WARNING!!! Does NOT return the same image as in the self.coreImage.
+
         Returns:
             numpy array
         todo: doctest
         """
+        if self.format == ColorFormat.R16:
+            return self.coreImage.getDataR16()
         return self.coreImage.getData()
 
     def isBGR(self) -> bool:
@@ -438,6 +445,9 @@ class VLImage:
     def convert(self, colorFormat: ColorFormat) -> "VLImage":
         """
         Convert current VLImage into image with another color format.
+
+        Args:
+            colorFormat: color format to convert into
         """
         error, coreImage = self.coreImage.convert(colorFormat.coreFormat)
         if error.isError:

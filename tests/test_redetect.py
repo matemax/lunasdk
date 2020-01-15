@@ -140,10 +140,7 @@ class TestDetector(DetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=INVALID_RECT)
-                if detector.detectorType.name == "FACE_DET_V3":
-                    self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
-                else:
-                    self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_redetect_invalid_rectangle(self):
         """

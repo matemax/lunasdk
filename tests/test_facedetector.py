@@ -274,14 +274,13 @@ class TestDetector(DetectTestClass):
         """
         Test invalid image format detection
         """
-        for colorFormat in [ColorFormat.R8, ColorFormat.R16, ColorFormat.B8G8R8, ColorFormat.B8G8R8X8]:
-            if colorFormat.name == "R8" or colorFormat.name == "R16":
-                colorImage = VLImage(body=SINGLE_CHANNEL_IMAGE, colorFormat=colorFormat)
-            else:
-                colorImage = VLImage.load(filename=ONE_FACE, colorFormat=colorFormat)
+        colorToImageMap = self.getColorToImageMap()
+        allowedColorsForDetection = {ColorFormat.R8G8B8}
+        for colorFormat in set(colorToImageMap) - allowedColorsForDetection:
+            colorImage = colorToImageMap[colorFormat]
             errorDetail = f"Bad image format for detection, format: {colorFormat.value}, image: {colorImage.filename}"
             for detector in self.detectors:
-                with self.subTest(detectorType=detector.detectorType):
+                with self.subTest(detectorType=detector.detectorType, colorFormat=colorFormat.name):
                     with pytest.raises(LunaSDKException) as exceptionInfo:
                         detector.detect(images=[colorImage])
                     self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(details=errorDetail))
@@ -316,7 +315,7 @@ class TestDetector(DetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)
-                self.assertLunaVlError(exceptionInfo, LunaVLError.Internal)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_batch_detect_in_area_outside_image(self):
         """
@@ -344,7 +343,7 @@ class TestDetector(DetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=Rect())
-                self.assertLunaVlError(exceptionInfo, LunaVLError.Internal)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_batch_detect_invalid_rectangle(self):
         """
