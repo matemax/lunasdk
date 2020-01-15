@@ -1,6 +1,6 @@
 import itertools
 from collections import namedtuple
-from typing import List, Union, Tuple, ContextManager, Iterator, Type
+from typing import List, Union
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine, DetectorType
 from lunavl.sdk.faceengine.facedetector import FaceDetection, FaceDetector, BoundingBox, Landmarks5, Landmarks68
@@ -8,12 +8,10 @@ from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 
-Detector: Type[Tuple[FaceDetector]] = namedtuple("Detector", ("type",))
-
 
 class DetectTestClass(BaseTestClass):
     faceEngine: VLFaceEngine
-    detectors: List[Detector]
+    detectors: List[FaceDetector]
 
     @classmethod
     def setup_class(cls):
@@ -22,9 +20,9 @@ class DetectTestClass(BaseTestClass):
         """
         super().setup_class()
         cls.detectors = [
-            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)),
-            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2)),
-            Detector(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)),
+            cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1),
+            cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2),
+            cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3),
         ]
         CaseLandmarks = namedtuple("CaseLandmarks", ("detect5Landmarks", "detect68Landmarks"))
         cls.landmarksCases = [
@@ -90,12 +88,3 @@ class DetectTestClass(BaseTestClass):
 
         assert isinstance(boundingBox.score, float), f"{boundingBox.score} is not float"
         assert 0 <= boundingBox.score < 1, "score out of range [0,1]"
-
-    def detectorSubTest(self) -> Iterator[Tuple[ContextManager, FaceDetector]]:
-        """
-        Generator for sub tests from FaceDetector
-        """
-        for testDetector in self.detectors:
-            subTest = self.subTest(testDetector=testDetector)
-            detector = testDetector.type
-            yield subTest, detector
