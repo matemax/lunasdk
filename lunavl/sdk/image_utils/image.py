@@ -97,15 +97,15 @@ class ColorFormat(Enum):
         if colorFormat == "RGB":
             return cls.R8G8B8
         if colorFormat == "RGBa":
-            pass
+            return cls.R8G8B8X8
         if colorFormat == "RGBA":
-            pass
+            return cls.R8G8B8X8
         if colorFormat == "RGBX":
             return cls.R8G8B8X8
         if colorFormat == "BGR":
             return cls.B8G8R8
         if colorFormat == "BGRa":
-            pass
+            return cls.B8G8R8X8
         if colorFormat == "BGRx":
             return cls.B8G8R8X8
         if colorFormat == "RGB":
