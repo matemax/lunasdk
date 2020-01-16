@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Optional, Union
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
-from numpy import ndarray
+import numpy as np
+from PIL.Image import Image as PilImage
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
@@ -39,7 +40,9 @@ class ColorFormat(Enum):
     B8G8R8 = "B8G8R8"
     #: 3 channel, 8 bit per channel, B-G-R color order format with 8 bit padding before next pixel;
     B8G8R8X8 = "B8G8R8X8"
-    #: 1 channel, 8 bit per channel format;
+    #: 3 channel, 8 bit per channel format with InfraRed semantics
+    IR_X8X8X8 = "IR_X8X8X8"
+    #: 1 channel, 16 bit per channel format;
     R16 = "R16"
     #: 1 channel, 8 bit per channel format;
     R8 = "R8"
@@ -74,6 +77,49 @@ class ColorFormat(Enum):
         """
         return getattr(ColorFormat, imageFormat.name)
 
+    @classmethod
+    def load(cls, colorFormat: str) -> "ColorFormat":
+        """
+        Load color format from known sources:
+            1. some PIL image "mode" https://pillow.readthedocs.io/en/stable/handbook/concepts.html#modes
+            2. FSDK color format
+
+        Args:
+            colorFormat: input color format
+
+        Returns:
+            corresponding lunavl image format
+
+        Raises:
+            NotImplementedError if color format is not supported
+        """
+
+        if colorFormat == "RGB":
+            return cls.R8G8B8
+        if colorFormat == "RGBa":
+            return cls.R8G8B8X8
+        if colorFormat == "RGBA":
+            return cls.R8G8B8X8
+        if colorFormat == "RGBX":
+            return cls.R8G8B8X8
+        if colorFormat == "BGR":
+            return cls.B8G8R8
+        if colorFormat == "BGRa":
+            return cls.B8G8R8X8
+        if colorFormat == "BGRx":
+            return cls.B8G8R8X8
+        if colorFormat == "RGB":
+            return cls.R8G8B8
+        if colorFormat in "LP":
+            return cls.R8
+
+        try:
+            return getattr(cls, colorFormat)
+        except AttributeError:
+            pass
+
+        raise ValueError(f"Cannot load '{colorFormat}' color format.")
+
 
 class VLImage:
     """
@@ -81,7 +127,7 @@ class VLImage:
 
     Attributes:
         coreImage (CoreFE.Image): core image object
-        source (Union[bytes, bytearray, ndarray, CoreImage]): body of image
+        source (Union[bytes, bytearray, PilImage, CoreImage]): body of image
         filename (str): filename of the file which is source of image
     """
 
@@ -89,8 +135,8 @@ class VLImage:
 
     def __init__(
         self,
-        body: Union[bytes, bytearray, ndarray, CoreImage],
-        imgFormat: Optional[ColorFormat] = None,
+        body: Union[bytes, bytearray, PilImage, CoreImage],
+        colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
     ):
         """
@@ -98,29 +144,34 @@ class VLImage:
 
         Args:
             body: body of image - bytes numpy array or core image
-            imgFormat: img format
+            colorFormat: img format to cast into
             filename: user mark a source of image
         Raises:
             TypeError: if body has incorrect type
             LunaSDKException: if failed to load image to sdk Image
         """
-        if imgFormat is None:
-            imgFormat = ColorFormat.R8G8B8
-        self.coreImage = CoreImage()
+        if isinstance(body, bytearray):
+            body = bytes(body)
 
         if isinstance(body, CoreImage):
-            self.coreImage = body
+            if colorFormat is None or colorFormat.coreFormat == body.getFormat():
+                self.coreImage = body
+            else:
+                error, self.coreImage = body.convert(colorFormat.coreFormat)
+                if error.isError:
+                    raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, bytes):
-            error = self.coreImage.loadFromMemory(body, len(body), imgFormat.coreFormat)
+            self.coreImage = CoreImage()
+            imgFormat = (colorFormat or ColorFormat.R8G8B8).coreFormat
+            error = self.coreImage.loadFromMemory(body, len(body), imgFormat)
             if error.isError:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
-        elif isinstance(body, bytearray):
-            error = self.coreImage.loadFromMemory(bytes(body), len(body), imgFormat.coreFormat)
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
-        elif isinstance(body, ndarray):
-            #: todo, format ?????
-            self.coreImage.setData(body, imgFormat.coreFormat)
+        elif isinstance(body, PilImage):
+            array = np.array(body)
+            colorFormat = ColorFormat.load(body.mode)
+            self.coreImage = self._coreImageFromNumpyArray(
+                ndarray=array, inputColorFormat=colorFormat, colorFormat=colorFormat
+            )
         else:
             raise TypeError("Bad image type")
 
@@ -129,7 +180,7 @@ class VLImage:
 
     @classmethod
     def load(
-        cls, *_, filename: Optional[str] = None, url: Optional[str] = None, imgFormat: Optional[ColorFormat] = None
+        cls, *_, filename: Optional[str] = None, url: Optional[str] = None, colorFormat: Optional[ColorFormat] = None
     ) -> "VLImage":
 
         """
@@ -139,7 +190,7 @@ class VLImage:
             *_: for remove positional argument
             filename: filename
             url: url
-            imgFormat:
+            colorFormat: img format to cast into
 
         Returns:
             vl image
@@ -155,17 +206,68 @@ class VLImage:
             path = Path(filename)
             with path.open("rb") as file:
                 body = file.read()
-                img = cls(body, imgFormat)
+                img = cls(body, colorFormat)
                 img.filename = path.name
                 return img
 
         if url is not None:
             response = requests.get(url=url)
             if response.status_code == 200:
-                img = cls(response.content, imgFormat)
+                img = cls(response.content, colorFormat)
                 img.filename = url
                 return img
         raise ValueError
+
+    @staticmethod
+    def _coreImageFromNumpyArray(
+        ndarray: np.ndarray, inputColorFormat: ColorFormat, colorFormat: Optional[ColorFormat] = None
+    ) -> CoreImage:
+        """
+        Load VLImage from numpy array into `self`.
+
+        Args:
+            ndarray: numpy pixel array
+            inputColorFormat: numpy pixel array format
+            colorFormat: pixel format to cast into
+
+        Returns:
+            core image instance
+        """
+        baseCoreImage = CoreImage()
+        baseCoreImage.setData(ndarray, inputColorFormat.coreFormat)
+        if colorFormat is None or baseCoreImage.getFormat() == colorFormat.coreFormat:
+            return baseCoreImage
+
+        error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return convertedCoreImage
+
+    @classmethod
+    def fromNumpyArray(
+        cls,
+        arr: np.ndarray,
+        inputColorFormat: Union[str, ColorFormat],
+        colorFormat: Optional[ColorFormat] = None,
+        filename: str = "",
+    ) -> "VLImage":
+        """
+        Load VLImage from numpy array.
+
+        Args:
+            arr: numpy pixel array
+            inputColorFormat: input numpy pixel array format
+            colorFormat: pixel format to cast into
+            filename: optional filename
+
+        Returns:
+            vl image
+        """
+        if isinstance(inputColorFormat, str):
+            inputColorFormat = ColorFormat.load(inputColorFormat)
+
+        coreImage = cls._coreImageFromNumpyArray(ndarray=arr, inputColorFormat=inputColorFormat)
+        return cls(coreImage, filename=filename, colorFormat=colorFormat)
 
     @property
     def format(self) -> ColorFormat:
@@ -264,14 +366,18 @@ class VLImage:
         """
         return self.coreImage.getChannelStep()
 
-    def asNPArray(self) -> ndarray:
+    def asNPArray(self) -> np.ndarray:
         """
         Get image as numpy array.
+
+        !!!WARNING!!! Does NOT return the same image as in the self.coreImage.
 
         Returns:
             numpy array
         todo: doctest
         """
+        if self.format == ColorFormat.R16:
+            return self.coreImage.getDataR16()
         return self.coreImage.getData()
 
     def isBGR(self) -> bool:
@@ -298,16 +404,20 @@ class VLImage:
         """
         return self.coreImage.isPadded()
 
-    def save(self, filename: str):
+    def save(self, filename: str, colorFormat: Optional[ColorFormat] = None):
         """
         Save image to disk. Support image format: *ppm, jpg, png, tif*.
 
         Args:
             filename: filename
+            colorFormat: color format to save image in
         Raises:
             LunaSDKException: if failed to save image to sdk Image
         """
-        saveRes = self.coreImage.save(filename)
+        if colorFormat is None:
+            saveRes = self.coreImage.save(filename)
+        else:
+            saveRes = self.coreImage.save(filename, colorFormat.coreFormat)
         if saveRes.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(saveRes))
 
@@ -329,3 +439,21 @@ class VLImage:
             True if image is valid otherwise False
         """
         return self.coreImage.isValid()
+
+    def convert(self, colorFormat: ColorFormat) -> "VLImage":
+        """
+        Convert current VLImage into image with another color format.
+
+        Args:
+            colorFormat: color format to convert into
+
+        Returns:
+            converted vl image
+
+        Raises:
+            LunaSDKException: if failed to convert image
+        """
+        error, coreImage = self.coreImage.convert(colorFormat.coreFormat)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return self.__class__(body=coreImage, filename=self.filename)
