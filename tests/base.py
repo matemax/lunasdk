@@ -21,6 +21,10 @@ class BaseTestClass(unittest.TestCase):
         super().setUpClass()
         cls.faceEngine = VLFaceEngine()
 
+    @classmethod
+    def teardown_class(cls) -> None:
+        super().tearDownClass()
+
     @staticmethod
     def assertLunaVlError(exceptionInfo: ExceptionInfo, expectedError: ErrorInfo):
         """
@@ -53,28 +57,56 @@ class BaseTestClass(unittest.TestCase):
             )
 
     @staticmethod
-    def getColorToImageMap() -> Dict[ColorFormat, VLImage]:
+    def generateColorToArrayMap() -> Dict[ColorFormat, np.ndarray]:
         """
-        Get all available images.
+        Get images as ndarrays in all available color formats.
 
         Returns:
-            color format to vl image map
+            color format to pixel ndarray map
         """
         image = Image.open(ONE_FACE)
         R, G, B = np.array(image).T
         X = np.ndarray(B.shape, dtype=np.uint8)
 
         allImages = {
-            ColorFormat.B8G8R8: VLImage.fromNumpyArray(np.array((B, G, R)).T, ColorFormat.B8G8R8),
-            ColorFormat.B8G8R8X8: VLImage.fromNumpyArray(np.array((B, G, R, X)).T, ColorFormat.B8G8R8X8),
-            ColorFormat.IR_X8X8X8: VLImage.fromNumpyArray(np.array(image, dtype=np.uint8), ColorFormat.IR_X8X8X8),
-            ColorFormat.R16: VLImage.fromNumpyArray(np.array(image.convert("L"), dtype=np.uint16), ColorFormat.R16),
-            ColorFormat.R8: VLImage.fromNumpyArray(np.array(image.convert("L"), dtype=np.uint8).T, ColorFormat.R8),
-            ColorFormat.R8G8B8: VLImage.fromNumpyArray(np.array(image), ColorFormat.R8G8B8),
-            ColorFormat.R8G8B8X8: VLImage.fromNumpyArray(np.array((R, G, B, X)).T, ColorFormat.R8G8B8X8),
+            ColorFormat.B8G8R8: np.array((B, G, R)).T,
+            ColorFormat.B8G8R8X8: np.array((B, G, R, X)).T,
+            ColorFormat.IR_X8X8X8: np.array(image, dtype=np.uint8),
+            ColorFormat.R16: np.array(image.convert("L"), dtype=np.uint16),
+            ColorFormat.R8: np.array(image.convert("L"), dtype=np.uint8),
+            ColorFormat.R8G8B8: np.array(image),
+            ColorFormat.R8G8B8X8: np.array((R, G, B, X)).T,
         }
-        notImplementedFormats = set(ColorFormat) - set(allImages) - {ColorFormat.Unknown}
-        if notImplementedFormats:
-            notImplementedFormatsList = list(map(attrgetter("name"), notImplementedFormats))
-            raise RuntimeError(f"Add Image for {notImplementedFormatsList} color formats")
+
+        def _checksAllFormats():
+            _notImplementedFormats = set(ColorFormat) - set(allImages) - {ColorFormat.Unknown}
+            if _notImplementedFormats:
+                notImplementedFormatsList = list(map(attrgetter("name"), _notImplementedFormats))
+                raise RuntimeError(f"Add Image for {notImplementedFormatsList} color formats")
+
+        def _checksArrayShapes():
+            for color, ndarray in allImages.items():
+                if ndarray.shape[:2] != allImages[ColorFormat.R8G8B8].shape[:2]:
+                    msg = (
+                        f"'{color.name}' image has incorrect shape.\n"
+                        f"Expected:{allImages[ColorFormat.R8G8B8].shape}\n"
+                        f"Received:{ndarray.shape}"
+                    )
+                    raise RuntimeError(msg)
+
+        _checksAllFormats()
+        _checksArrayShapes()
         return allImages
+
+    @staticmethod
+    def getColorToImageMap() -> Dict[ColorFormat, VLImage]:
+        """
+        Get images as vl image in all available color formats.
+
+        Returns:
+            color format to vl image map
+        """
+        return {
+            color: VLImage.fromNumpyArray(ndarray, color)
+            for color, ndarray in BaseTestClass.generateColorToArrayMap().items()
+        }

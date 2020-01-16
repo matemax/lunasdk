@@ -118,7 +118,7 @@ class ColorFormat(Enum):
         except AttributeError:
             pass
 
-        raise NotImplemented(f"Cannot load '{colorFormat}' color format.")
+        raise ValueError(f"Cannot load '{colorFormat}' color format.")
 
 
 class VLImage:
@@ -266,10 +266,8 @@ class VLImage:
         if isinstance(inputColorFormat, str):
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
-        coreImage = cls._coreImageFromNumpyArray(
-            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
-        )
-        return cls(coreImage, filename=filename)
+        coreImage = cls._coreImageFromNumpyArray(ndarray=arr, inputColorFormat=inputColorFormat)
+        return cls(coreImage, filename=filename, colorFormat=colorFormat)
 
     @property
     def format(self) -> ColorFormat:
@@ -448,6 +446,12 @@ class VLImage:
 
         Args:
             colorFormat: color format to convert into
+
+        Returns:
+            converted vl image
+
+        Raises:
+            LunaSDKException: if failed to convert image
         """
         error, coreImage = self.coreImage.convert(colorFormat.coreFormat)
         if error.isError:

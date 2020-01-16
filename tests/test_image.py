@@ -35,6 +35,7 @@ class TestImage(BaseTestClass):
 
     @classmethod
     def teardown_class(cls) -> None:
+        super().teardown_class()
         for path in cls.filesToDelete:
             if isinstance(path, Path):
                 Path.unlink(path)
@@ -226,6 +227,16 @@ class TestImage(BaseTestClass):
         assert blackImage.isValid()
         self.checkRectAttr(blackImage.rect)
 
+    def test_from_numpy_array(self):
+        """
+        Test init image from different formats with validation
+        """
+        colorToNdArrayMap = self.generateColorToArrayMap()
+        for color, ndarray in colorToNdArrayMap.items():
+            with self.subTest(color=color.name):
+                img = VLImage.fromNumpyArray(ndarray, color)
+                assert color == img.format, img.format
+
     def test_convert(self):
         """
         Test convert image combinations (every to every).
@@ -257,4 +268,5 @@ class TestImage(BaseTestClass):
                             exceptionInfo, LunaVLError.InvalidConversion.format("Requiered conversion not implemented")
                         )
                     else:
-                        sourceImage.convert(target)
+                        targetImg = sourceImage.convert(target)
+                        assert target == targetImg.format, targetImg.format
