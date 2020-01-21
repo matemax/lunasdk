@@ -173,7 +173,7 @@ class VLImage:
                 ndarray=array, inputColorFormat=colorFormat, colorFormat=colorFormat
             )
         else:
-            raise TypeError("Bad image type")
+            raise TypeError(f"Bad image type: {type(body)}")
 
         self.source = body
         self.filename = filename
