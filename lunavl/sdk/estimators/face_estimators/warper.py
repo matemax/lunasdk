@@ -2,9 +2,11 @@
 """
 from typing import Union, Optional
 
+from numpy import ndarray
+
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from numpy.ma import array
+
 
 from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
 from lunavl.sdk.image_utils.image import VLImage
@@ -24,7 +26,7 @@ class WarpedImage(VLImage):
         - the face is always centered and rotated so that imaginary line between the eyes is horizontal.
     """
 
-    def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
+    def __init__(self, body: Union[bytes, ndarray, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
         """
         Init.
 

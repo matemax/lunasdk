@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Face descriptor estimate example
 """
@@ -8,7 +9,7 @@ from lunavl.sdk.image_utils.image import VLImage
 from resources import EXAMPLE_O, EXAMPLE_1
 
 
-def matchDescriptors():
+def matchFacesFromImages():
     """
     Estimate face descriptor.
     """
@@ -36,5 +37,22 @@ def matchDescriptors():
     print(matcher.match(descriptor1, [descriptor2, descriptor1]))
 
 
+def matchDescriptors():
+    """
+    Match raw descriptors.
+    """
+
+    faceEngine = VLFaceEngine()
+    version = 54
+    matcher = faceEngine.createFaceMatcher(version=version)
+    magicPrefix = b"dp\x00\x00" + version.to_bytes(length=4, byteorder="little")
+    descriptor1 = magicPrefix + bytes([126, 128] * 256)  # length is 8 + 512
+    descriptor2 = magicPrefix + bytes([128, 126] * 256)  # length is 8 + 512
+
+    print(matcher.match(descriptor1, descriptor2))
+    print(matcher.match(descriptor1, [descriptor2, descriptor1]))
+
+
 if __name__ == "__main__":
+    matchFacesFromImages()
     matchDescriptors()

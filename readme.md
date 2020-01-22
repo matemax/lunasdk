@@ -1,6 +1,8 @@
 # Luna VisionLabs
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d24e9508258849c2b40760fce3448c6b)](https://www.codacy.com/app/matemax/lunasdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=matemax/lunasdk&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9a84be56ae864b09a667dcf1a2c400f8)](https://www.codacy.com/manual/VisionLabs/lunasdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=matemax/lunasdk&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/matemax/lunasdk.svg?branch=master)](https://travis-ci.org/matemax/lunasdk)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A python interface to VisionLabs LUNA product.
 
@@ -28,8 +30,8 @@ You can install this package several path:
 ## Setup
 
 We get a path to folder with neural network models and path to a FaceEngine configuration file  from environment 
-variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by default. You can specify these path's 
-in initialization *VLFaceEngine*. 
+variable *FSDK_ROOT* (*{FSDK_ROOT}/data*, *{FSDK_ROOT}/data/faceengine.conf*) by default. You can also specify these paths 
+within *VLFaceEngine* initialization. 
 
 ## Getting Started
 

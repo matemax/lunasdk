@@ -4,8 +4,7 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from collections import Iterator
-from typing import Dict, List
+from typing import Dict, List, Iterator
 from typing import Union, Optional
 
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr  # pylint: disable=E0611,E0401
@@ -77,6 +76,22 @@ class FaceDescriptor(BaseEstimation):
         """
         return self.coreEstimation.getModelVersion()
 
+    def reload(self, descriptor: bytes, garbageScore: float = 0.0) -> None:
+        """
+        Reload internal descriptor bytes.
+
+        Args:
+            descriptor: descriptor bytes
+            garbageScore: new garbage scores
+
+        Raises:
+            LunaSDKException(LunaVLError.fromSDKError(res)) if cannot create descriptor instance
+        """
+        res = self.coreEstimation.load(descriptor, len(descriptor))
+        if res.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(res))
+        self.garbageScore = garbageScore
+
 
 class FaceDescriptorBatch(BaseEstimation):
     """
@@ -126,7 +141,7 @@ class FaceDescriptorBatch(BaseEstimation):
 
     def __iter__(self) -> Iterator:
         """
-        Iterator by by batch.
+        Iterator by batch.
 
         Returns:
             iterator by descriptors.
@@ -158,17 +173,38 @@ class FaceDescriptorFactory:
         self._faceEngine = faceEngine
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
-    def generateDescriptor(self) -> IDescriptorPtr:
+    def generateDescriptor(
+        self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None
+    ) -> FaceDescriptor:
         """
-        Generate core descriptor
+        Generate core descriptor.
+
+        Args:
+            descriptor: the input descriptor
+            garbageScore: the input descriptor garbage score
 
         Returns:
-            core descriptor
+            a core descriptor
+
+        Raises:
+            ValueError if garbageScore is not empty and descriptor is empty
         """
-        return FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor())
+        if garbageScore is not None and descriptor is None:
+            raise ValueError("Do not specify `garbageScore` unexpected")
+
+        if descriptor is not None:
+            version = int.from_bytes(descriptor[4:8], byteorder="little")
+            faceDescriptor = FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor(version))
+            if garbageScore is not None:
+                faceDescriptor.reload(descriptor=descriptor, garbageScore=garbageScore)
+            else:
+                faceDescriptor.reload(descriptor=descriptor)
+        else:
+            faceDescriptor = FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor())
+        return faceDescriptor
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
-    def generateDescriptorsBatch(self, size: int) -> IDescriptorBatchPtr:
+    def generateDescriptorsBatch(self, size: int) -> FaceDescriptorBatch:
         """
         Generate core descriptors batch.
 

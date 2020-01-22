@@ -1,17 +1,18 @@
 """Module contains face estimator collections.
 """
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
 
-from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator
-from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributesEstimator
-from lunavl.sdk.estimators.face_estimators.emotions import EmotionsEstimator
-from lunavl.sdk.estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
-from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
-from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator
-from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator
-from lunavl.sdk.estimators.face_estimators.warp_quality import WarpQualityEstimator
-from lunavl.sdk.faceengine.engine import VLFaceEngine
+from .estimators.face_estimators.ags import AGSEstimator
+from .estimators.face_estimators.basic_attributes import BasicAttributesEstimator
+from .estimators.face_estimators.emotions import EmotionsEstimator
+from .estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
+from .estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
+from .estimators.face_estimators.head_pose import HeadPoseEstimator
+from .estimators.face_estimators.mouth_state import MouthStateEstimator
+from .estimators.face_estimators.warp_quality import WarpQualityEstimator
+from .estimators.face_estimators.warper import Warper
+from .faceengine.engine import VLFaceEngine
 
 
 class FaceEstimator(Enum):
@@ -85,16 +86,16 @@ class FaceEstimatorsCollection:
         else:
             self._faceEngine = faceEngine
 
-        self._basicAttributesEstimator = None
-        self._eyeEstimator = None
-        self._emotionsEstimator = None
-        self._gazeDirectionEstimator = None
-        self._mouthStateEstimator = None
-        self._warpQualityEstimator = None
-        self._headPoseEstimator = None
-        self._AGSEstimator = None
-        self._descriptorEstimator = None
-        self.warper = self._faceEngine.createWarper()
+        self._basicAttributesEstimator: Union[None, BasicAttributesEstimator] = None
+        self._eyeEstimator: Union[None, EyeEstimator] = None
+        self._emotionsEstimator: Union[None, EmotionsEstimator] = None
+        self._gazeDirectionEstimator: Union[None, GazeEstimator] = None
+        self._mouthStateEstimator: Union[None, MouthStateEstimator] = None
+        self._warpQualityEstimator: Union[None, WarpQualityEstimator] = None
+        self._headPoseEstimator: Union[None, HeadPoseEstimator] = None
+        self._AGSEstimator: Union[None, AGSEstimator] = None
+        self._descriptorEstimator: Union[None, FaceDescriptorEstimator] = None
+        self.warper: Warper = self._faceEngine.createWarper()
 
         if startEstimators:
             for estimator in set(startEstimators):
@@ -104,16 +105,18 @@ class FaceEstimatorsCollection:
     def _getEstimatorByAttributeName(estimatorAttributeName: str) -> FaceEstimator:
         """
         Get face estimator by attribute name which corresponding to estimator
+
         Args:
-            estimatorAttributeName: name
+            estimatorAttributeName:  attribute estimator name
 
         Returns:
             corresponding face estimator
+
         Raises:
-            ValueError("Bad attribute name"): if face estimator not found
+            ValueError: if face estimator not found
         """
         for estimator in FaceEstimator:
-            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:
+            if estimator.name.lower() == estimatorAttributeName[1 : -len("Estimator")]:  # noqa: E203
                 return estimator
         raise ValueError("Bad attribute name")
 
@@ -126,13 +129,14 @@ class FaceEstimatorsCollection:
 
         Returns:
             corresponding attribute name
+
         Raises:
-            ValueError("Bad estimator"): if attribute name not found
+            ValueError: if attribute name not found
         """
         for estimatorName in self.__slots__:
             if estimatorName == "_faceEngine":
                 continue
-            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:
+            if estimator.name.lower() == estimatorName[1 : -len("Estimator")]:  # noqa: E203
                 return estimatorName
         raise ValueError("Bad estimator")
 
@@ -143,7 +147,7 @@ class FaceEstimatorsCollection:
         Args:
             estimator: estimator for creating
         Raises:
-             ValueError("Bad estimator type"): if estimator not found
+            ValueError: if estimator not found
         """
         if estimator == FaceEstimator.BasicAttributes:
             self._basicAttributesEstimator = self._faceEngine.createBasicAttributesEstimator()
@@ -206,7 +210,7 @@ class FaceEstimatorsCollection:
 
     # pylint: disable=C0103
     @property
-    def AGSEstimator(self) -> AGSEstimator:
+    def AGSEstimator(self) -> AGSEstimator:  # type: ignore
         """
         Get ags estimator.
 
@@ -221,7 +225,7 @@ class FaceEstimatorsCollection:
 
     # pylint: disable=C0103
     @AGSEstimator.setter
-    def AGSEstimator(self, newEstimator: AGSEstimator) -> None:
+    def AGSEstimator(self, newEstimator: AGSEstimator) -> None:  # type: ignore
         """
         Set ags estimator.
 

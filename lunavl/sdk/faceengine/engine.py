@@ -34,9 +34,12 @@ class VLFaceEngine:
         _faceEngine (PyIFaceEngine): python C++ binding on IFaceEngine, Root LUNA SDK object interface
     """
 
-    def __init__(self, pathToData: Optional[str] = None,
-                 faceEngineConf: Optional[Union[str, FaceEngineSettingsProvider]] = None,
-                 runtimeConf: Optional[Union[str, RuntimeSettingsProvider]] = None):
+    def __init__(
+        self,
+        pathToData: Optional[str] = None,
+        faceEngineConf: Optional[Union[str, FaceEngineSettingsProvider]] = None,
+        runtimeConf: Optional[Union[str, RuntimeSettingsProvider]] = None,
+    ):
         """
         Init.
 
@@ -69,8 +72,9 @@ class VLFaceEngine:
 
         self.dataPath = pathToData
         # todo: validate initialize
-        self._faceEngine = CoreFE.createFaceEngine(dataPath=pathToData,
-                                                   configPath=str(self.faceEngineProvider.pathToConfig))
+        self._faceEngine = CoreFE.createFaceEngine(
+            dataPath=pathToData, configPath=str(self.faceEngineProvider.pathToConfig)
+        )
 
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
@@ -168,19 +172,29 @@ class VLFaceEngine:
         """
         return AGSEstimator(self._faceEngine.createAGSEstimator())
 
-    def createFaceDescriptorEstimator(self) -> FaceDescriptorEstimator:
+    def createFaceDescriptorEstimator(self, descriptorVersion: Optional[int] = None) -> FaceDescriptorEstimator:
         """
         Approximate garbage score estimator
+
+        Args:
+            descriptorVersion: descriptor version to init estimator for
 
         Returns:
             estimator
         """
-        return FaceDescriptorEstimator(self._faceEngine.createExtractor(), self.createFaceDescriptorFactory())
+        extractor = (
+            self._faceEngine.createExtractor(descriptorVersion)
+            if descriptorVersion
+            else self._faceEngine.createExtractor()
+        )
+        return FaceDescriptorEstimator(extractor, self.createFaceDescriptorFactory())
 
     def createFaceDescriptorFactory(self) -> FaceDescriptorFactory:
         return FaceDescriptorFactory(self)
 
-    def createFaceMatcher(self) -> FaceMatcher:
+    def createFaceMatcher(self, version: Optional[int] = None) -> FaceMatcher:
+        if version is not None:
+            return FaceMatcher(self._faceEngine.createMatcher(version), self.createFaceDescriptorFactory())
         return FaceMatcher(self._faceEngine.createMatcher(), self.createFaceDescriptorFactory())
 
     @property

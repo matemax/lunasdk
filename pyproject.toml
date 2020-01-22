@@ -12,14 +12,19 @@ repository = "https://github.com/matemax/lunasdk"
 [tool.poetry.dependencies]
 python = ">=3.6"
 numpy = "*"
-requests = "*"
+requests = "^2.22"
+Pillow = "7.0.0"
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
 pytest = ">=4.4"
 pytest-subtests = "*"
 sphinx-autodoc-typehints = "*"
 pre-commit = "^1.18"
-black = {version = "^18.3-alpha.0",allows-prereleases = true}
+black = {version = "^18.3-alpha.0",allow-prereleases = true}
+jsonschema = "^3.2.0"
+mypy = "^0.750"
+flake8 = "^3.7.9"
+bandit = "^1.6.2"
 
 [tool.black]
 line-length = 120
