@@ -172,14 +172,22 @@ class VLFaceEngine:
         """
         return AGSEstimator(self._faceEngine.createAGSEstimator())
 
-    def createFaceDescriptorEstimator(self) -> FaceDescriptorEstimator:
+    def createFaceDescriptorEstimator(self, descriptorVersion: Optional[int] = None) -> FaceDescriptorEstimator:
         """
         Approximate garbage score estimator
+
+        Args:
+            descriptorVersion: descriptor version to init estimator for
 
         Returns:
             estimator
         """
-        return FaceDescriptorEstimator(self._faceEngine.createExtractor(), self.createFaceDescriptorFactory())
+        extractor = (
+            self._faceEngine.createExtractor(descriptorVersion)
+            if descriptorVersion
+            else self._faceEngine.createExtractor()
+        )
+        return FaceDescriptorEstimator(extractor, self.createFaceDescriptorFactory())
 
     def createFaceDescriptorFactory(self) -> FaceDescriptorFactory:
         return FaceDescriptorFactory(self)
