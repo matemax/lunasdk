@@ -182,8 +182,11 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        extractor = self._faceEngine.createExtractor(descriptorVersion) if descriptorVersion \
+        extractor = (
+            self._faceEngine.createExtractor(descriptorVersion)
+            if descriptorVersion
             else self._faceEngine.createExtractor()
+        )
         return FaceDescriptorEstimator(extractor, self.createFaceDescriptorFactory())
 
     def createFaceDescriptorFactory(self) -> FaceDescriptorFactory:
