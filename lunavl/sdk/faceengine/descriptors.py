@@ -167,10 +167,12 @@ class FaceDescriptorFactory:
 
     Attributes:
         _faceEngine (VLFaceEngine): faceEngine
+        _descriptorVersion (int): descriptor version
     """
 
-    def __init__(self, faceEngine: "VLFaceEngine"):  # type: ignore # noqa: F821
+    def __init__(self, faceEngine: "VLFaceEngine", descriptorVersion: int = 0):  # type: ignore # noqa: F821
         self._faceEngine = faceEngine
+        self._descriptorVersion = descriptorVersion
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptor(
@@ -200,18 +202,22 @@ class FaceDescriptorFactory:
             else:
                 faceDescriptor.reload(descriptor=descriptor)
         else:
-            faceDescriptor = FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor())
+            faceDescriptor = FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor(self._descriptorVersion))
         return faceDescriptor
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
-    def generateDescriptorsBatch(self, size: int) -> FaceDescriptorBatch:
+    def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> FaceDescriptorBatch:
         """
         Generate core descriptors batch.
 
         Args:
-            size:batch size
+            size: batch size
+            descriptorVersion: descriptor version
 
         Returns:
             batch
         """
-        return FaceDescriptorBatch(self._faceEngine.coreFaceEngine.createDescriptorBatch(size))
+        descriptorVersion = descriptorVersion or self._descriptorVersion
+        return FaceDescriptorBatch(
+            self._faceEngine.coreFaceEngine.createDescriptorBatch(size, version=descriptorVersion)
+        )
