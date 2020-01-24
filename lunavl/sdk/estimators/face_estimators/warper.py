@@ -74,7 +74,7 @@ class WarpedImage(VLImage):
         Returns:
             warp
         """
-        warp = cls(body=b"", vlImage=VLImage.load(filename=filename, url=url))
+        warp = cls(body=VLImage.load(filename=filename, url=url), filename=filename)
         warp.assertWarp()
         return warp
 
