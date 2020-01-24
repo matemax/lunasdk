@@ -8,6 +8,7 @@ import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 import numpy as np
 from PIL.Image import Image as PilImage
+from PIL import Image as pilImage
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
@@ -379,6 +380,19 @@ class VLImage:
         if self.format == ColorFormat.R16:
             return self.coreImage.getDataR16()
         return self.coreImage.getData()
+
+    def asPillow(self) -> PilImage:
+        """
+        Get image as pillow image.
+
+        !!!WARNING!!! Does NOT return the same image as in the self.coreImage.
+
+        Returns:
+            pillow image
+        todo: doctest
+        """
+        imageArray = self.asNPArray()
+        return pilImage.fromarray(imageArray)
 
     def isBGR(self) -> bool:
         """

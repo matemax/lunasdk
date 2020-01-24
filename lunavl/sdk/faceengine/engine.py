@@ -172,7 +172,7 @@ class VLFaceEngine:
         """
         return AGSEstimator(self._faceEngine.createAGSEstimator())
 
-    def createFaceDescriptorEstimator(self, descriptorVersion: Optional[int] = None) -> FaceDescriptorEstimator:
+    def createFaceDescriptorEstimator(self, descriptorVersion: int = 0) -> FaceDescriptorEstimator:
         """
         Approximate garbage score estimator
 
@@ -182,20 +182,15 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        extractor = (
-            self._faceEngine.createExtractor(descriptorVersion)
-            if descriptorVersion
-            else self._faceEngine.createExtractor()
+        return FaceDescriptorEstimator(
+            self._faceEngine.createExtractor(descriptorVersion), self.createFaceDescriptorFactory(descriptorVersion)
         )
-        return FaceDescriptorEstimator(extractor, self.createFaceDescriptorFactory())
 
-    def createFaceDescriptorFactory(self) -> FaceDescriptorFactory:
-        return FaceDescriptorFactory(self)
+    def createFaceDescriptorFactory(self, descriptorVersion: int = 0) -> FaceDescriptorFactory:
+        return FaceDescriptorFactory(self, descriptorVersion=descriptorVersion)
 
-    def createFaceMatcher(self, version: Optional[int] = None) -> FaceMatcher:
-        if version is not None:
-            return FaceMatcher(self._faceEngine.createMatcher(version), self.createFaceDescriptorFactory())
-        return FaceMatcher(self._faceEngine.createMatcher(), self.createFaceDescriptorFactory())
+    def createFaceMatcher(self, descriptorVersion: int = 0) -> FaceMatcher:
+        return FaceMatcher(self._faceEngine.createMatcher(descriptorVersion), self.createFaceDescriptorFactory())
 
     @property
     def coreFaceEngine(self) -> CoreFE.PyIFaceEngine:
