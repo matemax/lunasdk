@@ -35,13 +35,12 @@ class WarpedImage(VLImage):
         Args:
             body: body of image - bytes/bytearray or core image or pil image or vlImage
             filename: user mark a source of image
-            vlImage: source is vl image.
             colorFormat: output image color format
         """
         if isinstance(body, VLImage):
-            self.source = vlImage.source
-            self.filename = vlImage.filename
-            self.coreImage = vlImage.coreImage
+            self.source = body.source
+            self.filename = body.filename
+            self.coreImage = body.coreImage
         else:
             super().__init__(body, filename=filename, colorFormat=colorFormat)
             self.assertWarp()
