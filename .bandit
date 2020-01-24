@@ -1,0 +1,3 @@
+[bandit]
+# (optional) list skipped tests here:
+skips: B101

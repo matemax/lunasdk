@@ -12,3 +12,7 @@ jobs:
     - stage: mypy
       script: poetry run mypy $(pwd)/lunavl
       python: "3.8"
+    - stage: bandit
+      script: poetry run bandit -r $(pwd)
+      python: "3.8"
+
