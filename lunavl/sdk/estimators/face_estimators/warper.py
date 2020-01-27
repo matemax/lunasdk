@@ -43,7 +43,7 @@ class WarpedImage(VLImage):
             self.coreImage = body.coreImage
         else:
             super().__init__(body, filename=filename, colorFormat=colorFormat)
-            self.assertWarp()
+        self.assertWarp()
 
     def assertWarp(self):
         """
