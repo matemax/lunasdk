@@ -174,6 +174,15 @@ class FaceDescriptorFactory:
         self._faceEngine = faceEngine
         self._descriptorVersion = descriptorVersion
 
+    @property
+    def descriptorVersion(self) -> int:
+        """
+        Return descriptor version for generating descriptor
+        Returns:
+            _descriptorVersion
+        """
+        return self._descriptorVersion
+
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptor(
         self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
