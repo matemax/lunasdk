@@ -176,7 +176,7 @@ class FaceDescriptorFactory:
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptor(
-            self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
+        self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
     ) -> FaceDescriptor:
         """
         Generate core descriptor.
@@ -204,7 +204,8 @@ class FaceDescriptorFactory:
                 faceDescriptor.reload(descriptor=descriptor)
         else:
             faceDescriptor = FaceDescriptor(
-                self._faceEngine.coreFaceEngine.createDescriptor(descriptorVersion or self._descriptorVersion))
+                self._faceEngine.coreFaceEngine.createDescriptor(descriptorVersion or self._descriptorVersion)
+            )
         return faceDescriptor
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
