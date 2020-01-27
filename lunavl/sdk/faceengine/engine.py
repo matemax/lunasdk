@@ -177,7 +177,7 @@ class VLFaceEngine:
         Approximate garbage score estimator
 
         Args:
-            descriptorVersion: descriptor version to init estimator for
+            descriptorVersion: descriptor version to init estimator for or zero for use default descriptor version
 
         Returns:
             estimator
@@ -187,11 +187,33 @@ class VLFaceEngine:
         )
 
     def createFaceDescriptorFactory(self, descriptorVersion: int = 0) -> FaceDescriptorFactory:
+        """
+        Create face descriptor factory
+        Args:
+            descriptorVersion: descriptor version or zero for use default descriptor version
+
+        Returns:
+            face descriptor factory
+        """
         return FaceDescriptorFactory(self, descriptorVersion=descriptorVersion)
 
     def createFaceMatcher(self, descriptorVersion: int = 0) -> FaceMatcher:
+        """
+        Create face matcher
+        Args:
+            descriptorVersion: descriptor version or zero for use default descriptor version
+
+        Returns:
+            face matcher
+        """
         return FaceMatcher(self._faceEngine.createMatcher(descriptorVersion), self.createFaceDescriptorFactory())
 
     @property
     def coreFaceEngine(self) -> CoreFE.PyIFaceEngine:
+        """
+        Get core face engine
+
+        Returns:
+            core face engine
+        """
         return self._faceEngine
