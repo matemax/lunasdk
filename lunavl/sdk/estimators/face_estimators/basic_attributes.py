@@ -215,7 +215,7 @@ class BasicAttributesEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationBasicAttributeError)
     def estimate(
-            self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
+        self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
     ) -> BasicAttributes:
         """
         Estimate a basic attributes (age, gender, ethnicity) from warped images.
