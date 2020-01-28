@@ -118,19 +118,19 @@ class Point(Generic[COORDINATE_TYPE]):
             return Vector2i(self.x, self.y)
         return Vector2f(self.x, self.y)
 
-    def asDict(self) -> Tuple[COORDINATE_TYPE, COORDINATE_TYPE]:
+    def asDict(self) -> Tuple[int, int]:
         """
         Convert point to list
 
         Returns:
-            [self.x, self.y]
+            (int(self.x), int(self.y))
 
         >>> Point(1, 2).asDict()
         (1, 2)
         >>> Point(1.0, 2.0).asDict()
-        (1.0, 2.0)
+        (1, 2)
         """
-        return self.x, self.y
+        return int(self.x), int(self.y)
 
     def __repr__(self):
         return "x = {}, y = {}".format(self.x, self.y)
@@ -629,7 +629,7 @@ class Landmarks(BaseEstimation):
                                   range(len(self._coreEstimation))))
         return self._points
 
-    def asDict(self) -> Tuple[Tuple[float, float], ...]:
+    def asDict(self) -> Tuple[Tuple[int, int], ...]:
         """
         Convert to dict
 
@@ -638,4 +638,4 @@ class Landmarks(BaseEstimation):
         """
         pointCount = len(self._coreEstimation)
         points = self.coreEstimation
-        return tuple(((points[index].x, points[index].y) for index in range(pointCount)))
+        return tuple(((int(points[index].x), int(points[index].x)) for index in range(pointCount)))
