@@ -1582,6 +1582,7 @@ class BaseSettingsProvider:
                           the folder'data'  in "FSDK_ROOT".
         _coreSettingProvider (PyISettingsProvider): core settings provider
     """
+
     # default configuration filename.
     defaultConfName = ""
 
@@ -1627,6 +1628,7 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
 
     Proxy model.
     """
+
     # default configuration filename.
     defaultConfName = "faceengine.conf"
 
@@ -1807,6 +1809,7 @@ class RuntimeSettingsProvider(BaseSettingsProvider):
 
     Proxy model.
     """
+
     defaultConfName = "runtime.conf"
 
     @property

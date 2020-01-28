@@ -246,12 +246,15 @@ class BasicAttributesEstimator(BaseEstimator):
 
     @CoreExceptionWrap(LunaVLError.BatchEstimationBasicAttributeError)
     def estimateBasicAttributesBatch(
-            self, warps: List[Union[Warp, WarpedImage]],
-            estimateAge: bool, estimateGender: bool, estimateEthnicity: bool,
-            aggregate: bool = False,
+        self,
+        warps: List[Union[Warp, WarpedImage]],
+        estimateAge: bool,
+        estimateGender: bool,
+        estimateEthnicity: bool,
+        aggregate: bool = False,
     ) -> Tuple[List[BasicAttributes], Union[None, BasicAttributes]]:
         """
-        Batch estimation a basic attributes from warped images.
+        Batch basic attributes estimation on warped images.
 
         Args:
             warps: warped images

@@ -1,12 +1,11 @@
 """
 Module contains geometric structures (Rect, Point, Size)
 """
-from typing import TypeVar, Generic, Union, List, Optional, Dict, Tuple
-
-from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
-from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
+from typing import TypeVar, Generic, Union, Optional, Dict, Tuple
 
 from FaceEngine import Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
+from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
@@ -601,7 +600,7 @@ class Landmarks(BaseEstimation):
     Base class for landmarks
 
     Attributes:
-        _points (Optional[List[Point[float]]]): lazy load attributes, converted to point list core landmarks
+        _points (Optional[Tuple[Point[float]]]): lazy load attributes, converted to point list core landmarks
     """
 
     __slots__ = ["_points", "_coreLandmarks"]
@@ -614,7 +613,7 @@ class Landmarks(BaseEstimation):
             coreLandmarks (LANDMARKS): core landmarks
         """
         super().__init__(coreLandmarks)
-        self._points: Optional[List[Point[float]]] = None
+        self._points: Optional[Tuple[Point[float], ...]] = None
 
     @property
     def points(self) -> Tuple[Point[float], ...]:
@@ -625,11 +624,12 @@ class Landmarks(BaseEstimation):
             list of points
         """
         if self._points is None:
-            self._points = tuple((Point.fromVector2(self._coreEstimation[index]) for index in
-                                  range(len(self._coreEstimation))))
+            self._points = tuple(
+                (Point.fromVector2(self._coreEstimation[index]) for index in range(len(self._coreEstimation)))
+            )
         return self._points
 
-    def asDict(self) -> Tuple[Tuple[int, int], ...]:
+    def asDict(self) -> Tuple[Tuple[int, int], ...]:  # type: ignore
         """
         Convert to dict
 

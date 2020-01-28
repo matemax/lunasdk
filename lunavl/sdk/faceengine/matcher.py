@@ -47,11 +47,13 @@ class FaceMatcher:
         Args:
             coreMatcher: core matcher
         """
-        self._coreMatcher = coreMatcher
-        self.descriptorFactory = descriptorFactory
+        self._coreMatcher: IDescriptorMatcherPtr = coreMatcher
+        self.descriptorFactory: FaceDescriptorFactory = descriptorFactory
 
     def match(
-        self, reference: FaceDescriptor, candidates: Union[FaceDescriptor, List[FaceDescriptor], FaceDescriptorBatch]
+        self,
+        reference: Union[FaceDescriptor, bytes],
+        candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch],
     ) -> Union[MatchingResult, List[MatchingResult]]:
         """
         Match face descriptor vs face descriptors.
@@ -59,21 +61,37 @@ class FaceMatcher:
         Returns:
             List of matching results if match by several descriptors otherwise one MatchingResult.
         """
-        if isinstance(candidates, FaceDescriptor):
-            error = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
-            return error.value
-        elif isinstance(candidates, FaceDescriptorBatch):
-            error, matchResults = self._coreMatcher.match(reference.coreEstimation, candidates.coreEstimation)
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
-            return matchResults
+        if isinstance(reference, bytes):
+            referenceForMatcher = self.descriptorFactory.generateDescriptor(reference)
         else:
-            batch = self.descriptorFactory.generateDescriptorsBatch(len(candidates))
-            for candidate in candidates:
+            referenceForMatcher = reference
+
+        if isinstance(candidates, bytes):
+            candidatesForMatcher = self.descriptorFactory.generateDescriptor(candidates)
+        elif isinstance(candidates, list):
+            candidatesForMatcher = []
+            for idx in range(len(candidates)):
+                if isinstance(candidates[idx], bytes):
+                    candidatesForMatcher[idx] = self.descriptorFactory.generateDescriptor(candidates[idx])
+                else:
+                    candidatesForMatcher[idx] = candidates[idx]
+        else:
+            candidatesForMatcher = candidates
+
+        if isinstance(candidatesForMatcher, FaceDescriptor):
+            error, matchResults = self._coreMatcher.match(
+                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
+            )
+        elif isinstance(candidatesForMatcher, FaceDescriptorBatch):
+            error, matchResults = self._coreMatcher.match(
+                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
+            )
+        else:
+            batch = self.descriptorFactory.generateDescriptorsBatch(len(candidatesForMatcher))
+            for candidate in candidatesForMatcher:
                 batch.append(candidate)
-            error, matchResults = self._coreMatcher.match(reference.coreEstimation, batch.coreEstimation)
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
-            return matchResults
+            error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation, batch.coreEstimation)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return matchResults

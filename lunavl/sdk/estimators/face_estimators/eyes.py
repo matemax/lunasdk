@@ -191,7 +191,7 @@ class EyeEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(
-            self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
+        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
     ) -> EyesEstimation:
         """
         Estimate mouth state on warp.
@@ -276,8 +276,10 @@ class GazeDirection(BaseEstimation):
         Returns:
             {'yaw': self.yaw, 'pitch': self.pitch}
         """
-        return {"yaw": self.yaw if _isNotNan(self.yaw) else None,
-                "pitch": self.pitch if _isNotNan(self.pitch) else None}
+        return {
+            "yaw": self.yaw if _isNotNan(self.yaw) else None,
+            "pitch": self.pitch if _isNotNan(self.pitch) else None,
+        }
 
 
 class GazeEstimator(BaseEstimator):
@@ -297,9 +299,9 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(self,
-                 transformedLandmarks: Union[Landmarks5, Landmarks68],
-                 warp: Union[Warp, WarpedImage]) -> GazeDirection:
+    def estimate(
+        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
+    ) -> GazeDirection:
         """
         Estimate a gaze direction
 

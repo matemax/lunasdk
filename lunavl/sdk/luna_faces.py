@@ -1,12 +1,10 @@
 """Module realize hight level api for estimate face attributes
 """
-from collections import defaultdict
-from typing import Optional, Union, List, Dict, Tuple, Iterable
+from typing import Optional, Union, List, Dict
 
-from FaceEngine import Face, DetectionType, dtBBox, DetectionFloat  # pylint: disable=E0611,E0401
+from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
-from numpy.ma import array
-
+from PIL.Image import Image as PilImage
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
@@ -17,11 +15,16 @@ from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import FaceDetection, ImageForDetection, FaceDetector, Landmarks5, \
-    ImageForRedetection
+from lunavl.sdk.faceengine.facedetector import (
+    FaceDetection,
+    ImageForDetection,
+    FaceDetector,
+    Landmarks5,
+    ImageForRedetection,
+)
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
 class VLFaceDetection(FaceDetection):
@@ -74,9 +77,9 @@ class VLFaceDetection(FaceDetection):
         self._warpQuality: Optional[Quality] = None
         self._headPose: Optional[HeadPose] = None
         self._transformedLandmarks5: Optional[Landmarks5] = None
-        self._ags = None
-        self._descriptor = None
-        self.estimatorCollection = estimatorCollection
+        self._ags: Optional[float] = None
+        self._descriptor: Optional[FaceDescriptor] = None
+        self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
 
     @property
     def warp(self) -> Warp:
@@ -99,8 +102,9 @@ class VLFaceDetection(FaceDetection):
             head pose
         """
         if self._headPose is None:
-            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(self.boundingBox,
-                                                                                              self.image)
+            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(
+                self.boundingBox, self.image
+            )
         return self._headPose
 
     @property
@@ -136,7 +140,7 @@ class VLFaceDetection(FaceDetection):
             emotions
         """
         if self._ags is None:
-            self._ags = self.estimatorCollection.AGSEstimator.estimate(self)
+            self._ags = self.estimatorCollection.AGSEstimator.estimate(self)  # type: ignore
         return self._ags
 
     @property
@@ -184,10 +188,9 @@ class VLFaceDetection(FaceDetection):
             landmarks5
         """
         if self._transformedLandmarks5 is None:
-            self._transformedLandmarks5 = self.estimatorCollection.warper.makeWarpTransformationWithLandmarks(
-                self, "L5"
-            )
-        return self._transformedLandmarks5
+            warper = self.estimatorCollection.warper
+            self._transformedLandmarks5 = warper.makeWarpTransformationWithLandmarks(self, "L5")  # type: ignore
+        return self._transformedLandmarks5  # type: ignore
 
     @property
     def eyes(self) -> EyesEstimation:
@@ -210,18 +213,19 @@ class VLFaceDetection(FaceDetection):
             gaze direction
         """
         if self._gaze is None:
-            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(self._getTransformedLandmarks5(),
-                                                                                  self.warp)
+            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(
+                self._getTransformedLandmarks5(), self.warp
+            )
         return self._gaze
 
-    def asDict(self) -> Dict[str, Union[dict, list, float]]:
+    def asDict(self) -> Dict[str, Union[str, dict, list, float, tuple]]:
         """
         Convert to dict.
 
         Returns:
             All estimated attributes will be added to dict
         """
-        res = {
+        res: Dict[str, Union[str, dict, list, float, tuple]] = {
             "rect": {
                 "x": int(self.boundingBox.rect.x),
                 "y": int(self.boundingBox.rect.y),
@@ -276,7 +280,7 @@ class VLFaceDetector:
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def __init__(
-            self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
+        self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
     ):
         """
         Init.
@@ -320,8 +324,11 @@ class VLFaceDetector:
         for imageNumber, image in enumerate(images):
             res.append(
                 [
-                    VLFaceDetection(detectRes.coreEstimation, image if isinstance(image, VLImage) else image.image,
-                                    self.estimatorsCollection)
+                    VLFaceDetection(
+                        detectRes.coreEstimation,
+                        image if isinstance(image, VLImage) else image.image,
+                        self.estimatorsCollection,
+                    )
                     for detectRes in detectRes[imageNumber]
                 ]
             )
@@ -338,11 +345,11 @@ class VLFaceDetector:
             return detection or None if face not found
         """
         if isinstance(image, VLFaceDetection):
-            image = VLFaceDetection.image
+            imageForRedetct = image.image
+        else:
+            imageForRedetct = image
         redetection: Union[None, FaceDetection] = self._faceDetector.redetectOne(
-            image, bBox=bBox,
-            detect5Landmarks=True,
-            detect68Landmarks=True
+            imageForRedetct, bBox=bBox, detect5Landmarks=True, detect68Landmarks=True
         )
         if redetection:
             return VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
@@ -363,10 +370,12 @@ class VLFaceDetector:
         redetections: List[List[Union[FaceDetection, None]]] = self._faceDetector.redetect(imagesAndBBoxes, True, True)
         res = []
         for redetectionsOfImage in redetections:
-            imageRes = [VLFaceDetection(redetection.coreEstimation,
-                                        redetection.image,
-                                        self.estimatorsCollection) if redetection else None for redetection in
-                        redetectionsOfImage]
+            imageRes = [
+                VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+                if redetection
+                else None
+                for redetection in redetectionsOfImage
+            ]
             res.append(imageRes)
         return res
 
@@ -385,8 +394,13 @@ class VLWarpedImage(WarpedImage):
 
     __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality", "_descriptor")
 
-    def __init__(self, body: Union[bytes, array, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
-        super().__init__(body, filename, vlImage)
+    def __init__(
+        self,
+        body: Union[bytes, PilImage, CoreImage, VLImage],
+        filename: str = "",
+        colorFormat: Optional[ColorFormat] = None,
+    ):
+        super().__init__(body=body, filename=filename, colorFormat=colorFormat)
         self._emotions: Optional[Emotions] = None
         self._eyes: Optional[EyesEstimation] = None
         self._mouthState: Optional[MouthStates] = None
@@ -459,7 +473,7 @@ class VLWarpedImage(WarpedImage):
             self._warpQuality = VLWarpedImage.estimatorsCollection.warpQualityEstimator.estimate(self)
         return self._warpQuality
 
-    def asDict(self) -> Dict[str, Union[dict, list, float]]:
+    def asDict(self) -> Dict[str, Dict[str, float]]:
         """
         Convert to dict.
 
@@ -488,7 +502,7 @@ class VLWarpedImage(WarpedImage):
         return res
 
     @property
-    def warp(self) -> Warp:
+    def warp(self) -> WarpedImage:
         """
         Support VLFaceDetection interface.
 

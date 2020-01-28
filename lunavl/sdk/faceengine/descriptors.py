@@ -4,8 +4,7 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from collections import Iterator
-from typing import Dict, List
+from typing import Dict, List, Iterator
 from typing import Union, Optional
 
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr  # pylint: disable=E0611,E0401
@@ -77,6 +76,22 @@ class FaceDescriptor(BaseEstimation):
         """
         return self.coreEstimation.getModelVersion()
 
+    def reload(self, descriptor: bytes, garbageScore: float = 0.0) -> None:
+        """
+        Reload internal descriptor bytes.
+
+        Args:
+            descriptor: descriptor bytes
+            garbageScore: new garbage scores
+
+        Raises:
+            LunaSDKException(LunaVLError.fromSDKError(res)) if cannot create descriptor instance
+        """
+        res = self.coreEstimation.load(descriptor, len(descriptor))
+        if res.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(res))
+        self.garbageScore = garbageScore
+
 
 class FaceDescriptorBatch(BaseEstimation):
     """
@@ -126,7 +141,7 @@ class FaceDescriptorBatch(BaseEstimation):
 
     def __iter__(self) -> Iterator:
         """
-        Iterator by by batch.
+        Iterator by batch.
 
         Returns:
             iterator by descriptors.
@@ -152,30 +167,69 @@ class FaceDescriptorFactory:
 
     Attributes:
         _faceEngine (VLFaceEngine): faceEngine
+        _descriptorVersion (int): descriptor version or zero for use default descriptor version
     """
 
-    def __init__(self, faceEngine: "VLFaceEngine"):  # type: ignore # noqa: F821
+    def __init__(self, faceEngine: "VLFaceEngine", descriptorVersion: int = 0):  # type: ignore # noqa: F821
         self._faceEngine = faceEngine
+        self._descriptorVersion = descriptorVersion
+
+    @property
+    def descriptorVersion(self) -> int:
+        """
+        Return descriptor version for generating descriptor
+        Returns:
+            _descriptorVersion
+        """
+        return self._descriptorVersion
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
-    def generateDescriptor(self) -> IDescriptorPtr:
+    def generateDescriptor(
+        self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
+    ) -> FaceDescriptor:
         """
-        Generate core descriptor
+        Generate core descriptor.
+
+        Args:
+            descriptor: the input descriptor
+            garbageScore: the input descriptor garbage score
+            descriptorVersion: descriptor version or zero for use default descriptor version
 
         Returns:
-            core descriptor
+            a core descriptor
+
+        Raises:
+            ValueError if garbageScore is not empty and descriptor is empty
         """
-        return FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor())
+        if garbageScore is not None and descriptor is None:
+            raise ValueError("Do not specify `garbageScore` unexpected")
+
+        if descriptor is not None:
+            version = int.from_bytes(descriptor[4:8], byteorder="little")
+            faceDescriptor = FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor(version))
+            if garbageScore is not None:
+                faceDescriptor.reload(descriptor=descriptor, garbageScore=garbageScore)
+            else:
+                faceDescriptor.reload(descriptor=descriptor)
+        else:
+            faceDescriptor = FaceDescriptor(
+                self._faceEngine.coreFaceEngine.createDescriptor(descriptorVersion or self._descriptorVersion)
+            )
+        return faceDescriptor
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
-    def generateDescriptorsBatch(self, size: int) -> IDescriptorBatchPtr:
+    def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> FaceDescriptorBatch:
         """
         Generate core descriptors batch.
 
         Args:
-            size:batch size
+            size: batch size
+            descriptorVersion: descriptor version or zero for use default descriptor version
 
         Returns:
             batch
         """
-        return FaceDescriptorBatch(self._faceEngine.coreFaceEngine.createDescriptorBatch(size))
+        descriptorVersion = descriptorVersion or self._descriptorVersion
+        return FaceDescriptorBatch(
+            self._faceEngine.coreFaceEngine.createDescriptorBatch(size, version=descriptorVersion)
+        )
