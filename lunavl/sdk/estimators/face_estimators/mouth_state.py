@@ -2,7 +2,7 @@
 
 see `mouth state`_
 """
-from typing import Union
+from typing import Union, Dict
 
 from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
@@ -20,6 +20,7 @@ class MouthStates(BaseEstimation):
 
         - smile
         - mouth
+        - occlusion
     """
 
     #  pylint: disable=W0235
@@ -37,7 +38,7 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.smile
 
     @property
-    def mouth(self):
+    def mouth(self) -> float:
         """
         Get mouth score value.
 
@@ -47,7 +48,7 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.mouth
 
     @property
-    def occlusion(self):
+    def occlusion(self) -> float:
         """
         Get occlusion score value.
 
@@ -56,9 +57,9 @@ class MouthStates(BaseEstimation):
         """
         return self._coreEstimation.occlusion
 
-    def asDict(self):
+    def asDict(self) -> Dict[str, float]:
         """
-        Convert ot dict.
+        Convert to dict.
 
         Returns:
             {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
