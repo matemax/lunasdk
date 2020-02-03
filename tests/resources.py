@@ -1,4 +1,5 @@
 import pathlib
+from lunavl.sdk.estimators.face_estimators.emotions import Emotion
 
 
 def getPathToImage(filename: str) -> str:
@@ -12,5 +13,5 @@ MANY_FACES = getPathToImage("many_faces.jpg")
 NO_FACES = getPathToImage("kand.jpg")
 SMALL_IMAGE = getPathToImage("small_image.jpg")
 
-ALL_EMOTIONS = ["anger", "disgust", "fear", "happiness", "sadness", "surprise", "neutral"]
+ALL_EMOTIONS = [emotion.name.lower() for emotion in Emotion]
 EMOTION_FACES = {emotion: getPathToImage(f"{emotion}.jpg") for emotion in ALL_EMOTIONS}
