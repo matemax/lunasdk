@@ -29,16 +29,16 @@ class TestEstimateEmotions(DetectTestClass):
         """
         self.validate_emotion_dict(emotionDetection)
         if predominantEmotion is not None:
-            assert emotionDetection['predominant_emotion'], predominantEmotion
+            assert emotionDetection["predominant_emotion"], predominantEmotion
 
     @staticmethod
     def validate_emotion_dict(receivedDict: dict):
         """
         Validate emotion dict
         """
-        assert sorted(['predominant_emotion', 'estimations']), sorted(receivedDict.keys())
-        assert sorted(ALL_EMOTIONS), receivedDict['estimations']
-        for emotion, emotionValue in receivedDict['estimations'].items():
+        assert sorted(["predominant_emotion", "estimations"]), sorted(receivedDict.keys())
+        assert sorted(ALL_EMOTIONS), receivedDict["estimations"]
+        for emotion, emotionValue in receivedDict["estimations"].items():
             assert 0 < emotionValue < 1
 
     def test_estimate_emotions_as_dict(self):
@@ -47,7 +47,7 @@ class TestEstimateEmotions(DetectTestClass):
         """
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                faceDetection = detector.detectOne(EMOTION_IMAGES['fear'])
+                faceDetection = detector.detectOne(EMOTION_IMAGES["fear"])
                 warp = self.warper.warp(faceDetection)
                 emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
                 self.validate_emotion_dict(emotionDict)
@@ -61,5 +61,18 @@ class TestEstimateEmotions(DetectTestClass):
                 with self.subTest(detectorType=detector.detectorType, emotion=emotion):
                     faceDetection = detector.detectOne(EMOTION_IMAGES[emotion])
                     warp = self.warper.warp(faceDetection)
+                    emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
+                    self.assert_emotion_reply(emotionDict, emotion)
+
+    def test_estimate_emotion_not_warped(self):
+        """
+        Test emotions with not warped image
+        """
+        for detector in self.detectors:
+            for emotion in ALL_EMOTIONS:
+                with self.subTest(detectorType=detector.detectorType, emotion=emotion):
+                    faceDetection = detector.detectOne(EMOTION_IMAGES[emotion])
+                    warp = self.warper.warp(faceDetection)
+                    VLImage
                     emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
                     self.assert_emotion_reply(emotionDict, emotion)
