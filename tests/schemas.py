@@ -26,3 +26,16 @@ REQUIRED_FACE_DETECTION = {
     "additionalProperties": False,
     "required": ["rect", "score"],
 }
+
+QUALITY = {
+    "type": "object",
+    "properties": {
+        "blurriness": TYPE_SCORE,
+        "dark": TYPE_SCORE,
+        "illumination": TYPE_SCORE,
+        "specularity": TYPE_SCORE,
+        "light": TYPE_SCORE,
+    },
+    "additionalProperties": False,
+    "required": ["blurriness", "dark", "illumination", "specularity", "light"],
+}
