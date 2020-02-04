@@ -15,3 +15,6 @@ SMALL_IMAGE = getPathToImage("small_image.jpg")
 
 ALL_EMOTIONS = [emotion.name.lower() for emotion in Emotion]
 EMOTION_FACES = {emotion: getPathToImage(f"{emotion}.jpg") for emotion in ALL_EMOTIONS}
+GOST_HEAD_POSE_FACE = getPathToImage("gost_head_pose.jpg")
+TURNED_HEAD_POSE_FACE = getPathToImage("turned_head_pose.jpg")
+FRONTAL_HEAD_POSE_FACE = getPathToImage("frontal_head_pose.jpg")
