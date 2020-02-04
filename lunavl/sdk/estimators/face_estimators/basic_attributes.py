@@ -172,7 +172,7 @@ class BasicAttributes(BaseEstimation):
         else:
             self.ethnicity = Ethnicities(coreEstimation.ethnicity_opt.value())
 
-        if not coreEstimation.ethnicity_opt.isValid():
+        if not coreEstimation.age_opt.isValid():
             self.age = None
         else:
             self.age = coreEstimation.age_opt.value()
