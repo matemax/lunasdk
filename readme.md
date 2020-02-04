@@ -21,12 +21,6 @@ You can install this package several path:
     pip install git+https://github.com/matemax/lunasdk.git
     ```
 
--   you can load archive from github, unpack it and make a command:
-  
-    ```console
-    python setup.py install
-    ```
-
 ## Setup
 
 We get a path to folder with neural network models and path to a FaceEngine configuration file  from environment 
