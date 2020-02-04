@@ -27,7 +27,7 @@ REQUIRED_FACE_DETECTION = {
     "required": ["rect", "score"],
 }
 
-QUALITY = {
+QUALITY_SCHEMA = {
     "type": "object",
     "properties": {
         "blurriness": TYPE_SCORE,
