@@ -139,12 +139,12 @@ class FaceDescriptorBatch(BaseEstimation):
         """
         return FaceDescriptor(self._coreEstimation.getDescriptorFast(i), self.scores[i])
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[FaceDescriptor]:
         """
         Iterator by batch.
 
-        Returns:
-            iterator by descriptors.
+        Yields:
+            descriptors
         """
         itemCount = self._coreEstimation.getMaxCount()
         for index in range(itemCount):
