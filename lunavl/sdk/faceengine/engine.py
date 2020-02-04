@@ -172,23 +172,48 @@ class VLFaceEngine:
         """
         return AGSEstimator(self._faceEngine.createAGSEstimator())
 
-    def createFaceDescriptorEstimator(self) -> FaceDescriptorEstimator:
+    def createFaceDescriptorEstimator(self, descriptorVersion: int = 0) -> FaceDescriptorEstimator:
         """
         Approximate garbage score estimator
+
+        Args:
+            descriptorVersion: descriptor version to init estimator for or zero for use default descriptor version
 
         Returns:
             estimator
         """
-        return FaceDescriptorEstimator(self._faceEngine.createExtractor(), self.createFaceDescriptorFactory())
+        return FaceDescriptorEstimator(
+            self._faceEngine.createExtractor(descriptorVersion), self.createFaceDescriptorFactory(descriptorVersion)
+        )
 
-    def createFaceDescriptorFactory(self) -> FaceDescriptorFactory:
-        return FaceDescriptorFactory(self)
+    def createFaceDescriptorFactory(self, descriptorVersion: int = 0) -> FaceDescriptorFactory:
+        """
+        Create face descriptor factory
+        Args:
+            descriptorVersion: descriptor version or zero for use default descriptor version
 
-    def createFaceMatcher(self, version: Optional[int] = None) -> FaceMatcher:
-        if version is not None:
-            return FaceMatcher(self._faceEngine.createMatcher(version), self.createFaceDescriptorFactory())
-        return FaceMatcher(self._faceEngine.createMatcher(), self.createFaceDescriptorFactory())
+        Returns:
+            face descriptor factory
+        """
+        return FaceDescriptorFactory(self, descriptorVersion=descriptorVersion)
+
+    def createFaceMatcher(self, descriptorVersion: int = 0) -> FaceMatcher:
+        """
+        Create face matcher
+        Args:
+            descriptorVersion: descriptor version or zero for use default descriptor version
+
+        Returns:
+            face matcher
+        """
+        return FaceMatcher(self._faceEngine.createMatcher(descriptorVersion), self.createFaceDescriptorFactory())
 
     @property
     def coreFaceEngine(self) -> CoreFE.PyIFaceEngine:
+        """
+        Get core face engine
+
+        Returns:
+            core face engine
+        """
         return self._faceEngine

@@ -2,16 +2,13 @@
 """
 from typing import Union, Optional
 
-from numpy import ndarray
-
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-
-
-from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
-from lunavl.sdk.image_utils.image import VLImage
 from FaceEngine import IWarperPtr, Transformation  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
+from PIL.Image import Image as PilImage
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
+from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
+from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
 class WarpedImage(VLImage):
@@ -26,22 +23,27 @@ class WarpedImage(VLImage):
         - the face is always centered and rotated so that imaginary line between the eyes is horizontal.
     """
 
-    def __init__(self, body: Union[bytes, ndarray, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
+    def __init__(
+        self,
+        body: Union[bytes, bytearray, PilImage, CoreImage, VLImage],
+        filename: str = "",
+        colorFormat: Optional[ColorFormat] = None,
+    ):
         """
         Init.
 
         Args:
-            body: body of image - bytes numpy array or core image
+            body: body of image - bytes/bytearray or core image or pil image or vlImage
             filename: user mark a source of image
-            vlImage: source is vl image.
+            colorFormat: output image color format
         """
-        if vlImage is None:
-            super().__init__(body, filename=filename)
-            self.assertWarp()
+        if isinstance(body, VLImage):
+            self.source = body.source
+            self.filename = body.filename
+            self.coreImage = body.coreImage
         else:
-            self.source = vlImage.source
-            self.filename = vlImage.filename
-            self.coreImage = vlImage.coreImage
+            super().__init__(body, filename=filename, colorFormat=colorFormat)
+        self.assertWarp()
 
     def assertWarp(self):
         """
@@ -72,7 +74,7 @@ class WarpedImage(VLImage):
         Returns:
             warp
         """
-        warp = cls(body=b"", vlImage=VLImage.load(filename=filename, url=url))
+        warp = cls(body=VLImage.load(filename=filename, url=url), filename=filename or "")
         warp.assertWarp()
         return warp
 

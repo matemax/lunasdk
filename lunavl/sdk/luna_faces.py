@@ -4,8 +4,7 @@ from typing import Optional, Union, List, Dict
 
 from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
-from numpy import ndarray
-
+from PIL.Image import Image as PilImage
 from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
 from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
 from lunavl.sdk.estimators.face_estimators.emotions import Emotions
@@ -25,7 +24,7 @@ from lunavl.sdk.faceengine.facedetector import (
 )
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
 class VLFaceDetection(FaceDetection):
@@ -395,8 +394,13 @@ class VLWarpedImage(WarpedImage):
 
     __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality", "_descriptor")
 
-    def __init__(self, body: Union[bytes, ndarray, CoreImage], filename: str = "", vlImage: Optional[VLImage] = None):
-        super().__init__(body, filename, vlImage)
+    def __init__(
+        self,
+        body: Union[bytes, PilImage, CoreImage, VLImage],
+        filename: str = "",
+        colorFormat: Optional[ColorFormat] = None,
+    ):
+        super().__init__(body=body, filename=filename, colorFormat=colorFormat)
         self._emotions: Optional[Emotions] = None
         self._eyes: Optional[EyesEstimation] = None
         self._mouthState: Optional[MouthStates] = None

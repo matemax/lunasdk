@@ -5,3 +5,5 @@ docs/html*
 lunavl.egg*
 .vscode/*
 .mypy_*
+build/*
+dist/*
