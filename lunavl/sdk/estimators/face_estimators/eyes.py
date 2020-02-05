@@ -299,9 +299,7 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(
-        self, transformedLandmarks: Landmarks5, warp: Union[Warp, WarpedImage]
-    ) -> GazeDirection:
+    def estimate(self, transformedLandmarks: Landmarks5, warp: Union[Warp, WarpedImage]) -> GazeDirection:
         """
         Estimate a gaze direction
 
