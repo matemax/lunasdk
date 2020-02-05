@@ -3,9 +3,7 @@ import pytest
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import DetectTestClass
-from tests.resources import EMOTION_FACES
-
-EMOTION_IMAGES = {emotion: VLImage.load(filename=imagePath) for emotion, imagePath in EMOTION_FACES.items()}
+from tests.resources import ONE_FACE
 
 
 class TestEstimateEmotions(DetectTestClass):
@@ -19,7 +17,7 @@ class TestEstimateEmotions(DetectTestClass):
         cls.defaultDetector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
         cls.warper = cls.faceEngine.createWarper()
         cls.gazeEstimator = cls.faceEngine.createGazeEstimator()
-        cls.faceDetection = cls.defaultDetector.detectOne(EMOTION_IMAGES["fear"])
+        cls.faceDetection = cls.defaultDetector.detectOne(VLImage.load(filename=ONE_FACE))
         cls.warp = cls.warper.warp(faceDetection=cls.faceDetection)
 
     @staticmethod
@@ -43,14 +41,24 @@ class TestEstimateEmotions(DetectTestClass):
 
     def test_estimate_gaze_landmarks68(self):
         """
+        Test gaze estimator with landmarks 68 (not supported by estimator)
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                faceDetection = detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=True)
+                landMarks68Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L68")
+                with pytest.raises(TypeError):
+                    self.gazeEstimator.estimate(landMarks68Transformation, self.warp)
+
+    def test_estimate_gaze_landmarks68_without_landmarks68_detection(self):
+        """
         Test gaze estimator with landmarks 68
         """
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                faceDetection = detector.detectOne(EMOTION_IMAGES["fear"], detect68Landmarks=True)
-                landMarks68Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L68")
-                with pytest.raises(TypeError):
-                    self.gazeEstimator.estimate(landMarks68Transformation, self.warp)
+                faceDetection = detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=False)
+                with pytest.raises(ValueError):
+                    self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L68")
 
     def test_estimate_gaze_landmarks_wrong(self):
         """
