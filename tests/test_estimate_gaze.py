@@ -21,12 +21,13 @@ class TestEstimateEmotions(DetectTestClass):
         cls.warp = cls.warper.warp(faceDetection=cls.faceDetection)
 
     @staticmethod
-    def validate_emotion_dict(receivedDict: dict):
+    def validate_gaze_estimation(receivedDict: dict):
         """
         Validate emotion dict
         """
         assert sorted(["pitch", "yaw"]) == sorted(receivedDict.keys())
         for gaze in ("pitch", "yaw"):
+            assert isinstance(receivedDict[gaze], float)
             assert -180 <= receivedDict[gaze] <= 180
 
     def test_estimate_gaze_landmarks5(self):
@@ -37,7 +38,7 @@ class TestEstimateEmotions(DetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")
                 gazeEstimation = self.gazeEstimator.estimate(landMarks5Transformation, self.warp).asDict()
-                self.validate_emotion_dict(gazeEstimation)
+                self.validate_gaze_estimation(gazeEstimation)
 
     def test_estimate_gaze_landmarks68(self):
         """
