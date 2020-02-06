@@ -56,7 +56,8 @@ class TestHeadPose(BaseTestClass):
         Args:
             headPose: an estimate head pose
         """
-        assert isinstance(headPose, HeadPose), "bad head pose instance"
+        assert isinstance(headPose, HeadPose), f"bad head pose instance, type of head pose is {type(headPose)}"
+
         self.assertAngle(headPose.yaw)
         self.assertAngle(headPose.roll)
         self.assertAngle(headPose.pitch)
