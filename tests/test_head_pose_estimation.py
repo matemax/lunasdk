@@ -46,7 +46,7 @@ class TestHeadPose(BaseTestClass):
         Args:
             angle: -180 <= number <= 180
         """
-        assert isinstance(angle, float), "bad angle instance"
+        assert isinstance(angle, float), f"bad angle instance, type of angle is {type(angle)}"
         assert -180 <= angle <= 180
 
     def assertHeadPose(self, headPose: HeadPose):
