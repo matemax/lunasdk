@@ -62,7 +62,8 @@ class TestHeadPose(BaseTestClass):
         self.assertAngle(headPose.roll)
         self.assertAngle(headPose.pitch)
 
-        assert isinstance(headPose.getFrontalType(), FrontalType), "bad instance frontal type"
+        assert isinstance(headPose.getFrontalType(), FrontalType), f"bad instance frontal type, type of frontal type is {type(headPose.getFrontalType())}"
+
 
     def test_init_estimator(self):
         """
