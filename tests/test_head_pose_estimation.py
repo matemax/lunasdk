@@ -69,7 +69,7 @@ class TestHeadPose(BaseTestClass):
         Test init estimator.
         """
         estimator = TestHeadPose.faceEngine.createHeadPoseEstimator()
-        assert isinstance(estimator, HeadPoseEstimator), "bad estimator instance"
+        assert isinstance(estimator, HeadPoseEstimator), f"bad estimator instance, type of estimator  is {type(HeadPoseEstimator)}"
 
     def test_estimate_head_pose_by_68landmarks(self):
         """
