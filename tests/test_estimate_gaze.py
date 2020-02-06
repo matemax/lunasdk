@@ -23,7 +23,7 @@ class TestEstimateEmotions(DetectTestClass):
     @staticmethod
     def validate_gaze_estimation(receivedDict: dict):
         """
-        Validate emotion dict
+        Validate gaze estimation reply
         """
         assert sorted(["pitch", "yaw"]) == sorted(receivedDict.keys())
         for gaze in ("pitch", "yaw"):
