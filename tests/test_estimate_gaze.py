@@ -1,5 +1,6 @@
 import pytest
 
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import DetectTestClass
@@ -69,3 +70,13 @@ class TestEstimateEmotions(DetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(ValueError):
                     self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L10")
+
+    def test_estimate_gaze_landmarks68_without_transformation(self):
+        """
+        Test gaze estimator without transformation
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                faceDetection = detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=False)
+                with pytest.raises(LunaSDKException):
+                    self.gazeEstimator.estimate(faceDetection.landmarks5, self.warp)
