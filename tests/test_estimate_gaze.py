@@ -71,7 +71,7 @@ class TestEstimateEmotions(DetectTestClass):
                 with pytest.raises(ValueError):
                     self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L10")
 
-    def test_estimate_gaze_landmarks68_without_transformation(self):
+    def test_estimate_gaze_without_transformation(self):
         """
         Test gaze estimator without transformation
         """
