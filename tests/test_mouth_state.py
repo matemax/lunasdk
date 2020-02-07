@@ -15,6 +15,7 @@ class TestMouthEstimation(DetectTestClass):
     """
     Test Mouth States Estimation
     """
+
     mouthEstimator: MouthStateEstimator = None
 
     @classmethod
@@ -47,8 +48,7 @@ class TestMouthEstimation(DetectTestClass):
         mouthStates = self.mouthEstimator.estimate(WARPED_IMAGE)
         assert isinstance(mouthStates, MouthStates), f"{mouthStates.__class__} is not {MouthStates}"
         assert all(
-            isinstance(getattr(mouthStates, f"{mouthState}"), float)
-            for mouthState in ("smile", "mouth", "occlusion")
+            isinstance(getattr(mouthStates, f"{mouthState}"), float) for mouthState in ("smile", "mouth", "occlusion")
         )
 
     def test_mouth_estimation_as_dict(self):
