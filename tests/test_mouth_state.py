@@ -8,7 +8,6 @@ from tests.resources import CLEAN_ONE_FACE, WARP_WHITE_MAN
 from tests.schemas import MOUTH_STATES
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
-WARPED_IMAGE = WarpedImage(VLImage.load(filename=WARP_WHITE_MAN))
 
 
 class TestMouthEstimation(DetectTestClass):
@@ -16,6 +15,7 @@ class TestMouthEstimation(DetectTestClass):
     Test Mouth States Estimation
     """
 
+    # mouth state estimator
     mouthEstimator: MouthStateEstimator = None
 
     @classmethod
@@ -27,36 +27,30 @@ class TestMouthEstimation(DetectTestClass):
         for detector in cls.detectors:
             detection = detector.detectOne(VLIMAGE_ONE_FACE)
             cls.warpList.append(cls.warper.warp(detection))
+        cls.warpList.append(WarpedImage(VLImage.load(filename=WARP_WHITE_MAN)))
 
-    def test_mouth_states_with_warp_structure(self):
+    def test_mouth_states_with_different_type(self):
         """
-        Test estimated states on warp structure
+        Test estimate mouth state with warp and warpedImage
         """
         for warp in self.warpList:
-            with self.subTest(warp=warp):
+            with self.subTest(warp=warp, type=type(warp).__name__):
                 mouthStates = self.mouthEstimator.estimate(warp)
                 assert isinstance(mouthStates, MouthStates), f"{mouthStates.__class__} is not {MouthStates}"
                 assert all(
                     isinstance(getattr(mouthStates, f"{mouthState}"), float)
                     for mouthState in ("smile", "mouth", "occlusion")
-                )
-
-    def test_mouth_states_with_warped_image(self):
-        """
-        Test estimated states on warpedImage
-        """
-        mouthStates = self.mouthEstimator.estimate(WARPED_IMAGE)
-        assert isinstance(mouthStates, MouthStates), f"{mouthStates.__class__} is not {MouthStates}"
-        assert all(
-            isinstance(getattr(mouthStates, f"{mouthState}"), float) for mouthState in ("smile", "mouth", "occlusion")
-        )
+                ), f"mouth state's attributes is not float, {mouthStates.asDict()}"
+                assert all(
+                    0 <= getattr(mouthStates, f"{mouthState}") <= 1 for mouthState in ("smile", "mouth", "occlusion")
+                ), f"mouth state's attributes out of range [0,1], {mouthStates.asDict()}"
 
     def test_mouth_estimation_as_dict(self):
         """
         Test mouth states convert to dict
         """
         for warp in self.warpList:
-            with self.subTest(warp=warp):
+            with self.subTest(warp=warp, type=type(warp).__name__):
                 emotionDict = self.mouthEstimator.estimate(warp).asDict()
                 assert (
                     jsonschema.validate(emotionDict, MOUTH_STATES) is None
