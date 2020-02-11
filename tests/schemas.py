@@ -27,7 +27,7 @@ REQUIRED_FACE_DETECTION = {
     "required": ["rect", "score"],
 }
 
-MOUTH_STATES = {
+MOUTH_STATES_SCHEMA = {
     "type": "object",
     "properties": {"score": TYPE_SCORE, "occluded": TYPE_SCORE, "smile": TYPE_SCORE},
     "additionalProperties": False,

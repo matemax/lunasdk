@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import jsonschema
 
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator, MouthStates
@@ -5,7 +7,7 @@ from lunavl.sdk.estimators.face_estimators.warper import WarpedImage
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import DetectTestClass
 from tests.resources import CLEAN_ONE_FACE, WARP_WHITE_MAN
-from tests.schemas import MOUTH_STATES
+from tests.schemas import MOUTH_STATES_SCHEMA
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 
@@ -23,35 +25,32 @@ class TestMouthEstimation(DetectTestClass):
         super().setup_class()
         cls.warper = cls.faceEngine.createWarper()
         cls.mouthEstimator = cls.faceEngine.createMouthEstimator()
+        CaseWarp = namedtuple("CaseWarp", ("warp", "detector"))
         cls.warpList = []
         for detector in cls.detectors:
             detection = detector.detectOne(VLIMAGE_ONE_FACE)
-            cls.warpList.append(cls.warper.warp(detection))
-        cls.warpList.append(WarpedImage(VLImage.load(filename=WARP_WHITE_MAN)))
+            cls.warpList.append(CaseWarp(cls.warper.warp(detection), detector.detectorType.name))
+        cls.warpList.append(CaseWarp(WarpedImage(VLImage.load(filename=WARP_WHITE_MAN)), "None"))
 
     def test_mouth_states_with_different_type(self):
         """
         Test estimate mouth state with warp and warpedImage
         """
-        for warp in self.warpList:
-            with self.subTest(warp=warp, type=type(warp).__name__):
-                mouthStates = self.mouthEstimator.estimate(warp)
+        for case in self.warpList:
+            with self.subTest(warp=type(case.warp).__name__, detectorType=case.detector):
+                mouthStates = self.mouthEstimator.estimate(case.warp)
                 assert isinstance(mouthStates, MouthStates), f"{mouthStates.__class__} is not {MouthStates}"
-                assert all(
-                    isinstance(getattr(mouthStates, f"{mouthState}"), float)
-                    for mouthState in ("smile", "mouth", "occlusion")
-                ), f"mouth state's attributes is not float, {mouthStates.asDict()}"
-                assert all(
-                    0 <= getattr(mouthStates, f"{mouthState}") <= 1 for mouthState in ("smile", "mouth", "occlusion")
-                ), f"mouth state's attributes out of range [0,1], {mouthStates.asDict()}"
+                for mouthState in ("smile", "mouth", "occlusion"):
+                    assert isinstance(getattr(mouthStates, f"{mouthState}"), float), f"{mouthState} is not float"
+                    assert 0 <= getattr(mouthStates, f"{mouthState}") <= 1, f"{mouthState} out of range [0,1]"
 
     def test_mouth_estimation_as_dict(self):
         """
         Test mouth states convert to dict
         """
-        for warp in self.warpList:
-            with self.subTest(warp=warp, type=type(warp).__name__):
-                emotionDict = self.mouthEstimator.estimate(warp).asDict()
+        for case in self.warpList:
+            with self.subTest(warp=type(case.warp).__name__, detectorType=case.detector):
+                emotionDict = self.mouthEstimator.estimate(case.warp).asDict()
                 assert (
-                    jsonschema.validate(emotionDict, MOUTH_STATES) is None
-                ), f"Mouth states: {emotionDict} does not match with schema: {MOUTH_STATES}"
+                    jsonschema.validate(emotionDict, MOUTH_STATES_SCHEMA) is None
+                ), f"Mouth states: {emotionDict} does not match with schema: {MOUTH_STATES_SCHEMA}"
