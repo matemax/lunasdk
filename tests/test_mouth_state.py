@@ -40,9 +40,10 @@ class TestMouthEstimation(DetectTestClass):
             with self.subTest(warp=type(case.warp).__name__, detectorType=case.detector):
                 mouthStates = self.mouthEstimator.estimate(case.warp)
                 assert isinstance(mouthStates, MouthStates), f"{mouthStates.__class__} is not {MouthStates}"
-                for mouthState in ("smile", "mouth", "occlusion"):
-                    assert isinstance(getattr(mouthStates, f"{mouthState}"), float), f"{mouthState} is not float"
-                    assert 0 <= getattr(mouthStates, f"{mouthState}") <= 1, f"{mouthState} out of range [0,1]"
+                for attr in ("smile", "mouth", "occlusion"):
+                    mouthState = getattr(mouthStates, f"{attr}")
+                    assert isinstance(mouthState, float), f"{mouthState} is not float"
+                    assert 0 <= mouthState <= 1, f"{mouthState} out of range [0,1]"
 
     def test_mouth_estimation_as_dict(self):
         """
