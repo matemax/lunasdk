@@ -7,7 +7,7 @@ FLOAT = {"type": "number"}
 COORDINATE_TYPE = {"type": "number", "minimum": 0}
 LANDMARKS_ITEM = {"type": "array", "maxItems": 2, "minItems": 2, "items": FLOAT}
 
-TYPE_SCORE = {"type": "number", "minimum": 0, "maximum": 1, "exclusiveMaximum": True}
+TYPE_SCORE = {"type": "number", "minimum": 0, "maximum": 1}
 
 TYPE_RECT = {
     "type": "object",
@@ -25,6 +25,13 @@ REQUIRED_FACE_DETECTION = {
     "properties": {"rect": TYPE_RECT, "score": TYPE_SCORE, "landmarks5": LANDMARKS5, "landmarks68": LANDMARKS68},
     "additionalProperties": False,
     "required": ["rect", "score"],
+}
+
+MOUTH_STATES_SCHEMA = {
+    "type": "object",
+    "properties": {"score": TYPE_SCORE, "occluded": TYPE_SCORE, "smile": TYPE_SCORE},
+    "additionalProperties": False,
+    "required": ["score", "occluded", "smile"],
 }
 
 QUALITY_SCHEMA = {
