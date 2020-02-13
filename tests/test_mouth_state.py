@@ -42,8 +42,8 @@ class TestMouthEstimation(DetectTestClass):
                 assert isinstance(mouthStates, MouthStates), f"{mouthStates.__class__} is not {MouthStates}"
                 for attr in ("smile", "mouth", "occlusion"):
                     mouthState = getattr(mouthStates, f"{attr}")
-                    assert isinstance(mouthState, float), f"{mouthState} is not float"
-                    assert 0 <= mouthState <= 1, f"{mouthState} out of range [0,1]"
+                    assert isinstance(mouthState, float), f"{attr} is not float"
+                    assert 0 <= mouthState <= 1, f"{attr} out of range [0,1]"
 
     def test_mouth_estimation_as_dict(self):
         """
