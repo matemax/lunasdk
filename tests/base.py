@@ -14,12 +14,11 @@ from tests.resources import ONE_FACE
 
 
 class BaseTestClass(unittest.TestCase):
-    faceEngine: VLFaceEngine
+    faceEngine = VLFaceEngine()
 
     @classmethod
     def setup_class(cls):
         super().setUpClass()
-        cls.faceEngine = VLFaceEngine()
 
     @classmethod
     def teardown_class(cls) -> None:

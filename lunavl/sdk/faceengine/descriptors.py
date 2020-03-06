@@ -44,7 +44,7 @@ class FaceDescriptor(BaseEstimation):
             bytes with metadata
         """
         error, descBytes = self.coreEstimation.save()
-        if error.isError():
+        if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return descBytes
 

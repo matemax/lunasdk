@@ -62,12 +62,11 @@ class WarpedImage(VLImage):
 
     #  pylint: disable=W0221
     @classmethod
-    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> "WarpedImage":  # type: ignore
+    def load(cls, *, filename: Optional[str] = None, url: Optional[str] = None) -> "WarpedImage":  # type: ignore
         """
         Load imag from numpy array or file or url.
 
         Args:
-            *_: for remove positional argument
             filename: filename
             url: url
 

@@ -181,14 +181,14 @@ class VLImage:
 
     @classmethod
     def load(
-        cls, *_, filename: Optional[str] = None, url: Optional[str] = None, colorFormat: Optional[ColorFormat] = None
+        cls, *, filename: Optional[str] = None, url: Optional[str] = None, colorFormat: Optional[ColorFormat] = None
     ) -> "VLImage":
 
         """
         Load imag from numpy array or file or url.
 
         Args:
-            *_: for remove positional argument
+            *: for positional argument removal
             filename: filename
             url: url
             colorFormat: img format to cast into
