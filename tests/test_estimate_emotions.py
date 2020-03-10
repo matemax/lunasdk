@@ -36,8 +36,8 @@ class TestEstimateEmotions(DetectTestClass):
         """
         Validate emotion dict
         """
-        assert sorted(["predominant_emotion", "estimations"]) == sorted(receivedDict.keys())
-        assert sorted(ALL_EMOTIONS) == receivedDict["estimations"]
+        assert {"predominant_emotion", "estimations"} == receivedDict.keys()
+        assert set(ALL_EMOTIONS) == receivedDict["estimations"].keys()
         for emotion, emotionValue in receivedDict["estimations"].items():
             assert 0 < emotionValue < 1
 
