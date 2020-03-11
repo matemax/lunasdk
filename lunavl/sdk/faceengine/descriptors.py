@@ -180,10 +180,10 @@ class FaceDescriptorBatch(BaseEstimation):
         Returns:
             str(self.asDict())
         """
-        full_descriptors = self.asDict()
-        for d in full_descriptors:
+        fullDescriptors = self.asDict()
+        for d in fullDescriptors:
             del d["descriptor"]
-        return str(full_descriptors)
+        return str(fullDescriptors)
 
 
 class FaceDescriptorFactory:
