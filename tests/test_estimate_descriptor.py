@@ -120,7 +120,7 @@ class TestEstimateDescriptor(BaseTestClass):
         self.assertEqual(descriptor.model, expectedVersion, "descriptor has wrong version")
         length = {46: 256, 52: 256, 54: 512, 56: 512}[expectedVersion]
         self.assertEqual(length, len(descriptor.asBytes))
-        self.assertEqual(length, len(descriptor.asVector) == length)
+        self.assertEqual(length, len(descriptor.asVector))
         self.assertEqual(length + 8, len(descriptor.rawDescriptor))
 
     def getDescr(self, planVersion) -> FaceDescriptor:
