@@ -13,7 +13,8 @@ repository = "https://github.com/matemax/lunasdk"
 python = ">=3.6"
 numpy = "*"
 requests = "^2.22"
-Pillow = "7.0.0"
+Pillow = {version = "7.0.0", markers = "sys_platform == 'win32'"}
+pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
 pytest = ">=4.4"
