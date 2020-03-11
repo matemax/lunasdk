@@ -111,8 +111,7 @@ class TestEstimateDescriptor(BaseTestClass):
     Test estimate descriptor.
     """
 
-    @staticmethod
-    def assertDescriptor(expectedVersion: int, descriptor: FaceDescriptor) -> None:
+    def assertDescriptor(self, expectedVersion: int, descriptor: FaceDescriptor) -> None:
         """
         Assert extracted descriptor.
 
@@ -120,11 +119,12 @@ class TestEstimateDescriptor(BaseTestClass):
             expectedVersion: expected descriptor version
             descriptor: extracted descriptor
         """
-        assert descriptor.model == expectedVersion, "descriptor has wrong version"
+        self.assertIsInstance(descriptor, FaceDescriptor)
+        self.assertEqual(descriptor.model, expectedVersion, "descriptor has wrong version")
         length = {46: 256, 52: 256, 54: 512, 56: 512}[expectedVersion]
-        assert len(descriptor.asBytes) == length
-        assert len(descriptor.asVector) == length
-        assert len(descriptor.rawDescriptor) == length + 8
+        self.assertEqual(length, len(descriptor.asBytes))
+        self.assertEqual(length, len(descriptor.asVector) == length)
+        self.assertEqual(length + 8, len(descriptor.rawDescriptor))
 
     def getDescr(self, planVersion) -> FaceDescriptor:
         """
