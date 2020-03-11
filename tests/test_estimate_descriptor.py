@@ -33,13 +33,13 @@ class TestDescriptorFunctionality(BaseTestClass):
         self.assertEqual(list(binaryDesc), descriptor.asVector)
         self.assertEqual(b"dp\x00\x00" + self.version.to_bytes(4, "little") + binaryDesc, descriptor.rawDescriptor)
 
-    def testDescriptorMethods(self):
+    def test_descriptor_methods(self):
         """
         Test a descriptor.
         """
         self.assertDescriptor(self.descriptor)
 
-    def testReplacedDescriptorMethods(self):
+    def test_replaced_descriptor_methods(self):
         """
         Test a replaced descriptor.
         """
@@ -55,13 +55,13 @@ class TestDescriptorFunctionality(BaseTestClass):
         self.assertEqual(rawBinaryDesc, descriptor.rawDescriptor)
         self.assertEqual(gs, descriptor.garbageScore)
 
-    def testAggregatedDescriptorMethods(self):
+    def test_aggregated_descriptor_methods(self):
         """
         Test aggregated method.
         """
         self.assertDescriptor(self.aggregatedDescriptor)
 
-    def testDescriptorBatchMethods(self):
+    def test_descriptor_batch_methods(self):
         """
         Test descriptor batch methods.
         """
@@ -77,23 +77,20 @@ class TestDescriptorFunctionality(BaseTestClass):
             descriptors = list(self.descriptorBatch)
             self.assertEqual(len(warps), len(descriptors))
 
-    def testDescriptorBatchMethodsBad(self):
+    def test_descriptor_batch_methods_bad(self):
         """
         Test descriptor batch methods bad.
         """
         maxLength = 2
         descriptorBatch = self._estimator.descriptorFactory.generateDescriptorsBatch(maxLength, self.version)
         descriptorBatch.append(self.descriptor)
-        for name, idx in (
-            ("empty", 1),
-            ("nonexistent", 3),
-        ):
+        for name, idx in (("empty", 1), ("nonexistent", 3)):
             with self.subTest(name=name):
                 with self.assertRaises(IndexError) as e:
                     descriptorBatch[idx]
                 self.assertIn(str(idx), e.exception.args[0])
 
-    def testDescriptorBatchAppend(self):
+    def test_descriptor_batch_append(self):
         """
         Test descriptor batch append.
         """
@@ -151,7 +148,7 @@ class TestEstimateDescriptor(BaseTestClass):
         """
         return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptorsBatch(size)
 
-    def testCreateEstimatorsPositive(self):
+    def test_create_estimators_positive(self):
         """
         Test create estimators of different existent plan versions.
         """
@@ -162,7 +159,7 @@ class TestEstimateDescriptor(BaseTestClass):
                 except RuntimeError as e:
                     raise AssertionError(f"Descriptor version {planVersion} is not supported. But must be.") from e
 
-    def testCreateEstimatorsNegative(self):
+    def test_create_estimators_negative(self):
         """
         Test create estimators of different nonexistent plan versions.
         """
@@ -176,7 +173,7 @@ class TestEstimateDescriptor(BaseTestClass):
                 else:
                     raise AssertionError(f"Descriptor version {planVersion} is supported. But should not.")
 
-    def testExtractDescriptorsPositive(self):
+    def test_extract_descriptors_positive(self):
         """
         Test correctly estimate descriptor.
         """
@@ -188,7 +185,7 @@ class TestEstimateDescriptor(BaseTestClass):
                     self.assertDescriptor(planVersion, descriptor)
 
     @unittest.skip("dont do it FSDK-2186")
-    def testExtractDescriptorsIncorrectSourceDescriptors(self):
+    def test_extract_descriptors_incorrect_source_descriptors(self):
         """
         Test estimate descriptor using incorrect source descriptor.
         """
@@ -201,7 +198,7 @@ class TestEstimateDescriptor(BaseTestClass):
                     descriptor = extractor.estimate(warp, descriptor=descriptorOfAnotherVersion)
                     self.assertDescriptor(planVersion, descriptor)
 
-    def testExtractDescriptorsBatchPositive(self):
+    def test_extract_descriptors_batch_positive(self):
         """
         Test correctly estimate descriptor batch.
         """
@@ -222,7 +219,7 @@ class TestEstimateDescriptor(BaseTestClass):
                             self.assertIsNone(descriptorAggregated)
 
     @unittest.skip("dont do it FSDK-2186")
-    def testExtractDescriptorsBatchIncorrectSourceDescriptors(self):
+    def test_extract_descriptors_batch_incorrect_source_descriptors(self):
         """
         Test correctly estimate descriptor batch.
         """
