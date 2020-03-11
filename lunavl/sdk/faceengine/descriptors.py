@@ -7,7 +7,7 @@ See `face descriptor`_.
 from typing import Dict, List, Iterator
 from typing import Union, Optional
 
-from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr  # pylint: disable=E0611,E0401
+from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr, DescriptorBatchResult  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
@@ -44,7 +44,7 @@ class FaceDescriptor(BaseEstimation):
             bytes with metadata
         """
         error, descBytes = self.coreEstimation.save()
-        if error.isError():
+        if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return descBytes
 
@@ -111,6 +111,15 @@ class FaceDescriptorBatch(BaseEstimation):
 
     def __len__(self) -> int:
         """
+        Get descriptors count.
+
+        Returns:
+            descriptors count
+        """
+        return self._coreEstimation.getCount()
+
+    def maxLen(self) -> int:
+        """
         Get batch size.
 
         Returns:
@@ -137,17 +146,19 @@ class FaceDescriptorBatch(BaseEstimation):
         Returns:
             descriptor
         """
-        return FaceDescriptor(self._coreEstimation.getDescriptorFast(i), self.scores[i])
+        if i >= len(self):
+            raise IndexError(f"Descriptor index '{i}' out of range")  # todo remove after
+        descriptor = FaceDescriptor(self._coreEstimation.getDescriptorFast(i), self.scores[i])
+        return descriptor
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[FaceDescriptor]:
         """
         Iterator by batch.
 
         Returns:
             iterator by descriptors.
         """
-        itemCount = self._coreEstimation.getMaxCount()
-        for index in range(itemCount):
+        for index in range(len(self)):
             yield FaceDescriptor(self._coreEstimation.getDescriptorFast(index), self.scores[index])
 
     def append(self, descriptor: FaceDescriptor) -> None:
@@ -157,8 +168,22 @@ class FaceDescriptorBatch(BaseEstimation):
         Args:
             descriptor: descriptor
         """
-        self.coreEstimation.add(descriptor.coreEstimation)
+        error: DescriptorBatchResult = self.coreEstimation.add(descriptor.coreEstimation)
+        if not error.isOk:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
         self.scores.append(descriptor.garbageScore)
+
+    def __repr__(self) -> str:
+        """
+        Representation.
+
+        Returns:
+            str(self.asDict())
+        """
+        fullDescriptors = self.asDict()
+        for d in fullDescriptors:
+            del d["descriptor"]
+        return str(fullDescriptors)
 
 
 class FaceDescriptorFactory:
@@ -223,13 +248,14 @@ class FaceDescriptorFactory:
         Generate core descriptors batch.
 
         Args:
-            size: batch size
+            size: maximum batch size
             descriptorVersion: descriptor version or zero for use default descriptor version
 
         Returns:
-            batch
+            empty batch with the restricted maximum size
         """
         descriptorVersion = descriptorVersion or self._descriptorVersion
-        return FaceDescriptorBatch(
-            self._faceEngine.coreFaceEngine.createDescriptorBatch(size, version=descriptorVersion)
+        coreBatch: IDescriptorBatchPtr = self._faceEngine.coreFaceEngine.createDescriptorBatch(
+            size, version=descriptorVersion
         )
+        return FaceDescriptorBatch(coreBatch)

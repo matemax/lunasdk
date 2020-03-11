@@ -150,7 +150,7 @@ class TestDetector(DetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[INVALID_RECT])])
-                self.assertLunaVlError(exceptionInfo, LunaVLError.UnknownError)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Unknown error"))
 
     def test_redetect_one_without_detection_and_bbox(self):
         """
