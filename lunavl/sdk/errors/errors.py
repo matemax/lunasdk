@@ -136,7 +136,10 @@ class LunaVLError:
 
         errorClassErrors = inspect.getmembers(cls, lambda err: isinstance(err, ErrorInfo))
 
-        error = sdkError.error
+        try:
+            error = sdkError.error
+        except AttributeError:  # todo remove after FSDK-2190
+            error = sdkError.serializeError
         for errorName, errorVal in errorClassErrors:
             if errorName == error.name:
                 return ErrorInfo(errorVal.errorCode, errorVal.description, sdkError.what)
