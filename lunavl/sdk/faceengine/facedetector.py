@@ -399,7 +399,8 @@ class FaceDetector:
         faces = []
         for image in images:
             faces.extend(facesFactory(image))
-        error, detectRes = self._detector.redetect(faces, self._getDetectionType(detect5Landmarks, detect68Landmarks))
+        error, detectRes, _ = self._detector.redetect(faces,
+                                                      self._getDetectionType(detect5Landmarks, detect68Landmarks))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
