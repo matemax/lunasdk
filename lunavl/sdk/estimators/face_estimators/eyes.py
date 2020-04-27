@@ -205,9 +205,9 @@ class EyeEstimator(BaseEstimator):
         """
         cropper = EyeCropper()
         if isinstance(transformedLandmarks, Landmarks5):
-            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage, transformedLandmarks._coreEstimation)
+            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
         else:
-            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage, transformedLandmarks._coreEstimation)
+            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
         error, eyesEstimation = self._coreEstimator.estimate(warp.warpedImage.coreImage, eyeRects)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -309,7 +309,7 @@ class GazeEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation failed
         """
-        error, gaze = self._coreEstimator.estimate(warp.warpedImage.coreImage, transformedLandmarks._coreEstimation)
+        error, gaze = self._coreEstimator.estimate(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return GazeDirection(gaze)
