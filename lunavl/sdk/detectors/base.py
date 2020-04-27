@@ -1,7 +1,10 @@
-from typing import NamedTuple, List, Any, Dict, Union
+from typing import NamedTuple, List, Any, Dict, Union, Tuple
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+from FaceEngine import Rect as CoreRectI  # pylint: disable=E0611,E0401
+from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
+
+from ..errors.errors import LunaVLError
+from ..errors.exceptions import LunaSDKException
 
 from ..base import BaseEstimation, BoundingBox
 from ..image_utils.geometry import Rect
@@ -76,13 +79,33 @@ class BaseDetection(BaseEstimation):
         return {"rect": self.boundingBox.rect.asDict(), "score": self.boundingBox.score}
 
 
-def assertImageForDetection(image: VLImage):
+def assertImageForDetection(image: VLImage) -> None:
+    """
+    Assert image for detection
+    Args:
+        image: image
+
+    Raises:
+        LunaSDKException: if image format is not R8G8B8
+    """
     if image.format != ColorFormat.R8G8B8:
         details = "Bad image format for detection, format: {}, image: {}".format(image.format.value, image.filename)
         raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
 
 
-def getDataForCoreDetector(images: List[Union[VLImage, ImageForDetection]]):
+def getArgsForCoreDetectorForImages(
+    images: List[Union[VLImage, ImageForDetection]]
+) -> Tuple[List[CoreImage], List[CoreRectI]]:
+    """
+    Create args for detect for image list
+    Args:
+        images: list of images for detection
+
+    Returns:
+        tuple: first - list core images
+               second - detect area for corresponding images
+    """
+
     coreImages = []
     detectAreas = []
     for image in images:

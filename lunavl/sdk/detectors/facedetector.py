@@ -15,7 +15,7 @@ from ..detectors.base import (
     ImageForRedetection,
     BaseDetection,
     assertImageForDetection,
-    getDataForCoreDetector,
+    getArgsForCoreDetectorForImages,
 )
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError
@@ -196,7 +196,7 @@ class FaceDetector:
             LunaSDKException(LunaVLError.InvalidImageFormat): if any image has bad format or detect is failed
 
         """
-        imgs, detectAreas = getDataForCoreDetector(images)
+        imgs, detectAreas = getArgsForCoreDetectorForImages(images)
 
         error, detectRes = self._detector.detect(
             imgs, detectAreas, limit, self._getDetectionType(detect5Landmarks, detect68Landmarks)

@@ -50,6 +50,15 @@ def CoreExceptionWrap(error: ErrorInfo):
     return realWarp
 
 
-def assertError(error: FSDKErrorResult):
+def assertError(error: FSDKErrorResult) -> None:
+    """
+    Assert core optional.
+    Args:
+        error: optional
+
+    Raises:
+        LunaSDKException: if optional contains error
+
+    """
     if error.isError:
         raise LunaSDKException(LunaVLError.fromSDKError(error))
