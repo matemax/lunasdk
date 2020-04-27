@@ -5,26 +5,21 @@ from typing import Optional, Union, List, Dict
 from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
-from lunavl.sdk.estimator_collections import FaceEstimatorsCollection
-from lunavl.sdk.estimators.face_estimators.basic_attributes import BasicAttributes
-from lunavl.sdk.estimators.face_estimators.emotions import Emotions
-from lunavl.sdk.estimators.face_estimators.eyes import EyesEstimation, GazeDirection
-from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor
-from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
-from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStates
-from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
-from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import (
-    FaceDetection,
-    ImageForDetection,
-    FaceDetector,
-    Landmarks5,
-    ImageForRedetection,
-)
-from lunavl.sdk.faceengine.setting_provider import DetectorType
-from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage, ColorFormat
+from .estimator_collections import FaceEstimatorsCollection
+from .estimators.face_estimators.basic_attributes import BasicAttributes
+from .estimators.face_estimators.emotions import Emotions
+from .estimators.face_estimators.eyes import EyesEstimation, GazeDirection
+from .estimators.face_estimators.face_descriptor import FaceDescriptor
+from .estimators.face_estimators.head_pose import HeadPose
+from .estimators.face_estimators.mouth_state import MouthStates
+from .estimators.face_estimators.warp_quality import Quality
+from .estimators.face_estimators.warper import Warp, WarpedImage
+from .faceengine.engine import VLFaceEngine
+from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
+from .detectors.base import ImageForDetection, ImageForRedetection
+from .faceengine.setting_provider import DetectorType
+from .image_utils.geometry import Rect
+from .image_utils.image import VLImage, ColorFormat
 
 
 class VLFaceDetection(FaceDetection):

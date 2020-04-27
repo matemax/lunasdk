@@ -1,13 +1,11 @@
 """
 Module contains geometric structures (Rect, Point, Size)
 """
-from typing import TypeVar, Generic, Union, Optional, Dict, Tuple
+from typing import TypeVar, Generic, Union, Dict, Tuple
 
 from FaceEngine import Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
 from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
-
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
 
 COORDINATE_TYPE = TypeVar("COORDINATE_TYPE", float, int)  #: generic type for allowed values type of coordinates
 LANDMARKS = TypeVar(
@@ -593,49 +591,3 @@ class Rect(Generic[COORDINATE_TYPE]):
 
         """
         return self.coreRect.__repr__()
-
-
-class Landmarks(BaseEstimation):
-    """
-    Base class for landmarks
-
-    Attributes:
-        _points (Optional[Tuple[Point[float]]]): lazy load attributes, converted to point list core landmarks
-    """
-
-    __slots__ = ["_points", "_coreLandmarks"]
-
-    def __init__(self, coreLandmarks: LANDMARKS):
-        """
-        Init
-
-        Args:
-            coreLandmarks (LANDMARKS): core landmarks
-        """
-        super().__init__(coreLandmarks)
-        self._points: Optional[Tuple[Point[float], ...]] = None
-
-    @property
-    def points(self) -> Tuple[Point[float], ...]:
-        """
-        Lazy load of points.
-
-        Returns:
-            list of points
-        """
-        if self._points is None:
-            self._points = tuple(
-                (Point.fromVector2(self._coreEstimation[index]) for index in range(len(self._coreEstimation)))
-            )
-        return self._points
-
-    def asDict(self) -> Tuple[Tuple[int, int], ...]:  # type: ignore
-        """
-        Convert to dict
-
-        Returns:
-            list to list points
-        """
-        pointCount = len(self._coreEstimation)
-        points = self.coreEstimation
-        return tuple(((int(points[index].x), int(points[index].x)) for index in range(pointCount)))

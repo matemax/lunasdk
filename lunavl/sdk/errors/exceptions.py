@@ -4,7 +4,9 @@ Module realizes LunaSDKException - single exception for rising in sdk module
 from functools import wraps
 from typing import Optional, Any, Callable
 
-from lunavl.sdk.errors.errors import ErrorInfo
+from FaceEngine import FSDKErrorResult  # pylint: disable=E0611,E0401
+
+from lunavl.sdk.errors.errors import ErrorInfo, LunaVLError
 
 
 class LunaSDKException(Exception):
@@ -46,3 +48,8 @@ def CoreExceptionWrap(error: ErrorInfo):
         return wrap
 
     return realWarp
+
+
+def assertError(error: FSDKErrorResult):
+    if error.isError:
+        raise LunaSDKException(LunaVLError.fromSDKError(error))

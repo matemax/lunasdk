@@ -5,22 +5,20 @@ See `eyes`_ and `gaze direction`_.
 
 """
 from enum import Enum
-from typing import Union, Dict
+from typing import Union
 
 from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
 from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
-from FaceEngine import GazeEstimation as CoreGazeEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
-from lunavl.sdk.faceengine.facedetector import Landmarks5, Landmarks68
+from lunavl.sdk.estimators.base_estimation import BaseEstimator
+from lunavl.sdk.base import BaseEstimation, Landmarks
+from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
 
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
-from lunavl.sdk.image_utils.geometry import Landmarks
 
 
 class EyeState(Enum):
@@ -207,9 +205,9 @@ class EyeEstimator(BaseEstimator):
         """
         cropper = EyeCropper()
         if isinstance(transformedLandmarks, Landmarks5):
-            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
+            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage, transformedLandmarks._coreEstimation)
         else:
-            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
+            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage, transformedLandmarks._coreEstimation)
         error, eyesEstimation = self._coreEstimator.estimate(warp.warpedImage.coreImage, eyeRects)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -311,7 +309,7 @@ class GazeEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation failed
         """
-        error, gaze = self._coreEstimator.estimate(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
+        error, gaze = self._coreEstimator.estimate(warp.warpedImage.coreImage, transformedLandmarks._coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return GazeDirection(gaze)

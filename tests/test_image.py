@@ -1,7 +1,8 @@
 import os
+
 from collections import namedtuple
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import List, Union
 
 import FaceEngine as fe
 import numpy as np
@@ -42,7 +43,7 @@ class TestImage(BaseTestClass):
             elif isinstance(path, str):
                 os.remove(path)
             else:
-                raise NotImplemented(f"{type(path)}")
+                raise NotImplementedError(f"{type(path)}")
 
     def test_image_initialize(self):
         """
@@ -119,9 +120,9 @@ class TestImage(BaseTestClass):
         """
         Test check numpy array conversion
         """
-        imageWithOneFace = VLImage.load(filename=ONE_FACE)
-        assert imageWithOneFace.isValid()
-        assert (np.asarray(Image.open(ONE_FACE)) == imageWithOneFace.asNPArray()).all()
+        image = Image.open(ONE_FACE)
+        imageWithOneFace = VLImage(image)
+        assert (np.asarray(image) == imageWithOneFace.asNPArray()).all()
 
     def test_convert_color_format(self):
         """

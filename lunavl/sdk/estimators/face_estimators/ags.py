@@ -8,8 +8,9 @@ from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
-from lunavl.sdk.faceengine.facedetector import BoundingBox, FaceDetection
+from ..base_estimation import BaseEstimator
+from lunavl.sdk.detectors.facedetector import FaceDetection
+from ...base import BoundingBox
 from lunavl.sdk.image_utils.image import VLImage
 
 

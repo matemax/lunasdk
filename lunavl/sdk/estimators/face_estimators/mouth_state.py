@@ -8,7 +8,8 @@ from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
+from lunavl.sdk.estimators.base_estimation import BaseEstimator
+from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 
 

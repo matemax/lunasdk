@@ -2,7 +2,8 @@ import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.facedetector import FaceDetector, ImageForRedetection
+from lunavl.sdk.detectors.facedetector import FaceDetector
+from lunavl.sdk.detectors.base import ImageForRedetection
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage

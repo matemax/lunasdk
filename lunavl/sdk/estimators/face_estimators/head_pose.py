@@ -9,8 +9,9 @@ from typing import Dict
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.faceengine.facedetector import Landmarks68, BoundingBox
+from lunavl.sdk.estimators.base_estimation import BaseEstimator
+from lunavl.sdk.base import BaseEstimation, BoundingBox
+from lunavl.sdk.detectors.facedetector import Landmarks68
 from lunavl.sdk.image_utils.image import VLImage
 
 
@@ -139,7 +140,7 @@ class HeadPoseEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation is failed
         """
-        error, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
+        error, headPoseEstimation = self._coreEstimator.estimate(landmarks68._coreEstimation)
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

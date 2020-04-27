@@ -6,7 +6,7 @@ import pprint
 import cv2  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.facedetector import DetectorType
+from lunavl.detectors.facedetector import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 
 
