@@ -72,9 +72,9 @@ class FaceMatcher:
             candidatesForMatcher = []
             for idx in range(len(candidates)):
                 if isinstance(candidates[idx], bytes):
-                    candidatesForMatcher[idx] = self.descriptorFactory.generateDescriptor(candidates[idx])
+                    candidatesForMatcher.append(self.descriptorFactory.generateDescriptor(candidates[idx]))
                 else:
-                    candidatesForMatcher[idx] = candidates[idx]
+                    candidatesForMatcher.append(candidates[idx])
         else:
             candidatesForMatcher = candidates
 
