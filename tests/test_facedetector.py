@@ -3,7 +3,8 @@ from PIL import Image
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.facedetector import FaceDetector, ImageForDetection
+from lunavl.sdk.detectors.facedetector import FaceDetector
+from lunavl.sdk.detectors.base import ImageForDetection
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
@@ -332,8 +333,8 @@ class TestDetector(DetectTestClass):
         Test excessive image list detection
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 20)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.UnknownError)
+            TestDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 40)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.HighMemoryUsage)
 
     def test_detect_one_invalid_rectangle(self):
         """

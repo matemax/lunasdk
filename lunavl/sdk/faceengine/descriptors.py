@@ -9,9 +9,9 @@ from typing import Union, Optional
 
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr, DescriptorBatchResult  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.estimators.base_estimation import BaseEstimation
+from ..errors.errors import LunaVLError
+from ..errors.exceptions import LunaSDKException, CoreExceptionWrap
+from ..base import BaseEstimation
 
 
 class FaceDescriptor(BaseEstimation):

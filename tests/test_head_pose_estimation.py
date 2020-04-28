@@ -6,7 +6,8 @@ import pytest
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator, HeadPose, FrontalType
-from lunavl.sdk.faceengine.facedetector import FaceDetector, FaceDetection, BoundingBox
+from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
+from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass

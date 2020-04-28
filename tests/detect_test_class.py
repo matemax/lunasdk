@@ -3,7 +3,8 @@ from collections import namedtuple
 from typing import List, Union
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine, DetectorType
-from lunavl.sdk.faceengine.facedetector import FaceDetection, FaceDetector, BoundingBox, Landmarks5, Landmarks68
+from lunavl.sdk.detectors.facedetector import FaceDetection, FaceDetector, Landmarks5, Landmarks68
+from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass

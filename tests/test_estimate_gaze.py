@@ -81,4 +81,4 @@ class TestEstimateEmotions(DetectTestClass):
                 faceDetection = detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=False)
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     self.gazeEstimator.estimate(faceDetection.landmarks5, self.warp)
-                self.assertLunaVlError(exceptionInfo, LunaVLError.Internal)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

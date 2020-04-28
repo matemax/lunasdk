@@ -10,8 +10,8 @@ import numpy as np
 from PIL.Image import Image as PilImage
 from PIL import Image as pilImage
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+from ..errors.errors import LunaVLError
+from ..errors.exceptions import LunaSDKException
 from .geometry import Rect
 
 

@@ -15,6 +15,11 @@ numpy = "*"
 requests = "^2.22"
 Pillow = {version = "7.0.0", markers = "sys_platform == 'win32'"}
 pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
+
+#[tool.poetry.dependencies.FaceEngine]
+#git = "https://github.com/VisionLabs/FaceEngine"
+#tag = "v.3.9.3.0"
+
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
 pytest = ">=4.4"
@@ -26,6 +31,7 @@ jsonschema = "^3.2.0"
 mypy = "^0.750"
 flake8 = "^3.7.9"
 bandit = "^1.6.2"
+
 
 [tool.black]
 line-length = 120

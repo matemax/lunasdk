@@ -2,49 +2,7 @@
 Module with base classes of estimators and estimations
 """
 from abc import ABC, abstractmethod
-from typing import Union, Any
-
-
-class BaseEstimation(ABC):
-    """
-    Base class for estimation structures.
-
-    Attributes:
-        _coreEstimation: core estimation
-    """
-
-    __slots__ = ("_coreEstimation",)
-
-    def __init__(self, coreEstimation):
-        self._coreEstimation = coreEstimation
-
-    @property
-    def coreEstimation(self):
-        """
-        Get core estimation from init
-        Returns:
-            _coreEstimation
-        """
-        return self._coreEstimation
-
-    @abstractmethod
-    def asDict(self) -> Union[dict, list]:
-        """
-        Convert to a dict.
-
-        Returns:
-            dict from luna api
-        """
-        pass
-
-    def __repr__(self) -> str:
-        """
-        Representation.
-
-        Returns:
-            str(self.asDict())
-        """
-        return str(self.asDict())
+from typing import Any
 
 
 class BaseEstimator(ABC):

@@ -5,12 +5,14 @@ See ags_.
 from typing import Optional
 
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
+
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
-
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
-from lunavl.sdk.faceengine.facedetector import BoundingBox, FaceDetection
+from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.image_utils.image import VLImage
+
+from ..base_estimation import BaseEstimator
+from ...base import BoundingBox
 
 
 class AGSEstimator(BaseEstimator):

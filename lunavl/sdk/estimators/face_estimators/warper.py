@@ -7,7 +7,7 @@ from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
+from lunavl.sdk.detectors.facedetector import FaceDetection, Landmarks68, Landmarks5
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 

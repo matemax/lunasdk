@@ -10,7 +10,8 @@ from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimator, BaseEstimation
+from lunavl.sdk.estimators.base_estimation import BaseEstimator
+from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
 
 
