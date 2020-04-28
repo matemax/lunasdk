@@ -7,8 +7,8 @@ See `eyes`_ and `gaze direction`_.
 from enum import Enum
 from typing import Union
 
-from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
-from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
+from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr, GazeEstimation  # pylint: disable=E0611,E0401
+from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks, EyeAttributes  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
@@ -92,7 +92,7 @@ class Eye(BaseEstimation):
     __slots__ = ("irisLandmarks", "eyelidLandMarks", "state")
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimation):
+    def __init__(self, coreEstimation: EyeAttributes):
         """
         Init.
 
@@ -241,7 +241,7 @@ class GazeDirection(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimation):
+    def __init__(self, coreEstimation: GazeEstimation):
         """
         Init.
         """

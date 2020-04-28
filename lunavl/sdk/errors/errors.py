@@ -120,7 +120,7 @@ class LunaVLError:
     CreationWarpError = ErrorInfo(110016, "Creation warped image error", "")
     WarpTransformationError = ErrorInfo(110017, "Landmarks transformation error", "")
     DetectOneFaceError = ErrorInfo(110018, "Detect one face error", "")
-    DetectFacesError = ErrorInfo(110019, "Detect one face error", "")
+    DetectFacesError = ErrorInfo(110019, "Detect faces error", "")
     HighMemoryUsage = ErrorInfo(110020, "High memory usage", "")
 
     @classmethod

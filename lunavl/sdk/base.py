@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, Optional, Tuple, Dict
+from typing import Union, Optional, Tuple, Dict, Any
 
 from FaceEngine import DetectionFloat  # pylint: disable=E0611,E0401
 
@@ -16,7 +16,7 @@ class BaseEstimation(ABC):
 
     __slots__ = ("_coreEstimation",)
 
-    def __init__(self, coreEstimation):
+    def __init__(self, coreEstimation: Any):
         self._coreEstimation = coreEstimation
 
     @property
