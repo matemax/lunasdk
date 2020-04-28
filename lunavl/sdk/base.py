@@ -53,7 +53,7 @@ class Landmarks(BaseEstimation):
     Base class for landmarks
 
     Attributes:
-        _points (Optional[Tuple[Point[float]]]): lazy load attributes, converted to point list core landmarks
+        _points (Optional[Tuple[Point[float]]]): lazy loaded attributes: core landmarks as point list
     """
 
     __slots__ = ["_points", "_coreEstimation"]
@@ -71,14 +71,14 @@ class Landmarks(BaseEstimation):
     @property
     def points(self) -> Tuple[Point[float], ...]:
         """
-        Lazy load of points.
+        Lazy points loader.
 
         Returns:
             list of points
         """
         if self._points is None:
             self._points = tuple(
-                (Point.fromVector2(self._coreEstimation[index]) for index in range(len(self._coreEstimation)))
+                Point.fromVector2(self._coreEstimation[index]) for index in range(len(self._coreEstimation))
             )
         return self._points
 
