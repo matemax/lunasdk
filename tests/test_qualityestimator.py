@@ -1,14 +1,14 @@
 from lunavl.sdk.estimators.face_estimators.warp_quality import Quality
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from tests.detect_test_class import DetectTestClass
+from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 from tests.schemas import jsonValidator, QUALITY_SCHEMA
 
-QUALITY_PROPERTIES = [key for key in Quality.__dict__.keys() if not (key.startswith("_") or key is "asDict")]
+QUALITY_PROPERTIES = [key for key in Quality.__dict__.keys() if not (key.startswith("_") or key == "asDict")]
 
 
-class TestEstimateQuality(DetectTestClass):
+class TestEstimateQuality(BaseTestClass):
     """
     Test estimate emotions.
     """
@@ -16,10 +16,10 @@ class TestEstimateQuality(DetectTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.defaultDetector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
         cls.warper = cls.faceEngine.createWarper()
         cls.qualityEstimator = cls.faceEngine.createWarpQualityEstimator()
-        cls.warps = [cls.warper.warp(detector.detectOne(VLImage.load(filename=ONE_FACE))) for detector in cls.detectors]
+        cls.warp = cls.warper.warp(cls.detector.detectOne(VLImage.load(filename=ONE_FACE)))
 
     def assertQuality(self, quality: Quality):
         """
@@ -45,20 +45,17 @@ class TestEstimateQuality(DetectTestClass):
             jsonValidator(schema=QUALITY_SCHEMA).validate(qualityDict) is None
         ), f"{qualityDict} does not match with schema {QUALITY_SCHEMA}"
 
-    def test_estimate_quality_(self):
+    def test_estimate_quality(self):
         """
         Test quality estimations
         """
-        for idx, detector in enumerate(self.detectors):
-            with self.subTest(detectorType=detector.detectorType):
-                quality = self.qualityEstimator.estimate(self.warps[idx].warpedImage)
-                self.assertQuality(quality)
+        quality = self.qualityEstimator.estimate(self.warp.warpedImage)
+        self.assertQuality(quality)
 
     def test_estimate_quality_as_dict(self):
         """
         Test quality estimations as dict
         """
-        for idx, detector in enumerate(self.detectors):
-            with self.subTest(detectorType=detector.detectorType):
-                qualityDict = self.qualityEstimator.estimate(self.warps[idx].warpedImage).asDict()
-                self.assertQualityReply(qualityDict)
+
+        qualityDict = self.qualityEstimator.estimate(self.warp.warpedImage).asDict()
+        self.assertQualityReply(qualityDict)

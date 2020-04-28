@@ -1,26 +1,22 @@
 import pytest
 
+from lunavl.sdk.detectors.base import ImageForRedetection
+from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.detectors.facedetector import FaceDetector
-from lunavl.sdk.detectors.base import ImageForRedetection
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
-from tests.detect_test_class import DetectTestClass
-from tests.resources import SEVERAL_FACES, CLEAN_ONE_FACE, SMALL_IMAGE
+from tests.detect_test_class import FaceDetectTestClass
+from tests.detect_test_class import VLIMAGE_SEVERAL_FACE, VLIMAGE_SMALL, OUTSIDE_AREA, INVALID_RECT, ERROR_CORE_RECT
+from tests.resources import CLEAN_ONE_FACE
 
-VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
-VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
-INVALID_RECT = Rect(0, 0, 0, 0)
-ERROR_CORE_RECT = Rect(0.1, 0.1, 0.1, 0.1)  # anything out of range (0.1, 1)
-OUTSIDE_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)
 
 
-class TestDetector(DetectTestClass):
+class TestsRedetectFace(FaceDetectTestClass):
     """
-    Test of redetection.
+    Face redetection tests.
     """
 
     detector: FaceDetector

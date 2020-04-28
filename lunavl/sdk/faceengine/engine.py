@@ -5,19 +5,23 @@ from typing import Optional, Union
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 
-from ..detectors.facedetector import FaceDetector
 from ..estimators.face_estimators.ags import AGSEstimator
 from ..estimators.face_estimators.basic_attributes import BasicAttributesEstimator
 from ..estimators.face_estimators.emotions import EmotionsEstimator
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
-from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
+
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.warper import Warper
+
+from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..faceengine.descriptors import FaceDescriptorFactory
 from ..faceengine.matcher import FaceMatcher
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
+from ..detectors.humandetector import HumanDetector
+
+from ..detectors.facedetector import FaceDetector
 
 
 class VLFaceEngine:
@@ -214,3 +218,11 @@ class VLFaceEngine:
             core face engine
         """
         return self._faceEngine
+
+    def createHumanDetector(self) -> HumanDetector:
+        """
+        Create human detector.
+        Returns:
+            detector
+        """
+        return HumanDetector(self._faceEngine.createHumanDetector())

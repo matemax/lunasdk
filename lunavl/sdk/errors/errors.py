@@ -122,6 +122,8 @@ class LunaVLError:
     DetectOneFaceError = ErrorInfo(110018, "Detect one face error", "")
     DetectFacesError = ErrorInfo(110019, "Detect faces error", "")
     HighMemoryUsage = ErrorInfo(110020, "High memory usage", "")
+    DetectHumanError = ErrorInfo(110021, "Detect one human body error", "")
+    DetectHumansError = ErrorInfo(110022, "Detect humans bodies error", "")
 
     @classmethod
     def fromSDKError(cls, sdkError: FSDKErrorResult) -> "ErrorInfo":

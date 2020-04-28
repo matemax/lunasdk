@@ -23,6 +23,18 @@ from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
 
+def _createCoreFace(image: ImageForRedetection) -> List[Face]:
+    """
+    Create core face objects for redetection
+    Args:
+        image: image for redection
+
+    Returns:
+        Face object list. one object for one bbox
+    """
+    return [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
+
+
 class Landmarks5(Landmarks):
     """
     Landmarks5
@@ -93,10 +105,14 @@ class FaceDetection(BaseDetection):
         res = super().asDict()
         if self.landmarks5 is not None:
             coreLandmarks5 = self.landmarks5.coreEstimation
-            res["landmarks5"] = tuple((coreLandmarks5[index].x, coreLandmarks5[index].y) for index in range(5))
+            res["landmarks5"] = tuple(
+                (int(coreLandmarks5[index].x), int(coreLandmarks5[index].y)) for index in range(5)
+            )
         if self.landmarks68 is not None:
             coreLandmarks68 = self.landmarks68.coreEstimation
-            res["landmarks68"] = tuple((coreLandmarks68[index].x, coreLandmarks68[index].y) for index in range(68))
+            res["landmarks68"] = tuple(
+                (int(coreLandmarks68[index].x), int(coreLandmarks68[index].y)) for index in range(68)
+            )
         return res
 
 
@@ -286,15 +302,10 @@ class FaceDetector:
         Raises:
             LunaSDKException if an error occurs
         """
-
-        def facesFactory(image: ImageForRedetection) -> List[Face]:
-            faces = [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
-            return faces
-
         faces = []
         for image in images:
             assertImageForDetection(image.image)
-            faces.extend(facesFactory(image))
+            faces.extend(_createCoreFace(image))
         error, detectRes, _ = self._detector.redetect(
             faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )

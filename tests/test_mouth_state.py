@@ -5,20 +5,20 @@ import jsonschema
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator, MouthStates
 from lunavl.sdk.estimators.face_estimators.warper import WarpedImage
 from lunavl.sdk.image_utils.image import VLImage
-from tests.detect_test_class import DetectTestClass
+from tests.detect_test_class import FaceDetectTestClass
 from tests.resources import CLEAN_ONE_FACE, WARP_WHITE_MAN
 from tests.schemas import MOUTH_STATES_SCHEMA
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 
 
-class TestMouthEstimation(DetectTestClass):
+class TestMouthEstimation(FaceDetectTestClass):
     """
     Test Mouth States Estimation
     """
 
     # mouth state estimator
-    mouthEstimator: MouthStateEstimator = None
+    mouthEstimator: MouthStateEstimator
 
     @classmethod
     def setup_class(cls):

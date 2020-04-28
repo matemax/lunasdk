@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Union, Optional, Tuple, Dict, Any
 
-from FaceEngine import DetectionFloat  # pylint: disable=E0611,E0401
+from FaceEngine import DetectionFloat, HumanLandmark, HumanLandmarks17  # pylint: disable=E0611,E0401
 
 from .image_utils.geometry import LANDMARKS, Point, Rect
 
@@ -92,6 +92,101 @@ class Landmarks(BaseEstimation):
         pointCount = len(self._coreEstimation)
         points = self._coreEstimation
         return tuple(((int(points[index].x), int(points[index].x)) for index in range(pointCount)))
+
+
+class LandmarkWithScore(BaseEstimation):
+    """
+    Point with score.
+    """
+
+    def __init__(self, landmark: HumanLandmark):  # pylint: disable=C0103
+        """
+        Init
+
+        Args:
+            landmark: core landmark
+        """
+        super().__init__(landmark)
+
+    @property
+    def point(self) -> Point[float]:
+        """
+        Coordinate of landmark
+        Returns:
+            point
+        """
+        return Point.fromVector2(self._coreEstimation.point)
+
+    @property
+    def score(self) -> float:
+        """
+        Landmark score
+        Returns:
+            float[0,1]
+        """
+        return self._coreEstimation.score
+
+    def asDict(self) -> dict:
+        """
+        Convert point to list (json),  coordinates will be cast from float to int
+
+        Returns:
+            dict with keys: score and point
+        """
+        return {"score": self._coreEstimation.score, "point": (int(self.point.x), int(self.point.y))}
+
+    def __repr__(self) -> str:
+        """
+        Representation.
+
+        Returns:
+            "x = {self.point.x}, y = {self.point.y}, score = {self.score}"
+        """
+        return "x = {}, y = {}, score = {}".format(self.point.x, self.point.y, self.score)
+
+
+class LandmarksWithScore(BaseEstimation):
+    """
+    Base class for landmarks with score
+
+    Attributes:
+        _points (Optional[Tuple[Point[float]]]): lazy load attributes, converted to point list core landmarks
+    """
+
+    __slots__ = ["_points", "_coreEstimation"]
+
+    def __init__(self, coreLandmarks: HumanLandmarks17):
+        """
+        Init
+
+        Args:
+            coreLandmarks (LANDMARKS): core landmarks
+        """
+        super().__init__(coreLandmarks)
+        self._points: Optional[Tuple[LandmarkWithScore, ...]] = None
+
+    @property
+    def points(self) -> Tuple[LandmarkWithScore, ...]:
+        """
+        Lazy load of points.
+
+        Returns:
+            list of points
+        """
+        if self._points is None:
+            self._points = tuple(
+                (LandmarkWithScore(self._coreEstimation[index]) for index in range(len(self._coreEstimation)))
+            )
+        return self._points
+
+    def asDict(self) -> Tuple[dict, ...]:  # type: ignore
+        """
+        Convert to dict
+
+        Returns:
+            list to list points
+        """
+        return tuple(point.asDict() for point in self.points)
 
 
 class BoundingBox(BaseEstimation):
