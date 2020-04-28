@@ -6,7 +6,7 @@ Module realize simple examples following features:
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.detectors.base_detection import ImageForRedetection
+from lunavl.sdk.detectors.base import ImageForRedetection
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
