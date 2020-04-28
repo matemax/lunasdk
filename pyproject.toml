@@ -16,9 +16,9 @@ requests = "^2.22"
 Pillow = {version = "7.0.0", markers = "sys_platform == 'win32'"}
 pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
 
-[tool.poetry.dependencies.FaceEngine]
-git = "https://github.com/VisionLabs/FaceEngine"
-tag = "v.3.9.3.0"
+#[tool.poetry.dependencies.FaceEngine]
+#git = "https://github.com/VisionLabs/FaceEngine"
+#tag = "v.3.9.3.0"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
