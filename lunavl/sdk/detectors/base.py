@@ -76,7 +76,7 @@ class BaseDetection(BaseEstimation):
         Returns:
             dict. required keys: 'rect', 'score'.
         """
-        return {"rect": self.boundingBox.rect.asDict(), "score": self.boundingBox.score}
+        return self.boundingBox.asDict()
 
 
 def assertImageForDetection(image: VLImage) -> None:
