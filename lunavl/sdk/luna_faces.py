@@ -13,7 +13,7 @@ from .estimators.face_estimators.face_descriptor import FaceDescriptor
 from .estimators.face_estimators.head_pose import HeadPose
 from .estimators.face_estimators.mouth_state import MouthStates
 from .estimators.face_estimators.warp_quality import Quality
-from .estimators.face_estimators.warper import Warp, WarpedImage
+from .estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from .faceengine.engine import VLFaceEngine
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .detectors.base import ImageForDetection, ImageForRedetection
@@ -65,7 +65,7 @@ class VLFaceDetection(FaceDetection):
         super().__init__(coreDetection, image)
         self._emotions: Optional[Emotions] = None
         self._eyes: Optional[EyesEstimation] = None
-        self._warp: Optional[Warp] = None
+        self._warp: Optional[FaceWarp] = None
         self._mouthState: Optional[MouthStates] = None
         self._basicAttributes: Optional[BasicAttributes] = None
         self._gaze: Optional[GazeDirection] = None
@@ -77,7 +77,7 @@ class VLFaceDetection(FaceDetection):
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
 
     @property
-    def warp(self) -> Warp:
+    def warp(self) -> FaceWarp:
         """
         Get warp from detection.
 
@@ -375,7 +375,7 @@ class VLFaceDetector:
         return res
 
 
-class VLWarpedImage(WarpedImage):
+class VLWarpedImage(FaceWarpedImage):
     """
     High level sample object.
 
@@ -497,7 +497,7 @@ class VLWarpedImage(WarpedImage):
         return res
 
     @property
-    def warp(self) -> WarpedImage:
+    def warp(self) -> FaceWarpedImage:
         """
         Support VLFaceDetection interface.
 

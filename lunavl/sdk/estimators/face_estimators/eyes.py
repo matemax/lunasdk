@@ -14,11 +14,11 @@ from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimati
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
+from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.base import BaseEstimation, Landmarks
 from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
 
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class EyeState(Enum):
@@ -189,7 +189,7 @@ class EyeEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(
-        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
+        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[FaceWarp, FaceWarpedImage]
     ) -> EyesEstimation:
         """
         Estimate mouth state on warp.
@@ -297,7 +297,7 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(self, transformedLandmarks: Landmarks5, warp: Union[Warp, WarpedImage]) -> GazeDirection:
+    def estimate(self, transformedLandmarks: Landmarks5, warp: Union[FaceWarp, FaceWarpedImage]) -> GazeDirection:
         """
         Estimate a gaze direction
 

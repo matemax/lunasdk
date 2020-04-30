@@ -11,7 +11,7 @@ from .estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from .estimators.face_estimators.head_pose import HeadPoseEstimator
 from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
-from .estimators.face_estimators.warper import Warper
+from .estimators.face_estimators.facewarper import FaceWarper
 from .faceengine.engine import VLFaceEngine
 
 
@@ -95,7 +95,7 @@ class FaceEstimatorsCollection:
         self._headPoseEstimator: Union[None, HeadPoseEstimator] = None
         self._AGSEstimator: Union[None, AGSEstimator] = None
         self._descriptorEstimator: Union[None, FaceDescriptorEstimator] = None
-        self.warper: Warper = self._faceEngine.createWarper()
+        self.warper: FaceWarper = self._faceEngine.createWarper()
 
         if startEstimators:
             for estimator in set(startEstimators):
