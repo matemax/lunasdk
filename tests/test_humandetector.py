@@ -184,8 +184,8 @@ class TestHumanDetector(HumanDetectTestClass):
         """
         imageWithManyFaces = VLImage.load(filename=MANY_FACES)
 
-        detection = self.detector.detect(images=[imageWithManyFaces])[0]
-        assert 5 == len(detection)
+        detection = self.detector.detect(images=[imageWithManyFaces], limit=6)[0]
+        assert 6 == len(detection)
 
         detection = self.detector.detect(images=[imageWithManyFaces], limit=20)[0]
         assert 11 == len(detection)
