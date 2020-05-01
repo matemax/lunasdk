@@ -20,11 +20,11 @@ from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
 
-def _createCoreHuman(image: ImageForRedetection) -> List[Human]:
+def _createCoreHumans(image: ImageForRedetection) -> List[Human]:
     """
-    Create core human objects for redetection
+    Create core humans for redetection
     Args:
-        image: image for redection
+        image: image and bounding boxes for redetection
 
     Returns:
         Human object list. one object for one bbox
@@ -125,7 +125,7 @@ class HumanDetector:
         Detect just one best detection on the image.
 
         Args:
-            image: image. Format must be R8G8B8 (todo check)
+            image: image. Format must be R8G8B8
             detectArea: rectangle area which contains human to detect. If not set will be set image.rect
             detectLandmarks: detect or not landmarks
         Returns:
@@ -206,7 +206,7 @@ class HumanDetector:
             area = detection.boundingBox.rect
         else:
             raise NotImplementedError
-        human = _createCoreHuman(ImageForRedetection(image, [area]))[0]
+        human = _createCoreHumans(ImageForRedetection(image, [area]))[0]
         error, detectRes = self._detector.redetectOne(human)
 
         assertError(error)

@@ -23,12 +23,11 @@ from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
 
-def _createCoreFace(image: ImageForRedetection) -> List[Face]:
+def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
     """
-    Create core face objects for redetection
+    Create core faces for redetection
     Args:
-        image: image for redection
-
+        image: image and bounding boxes for redection
     Returns:
         Face object list. one object for one bbox
     """
@@ -165,7 +164,7 @@ class FaceDetector:
         Detect just one best detection on the image.
 
         Args:
-            image: image. Format must be R8G8B8 (todo check)
+            image: image. Format must be R8G8B8
             detectArea: rectangle area which contains face to detect. If not set will be set image.rect
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
@@ -305,7 +304,7 @@ class FaceDetector:
         faces = []
         for image in images:
             assertImageForDetection(image.image)
-            faces.extend(_createCoreFace(image))
+            faces.extend(_createCoreFaces(image))
         error, detectRes, _ = self._detector.redetect(
             faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
