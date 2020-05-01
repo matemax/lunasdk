@@ -294,7 +294,7 @@ class VLFaceDetector:
         Detect just one best detection on the image.
 
         Args:
-            image: image. Format must be R8G8B8 (todo check)
+            image: image. Format must be R8G8B8
             detectArea: rectangle area which contains face to detect. If not set will be set image.rect
         Returns:
             face detection if face is found otherwise None

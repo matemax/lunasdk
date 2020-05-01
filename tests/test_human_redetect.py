@@ -90,7 +90,12 @@ class TestsRedetectHuman(HumanDetectTestClass):
         Test batch re-detection with an invalid rect
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[INVALID_RECT])])
+            self.detector.redetect(
+                images=[
+                    ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[INVALID_RECT]),
+                    ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)]),
+                ]
+            )
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_redetect_one_without_detection_and_bbox(self):
