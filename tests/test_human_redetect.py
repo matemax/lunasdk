@@ -60,9 +60,10 @@ class TestsRedetectHuman(HumanDetectTestClass):
                 ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[detectSeveral[0][0].boundingBox.rect]),
             ]
         )
+
+        assert 2 == len(redetect)
         self.assertHumanDetection(redetect[0], VLIMAGE_SEVERAL_FACE)
         self.assertHumanDetection(redetect[1], VLIMAGE_ONE_FACE)
-        assert 2 == len(redetect)
         assert 5 == len(redetect[0])
         assert 1 == len(redetect[1])
 
@@ -74,8 +75,8 @@ class TestsRedetectHuman(HumanDetectTestClass):
         redetect = self.detector.redetect(
             images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)])]
         )[0][0]
-        assert redetectOne is None
-        assert redetect is None
+        assert redetectOne is None, "excepted None but found {}".format(redetectOne)
+        assert redetect is None, "excepted None but found {}".format(redetectOne)
 
     def test_redetect_one_invalid_rectangle(self):
         """

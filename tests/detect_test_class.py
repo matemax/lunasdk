@@ -66,12 +66,14 @@ class BaseDetectorTestClass(BaseTestClass):
             imageVl: class image
         """
         if isinstance(detection, list):
-            listOfFaceDetection = [faceDetection for faceDetection in detection]
+            listOfFaceDetection = detection
         else:
             listOfFaceDetection = [detection]
 
         for detection in listOfFaceDetection:
-            assert isinstance(detection, self.__class__.detectionClass), f"{detection.__class__} is not {FaceDetection}"
+            assert isinstance(detection, self.__class__.detectionClass), (
+                f"{detection.__class__} is not " f"{self.__class__.detectionClass}"
+            )
             assert detection.image == imageVl, "Detection image does not match VLImage"
             self.assertBoundingBox(detection.boundingBox)
 
@@ -104,7 +106,7 @@ class HumanDetectTestClass(BaseDetectorTestClass):
             imageVl: class image
         """
         if isinstance(detection, list):
-            listOfFaceDetection = [faceDetection for faceDetection in detection]
+            listOfFaceDetection = detection
         else:
             listOfFaceDetection = [detection]
 
@@ -173,7 +175,7 @@ class FaceDetectTestClass(BaseDetectorTestClass):
             imageVl: class image
         """
         if isinstance(detection, list):
-            listOfFaceDetection = [faceDetection for faceDetection in detection]
+            listOfFaceDetection = detection
         else:
             listOfFaceDetection = [detection]
 

@@ -1,7 +1,7 @@
 """
 Module realize simple examples following features:
-    * redect one human detection
-    * redect several humans
+    * redetect one human detection
+    * redetect several humans
 """
 import pprint
 
@@ -14,7 +14,7 @@ from resources import EXAMPLE_SEVERAL_FACES, EXAMPLE_O
 
 def detectHumans():
     """
-    Redect human body on images.
+    Redetect human body on images.
     """
     faceEngine = VLFaceEngine()
     detector = faceEngine.createHumanDetector()

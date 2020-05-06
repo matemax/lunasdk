@@ -27,7 +27,7 @@ def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
     """
     Create core faces for redetection
     Args:
-        image: image and bounding boxes for redection
+        image: image and bounding boxes for redetection
     Returns:
         Face object list. one object for one bbox
     """
