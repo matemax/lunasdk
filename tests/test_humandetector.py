@@ -147,7 +147,7 @@ class TestHumanDetector(HumanDetectTestClass):
         detection = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE])
         self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
         assert 1 == len(detection)
-        assert 5 == len(detection[0]), f"Excepted 5 bodies, got {len(detection[0)}"
+        assert 5 == len(detection[0]), f"Excepted 5 bodies, got {len(detection[0])}"
 
     def test_batch_detect_of_multiple_images(self):
         """

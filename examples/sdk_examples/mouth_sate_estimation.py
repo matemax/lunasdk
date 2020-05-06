@@ -17,7 +17,7 @@ def estimateMouthState():
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
-    warper = faceEngine.createWarper()
+    warper = faceEngine.createFaceWarper()
     warp = warper.warp(faceDetection)
 
     emotionEstimator = faceEngine.createMouthEstimator()

@@ -54,7 +54,7 @@ class HumanDescriptorEstimator(BaseEstimator):
             descriptorFactory=self.descriptorFactory,
             coreEstimator=self._coreEstimator,
         )
-        return outputDescriptor
+        return outputDescriptor  # type: ignore
 
     @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
@@ -79,7 +79,7 @@ class HumanDescriptorEstimator(BaseEstimator):
         """
         batch = estimateDescriptorsBatch(
             warps=warps,
-            descriptorFactory=self.descriptorFactory,
+            descriptorFactory=self.descriptorFactory,  # type: ignore
             aggregate=aggregate,
             descriptorBatch=descriptorBatch,
             coreEstimator=self._coreEstimator,

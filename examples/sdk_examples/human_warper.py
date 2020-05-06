@@ -10,7 +10,7 @@ from resources import EXAMPLE_O
 
 def createWarp():
     """
-    Create warp from detection.
+    Create human body warp from human detection.
 
     """
     faceEngine = VLFaceEngine()

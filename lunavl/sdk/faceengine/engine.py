@@ -113,9 +113,9 @@ class VLFaceEngine:
         """
         return WarpQualityEstimator(self._faceEngine.createQualityEstimator())
 
-    def createWarper(self) -> FaceWarper:
+    def createFaceWarper(self) -> FaceWarper:
         """
-        Create warper, `see <warping.html>`_:
+        Create face warper, `see <warping.html>`_:
 
         Returns:
             warper.

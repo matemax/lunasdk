@@ -42,7 +42,7 @@ def estimate(
 
 
 def estimateDescriptorsBatch(
-    warps: List[Union[HumanWarp, HumanWarpedImage, FaceWarp, FaceWarpedImage]],
+    warps: Union[List[Union[HumanWarp, HumanWarpedImage]], List[Union[FaceWarp, FaceWarpedImage]]],
     descriptorFactory: Type[BaseDescriptorFactory],
     coreEstimator: IDescriptorExtractorPtr,
     aggregate: bool = False,

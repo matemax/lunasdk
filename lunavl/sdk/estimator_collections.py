@@ -95,7 +95,7 @@ class FaceEstimatorsCollection:
         self._headPoseEstimator: Union[None, HeadPoseEstimator] = None
         self._AGSEstimator: Union[None, AGSEstimator] = None
         self._descriptorEstimator: Union[None, FaceDescriptorEstimator] = None
-        self.warper: FaceWarper = self._faceEngine.createWarper()
+        self.warper: FaceWarper = self._faceEngine.createFaceWarper()
 
         if startEstimators:
             for estimator in set(startEstimators):
@@ -402,7 +402,7 @@ class FaceEstimatorsCollection:
                 continue
             if getattr(self, estimatorName) is not None:
                 self.initEstimator(FaceEstimatorsCollection._getEstimatorByAttributeName(estimatorName))
-        self.warper = self._faceEngine.createWarper()
+        self.warper = self._faceEngine.createFaceWarper()
 
     def removeEstimator(self, estimator: FaceEstimator) -> None:
         """

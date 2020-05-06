@@ -19,8 +19,7 @@ class HumanWarpedImage(VLImage):
     Properties of a warped image:
 
         - it's always in RGB color format
-        - it always contains just a single face
-        - the face is always centered and rotated so that imaginary line between the eyes is horizontal.
+        - it always contains just a single human body
     """
 
     def __init__(
@@ -61,7 +60,7 @@ class HumanWarpedImage(VLImage):
     @classmethod
     def load(cls, *, filename: Optional[str] = None, url: Optional[str] = None) -> "HumanWarpedImage":  # type: ignore
         """
-        Load imag from numpy array or file or url.
+        Load image from numpy array or file or url.
 
         Args:
             filename: filename
@@ -90,7 +89,7 @@ class HumanWarp:
 
     Attributes:
         sourceDetection (HumanDetection): detection which generated warp
-        warpedImage (FaceWarpedImage):
+        warpedImage (HumanWarpedImage):  warped image
     """
 
     __slots__ = ["sourceDetection", "warpedImage"]
@@ -132,7 +131,7 @@ class HumanWarper:
         Create warp from detection.
 
         Args:
-            humanDetection: face detection with landmarks5
+            humanDetection: human body detection with landmarks5
 
         Returns:
             Warp

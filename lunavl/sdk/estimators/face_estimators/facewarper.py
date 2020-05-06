@@ -64,7 +64,7 @@ class FaceWarpedImage(VLImage):
     @classmethod
     def load(cls, *, filename: Optional[str] = None, url: Optional[str] = None) -> "FaceWarpedImage":  # type: ignore
         """
-        Load imag from numpy array or file or url.
+        Load image from numpy array or file or url.
 
         Args:
             filename: filename

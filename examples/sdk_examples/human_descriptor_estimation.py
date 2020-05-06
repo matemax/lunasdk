@@ -10,7 +10,7 @@ from resources import EXAMPLE_O
 
 def estimateDescriptor():
     """
-    Estimate face descriptor.
+    Estimate human descriptor.
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()

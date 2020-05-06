@@ -11,7 +11,7 @@ from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.descriptors.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap
-from lunavl.sdk.estimators.base import BaseEstimator
+from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
@@ -54,7 +54,7 @@ class FaceDescriptorEstimator(BaseEstimator):
             descriptorFactory=self.descriptorFactory,
             coreEstimator=self._coreEstimator,
         )
-        return outputDescriptor
+        return outputDescriptor  # type: ignore
 
     @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
@@ -79,7 +79,7 @@ class FaceDescriptorEstimator(BaseEstimator):
         """
         batch = estimateDescriptorsBatch(
             warps=warps,
-            descriptorFactory=self.descriptorFactory,
+            descriptorFactory=self.descriptorFactory,  # type: ignore
             aggregate=aggregate,
             descriptorBatch=descriptorBatch,
             coreEstimator=self._coreEstimator,

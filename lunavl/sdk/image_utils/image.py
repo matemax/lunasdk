@@ -185,7 +185,7 @@ class VLImage:
     ) -> "VLImage":
 
         """
-        Load imag from numpy array or file or url.
+        Load image from numpy array or file or url.
 
         Args:
             *: for positional argument removal

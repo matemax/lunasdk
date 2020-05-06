@@ -23,7 +23,7 @@ class TestMouthEstimation(FaceDetectTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.warper = cls.faceEngine.createWarper()
+        cls.warper = cls.faceEngine.createFaceWarper()
         cls.mouthEstimator = cls.faceEngine.createMouthEstimator()
         CaseWarp = namedtuple("CaseWarp", ("warp", "detector"))
         cls.warpList = []
