@@ -1,3 +1,4 @@
+"""Common descriptor extractor utils"""
 from typing import Optional, Union, List, Tuple, Type
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
