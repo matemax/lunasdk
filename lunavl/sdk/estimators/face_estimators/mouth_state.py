@@ -8,9 +8,9 @@ from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class MouthStates(BaseEstimation):

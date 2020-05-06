@@ -14,11 +14,11 @@ from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimati
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.base import BaseEstimation, Landmarks
 from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
 
-from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class EyeState(Enum):

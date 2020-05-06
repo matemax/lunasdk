@@ -2,8 +2,8 @@ from typing import Optional, Union, List, Tuple, Type
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarp, HumanWarpedImage
-from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory, BaseDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
