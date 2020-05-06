@@ -3,6 +3,8 @@ Test estimate descriptor.
 """
 import unittest
 
+import pytest
+
 from lunavl.sdk.estimators.face_estimators.warper import WarpedImage
 from lunavl.sdk.faceengine.descriptors import FaceDescriptor, FaceDescriptorBatch
 from tests.base import BaseTestClass
@@ -159,6 +161,7 @@ class TestEstimateDescriptor(BaseTestClass):
                 except RuntimeError as e:
                     raise AssertionError(f"Descriptor version {planVersion} is not supported. But must be.") from e
 
+    @pytest.mark.skip("need support 57 version")
     def test_create_estimators_negative(self):
         """
         Test create estimators of different nonexistent plan versions.
