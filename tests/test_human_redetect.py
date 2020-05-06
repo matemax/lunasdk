@@ -34,7 +34,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         Test re-detection of one human with detection options
         """
         detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE)
-        redetect = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, detection=detection)
+        redetect = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection)
         self.assertHumanDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect_with_one_human(self):
@@ -60,9 +60,10 @@ class TestsRedetectHuman(HumanDetectTestClass):
                 ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[detectSeveral[0][0].boundingBox.rect]),
             ]
         )
+
+        assert 2 == len(redetect)
         self.assertHumanDetection(redetect[0], VLIMAGE_SEVERAL_FACE)
         self.assertHumanDetection(redetect[1], VLIMAGE_ONE_FACE)
-        assert 2 == len(redetect)
         assert 5 == len(redetect[0])
         assert 1 == len(redetect[1])
 
@@ -74,8 +75,8 @@ class TestsRedetectHuman(HumanDetectTestClass):
         redetect = self.detector.redetect(
             images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)])]
         )[0][0]
-        assert redetectOne is None
-        assert redetect is None
+        assert redetectOne is None, "excepted None but found {}".format(redetectOne)
+        assert redetect is None, "excepted None but found {}".format(redetectOne)
 
     def test_redetect_one_invalid_rectangle(self):
         """
@@ -98,14 +99,6 @@ class TestsRedetectHuman(HumanDetectTestClass):
             )
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
-    def test_redetect_one_without_detection_and_bbox(self):
-        """
-        Test re-detection of one human without bounding box and human detection
-        """
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.detector.redetectOne(image=VLIMAGE_ONE_FACE)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.DetectHumansError)
-
     @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):
         """
@@ -115,7 +108,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
 
     def test_match_redetect_one_image(self):
         """
-            Test match of values at different re-detections (redetectOne and redetect) with one image
+        Test match of values at different re-detections (redetectOne and redetect) with one image
         """
         for image in (VLIMAGE_ONE_FACE, VLIMAGE_SMALL):
             bBoxRect = self.detector.detectOne(image=image).boundingBox.rect

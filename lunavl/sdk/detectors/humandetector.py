@@ -1,7 +1,7 @@
 """
 Module contains function for detection human bodies on images.
 """
-from typing import Optional, Union, List, Dict, Any, overload
+from typing import Optional, Union, List, Dict, Any
 
 from FaceEngine import HumanDetectionType, Human  # pylint: disable=E0611,E0401
 from FaceEngine import HumanLandmarks17 as CoreLandmarks17  # pylint: disable=E0611,E0401
@@ -172,19 +172,9 @@ class HumanDetector:
             res.append([HumanDetection(coreDetection, image) for coreDetection in imageDetections])
         return res
 
-    @overload
-    def redetectOne(self, image: VLImage, *, bBox: Optional[Rect]) -> Union[None, HumanDetection]:  # noqa: F811
-        ...
-
-    @overload
-    def redetectOne(  # noqa: F811
-        self, image: VLImage, *, detection: Optional[HumanDetection]
-    ) -> Union[None, HumanDetection]:
-        ...
-
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetectOne(  # noqa: F811
-        self, image: VLImage, *, bBox: Optional[Rect] = None, detection: Optional[HumanDetection] = None
+        self, image: VLImage, bBox: Union[Rect, HumanDetection]
     ) -> Union[None, HumanDetection]:
         """
         Redetect human body on an image in area, restricted with image.bBox, bBox or detection.
@@ -192,20 +182,18 @@ class HumanDetector:
         Args:
             image: image with a bounding box, or just VLImage. If VLImage provided, one of bBox or detection
                 should be defined.
-            bBox: bounding box
-            detection: core detection
+            bBox: detection bounding box
 
         Returns:
             detection if human body found otherwise None
         Raises:
             LunaSDKException if an error occurs
         """
-        if (bBox is not None) and (detection is None):
+        if isinstance(bBox, Rect):
             area = bBox
-        elif (bBox is None) and (detection is not None):
-            area = detection.boundingBox.rect
         else:
-            raise NotImplementedError
+            area = bBox.boundingBox.rect
+
         human = _createCoreHumans(ImageForRedetection(image, [area]))[0]
         error, detectRes = self._detector.redetectOne(human)
 
