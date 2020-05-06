@@ -175,7 +175,7 @@ class LandmarksWithScore(BaseEstimation):
         """
         if self._points is None:
             self._points = tuple(
-                (LandmarkWithScore(self._coreEstimation[index]) for index in range(len(self._coreEstimation)))
+                LandmarkWithScore(self._coreEstimation[index]) for index in range(len(self._coreEstimation))
             )
         return self._points
 
