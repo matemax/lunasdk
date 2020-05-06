@@ -21,7 +21,7 @@ def detectHumans():
 
     imageWithOneHuman = VLImage.load(filename=EXAMPLE_O)
     detection = detector.detectOne(imageWithOneHuman, detectLandmarks=False)
-    pprint.pprint(detector.redetectOne(image=imageWithOneHuman, detection=detection))
+    pprint.pprint(detector.redetectOne(image=imageWithOneHuman, bBox=detection))
     pprint.pprint(detector.redetectOne(image=imageWithOneHuman, bBox=detection.boundingBox.rect))
 
     imageWithSeveralHumans = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)

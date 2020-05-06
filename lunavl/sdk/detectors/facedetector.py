@@ -1,7 +1,7 @@
 """
 Module contains function for detection faces on images.
 """
-from typing import Optional, Union, List, Dict, Any, overload
+from typing import Optional, Union, List, Dict, Any
 
 from FaceEngine import DetectionFloat  # pylint: disable=E0611,E0401
 from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
@@ -225,32 +225,9 @@ class FaceDetector:
 
         return res
 
-    @overload
-    def redetectOne(  # noqa: F811
-        self, image: VLImage, *, bBox: Optional[Rect], detect5Landmarks: bool = True, detect68Landmarks: bool = False
-    ) -> DetectionFloat:
-        ...
-
-    @overload
-    def redetectOne(  # noqa: F811
-        self,
-        image: VLImage,
-        *,
-        detection: Optional[FaceDetection],
-        detect5Landmarks: bool = True,
-        detect68Landmarks: bool = False,
-    ) -> DetectionFloat:
-        ...
-
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetectOne(  # noqa: F811
-        self,
-        image: VLImage,
-        *,
-        bBox: Optional[Rect] = None,
-        detection: Optional[FaceDetection] = None,
-        detect5Landmarks=True,
-        detect68Landmarks=False,
+        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False,
     ) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
@@ -258,8 +235,7 @@ class FaceDetector:
         Args:
             image: image with a bounding box, or just VLImage. If VLImage provided, one of bBox or detection
                 should be defined.
-            bBox: bounding box
-            detection: core detection
+            bBox: detection bounding box
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
 
@@ -269,15 +245,12 @@ class FaceDetector:
             LunaSDKException if an error occurs
         """
         assertImageForDetection(image)
-        if (bBox is not None) and (detection is None):
-            bBox = bBox.coreRectF
-        elif (bBox is None) and (detection is not None):
-            bBox = detection.coreEstimation.detection.rect
+        if isinstance(bBox, Rect):
+            coreBBox = bBox.coreRectF
         else:
-            raise NotImplementedError
-
+            coreBBox = bBox.coreEstimation.detection.rect
         error, detectRes = self._detector.redetectOne(
-            image.coreImage, bBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+            image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
         assertError(error)
         if detectRes.isValid():

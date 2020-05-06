@@ -34,7 +34,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         Test re-detection of one human with detection options
         """
         detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE)
-        redetect = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, detection=detection)
+        redetect = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection)
         self.assertHumanDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect_with_one_human(self):
@@ -97,14 +97,6 @@ class TestsRedetectHuman(HumanDetectTestClass):
                 ]
             )
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
-
-    def test_redetect_one_without_detection_and_bbox(self):
-        """
-        Test re-detection of one human without bounding box and human detection
-        """
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.detector.redetectOne(image=VLIMAGE_ONE_FACE)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.DetectHumansError)
 
     @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):

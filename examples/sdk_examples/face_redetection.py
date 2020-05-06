@@ -23,7 +23,7 @@ def detectFaces():
     imageWithOneFace = VLImage.load(filename=EXAMPLE_O)
     pprint.pprint(detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False).asDict())
     detection = detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False)
-    pprint.pprint(detector.redetectOne(image=imageWithOneFace, detection=detection))
+    pprint.pprint(detector.redetectOne(image=imageWithOneFace, bBox=detection))
     pprint.pprint(detector.redetectOne(image=imageWithOneFace, bBox=detection.boundingBox.rect))
 
     imageWithSeveralFaces = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)

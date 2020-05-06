@@ -37,7 +37,7 @@ class TestsRedetectFace(FaceDetectTestClass):
                         detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE)
                         redetect = detector.redetectOne(
                             image=VLIMAGE_ONE_FACE,
-                            detection=detectOne,
+                            bBox=detectOne,
                             detect68Landmarks=case.detect68Landmarks,
                             detect5Landmarks=case.detect5Landmarks,
                         )
@@ -80,7 +80,7 @@ class TestsRedetectFace(FaceDetectTestClass):
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 detection = detector.detectOne(image=VLIMAGE_ONE_FACE)
-                redetect = detector.redetectOne(image=VLIMAGE_ONE_FACE, detection=detection)
+                redetect = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection)
                 self.assertFaceDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect_with_one_face(self):
@@ -148,16 +148,6 @@ class TestsRedetectFace(FaceDetectTestClass):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[INVALID_RECT])])
                 self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Unknown error"))
-
-    def test_redetect_one_without_detection_and_bbox(self):
-        """
-        Test re-detection of one face without bounding box and face detection
-        """
-        for detector in self.detectors:
-            with self.subTest(detectorType=detector.detectorType):
-                with pytest.raises(LunaSDKException) as exceptionInfo:
-                    detector.redetectOne(image=VLIMAGE_ONE_FACE)
-                self.assertLunaVlError(exceptionInfo, LunaVLError.DetectFacesError)
 
     @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):
