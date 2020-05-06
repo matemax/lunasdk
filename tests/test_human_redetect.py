@@ -108,7 +108,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
 
     def test_match_redetect_one_image(self):
         """
-            Test match of values at different re-detections (redetectOne and redetect) with one image
+        Test match of values at different re-detections (redetectOne and redetect) with one image
         """
         for image in (VLIMAGE_ONE_FACE, VLIMAGE_SMALL):
             bBoxRect = self.detector.detectOne(image=image).boundingBox.rect
