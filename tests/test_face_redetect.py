@@ -126,8 +126,8 @@ class TestsRedetectFace(FaceDetectTestClass):
                 redetect = detector.redetect(
                     images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)])]
                 )[0][0]
-                assert redetectOne is None
-                assert redetect is None
+                assert redetectOne is None, "excepted None but found {}".format(redetectOne)
+                assert redetect is None, "excepted None but found {}".format(redetectOne)
 
     def test_redetect_one_invalid_rectangle(self):
         """
@@ -190,7 +190,7 @@ class TestsRedetectFace(FaceDetectTestClass):
                     self.assertFaceDetection(redetectOne, VLIMAGE_ONE_FACE)
                 else:
                     redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
-                    assert redetectOne is None
+                    assert redetectOne is None, "excepted None but found {}".format(redetectOne)
 
     def test_batch_redetect_in_area_outside_image(self):
         """

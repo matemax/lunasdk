@@ -174,7 +174,7 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetectOne(  # noqa: F811
-        self, image: VLImage, bBox: Union[Rect, HumanDetection],
+        self, image: VLImage, bBox: Union[Rect, HumanDetection]
     ) -> Union[None, HumanDetection]:
         """
         Redetect human body on an image in area, restricted with image.bBox, bBox or detection.

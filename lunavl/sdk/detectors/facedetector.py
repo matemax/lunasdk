@@ -227,7 +227,7 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetectOne(  # noqa: F811
-        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False,
+        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
     ) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
