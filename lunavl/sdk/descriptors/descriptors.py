@@ -96,7 +96,7 @@ class BaseDescriptor(BaseEstimation):
 
 class BaseDescriptorBatch(BaseEstimation):
     """
-    Face descriptor batch.
+    Base descriptor batch.
 
     Attributes:
         scores (List[float]):  list of garbage scores
@@ -162,7 +162,7 @@ class BaseDescriptorBatch(BaseEstimation):
             iterator by descriptors.
         """
         for index in range(len(self)):
-            yield self.__class__._descriptorFactory(self._coreEstimation.getDescriptorFast(index), self.scores[index])
+            yield self._descriptorFactory(self._coreEstimation.getDescriptorFast(index), self.scores[index])
 
     def append(self, descriptor: BaseDescriptor) -> None:
         """
@@ -191,7 +191,7 @@ class BaseDescriptorBatch(BaseEstimation):
 
 class BaseDescriptorFactory:
     """
-    Face Descriptor factory.
+    Base Descriptor factory.
 
     Attributes:
         _faceEngine (VLFaceEngine): faceEngine

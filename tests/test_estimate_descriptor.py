@@ -23,7 +23,6 @@ from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from tests.base import BaseTestClass
 from tests.resources import WARP_WHITE_MAN, HUMAN_WARP
 
-# from unittest.case import _SubTest
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
 
@@ -91,7 +90,7 @@ class TestDescriptorFunctionality(BaseTestClass):
         self,
     ) -> Generator[Tuple[ContextManager[None], DescriptorCase], Tuple[ContextManager[None], DescriptorCase], None]:
         """
-        Generator for sub tests from root and user
+        Generator for sub tests for human descriptor and face descriptor.
         """
         for descriptorType in DescriptorType:
 
@@ -303,7 +302,7 @@ class TestEstimateDescriptor(BaseTestClass):
                             case.extractorFactory(descriptorVersion=planVersion)
                         except RuntimeError as e:
                             raise AssertionError(
-                                f"Descriptor version {planVersion} i" f"s not supported. But must be."
+                                f"Descriptor version {planVersion} is not supported. But must be."
                             ) from e
 
     @pytest.mark.skip("need support 57 version")

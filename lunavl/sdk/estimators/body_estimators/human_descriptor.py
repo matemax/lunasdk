@@ -37,7 +37,7 @@ class HumanDescriptorEstimator(BaseEstimator):
         self, warp: Union[HumanWarp, HumanWarpedImage], descriptor: Optional[HumanDescriptor] = None
     ) -> HumanDescriptor:
         """
-        Estimate face descriptor from a warp image.
+        Estimate human descriptor from a warp image.
 
         Args:
             warp: warped image
@@ -68,11 +68,11 @@ class HumanDescriptorEstimator(BaseEstimator):
 
         Args:
             warps: warped images
-            aggregate:  whether to estimate  aggregate descriptor or not
+            aggregate: whether to estimate an aggregated descriptor or not
             descriptorBatch: optional batch for saving descriptors
 
         Returns:
-            tuple of batch and the aggregate descriptors (or None)
+            tuple with a batch and a aggregated descriptor (or None)
         Raises:
             LunaSDKException: if estimation failed
 
