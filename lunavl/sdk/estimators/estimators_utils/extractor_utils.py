@@ -17,7 +17,7 @@ def estimate(
     descriptor: Optional[BaseDescriptor] = None,
 ) -> BaseDescriptor:
     """
-    Estimate face descriptor from a warp image.
+    Estimate a face descriptor or a human descriptor from the warped image.
 
     Args:
         warp: warped image
