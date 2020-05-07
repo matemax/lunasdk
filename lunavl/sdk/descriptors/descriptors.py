@@ -191,7 +191,7 @@ class BaseDescriptorBatch(BaseEstimation):
 
 class BaseDescriptorFactory:
     """
-    Face Descriptor factory.
+    Base Descriptor factory.
 
     Attributes:
         _faceEngine (VLFaceEngine): faceEngine
