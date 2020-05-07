@@ -303,7 +303,7 @@ class TestEstimateDescriptor(BaseTestClass):
                             case.extractorFactory(descriptorVersion=planVersion)
                         except RuntimeError as e:
                             raise AssertionError(
-                                f"Descriptor version {planVersion} i" f"s not supported. But must be."
+                                f"Descriptor version {planVersion} is not supported. But must be."
                             ) from e
 
     @pytest.mark.skip("need support 57 version")
