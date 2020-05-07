@@ -9,7 +9,7 @@ from FaceEngine import IDescriptorMatcherPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
-from lunavl.sdk.faceengine.descriptors import FaceDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import FaceDescriptorFactory
 
 
 class MatchingResult:

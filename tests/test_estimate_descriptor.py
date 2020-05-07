@@ -2,107 +2,222 @@
 Test estimate descriptor.
 """
 import unittest
+from enum import Enum
+from typing import Tuple, Generator, NamedTuple, Callable, List, Union, ContextManager
 
-import pytest
-
-from lunavl.sdk.estimators.face_estimators.warper import WarpedImage
-from lunavl.sdk.faceengine.descriptors import FaceDescriptor, FaceDescriptorBatch
+from lunavl.sdk.descriptors.descriptors import (
+    FaceDescriptor,
+    BaseDescriptor,
+    BaseDescriptorBatch,
+    HumanDescriptor,
+    FaceDescriptorBatch,
+    HumanDescriptorBatch,
+)
+from lunavl.sdk.estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
+from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarpedImage
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
+from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from tests.base import BaseTestClass
-from tests.resources import WARP_WHITE_MAN
+from tests.resources import WARP_WHITE_MAN, HUMAN_WARP
 
-EDVa = EXISTENT_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
+EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
 
-warp = WarpedImage.load(filename=WARP_WHITE_MAN)
-warps = [warp] * 3
+EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [DHDV]
+
+
+class DescriptorType(Enum):
+    face = "face"
+    human = "human"
+
+
+faceWarp = FaceWarpedImage.load(filename=WARP_WHITE_MAN)
+faceWarps = [faceWarp] * 3
+humanWarp = HumanWarpedImage.load(filename=HUMAN_WARP)
+humanWarps = [humanWarp] * 3
+
+
+class DescriptorCase(NamedTuple):
+    descriptor: BaseDescriptor
+    aggregatedDescriptor: BaseDescriptor
+    descriptorBatch: BaseDescriptorBatch
+    type: DescriptorType
+    estimator: Union[FaceDescriptorEstimator, HumanDescriptorEstimator]
+
+
+class ExtractorCase(NamedTuple):
+    type: DescriptorType
+    extractorFactory: Callable
+    versions: List[int]
+    warps: Union[List[HumanWarpedImage], List[FaceWarpedImage]]
 
 
 class TestDescriptorFunctionality(BaseTestClass):
-    version = EDVa[0]
-    _estimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(version)
-    descriptor = _estimator.estimate(warp)
-    descriptorBatch, aggregatedDescriptor = _estimator.estimateDescriptorsBatch(warps, aggregate=True)
+    faceDescriptorVersion: int = EFDVa[0]
+    faceEstimator: FaceDescriptorEstimator
+    faceDescriptor: FaceDescriptor
+    faceDescriptorBatch: FaceDescriptorBatch
+    aggregatedFaceDescriptor: FaceDescriptor
 
-    def assertDescriptor(self, descriptor: FaceDescriptor):
+    humanDescriptorVersion: int = EHDVa[0]
+    humanEstimator: HumanDescriptorEstimator
+    humanDescriptor: HumanDescriptor
+    humanDescriptorBatch: HumanDescriptorBatch
+    aggregatedHumanDescriptor: HumanDescriptor
+
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+        cls.faceEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(cls.faceDescriptorVersion)
+        cls.faceDescriptor = cls.faceEstimator.estimate(faceWarp)
+        estimator = cls.faceEstimator
+        cls.faceDescriptorBatch, cls.aggregatedFaceDescriptor = estimator.estimateDescriptorsBatch(
+            faceWarps, aggregate=True
+        )
+
+        cls.humanDescriptorVersion = EHDVa[0]
+        estimator = BaseTestClass.faceEngine.createHumanDescriptorEstimator(cls.humanDescriptorVersion)
+        cls.humanEstimator = estimator
+        cls.humanDescriptor = cls.humanEstimator.estimate(humanWarp)
+        cls.humanDescriptorBatch, cls.aggregatedHumanDescriptor = estimator.estimateDescriptorsBatch(
+            humanWarps, aggregate=True
+        )
+
+    def descriptorSubTest(
+        self,
+    ) -> Generator[Tuple[ContextManager[None], DescriptorCase], Tuple[ContextManager[None], DescriptorCase], None]:
+        """
+        Generator for sub tests for human descriptor and face descriptor.
+        """
+        for descriptorType in DescriptorType:
+
+            subTest = self.subTest(descriptorType=descriptorType)
+            if descriptorType == DescriptorType.human:
+                descriptor: BaseDescriptor = self.humanDescriptor
+                aggregatedDescriptor: BaseDescriptor = self.aggregatedHumanDescriptor
+                descriptorBatch: BaseDescriptorBatch = self.humanDescriptorBatch
+                estimator: Union[HumanDescriptorEstimator, FaceDescriptorEstimator] = self.humanEstimator
+            else:
+                descriptor = self.faceDescriptor
+                aggregatedDescriptor = self.aggregatedFaceDescriptor
+                descriptorBatch = self.faceDescriptorBatch
+                estimator = self.faceEstimator
+            yield subTest, DescriptorCase(descriptor, aggregatedDescriptor, descriptorBatch, descriptorType, estimator)
+
+    def assertDescriptor(self, descriptor: BaseDescriptor, descriptorType: DescriptorType):
         """
         Assert descriptor format.
 
         Args:
             descriptor: descriptor to assert
+            descriptorType: descriptor Type
         """
         binaryDesc = descriptor.asBytes
-        self.assertTrue(0.0 <= descriptor.garbageScore <= 1.0, descriptor.garbageScore)
-        self.assertEqual(self.version, descriptor.model)
-        self.assertEqual(list(binaryDesc), descriptor.asVector)
-        self.assertEqual(b"dp\x00\x00" + self.version.to_bytes(4, "little") + binaryDesc, descriptor.rawDescriptor)
+        assert 0.0 <= descriptor.garbageScore <= 1.0, descriptor.garbageScore
+        assert list(binaryDesc) == descriptor.asVector
+        if descriptorType == DescriptorType.face:
+            version = self.faceDescriptorVersion
+        else:
+            version = self.humanDescriptorVersion
+
+        assert version == descriptor.model
+        assert b"dp\x00\x00" + version.to_bytes(4, "little") + binaryDesc == descriptor.rawDescriptor
 
     def test_descriptor_methods(self):
         """
         Test a descriptor.
         """
-        self.assertDescriptor(self.descriptor)
+        for subTest, case in self.descriptorSubTest():
+            with subTest:
+                self.assertDescriptor(case.descriptor, case.type)
 
     def test_replaced_descriptor_methods(self):
         """
         Test a replaced descriptor.
         """
-        gs = 0.777
-        rawBinaryDesc = self.descriptor.rawDescriptor
-        binaryDesc = rawBinaryDesc[8:]
-        descriptor: FaceDescriptor = self._estimator.descriptorFactory.generateDescriptor()
+        for subTest, case in self.descriptorSubTest():
+            with subTest:
+                gs = 0.777
+                rawBinaryDesc = case.descriptor.rawDescriptor
+                binaryDesc = rawBinaryDesc[8:]
+                descriptor = case.estimator.descriptorFactory.generateDescriptor()
+                descriptor.reload(rawBinaryDesc, garbageScore=gs)
 
-        descriptor.reload(rawBinaryDesc, garbageScore=gs)
-
-        self.assertDescriptor(descriptor)
-        self.assertEqual(binaryDesc, descriptor.asBytes)
-        self.assertEqual(rawBinaryDesc, descriptor.rawDescriptor)
-        self.assertEqual(gs, descriptor.garbageScore)
+                self.assertDescriptor(descriptor, case.type)
+                assert binaryDesc == descriptor.asBytes
+                assert rawBinaryDesc == descriptor.rawDescriptor
+                assert gs == descriptor.garbageScore
 
     def test_aggregated_descriptor_methods(self):
         """
         Test aggregated method.
         """
-        self.assertDescriptor(self.aggregatedDescriptor)
+        for subTest, case in self.descriptorSubTest():
+            with subTest:
+                self.assertDescriptor(case.aggregatedDescriptor, case.type)
 
     def test_descriptor_batch_methods(self):
         """
         Test descriptor batch methods.
         """
-        with self.subTest("__getitem__"):
-            for idx in range(len(warps)):
-                descr = self.descriptorBatch[idx]
-                self.assertDescriptor(descr)
+        for subTest, case in self.descriptorSubTest():
+            with subTest:
+                with self.subTest("__getitem__"):
+                    for idx in range(len(faceWarps)):
+                        descr = case.descriptorBatch[idx]
+                        self.assertDescriptor(descr, case.type)
 
-        with self.subTest("__len__"):
-            self.assertEqual(len(warps), len(self.descriptorBatch))
+                if case.type == DescriptorType.face:
+                    sourceWarp = faceWarps
+                else:
+                    sourceWarp = humanWarps
 
-        with self.subTest("__iter__"):
-            descriptors = list(self.descriptorBatch)
-            self.assertEqual(len(warps), len(descriptors))
+                assert len(sourceWarp) == len(case.descriptorBatch)
+
+                descriptors = list(case.descriptorBatch)
+                assert len(sourceWarp) == len(descriptors)
 
     def test_descriptor_batch_methods_bad(self):
         """
         Test descriptor batch methods bad.
         """
-        maxLength = 2
-        descriptorBatch = self._estimator.descriptorFactory.generateDescriptorsBatch(maxLength, self.version)
-        descriptorBatch.append(self.descriptor)
-        for name, idx in (("empty", 1), ("nonexistent", 3)):
-            with self.subTest(name=name):
-                with self.assertRaises(IndexError) as e:
-                    descriptorBatch[idx]
-                self.assertIn(str(idx), e.exception.args[0])
+        for subTest, case in self.descriptorSubTest():
+            with subTest:
+
+                maxLength = 2
+
+                descriptorFactory = case.estimator.descriptorFactory
+                if case.type == DescriptorType.face:
+                    descriptorBatch = descriptorFactory.generateDescriptorsBatch(maxLength, self.faceDescriptorVersion)
+                else:
+                    descriptorBatch = descriptorFactory.generateDescriptorsBatch(maxLength)
+
+                descriptorBatch.append(case.descriptor)
+                for name, idx in (("empty", 1), ("nonexistent", 3)):
+                    with self.subTest(name=name):
+                        with self.assertRaises(IndexError) as e:
+                            descriptorBatch[idx]
+                        assert str(idx) in e.exception.args[0]
 
     def test_descriptor_batch_append(self):
         """
         Test descriptor batch append.
         """
-        maxLength = 3
-        descriptorBatch = self._estimator.descriptorFactory.generateDescriptorsBatch(maxLength, self.version)
-        self.assertEqual(0, len(descriptorBatch))
-        for idx in range(maxLength):
-            with self.subTest(idx):
-                descriptorBatch.append(self.aggregatedDescriptor)
-                self.assertEqual(idx + 1, len(descriptorBatch))
+        for subTest, case in self.descriptorSubTest():
+            with subTest:
+
+                maxLength = 3
+                descriptorFactory = case.estimator.descriptorFactory
+                if case.type == DescriptorType.face:
+                    descriptorBatch = descriptorFactory.generateDescriptorsBatch(maxLength, self.faceDescriptorVersion)
+                else:
+                    descriptorBatch = descriptorFactory.generateDescriptorsBatch(maxLength)
+
+                assert 0 == len(descriptorBatch)
+                for idx in range(maxLength):
+                    with self.subTest(idx):
+                        descriptorBatch.append(case.aggregatedDescriptor)
+                        assert idx + 1 == len(descriptorBatch)
 
 
 class TestEstimateDescriptor(BaseTestClass):
@@ -110,135 +225,184 @@ class TestEstimateDescriptor(BaseTestClass):
     Test estimate descriptor.
     """
 
-    def assertDescriptor(self, expectedVersion: int, descriptor: FaceDescriptor) -> None:
+    cases: Tuple[ExtractorCase, ExtractorCase]
+
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+        cls.cases = (
+            ExtractorCase(DescriptorType.face, cls.faceEngine.createFaceDescriptorEstimator, EFDVa, faceWarps),
+            ExtractorCase(DescriptorType.human, cls.faceEngine.createHumanDescriptorEstimator, EHDVa, humanWarps),
+        )
+
+    @staticmethod
+    def assertDescriptor(expectedVersion: int, descriptor: BaseDescriptor, descriptorType: DescriptorType) -> None:
         """
         Assert extracted descriptor.
 
         Args:
             expectedVersion: expected descriptor version
             descriptor: extracted descriptor
+            descriptorType: descriptor type
         """
-        self.assertIsInstance(descriptor, FaceDescriptor)
-        self.assertEqual(descriptor.model, expectedVersion, "descriptor has wrong version")
-        length = {46: 256, 52: 256, 54: 512, 56: 512}[expectedVersion]
-        self.assertEqual(length, len(descriptor.asBytes))
-        self.assertEqual(length, len(descriptor.asVector))
-        self.assertEqual(length + 8, len(descriptor.rawDescriptor))
+        if descriptorType == DescriptorType.face:
+            assert isinstance(descriptor, FaceDescriptor)
+        else:
+            assert isinstance(descriptor, HumanDescriptor)
+        assert descriptor.model == expectedVersion, "descriptor has wrong version"
+        length = {46: 256, 52: 256, 54: 512, 56: 512, 101: 2048}[expectedVersion]
+        assert length == len(descriptor.asBytes)
+        assert length == len(descriptor.asVector)
+        assert length + 8 == len(descriptor.rawDescriptor)
 
-    def getDescr(self, planVersion) -> FaceDescriptor:
+    def getDescr(self, planVersion, descriptorType: DescriptorType) -> BaseDescriptor:
         """
         Get some descriptor.
 
         Args:
             planVersion: version of descriptor
-
+            descriptorType: descriptor type
         Returns:
             descriptor
         """
-        return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptor()
+        if descriptorType == DescriptorType.face:
+            return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptor()
+        else:
+            return self.faceEngine.createHumanDescriptorFactory(planVersion).generateDescriptor()
 
-    def getBatch(self, planVersion, size) -> FaceDescriptorBatch:
+    def getBatch(self, planVersion, size, descriptorType: DescriptorType) -> BaseDescriptorBatch:
         """
         Get some descriptor batch.
 
         Args:
             planVersion: version of descriptor batch
             size: number of descriptors in batch
-
+            descriptorType: descriptor type
         Returns:
             descriptor
         """
-        return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptorsBatch(size)
+        if descriptorType == DescriptorType.face:
+            return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptorsBatch(size)
+        else:
+            return self.faceEngine.createHumanDescriptorFactory(planVersion).generateDescriptorsBatch(size)
 
     def test_create_estimators_positive(self):
         """
         Test create estimators of different existent plan versions.
         """
-        for planVersion in EDVa:
-            with self.subTest(descriptor_version=planVersion):
-                try:
-                    self.faceEngine.createFaceDescriptorEstimator(descriptorVersion=planVersion)
-                except RuntimeError as e:
-                    raise AssertionError(f"Descriptor version {planVersion} is not supported. But must be.") from e
+        for case in self.cases:
+            with self.subTest(type=case.type):
+                for planVersion in case.versions:
 
-    @pytest.mark.skip("need support 57 version")
+                    with self.subTest(descriptor_version=planVersion):
+                        try:
+                            case.extractorFactory(descriptorVersion=planVersion)
+                        except RuntimeError as e:
+                            raise AssertionError(
+                                f"Descriptor version {planVersion} is not supported. But must be."
+                            ) from e
+
     def test_create_estimators_negative(self):
         """
         Test create estimators of different nonexistent plan versions.
         """
-        nonexistentVersions = set(range(min(EDVa) - 10, max(EDVa) + 10)) - set(EDVa)
-        for planVersion in nonexistentVersions:
-            with self.subTest(descriptor_version=planVersion):
-                try:
-                    self.faceEngine.createFaceDescriptorEstimator(descriptorVersion=planVersion)
-                except RuntimeError:
-                    pass
-                else:
-                    raise AssertionError(f"Descriptor version {planVersion} is supported. But should not.")
+        for case in self.cases:
+            with self.subTest(type=case.type):
+
+                nonexistentVersions = set(range(min(case.versions) - 10, max(case.versions) + 10)) - set(case.versions)
+                for planVersion in nonexistentVersions:
+                    with self.subTest(descriptor_version=planVersion):
+                        if planVersion == 57:
+                            self.skipTest("need support 57 version")
+                        try:
+                            case.extractorFactory(descriptorVersion=planVersion)
+                        except RuntimeError:
+                            pass
+                        else:
+                            raise AssertionError(f"Descriptor version {planVersion} is supported. But should not.")
 
     def test_extract_descriptors_positive(self):
         """
         Test correctly estimate descriptor.
         """
-        for planVersion in EDVa:
-            for kw in (dict(), dict(descriptor=self.getDescr(planVersion))):
-                extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion=planVersion)
-                with self.subTest(plan_version=planVersion, external_descriptor=bool(kw)):
-                    descriptor = extractor.estimate(warp, **kw)
-                    self.assertDescriptor(planVersion, descriptor)
+        for case in self.cases:
+            with self.subTest(type=case.type):
+
+                for planVersion in case.versions:
+                    for kw in (dict(), dict(descriptor=self.getDescr(planVersion, case.type))):
+                        extractor = case.extractorFactory(descriptorVersion=planVersion)
+                        with self.subTest(plan_version=planVersion, external_descriptor=bool(kw)):
+                            descriptor = extractor.estimate(case.warps[0], **kw)
+                            self.assertDescriptor(planVersion, descriptor, case.type)
 
     @unittest.skip("dont do it FSDK-2186")
     def test_extract_descriptors_incorrect_source_descriptors(self):
         """
         Test estimate descriptor using incorrect source descriptor.
         """
-        for planVersion in EDVa:
-            extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion=planVersion)
-            for descriptorVersion in set(EDVa) - {planVersion}:
-                descriptorOfAnotherVersion = self.getDescr(descriptorVersion)
-                with self.subTest(plan_version=planVersion, descriptor_version=descriptorVersion):
-                    print(f"Plan {planVersion}, empty descriptor version {descriptorVersion}")
-                    descriptor = extractor.estimate(warp, descriptor=descriptorOfAnotherVersion)
-                    self.assertDescriptor(planVersion, descriptor)
+        for case in self.cases:
+            with self.subTest(type=case.type):
+
+                for planVersion in case.versions:
+                    extractor = case.extractorFactory(descriptorVersion=planVersion)
+                    for descriptorVersion in set(EFDVa) - {planVersion}:
+                        descriptorOfAnotherVersion = self.getDescr(descriptorVersion, case.type)
+                        with self.subTest(plan_version=planVersion, descriptor_version=descriptorVersion):
+                            print(f"Plan {planVersion}, empty descriptor version {descriptorVersion}")
+                            descriptor = extractor.estimate(case.warps[0], descriptor=descriptorOfAnotherVersion)
+                            self.assertDescriptor(planVersion, descriptor, case.type)
 
     def test_extract_descriptors_batch_positive(self):
         """
         Test correctly estimate descriptor batch.
         """
-        for planVersion in EDVa:
-            extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion=planVersion)
-            for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(warps)))):
-                for aggregate in (True, False):
-                    with self.subTest(plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)):
-                        descriptorsRaw, descriptorAggregated = extractor.estimateDescriptorsBatch(
-                            warps, aggregate=aggregate, **kw
-                        )
-                        for descriptorRaw in descriptorsRaw:
-                            self.assertDescriptor(planVersion, descriptorRaw)
+        for case in self.cases:
+            with self.subTest(type=case.type):
 
-                        if aggregate:
-                            self.assertDescriptor(planVersion, descriptorAggregated)
-                        else:
-                            self.assertIsNone(descriptorAggregated)
+                for planVersion in case.versions:
+                    extractor = case.extractorFactory(descriptorVersion=planVersion)
+                    for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(case.warps), case.type))):
+                        for aggregate in (True, False):
+                            with self.subTest(
+                                plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)
+                            ):
+                                descriptorsRaw, descriptorAggregated = extractor.estimateDescriptorsBatch(
+                                    case.warps, aggregate=aggregate, **kw
+                                )
+                                for descriptorRaw in descriptorsRaw:
+                                    self.assertDescriptor(planVersion, descriptorRaw, case.type)
+
+                                if aggregate:
+                                    self.assertDescriptor(planVersion, descriptorAggregated, case.type)
+                                else:
+                                    assert descriptorAggregated is None
 
     @unittest.skip("dont do it FSDK-2186")
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):
         """
         Test correctly estimate descriptor batch.
         """
-        for planVersion in EDVa:
-            extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion=planVersion)
-            for descriptorVersion in set(EDVa) - {planVersion}:
-                for kw in (dict(), dict(descriptorBatch=self.getBatch(descriptorVersion, len(warps)))):
-                    for aggregate in (True, False):
-                        with self.subTest(plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)):
-                            descriptorsRaw, descriptorAggregated = extractor.estimateDescriptorsBatch(
-                                warps, aggregate=aggregate, **kw
-                            )
-                            for descriptorRaw in descriptorsRaw:
-                                self.assertDescriptor(planVersion, descriptorRaw)
+        for case in self.cases:
+            with self.subTest(type=case.type):
 
-                            if aggregate:
-                                self.assertDescriptor(planVersion, descriptorAggregated)
-                            else:
-                                self.assertIsNone(descriptorAggregated)
+                for planVersion in case.versions:
+                    extractor = case.extractorFactory(descriptorVersion=planVersion)
+                    for descriptorVersion in set(EFDVa) - {planVersion}:
+                        for kw in (
+                            dict(),
+                            dict(descriptorBatch=self.getBatch(descriptorVersion, len(case.warps), case.type)),
+                        ):
+                            for aggregate in (True, False):
+                                with self.subTest(
+                                    plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)
+                                ):
+                                    descriptorsRaw, descriptorAggregated = extractor.estimateDescriptorsBatch(
+                                        case.warps, aggregate=aggregate, **kw
+                                    )
+                                    for descriptorRaw in descriptorsRaw:
+                                        self.assertDescriptor(planVersion, descriptorRaw, case.type)
+
+                                    if aggregate:
+                                        self.assertDescriptor(planVersion, descriptorAggregated, case.type)
+                                    else:
+                                        assert descriptorAggregated is not None

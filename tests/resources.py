@@ -13,6 +13,7 @@ MANY_FACES = getPathToImage("many_faces.jpg")
 NO_FACES = getPathToImage("kand.jpg")
 SMALL_IMAGE = getPathToImage("small_image.jpg")
 WARP_WHITE_MAN = getPathToImage("warp_white_man.jpg")
+HUMAN_WARP = getPathToImage("human_body_warp.jpg")
 
 ALL_EMOTIONS = [emotion.name.lower() for emotion in Emotion]
 EMOTION_FACES = {emotion: getPathToImage(f"{emotion}.jpg") for emotion in ALL_EMOTIONS}

@@ -3,7 +3,7 @@ from collections import namedtuple
 import jsonschema
 
 from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator, MouthStates
-from lunavl.sdk.estimators.face_estimators.warper import WarpedImage
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import FaceDetectTestClass
 from tests.resources import CLEAN_ONE_FACE, WARP_WHITE_MAN
@@ -23,14 +23,14 @@ class TestMouthEstimation(FaceDetectTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.warper = cls.faceEngine.createWarper()
+        cls.warper = cls.faceEngine.createFaceWarper()
         cls.mouthEstimator = cls.faceEngine.createMouthEstimator()
         CaseWarp = namedtuple("CaseWarp", ("warp", "detector"))
         cls.warpList = []
         for detector in cls.detectors:
             detection = detector.detectOne(VLIMAGE_ONE_FACE)
             cls.warpList.append(CaseWarp(cls.warper.warp(detection), detector.detectorType.name))
-        cls.warpList.append(CaseWarp(WarpedImage(VLImage.load(filename=WARP_WHITE_MAN)), "None"))
+        cls.warpList.append(CaseWarp(FaceWarpedImage(VLImage.load(filename=WARP_WHITE_MAN)), "None"))
 
     def test_mouth_states_with_different_type(self):
         """

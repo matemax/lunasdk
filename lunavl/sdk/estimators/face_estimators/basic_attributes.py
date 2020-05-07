@@ -10,9 +10,9 @@ from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class Ethnicity(Enum):
@@ -216,7 +216,7 @@ class BasicAttributesEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationBasicAttributeError)
     def estimate(
-        self, warp: Union[Warp, WarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
+        self, warp: Union[FaceWarp, FaceWarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
     ) -> BasicAttributes:
         """
         Estimate a basic attributes (age, gender, ethnicity) from warped images.
@@ -248,7 +248,7 @@ class BasicAttributesEstimator(BaseEstimator):
     @CoreExceptionWrap(LunaVLError.BatchEstimationBasicAttributeError)
     def estimateBasicAttributesBatch(
         self,
-        warps: List[Union[Warp, WarpedImage]],
+        warps: List[Union[FaceWarp, FaceWarpedImage]],
         estimateAge: bool,
         estimateGender: bool,
         estimateEthnicity: bool,

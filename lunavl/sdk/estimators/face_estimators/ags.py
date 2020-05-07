@@ -11,7 +11,7 @@ from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.image_utils.image import VLImage
 
-from ..base_estimation import BaseEstimator
+from ..base import BaseEstimator
 from ...base import BoundingBox
 
 

@@ -17,7 +17,7 @@ def estimateBasicAttributes():
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetections = detector.detect([image])[0]
-    warper = faceEngine.createWarper()
+    warper = faceEngine.createFaceWarper()
     warps = [warper.warp(faceDetection) for faceDetection in faceDetections]
 
     basicAttributesEstimator = faceEngine.createBasicAttributesEstimator()

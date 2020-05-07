@@ -18,7 +18,7 @@ class TestEstimateEmotions(BaseTestClass):
     def setup_class(cls):
         super().setup_class()
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
-        cls.warper = cls.faceEngine.createWarper()
+        cls.warper = cls.faceEngine.createFaceWarper()
         cls.emotionEstimator = cls.faceEngine.createEmotionEstimator()
 
     def assert_emotion_reply(self, emotionDetection: dict, predominantEmotion: Optional[str] = None) -> None:
