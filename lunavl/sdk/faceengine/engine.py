@@ -5,6 +5,10 @@ from typing import Optional, Union
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 
+from ..descriptors.descriptors import FaceDescriptorFactory, HumanDescriptorFactory
+from ..descriptors.matcher import FaceMatcher
+from ..detectors.facedetector import FaceDetector
+from ..detectors.humandetector import HumanDetector
 from ..estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
 from ..estimators.body_estimators.humanwarper import HumanWarper
 from ..estimators.face_estimators.ags import AGSEstimator
@@ -12,18 +16,11 @@ from ..estimators.face_estimators.basic_attributes import BasicAttributesEstimat
 from ..estimators.face_estimators.emotions import EmotionsEstimator
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
-from ..estimators.face_estimators.mouth_state import MouthStateEstimator
-
-from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.facewarper import FaceWarper
-
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
-from ..descriptors.descriptors import FaceDescriptorFactory, HumanDescriptorFactory
-from ..descriptors.matcher import FaceMatcher
+from ..estimators.face_estimators.mouth_state import MouthStateEstimator
+from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
-from ..detectors.humandetector import HumanDetector
-
-from ..detectors.facedetector import FaceDetector
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
 
