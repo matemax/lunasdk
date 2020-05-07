@@ -72,7 +72,7 @@ class HumanDescriptorEstimator(BaseEstimator):
             descriptorBatch: optional batch for saving descriptors
 
         Returns:
-            tuple of batch and the aggregate descriptors (or None)
+            tuple with a batch and a aggregated descriptor (or None)
         Raises:
             LunaSDKException: if estimation failed
 
