@@ -96,7 +96,7 @@ class BaseDescriptor(BaseEstimation):
 
 class BaseDescriptorBatch(BaseEstimation):
     """
-    Face descriptor batch.
+    Base descriptor batch.
 
     Attributes:
         scores (List[float]):  list of garbage scores
