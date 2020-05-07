@@ -5,8 +5,6 @@ import unittest
 from enum import Enum
 from typing import Tuple, Generator, NamedTuple, Callable, List, Union, ContextManager
 
-import pytest
-
 from lunavl.sdk.descriptors.descriptors import (
     FaceDescriptor,
     BaseDescriptor,
@@ -22,7 +20,6 @@ from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from tests.base import BaseTestClass
 from tests.resources import WARP_WHITE_MAN, HUMAN_WARP
-
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
 
@@ -305,7 +302,6 @@ class TestEstimateDescriptor(BaseTestClass):
                                 f"Descriptor version {planVersion} is not supported. But must be."
                             ) from e
 
-    @pytest.mark.skip("need support 57 version")
     def test_create_estimators_negative(self):
         """
         Test create estimators of different nonexistent plan versions.
@@ -316,6 +312,8 @@ class TestEstimateDescriptor(BaseTestClass):
                 nonexistentVersions = set(range(min(case.versions) - 10, max(case.versions) + 10)) - set(case.versions)
                 for planVersion in nonexistentVersions:
                     with self.subTest(descriptor_version=planVersion):
+                        if planVersion == 57:
+                            self.skipTest("need support 57 version")
                         try:
                             case.extractorFactory(descriptorVersion=planVersion)
                         except RuntimeError:
