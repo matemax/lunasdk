@@ -68,7 +68,7 @@ class HumanDescriptorEstimator(BaseEstimator):
 
         Args:
             warps: warped images
-            aggregate:  whether to estimate  aggregate descriptor or not
+            aggregate: whether to estimate an aggregated descriptor or not
             descriptorBatch: optional batch for saving descriptors
 
         Returns:
