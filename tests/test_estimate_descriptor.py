@@ -23,7 +23,6 @@ from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from tests.base import BaseTestClass
 from tests.resources import WARP_WHITE_MAN, HUMAN_WARP
 
-# from unittest.case import _SubTest
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
 
