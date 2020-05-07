@@ -37,7 +37,7 @@ class HumanDescriptorEstimator(BaseEstimator):
         self, warp: Union[HumanWarp, HumanWarpedImage], descriptor: Optional[HumanDescriptor] = None
     ) -> HumanDescriptor:
         """
-        Estimate face descriptor from a warp image.
+        Estimate human descriptor from a warp image.
 
         Args:
             warp: warped image
