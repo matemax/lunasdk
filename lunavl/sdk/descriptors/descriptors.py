@@ -162,7 +162,7 @@ class BaseDescriptorBatch(BaseEstimation):
             iterator by descriptors.
         """
         for index in range(len(self)):
-            yield self.__class__._descriptorFactory(self._coreEstimation.getDescriptorFast(index), self.scores[index])
+            yield self._descriptorFactory(self._coreEstimation.getDescriptorFast(index), self.scores[index])
 
     def append(self, descriptor: BaseDescriptor) -> None:
         """
