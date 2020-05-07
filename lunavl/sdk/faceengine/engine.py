@@ -231,6 +231,13 @@ class VLFaceEngine:
         return HumanDetector(self._faceEngine.createHumanDetector())
 
     def createHumanWarper(self) -> HumanWarper:
+        """
+        Create human body warper.
+
+        Returns:
+            warper.
+
+        """
         return HumanWarper(self._faceEngine.createHumanWarper())
 
     def createHumanDescriptorFactory(self, descriptorVersion: int = DHDV) -> HumanDescriptorFactory:
