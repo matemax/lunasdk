@@ -90,7 +90,7 @@ class TestDescriptorFunctionality(BaseTestClass):
         self,
     ) -> Generator[Tuple[ContextManager[None], DescriptorCase], Tuple[ContextManager[None], DescriptorCase], None]:
         """
-        Generator for sub tests from root and user
+        Generator for sub tests for human descriptor and face descriptor.
         """
         for descriptorType in DescriptorType:
 
