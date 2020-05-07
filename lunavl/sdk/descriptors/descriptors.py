@@ -4,17 +4,18 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from typing import Dict, List, Iterator
+from typing import Dict, List, Iterator, Type
 from typing import Union, Optional
 
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr, DescriptorBatchResult  # pylint: disable=E0611,E0401
 
+from ..base import BaseEstimation
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException, CoreExceptionWrap
-from ..base import BaseEstimation
+from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
 
-class FaceDescriptor(BaseEstimation):
+class BaseDescriptor(BaseEstimation):
     """
     Descriptor
 
@@ -93,13 +94,15 @@ class FaceDescriptor(BaseEstimation):
         self.garbageScore = garbageScore
 
 
-class FaceDescriptorBatch(BaseEstimation):
+class BaseDescriptorBatch(BaseEstimation):
     """
-    Face descriptor batch.
+    Base descriptor batch.
 
     Attributes:
         scores (List[float]):  list of garbage scores
     """
+
+    _descriptorFactory: Type[BaseDescriptor]
 
     #  pylint: disable=W0235
     def __init__(self, coreEstimation: IDescriptorBatchPtr, scores: Optional[List[float]] = None):
@@ -136,7 +139,7 @@ class FaceDescriptorBatch(BaseEstimation):
         """
         return [descriptor.asDict() for descriptor in self]
 
-    def __getitem__(self, i) -> FaceDescriptor:
+    def __getitem__(self, i) -> BaseDescriptor:
         """
         Get descriptor by index
 
@@ -148,10 +151,10 @@ class FaceDescriptorBatch(BaseEstimation):
         """
         if i >= len(self):
             raise IndexError(f"Descriptor index '{i}' out of range")  # todo remove after
-        descriptor = FaceDescriptor(self._coreEstimation.getDescriptorFast(i), self.scores[i])
+        descriptor = self.__class__._descriptorFactory(self._coreEstimation.getDescriptorFast(i), self.scores[i])
         return descriptor
 
-    def __iter__(self) -> Iterator[FaceDescriptor]:
+    def __iter__(self) -> Iterator[BaseDescriptor]:
         """
         Iterator by batch.
 
@@ -159,9 +162,9 @@ class FaceDescriptorBatch(BaseEstimation):
             iterator by descriptors.
         """
         for index in range(len(self)):
-            yield FaceDescriptor(self._coreEstimation.getDescriptorFast(index), self.scores[index])
+            yield self._descriptorFactory(self._coreEstimation.getDescriptorFast(index), self.scores[index])
 
-    def append(self, descriptor: FaceDescriptor) -> None:
+    def append(self, descriptor: BaseDescriptor) -> None:
         """
         Add descriptor to end of batch.
 
@@ -186,14 +189,17 @@ class FaceDescriptorBatch(BaseEstimation):
         return str(fullDescriptors)
 
 
-class FaceDescriptorFactory:
+class BaseDescriptorFactory:
     """
-    Face Descriptor factory.
+    Base Descriptor factory.
 
     Attributes:
         _faceEngine (VLFaceEngine): faceEngine
         _descriptorVersion (int): descriptor version or zero for use default descriptor version
     """
+
+    _descriptorFactory: Type[BaseDescriptor]
+    _descriptorBatchFactory: Type[BaseDescriptorBatch]
 
     def __init__(self, faceEngine: "VLFaceEngine", descriptorVersion: int = 0):  # type: ignore # noqa: F821
         self._faceEngine = faceEngine
@@ -211,7 +217,7 @@ class FaceDescriptorFactory:
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptor(
         self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
-    ) -> FaceDescriptor:
+    ) -> BaseDescriptor:
         """
         Generate core descriptor.
 
@@ -231,19 +237,21 @@ class FaceDescriptorFactory:
 
         if descriptor is not None:
             version = int.from_bytes(descriptor[4:8], byteorder="little")
-            faceDescriptor = FaceDescriptor(self._faceEngine.coreFaceEngine.createDescriptor(version))
+            outputDescriptor = self.__class__._descriptorFactory(
+                self._faceEngine.coreFaceEngine.createDescriptor(version)
+            )
             if garbageScore is not None:
-                faceDescriptor.reload(descriptor=descriptor, garbageScore=garbageScore)
+                outputDescriptor.reload(descriptor=descriptor, garbageScore=garbageScore)
             else:
-                faceDescriptor.reload(descriptor=descriptor)
+                outputDescriptor.reload(descriptor=descriptor)
         else:
-            faceDescriptor = FaceDescriptor(
+            outputDescriptor = self.__class__._descriptorFactory(
                 self._faceEngine.coreFaceEngine.createDescriptor(descriptorVersion or self._descriptorVersion)
             )
-        return faceDescriptor
+        return outputDescriptor
 
     @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
-    def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> FaceDescriptorBatch:
+    def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> BaseDescriptorBatch:
         """
         Generate core descriptors batch.
 
@@ -258,4 +266,57 @@ class FaceDescriptorFactory:
         coreBatch: IDescriptorBatchPtr = self._faceEngine.coreFaceEngine.createDescriptorBatch(
             size, version=descriptorVersion
         )
-        return FaceDescriptorBatch(coreBatch)
+        return self._descriptorBatchFactory(coreBatch)
+
+
+class FaceDescriptor(BaseDescriptor):
+    """
+    Face Descriptor class
+    """
+
+    pass
+
+
+class FaceDescriptorBatch(BaseDescriptorBatch):
+    """
+    Face descriptor batch.
+    """
+
+    _descriptorFactory = FaceDescriptor
+
+
+class FaceDescriptorFactory(BaseDescriptorFactory):
+    """
+    Face Descriptor factory.
+    """
+
+    _descriptorBatchFactory = FaceDescriptorBatch
+    _descriptorFactory = FaceDescriptor
+
+
+class HumanDescriptor(BaseDescriptor):
+    """
+    Human Descriptor class
+    """
+
+    pass
+
+
+class HumanDescriptorBatch(BaseDescriptorBatch):
+    """
+    Human descriptor batch.
+    """
+
+    _descriptorFactory = HumanDescriptor
+
+
+class HumanDescriptorFactory(BaseDescriptorFactory):
+    """
+    Human Descriptor factory.
+    """
+
+    def __init__(self, faceEngine: "VLFaceEngine", descriptorVersion: int = DHDV):  # type: ignore # noqa: F821
+        super().__init__(faceEngine, descriptorVersion)
+
+    _descriptorBatchFactory = HumanDescriptorBatch
+    _descriptorFactory = HumanDescriptor

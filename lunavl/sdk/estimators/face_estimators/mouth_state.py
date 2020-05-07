@@ -8,9 +8,9 @@ from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class MouthStates(BaseEstimation):
@@ -85,7 +85,7 @@ class MouthStateEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationMouthStateError)
-    def estimate(self, warp: Union[Warp, WarpedImage]) -> MouthStates:
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> MouthStates:
         """
         Estimate mouth state on warp.
 

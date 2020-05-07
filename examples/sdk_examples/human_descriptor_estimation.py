@@ -1,26 +1,25 @@
 """
-Face descriptor estimate example
+Human descriptor estimate example
 """
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from resources import EXAMPLE_O
 
 
 def estimateDescriptor():
     """
-    Estimate face descriptor.
+    Estimate human descriptor.
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
-    faceDetection = detector.detectOne(image)
-    warper = faceEngine.createFaceWarper()
-    warp = warper.warp(faceDetection)
+    detector = faceEngine.createHumanDetector()
+    humanDetection = detector.detectOne(image)
+    warper = faceEngine.createHumanWarper()
+    warp = warper.warp(humanDetection)
 
-    extractor = faceEngine.createFaceDescriptorEstimator()
+    extractor = faceEngine.createHumanDescriptorEstimator()
 
     pprint.pprint(extractor.estimate(warp.warpedImage))
     pprint.pprint(extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage]))

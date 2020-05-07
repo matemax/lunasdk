@@ -17,7 +17,7 @@ class TestEstimateGazeDirection(BaseTestClass):
     def setup_class(cls):
         super().setup_class()
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
-        cls.warper = cls.faceEngine.createWarper()
+        cls.warper = cls.faceEngine.createFaceWarper()
         cls.gazeEstimator = cls.faceEngine.createGazeEstimator()
         cls.faceDetection = cls.detector.detectOne(VLImage.load(filename=ONE_FACE))
         cls.warp = cls.warper.warp(faceDetection=cls.faceDetection)

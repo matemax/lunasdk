@@ -11,13 +11,13 @@ from resources import EXAMPLE_O, EXAMPLE_1
 
 def matchFacesFromImages():
     """
-    Estimate face descriptor.
+    Match faces from images.
     """
 
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     extractor = faceEngine.createFaceDescriptorEstimator()
-    warper = faceEngine.createWarper()
+    warper = faceEngine.createFaceWarper()
     matcher = faceEngine.createFaceMatcher()
 
     image1 = VLImage.load(filename=EXAMPLE_O)

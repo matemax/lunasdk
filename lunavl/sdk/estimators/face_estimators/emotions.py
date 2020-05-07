@@ -9,9 +9,9 @@ from FaceEngine import IEmotionsEstimatorPtr, Emotions as CoreEmotions  # pylint
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class Emotion(Enum):
@@ -195,7 +195,7 @@ class EmotionsEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEmotionsError)
-    def estimate(self, warp: Union[Warp, WarpedImage]) -> Emotions:
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> Emotions:
         """
         Estimate emotion on warp.
 

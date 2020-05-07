@@ -11,14 +11,14 @@ from resources import EXAMPLE_O
 
 def createWarp():
     """
-    Create warp from detection.
+    Create face warp from detection.
 
     """
     faceEngine = VLFaceEngine()
     image = VLImage.load(filename=EXAMPLE_O)
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
-    warper = faceEngine.createWarper()
+    warper = faceEngine.createFaceWarper()
     warp = warper.warp(faceDetection)
     pprint.pprint(warp.warpedImage.rect)
 
