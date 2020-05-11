@@ -8,9 +8,9 @@ MIXED_EYES_IMAGE = VLImage.load(filename=MIXED_EYES)
 CLOSED_EYES_IMAGE = VLImage.load(filename=CLOSED_EYES)
 
 
-class TestEstimateEmotions(BaseTestClass):
+class TestEstimateEyes(BaseTestClass):
     """
-    Test estimate emotions.
+    Test estimate eyes.
     """
 
     @classmethod
@@ -49,7 +49,7 @@ class TestEstimateEmotions(BaseTestClass):
         Args:
             eyesDict: dict with eyes detection reply
         """
-        assert eyesDict.keys() == {'left_eye', 'right_eye'}
+        assert eyesDict.keys() == {"left_eye", "right_eye"}
         for eyeDict in eyesDict.values():
             self.validate_eye_dict(eyeDict)
 
@@ -71,9 +71,8 @@ class TestEstimateEmotions(BaseTestClass):
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
         eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
-        self.assert_eyes_reply(eyesDict)
-        for eye in ("left_eye", "right_eye"):
-            assert eyesDict[eye]["state"] == "open"
+        assert eyesDict["left_eye"]["state"] == "open"
+        assert eyesDict["right_eye"]["state"] == "open"
 
     def test_estimate_closed_eyes(self):
         """
@@ -83,9 +82,8 @@ class TestEstimateEmotions(BaseTestClass):
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
         eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
-        self.assert_eyes_reply(eyesDict)
-        for eye in ("left_eye", "right_eye"):
-            assert eyesDict[eye]["state"] == "close"
+        assert eyesDict["left_eye"]["state"] == "closed"
+        assert eyesDict["right_eye"]["state"] == "closed"
 
     def test_estimate_mixed_eyes(self):
         """
@@ -95,6 +93,5 @@ class TestEstimateEmotions(BaseTestClass):
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
         eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
-        self.assert_eyes_reply(eyesDict)
         assert eyesDict["left_eye"]["state"] == "occluded"
         assert eyesDict["right_eye"]["state"] == "open"
