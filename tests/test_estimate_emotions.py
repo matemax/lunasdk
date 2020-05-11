@@ -46,10 +46,12 @@ class TestEstimateEmotions(BaseTestClass):
         """
         Test emotion estimator 'asDict' method
         """
-        faceDetection = self.detector.detectOne(EMOTION_IMAGES["fear"])
-        warp = self.warper.warp(faceDetection)
-        emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
-        self.validate_emotion_dict(emotionDict)
+        for emotion in ALL_EMOTIONS:
+            with self.subTest(image_emotion=emotion):
+                faceDetection = self.detector.detectOne(EMOTION_IMAGES[emotion])
+                warp = self.warper.warp(faceDetection)
+                emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
+                self.validate_emotion_dict(emotionDict)
 
     @unittest.skip("Unstable")
     def test_estimate_emotions(self):
