@@ -1,3 +1,4 @@
+from lunavl.sdk.estimators.face_estimators.eyes import EyeState
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -70,9 +71,9 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(OPEN_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
-        assert eyesDict["left_eye"]["state"] == "open"
-        assert eyesDict["right_eye"]["state"] == "open"
+        eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
+        assert eyesResult.leftEye.state == EyeState.Open
+        assert eyesResult.rightEye.state == EyeState.Open
 
     def test_estimate_closed_eyes(self):
         """
@@ -81,9 +82,9 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(CLOSED_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
-        assert eyesDict["left_eye"]["state"] == "closed"
-        assert eyesDict["right_eye"]["state"] == "closed"
+        eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
+        assert eyesResult.leftEye.state == EyeState.Closed
+        assert eyesResult.rightEye.state == EyeState.Closed
 
     def test_estimate_mixed_eyes(self):
         """
@@ -92,6 +93,6 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(MIXED_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
-        assert eyesDict["left_eye"]["state"] == "occluded"
-        assert eyesDict["right_eye"]["state"] == "open"
+        eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
+        assert eyesResult.leftEye.state == EyeState.Occluded
+        assert eyesResult.rightEye.state == EyeState.Open
