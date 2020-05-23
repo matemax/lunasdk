@@ -108,6 +108,16 @@ class TestHeadPose(BaseTestClass):
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
+    def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
+        """
+        Estimating head pose by image and empty bounding box
+        """
+        fakeDetection = DetectionFloat(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
+        bBox = BoundingBox(fakeDetection)
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+
     def test_default_estimation(self):
         """
         Default estimating head pose test.
