@@ -56,7 +56,7 @@ class FaceWarpedImage(VLImage):
             this checks are not guarantee that image is warp. This function is intended for debug
         """
         if self.rect.size.height != 250 or self.rect.width != 250:
-            raise ValueError("Bad image size for warped image")
+            raise ValueError("Bad image size for face warped image")
         if self.format != self.format.R8G8B8:
             raise ValueError("Bad image format for warped image, must be R8G8B8")
 
