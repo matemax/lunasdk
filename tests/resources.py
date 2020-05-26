@@ -20,3 +20,7 @@ EMOTION_FACES = {emotion: getPathToImage(f"{emotion}.jpg") for emotion in ALL_EM
 GOST_HEAD_POSE_FACE = getPathToImage("gost_head_pose.jpg")
 TURNED_HEAD_POSE_FACE = getPathToImage("turned_head_pose.jpg")
 FRONTAL_HEAD_POSE_FACE = getPathToImage("frontal_head_pose.jpg")
+
+OPEN_EYES = getPathToImage("girl_front_face.jpg")
+MIXED_EYES = getPathToImage("one_face.jpg")
+CLOSED_EYES = getPathToImage("closed_eyes.jpg")

@@ -46,7 +46,7 @@ class TestEstimateEmotions(BaseTestClass):
         """
         Test emotion estimator 'asDict' method
         """
-        faceDetection = self.detector.detectOne(EMOTION_IMAGES["fear"])
+        faceDetection = self.detector.detectOne(EMOTION_IMAGES[ALL_EMOTIONS[0]])
         warp = self.warper.warp(faceDetection)
         emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
         self.validate_emotion_dict(emotionDict)
