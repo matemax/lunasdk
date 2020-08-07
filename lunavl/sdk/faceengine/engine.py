@@ -269,6 +269,5 @@ class VLFaceEngine:
             estimator
         """
         # todo replace createQualityEstimator -> createMaskEstimator
-        # return MaskEstimator(self._faceEngine.createQualityEstimator())
         estimator = MaskEstimator(self._faceEngine.createQualityEstimator())
         return estimator
