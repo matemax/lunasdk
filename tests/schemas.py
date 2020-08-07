@@ -68,7 +68,7 @@ QUALITY_SCHEMA = {
 
 MASK_SCHEMA = {
     "type": "object",
-    "properties": {"mask": TYPE_SCORE},
+    "properties": {"score": TYPE_SCORE},
     "additionalProperties": False,
-    "required": ["mask"],
+    "required": ["score"],
 }
