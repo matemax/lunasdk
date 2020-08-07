@@ -299,8 +299,5 @@ class FaceDetector:
 
     def setDetectionComparer(self):
         """
-        todo: wtf
-        Returns:
-
         """
         pass

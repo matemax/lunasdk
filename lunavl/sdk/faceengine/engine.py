@@ -20,6 +20,7 @@ from ..estimators.face_estimators.facewarper import FaceWarper
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
+from ..estimators.face_estimators.mask import MaskEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
@@ -259,3 +260,15 @@ class VLFaceEngine:
         return HumanDescriptorEstimator(
             self._faceEngine.createExtractor(descriptorVersion), self.createHumanDescriptorFactory(descriptorVersion)
         )
+
+    def createMaskEstimator(self) -> MaskEstimator:
+        """
+        Create an image quality estimator
+
+        Returns:
+            estimator
+        """
+        # todo replace createQualityEstimator -> createMaskEstimator
+        # return MaskEstimator(self._faceEngine.createQualityEstimator())
+        estimator = MaskEstimator(self._faceEngine.createQualityEstimator())
+        return estimator

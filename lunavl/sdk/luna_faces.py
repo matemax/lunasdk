@@ -13,6 +13,7 @@ from .estimators.face_estimators.face_descriptor import FaceDescriptor
 from .estimators.face_estimators.head_pose import HeadPose
 from .estimators.face_estimators.mouth_state import MouthStates
 from .estimators.face_estimators.warp_quality import Quality
+from .estimators.face_estimators.mask import Mask
 from .estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from .faceengine.engine import VLFaceEngine
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
@@ -34,6 +35,7 @@ class VLFaceDetection(FaceDetection):
         _basicAttributes (Optional[BasicAttributes]): lazy load basic attribute estimation
         _gaze (Optional[GazeEstimation]): lazy load gaze direction estimation
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
+        _mask (Optional[Mask]): lazy load mask estimation
         _headPose (Optional[HeadPose]): lazy load head pose estimation
         _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
@@ -53,6 +55,7 @@ class VLFaceDetection(FaceDetection):
         "_transformedLandmarks5",
         "_ags",
         "_descriptor",
+        "_mask",
     )
 
     def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
@@ -74,6 +77,7 @@ class VLFaceDetection(FaceDetection):
         self._transformedLandmarks5: Optional[Landmarks5] = None
         self._ags: Optional[float] = None
         self._descriptor: Optional[FaceDescriptor] = None
+        self._mask: Optional[Mask] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
 
     @property
@@ -162,6 +166,17 @@ class VLFaceDetection(FaceDetection):
         if self._warpQuality is None:
             self._warpQuality = self.estimatorCollection.warpQualityEstimator.estimate(self.warp)
         return self._warpQuality
+
+    @property
+    def mask(self) -> Mask:
+        """
+        Get mask of warped image which corresponding the detection
+        Returns:
+            mask
+        """
+        if self._mask is None:
+            self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
+        return self._mask
 
     @property
     def descriptor(self) -> FaceDescriptor:
@@ -254,6 +269,9 @@ class VLFaceDetection(FaceDetection):
 
         if self._basicAttributes is not None:
             attributes["basic_attributes"] = self._basicAttributes.asDict()
+
+        if self._mask is not None:
+            attributes["mask"] = self._mask.asDict()
 
         res["attributes"] = attributes
         return res
@@ -385,9 +403,10 @@ class VLWarpedImage(FaceWarpedImage):
         _mouthState (Optional[MouthStates]): lazy load mouth state estimation
         _basicAttributes (Optional[BasicAttributes]): lazy load basic attribute estimation
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
+        _mask (Optional[Mask]): lazy load mask estimation
     """
 
-    __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality", "_descriptor")
+    __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality", "_descriptor", "_mask")
 
     def __init__(
         self,
@@ -402,6 +421,7 @@ class VLWarpedImage(FaceWarpedImage):
         self._basicAttributes: Optional[BasicAttributes] = None
         self._warpQuality: Optional[Quality] = None
         self._descriptor: Optional[FaceDescriptor] = None
+        self._mask: Optional[Mask] = None
 
     #: estimators collection of class for usual creating detectors
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=VLFaceEngine())
@@ -468,6 +488,17 @@ class VLWarpedImage(FaceWarpedImage):
             self._warpQuality = VLWarpedImage.estimatorsCollection.warpQualityEstimator.estimate(self)
         return self._warpQuality
 
+    @property
+    def mask(self) -> Mask:
+        """
+        Get mask of warped image which corresponding the detection
+        Returns:
+            mask
+        """
+        if self._mask is None:
+            self._mask = VLWarpedImage.estimatorsCollection.maskEstimator.estimate(self)
+        return self._mask
+
     def asDict(self) -> Dict[str, Dict[str, float]]:
         """
         Convert to dict.
@@ -492,6 +523,9 @@ class VLWarpedImage(FaceWarpedImage):
 
         if self._basicAttributes is not None:
             attributes["basic_attributes"] = self._basicAttributes.asDict()
+
+        if self._mask is not None:
+            attributes["mask"] = self._mask.asDict()
 
         res["attributes"] = attributes
         return res

@@ -65,3 +65,12 @@ QUALITY_SCHEMA = {
     "additionalProperties": False,
     "required": ["blurriness", "dark", "illumination", "specularity", "light"],
 }
+
+MASK_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "mask": TYPE_SCORE,
+    },
+    "additionalProperties": False,
+    "required": ["mask"],
+}
