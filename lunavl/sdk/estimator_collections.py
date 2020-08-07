@@ -394,7 +394,7 @@ class FaceEstimatorsCollection:
         If estimator is initialized it will be returned otherwise it will be initialized and returned
 
         Returns:
-            estimator
+            mask estimator
         """
         if self._maskEstimator is None:
             self._maskEstimator = self._faceEngine.createMaskEstimator()
@@ -405,7 +405,7 @@ class FaceEstimatorsCollection:
         """
         Set warp mask estimator.
         Args:
-            newEstimator: new estimator
+            newEstimator: new mask estimator
         """
         self._maskEstimator = newEstimator
 

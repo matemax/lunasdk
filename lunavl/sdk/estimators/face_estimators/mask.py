@@ -16,7 +16,7 @@ from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 class Mask(BaseEstimation):
     """
-    Structure quality
+    Structure mask
 
     Estimation properties:
 
@@ -68,7 +68,7 @@ class MaskEstimator(BaseEstimator):
         Init.
 
         Args:
-            coreEstimator: core quality estimator
+            coreEstimator: core mask estimator
         """
         super().__init__(coreEstimator)
 
