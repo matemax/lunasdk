@@ -162,7 +162,10 @@ class BaseDescriptorBatch(BaseEstimation):
             iterator by descriptors.
         """
         for index in range(len(self)):
-            yield self._descriptorFactory(self._coreEstimation.getDescriptorFast(index), self.scores[index])
+            error, descriptor = self._coreEstimation.getDescriptorFast(index)
+            if error.isError:
+                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            yield self._descriptorFactory(descriptor, self.scores[index])
 
     def append(self, descriptor: BaseDescriptor) -> None:
         """

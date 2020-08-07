@@ -77,11 +77,11 @@ class FaceDescriptorEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
 
         """
-        batch = estimateDescriptorsBatch(
+        batch, aggregatedDescriptor = estimateDescriptorsBatch(
             warps=warps,
             descriptorFactory=self.descriptorFactory,  # type: ignore
             aggregate=aggregate,
             descriptorBatch=descriptorBatch,
             coreEstimator=self._coreEstimator,
         )
-        return batch  # type: ignore
+        return batch, aggregatedDescriptor  # type: ignore
