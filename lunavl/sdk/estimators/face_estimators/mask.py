@@ -51,9 +51,7 @@ class Mask(BaseEstimation):
         Returns:
             {"mask": self.mask}
         """
-        return {
-            "mask": self.mask,
-        }
+        return {"mask": self.mask}
 
 
 class MaskEstimator(BaseEstimator):
