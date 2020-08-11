@@ -78,6 +78,14 @@ MASK_SCHEMA = {
         "is_occluded_face": BOOL,
     },
     "additionalProperties": False,
-    "required": ["mask_in_place", "is_mask_in_place", "mask_not_in_place", "is_mask_not_in_place", "no_mask",
-                 "is_no_mask", "occluded_face", "is_occluded_face"],
+    "required": [
+        "mask_in_place",
+        "is_mask_in_place",
+        "mask_not_in_place",
+        "is_mask_not_in_place",
+        "no_mask",
+        "is_no_mask",
+        "occluded_face",
+        "is_occluded_face",
+    ],
 }
