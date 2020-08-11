@@ -2,16 +2,15 @@
 
 See `warp quality`_.
 """
-from typing import Dict, Union
+from typing import Union, Dict
 
-# todo replace
-from FaceEngine import SubjectiveQuality as CoreMask, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import MedicalMaskEstimation, IMedicalMaskEstimatorPtr  # pylint: disable=E0611,E0401
+
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
-
-from lunavl.sdk.base import BaseEstimation
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...base import BaseEstimation
 
 
 class Mask(BaseEstimation):
@@ -24,34 +23,33 @@ class Mask(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, maskMock: CoreMask):
+    def __init__(self, mask: MedicalMaskEstimation):
         """
         Init.
 
         Args:
-            coreMask: estimated mask
+            mask: estimated mask
         """
-        super().__init__(maskMock)
+        super().__init__(mask)
 
     @property
-    def mask(self) -> float:
+    def maskInPlace(self) -> float:
         """
         Get mask.
 
         Returns:
             float in range(0, 1)
         """
-        # todo replace
-        return self._coreEstimation.blur
+        return self._coreEstimation.maskInPlace
 
     def asDict(self) -> Dict[str, float]:
         """
         Convert to dict.
 
         Returns:
-            {"mask": self.mask}
+            {"score": self.maskInPlace}
         """
-        return {"score": self.mask}
+        return {"score": self.maskInPlace}
 
 
 class MaskEstimator(BaseEstimator):
@@ -60,15 +58,14 @@ class MaskEstimator(BaseEstimator):
     """
 
     #  pylint: disable=W0235
-    # todo IQualityEstimatorPtr
-    def __init__(self, coreEstimator: IQualityEstimatorPtr):
+    def __init__(self, maskEstimator: IMedicalMaskEstimatorPtr):
         """
         Init.
 
         Args:
-            coreEstimator: core mask estimator
+            maskEstimator: core mask estimator
         """
-        super().__init__(coreEstimator)
+        super().__init__(maskEstimator)
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationMaskError)

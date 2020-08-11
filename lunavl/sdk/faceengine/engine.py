@@ -263,11 +263,9 @@ class VLFaceEngine:
 
     def createMaskEstimator(self) -> MaskEstimator:
         """
-        Create an image quality estimator
+        Create an medical mask estimator
 
         Returns:
             estimator
         """
-        # todo replace createQualityEstimator -> createMaskEstimator
-        estimator = MaskEstimator(self._faceEngine.createQualityEstimator())
-        return estimator
+        return MaskEstimator(self._faceEngine.createMedicalMaskEstimator())
