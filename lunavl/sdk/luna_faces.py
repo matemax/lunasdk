@@ -170,7 +170,7 @@ class VLFaceDetection(FaceDetection):
     @property
     def mask(self) -> Mask:
         """
-        Get mask of warped image which corresponding the detection
+        Get mask existence estimation of warped image which corresponding the detection
         Returns:
             mask
         """

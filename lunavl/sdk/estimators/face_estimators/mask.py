@@ -35,12 +35,82 @@ class Mask(BaseEstimation):
     @property
     def maskInPlace(self) -> float:
         """
-        Get mask.
+        Get mask in place probability.
 
         Returns:
             float in range(0, 1)
         """
         return self._coreEstimation.maskInPlace
+
+    @property
+    def isMaskInPlace(self) -> bool:
+        """
+        Get mask is place.
+
+        Returns:
+            bool
+        """
+        return self._coreEstimation.isMaskInPlace
+
+    @property
+    def maskNotInPlace(self) -> float:
+        """
+        Get mask not in place probability.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.maskNotInPlace
+
+    @property
+    def isMaskNotInPlace(self) -> bool:
+        """
+        Get mask not in place.
+
+        Returns:
+            bool
+        """
+        return self._coreEstimation.isMaskNotInPlace
+
+    @property
+    def noMask(self) -> float:
+        """
+        Get no mask probability.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.noMask
+
+    @property
+    def isNoMask(self) -> bool:
+        """
+        Get no mask.
+
+        Returns:
+            bool
+        """
+        return self._coreEstimation.isNoMask
+
+    @property
+    def occludedFace(self) -> float:
+        """
+        Get occluded face probability.
+
+        Returns:
+            float in range(0, 1)
+        """
+        return self._coreEstimation.occludedFace
+
+    @property
+    def isOccludedFace(self) -> bool:
+        """
+        Get occluded face.
+
+        Returns:
+            bool
+        """
+        return self._coreEstimation.isOccludedFace
 
     def asDict(self) -> Dict[str, float]:
         """
@@ -49,7 +119,16 @@ class Mask(BaseEstimation):
         Returns:
             {"score": self.maskInPlace}
         """
-        return {"score": self.maskInPlace}
+        return {
+            "mask_in_place": self.maskInPlace,
+            "is_mask_in_place": self.isMaskInPlace,
+            "mask_not_in_place": self.maskNotInPlace,
+            "is_mask_not_in_place": self.isMaskNotInPlace,
+            "no_mask": self.noMask,
+            "is_no_mask": self.isNoMask,
+            "occluded_face": self.occludedFace,
+            "is_occluded_face": self.isOccludedFace,
+        }
 
 
 class MaskEstimator(BaseEstimator):
