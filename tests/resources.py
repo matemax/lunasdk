@@ -24,3 +24,5 @@ FRONTAL_HEAD_POSE_FACE = getPathToImage("frontal_head_pose.jpg")
 OPEN_EYES = getPathToImage("girl_front_face.jpg")
 MIXED_EYES = getPathToImage("one_face.jpg")
 CLOSED_EYES = getPathToImage("closed_eyes.jpg")
+
+FACE_WITH_MASK = getPathToImage("mask.jpg")

@@ -5,9 +5,9 @@ jsonValidator = jsonschema.validators.extend(jsonschema.Draft6Validator, type_ch
 
 FLOAT = {"type": "number"}
 INT = {"type": "integer"}
+BOOL = {"type": "boolean"}
 COORDINATE_TYPE = {"type": "number", "minimum": 0}
 LANDMARKS_ITEM = {"type": "array", "maxItems": 2, "minItems": 2, "items": INT}
-
 
 TYPE_SCORE = {"type": "number", "minimum": 0, "maximum": 1}
 
@@ -17,7 +17,6 @@ LANDMARK_WITH_SCORE_ITEM = {
     "required": ["score", "point"],
     "additionalProperties": False,
 }
-
 
 TYPE_RECT = {
     "type": "object",
@@ -64,4 +63,29 @@ QUALITY_SCHEMA = {
     },
     "additionalProperties": False,
     "required": ["blurriness", "dark", "illumination", "specularity", "light"],
+}
+
+MASK_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "mask_in_place": TYPE_SCORE,
+        "is_mask_in_place": BOOL,
+        "mask_not_in_place": TYPE_SCORE,
+        "is_mask_not_in_place": BOOL,
+        "no_mask": TYPE_SCORE,
+        "is_no_mask": BOOL,
+        "occluded_face": TYPE_SCORE,
+        "is_occluded_face": BOOL,
+    },
+    "additionalProperties": False,
+    "required": [
+        "mask_in_place",
+        "is_mask_in_place",
+        "mask_not_in_place",
+        "is_mask_not_in_place",
+        "no_mask",
+        "is_no_mask",
+        "occluded_face",
+        "is_occluded_face",
+    ],
 }
