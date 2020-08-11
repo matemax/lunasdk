@@ -35,7 +35,7 @@ class Mask(BaseEstimation):
     @property
     def maskInPlace(self) -> float:
         """
-        Get "mask in place" probability.
+        Mask is on the face
 
         Returns:
             float in range(0, 1)
@@ -45,7 +45,7 @@ class Mask(BaseEstimation):
     @property
     def isMaskInPlace(self) -> bool:
         """
-        Get "mask is place".
+        Mask is on the face, boolean flag
 
         Returns:
             bool
@@ -55,7 +55,7 @@ class Mask(BaseEstimation):
     @property
     def maskNotInPlace(self) -> float:
         """
-        Get "mask not in place" probability.
+        Mask is not on the right place
 
         Returns:
             float in range(0, 1)
@@ -65,7 +65,7 @@ class Mask(BaseEstimation):
     @property
     def isMaskNotInPlace(self) -> bool:
         """
-        Get "mask not in place".
+        Mask is not on the right place, boolean flag
 
         Returns:
             bool
@@ -75,7 +75,7 @@ class Mask(BaseEstimation):
     @property
     def noMask(self) -> float:
         """
-        Get "no mask" probability.
+        No mask on the face
 
         Returns:
             float in range(0, 1)
@@ -85,7 +85,7 @@ class Mask(BaseEstimation):
     @property
     def isNoMask(self) -> bool:
         """
-        Get "no mask".
+        No mask on the face, boolean flag
 
         Returns:
             bool
@@ -95,7 +95,7 @@ class Mask(BaseEstimation):
     @property
     def occludedFace(self) -> float:
         """
-        Get "occluded face" probability.
+        Face is occluded by other object
 
         Returns:
             float in range(0, 1)
@@ -105,7 +105,7 @@ class Mask(BaseEstimation):
     @property
     def isOccludedFace(self) -> bool:
         """
-        Get "occluded face".
+        Face is occluded by other object, boolean flag
 
         Returns:
             bool
