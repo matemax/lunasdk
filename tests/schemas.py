@@ -73,10 +73,5 @@ MASK_SCHEMA = {
         "occluded_face": TYPE_SCORE,
     },
     "additionalProperties": False,
-    "required": [
-        "mask_in_place",
-        "mask_not_in_place",
-        "no_mask",
-        "occluded_face"
-    ],
+    "required": ["mask_in_place", "mask_not_in_place", "no_mask", "occluded_face"],
 }
