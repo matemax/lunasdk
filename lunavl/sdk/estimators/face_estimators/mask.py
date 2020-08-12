@@ -35,7 +35,7 @@ class Mask(BaseEstimation):
     @property
     def maskInPlace(self) -> float:
         """
-        Mask is on the face
+        The probability that the mask exists on the face and is worn properly
 
         Returns:
             float in range(0, 1)
@@ -43,19 +43,9 @@ class Mask(BaseEstimation):
         return self._coreEstimation.maskInPlace
 
     @property
-    def isMaskInPlace(self) -> bool:
-        """
-        Mask is on the face, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isMaskInPlace
-
-    @property
     def maskNotInPlace(self) -> float:
         """
-        Mask is not on the right place
+        The probability that the mask exists on the face and is not worn properly
 
         Returns:
             float in range(0, 1)
@@ -63,19 +53,9 @@ class Mask(BaseEstimation):
         return self._coreEstimation.maskNotInPlace
 
     @property
-    def isMaskNotInPlace(self) -> bool:
-        """
-        Mask is not on the right place, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isMaskNotInPlace
-
-    @property
     def noMask(self) -> float:
         """
-        No mask on the face
+        The probability that the mask not exists on the face
 
         Returns:
             float in range(0, 1)
@@ -83,51 +63,32 @@ class Mask(BaseEstimation):
         return self._coreEstimation.noMask
 
     @property
-    def isNoMask(self) -> bool:
-        """
-        No mask on the face, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isNoMask
-
-    @property
     def occludedFace(self) -> float:
         """
-        Face is occluded by other object
+        The probability that the face is occluded by other object (not by mask)
 
         Returns:
             float in range(0, 1)
         """
         return self._coreEstimation.occludedFace
 
-    @property
-    def isOccludedFace(self) -> bool:
-        """
-        Face is occluded by other object, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isOccludedFace
-
     def asDict(self) -> Dict[str, float]:
         """
         Convert to dict.
 
         Returns:
-            {"score": self.maskInPlace}
+            {
+                "mask_in_place": self.maskInPlace,
+                "mask_not_in_place": self.maskNotInPlace,
+                "no_mask": self.noMask,
+                "occluded_face": self.occludedFace,
+            }
         """
         return {
             "mask_in_place": self.maskInPlace,
-            "is_mask_in_place": self.isMaskInPlace,
             "mask_not_in_place": self.maskNotInPlace,
-            "is_mask_not_in_place": self.isMaskNotInPlace,
             "no_mask": self.noMask,
-            "is_no_mask": self.isNoMask,
             "occluded_face": self.occludedFace,
-            "is_occluded_face": self.isOccludedFace,
         }
 
 
