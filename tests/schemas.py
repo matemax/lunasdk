@@ -67,16 +67,16 @@ QUALITY_SCHEMA = {
 MASK_SCHEMA = {
     "type": "object",
     "properties": {
-        "mask_exists": TYPE_SCORE,
-        "mask_in_wrong_place": TYPE_SCORE,
-        "mask_not_exists": TYPE_SCORE,
+        "mask_in_place": TYPE_SCORE,
+        "mask_not_in_place": TYPE_SCORE,
+        "no_mask": TYPE_SCORE,
         "occluded_face": TYPE_SCORE,
     },
     "additionalProperties": False,
     "required": [
-        "mask_exists",
-        "mask_in_wrong_place",
-        "mask_not_exists",
+        "mask_in_place",
+        "mask_not_in_place",
+        "no_mask",
         "occluded_face"
     ],
 }

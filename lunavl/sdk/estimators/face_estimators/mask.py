@@ -33,9 +33,9 @@ class Mask(BaseEstimation):
         super().__init__(mask)
 
     @property
-    def maskExists(self) -> float:
+    def maskInPlace(self) -> float:
         """
-        Mask exists on the face
+        Mask exists on the face and worn properly
 
         Returns:
             float in range(0, 1)
@@ -43,9 +43,9 @@ class Mask(BaseEstimation):
         return self._coreEstimation.maskInPlace
 
     @property
-    def maskInWrongPlace(self) -> float:
+    def maskNotInPlace(self) -> float:
         """
-        Mask is in wrong place
+        The mask exists on the face but is not worn properly
 
         Returns:
             float in range(0, 1)
@@ -53,7 +53,7 @@ class Mask(BaseEstimation):
         return self._coreEstimation.maskNotInPlace
 
     @property
-    def maskNotExists(self) -> float:
+    def noMask(self) -> float:
         """
         No mask on the face
 
@@ -65,7 +65,7 @@ class Mask(BaseEstimation):
     @property
     def occludedFace(self) -> float:
         """
-        Face is occluded by other object
+        Face is occluded by other object (not by mask)
 
         Returns:
             float in range(0, 1)
@@ -78,16 +78,16 @@ class Mask(BaseEstimation):
 
         Returns:
             {
-                "mask_exists": self.maskExists,
-                "mask_in_wrong_place": self.maskInWrongPlace,
-                "mask_not_exists": self.maskNotExists,
+                "mask_in_place": self.maskInPlace,
+                "mask_not_in_place": self.maskNotInPlace,
+                "no_mask": self.noMask,
                 "occluded_face": self.occludedFace,
             }
         """
         return {
-            "mask_exists": self.maskExists,
-            "mask_in_wrong_place": self.maskInWrongPlace,
-            "mask_not_exists": self.maskNotExists,
+            "mask_in_place": self.maskInPlace,
+            "mask_not_in_place": self.maskNotInPlace,
+            "no_mask": self.noMask,
             "occluded_face": self.occludedFace,
         }
 
