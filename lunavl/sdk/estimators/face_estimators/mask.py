@@ -35,7 +35,7 @@ class Mask(BaseEstimation):
     @property
     def maskInPlace(self) -> float:
         """
-        Mask exists on the face and worn properly
+        The probability that the mask exists on the face and is worn properly
 
         Returns:
             float in range(0, 1)
@@ -45,7 +45,7 @@ class Mask(BaseEstimation):
     @property
     def maskNotInPlace(self) -> float:
         """
-        The mask exists on the face but is not worn properly
+        The probability that the mask exists on the face and is not worn properly
 
         Returns:
             float in range(0, 1)
@@ -55,7 +55,7 @@ class Mask(BaseEstimation):
     @property
     def noMask(self) -> float:
         """
-        No mask on the face
+        The probability that the mask not exists on the face
 
         Returns:
             float in range(0, 1)
@@ -65,7 +65,7 @@ class Mask(BaseEstimation):
     @property
     def occludedFace(self) -> float:
         """
-        Face is occluded by other object (not by mask)
+        The probability that the face is occluded by other object (not by mask)
 
         Returns:
             float in range(0, 1)
