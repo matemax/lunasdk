@@ -44,22 +44,23 @@ class TestMask(BaseTestClass):
             assert 0 <= property < 1, f"{propertyName} is out of range [0,1]"
 
     @staticmethod
-    def assertMaskPropertyReply(replyMask: Mask, expectedProperty: str, lowerThreshold: float = 0.9):
+    def assertMaskPropertyReply(replyMask: Mask, expectedPredominantProperty: str, lowerThreshold: float = 0.9):
         """
-        Function check estimate property from reply
+        Function check predominant property from reply
 
         Args:
             replyMask: mask estimation object
-            expectedProperty: expected property of the mask object
+            expectedPredominantProperty: expected property of the mask object
             lowerThreshold: lower threshold of estimation
         """
-        lowerProbabilitySet = set(MASK_PROPERTIES) - {expectedProperty}
-        expectedResult = getattr(replyMask, expectedProperty)
-        assert expectedResult > lowerThreshold, f"Wrong value for best estimate: '{expectedProperty}'"
+        lowerProbabilitySet = set(MASK_PROPERTIES) - {expectedPredominantProperty}
+        actualPropertyResult = getattr(replyMask, expectedPredominantProperty)
+        assert actualPropertyResult > lowerThreshold, \
+            f"Value of the Mask estimation '{actualPropertyResult}' is less than '{lowerThreshold}'"
         for lowerProp in lowerProbabilitySet:
-            assert expectedResult > replyMask.__getattribute__(
+            assert actualPropertyResult > replyMask.__getattribute__(
                 lowerProp
-            ), f"Expected value of the Mask estimation '{expectedProperty}' is less than '{lowerProp}'"
+            ), f"Value of the Mask estimation '{expectedPredominantProperty}' is less than '{lowerProp}'"
 
     def test_estimate_mask(self):
         """
