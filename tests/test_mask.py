@@ -101,7 +101,7 @@ class TestMask(BaseTestClass):
         """
         mask = TestMask.maskEstimator.estimate(self.warpImageMaskNotInPlace)
         self.assertMaskEstimation(mask)
-        self.assertMaskPropertyReply(mask, "maskNotInPlace")
+        self.assertMaskPropertyReply(mask, "maskNotInPlace", 0.6)
 
     def test_estimate_mask_occluded_face(self):
         """
