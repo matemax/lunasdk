@@ -55,8 +55,9 @@ class TestMask(BaseTestClass):
         """
         lowerProbabilitySet = set(MASK_PROPERTIES) - {expectedPredominantProperty}
         actualPropertyResult = getattr(replyMask, expectedPredominantProperty)
-        assert actualPropertyResult > lowerThreshold, \
-            f"Value of the Mask estimation '{actualPropertyResult}' is less than '{lowerThreshold}'"
+        assert (
+            actualPropertyResult > lowerThreshold
+        ), f"Value of the Mask estimation '{actualPropertyResult}' is less than '{lowerThreshold}'"
         for lowerProp in lowerProbabilitySet:
             assert actualPropertyResult > replyMask.__getattribute__(
                 lowerProp
