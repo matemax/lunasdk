@@ -33,9 +33,9 @@ class Mask(BaseEstimation):
         super().__init__(mask)
 
     @property
-    def maskInPlace(self) -> float:
+    def maskExists(self) -> float:
         """
-        Mask is on the face
+        Mask exists on the face
 
         Returns:
             float in range(0, 1)
@@ -43,19 +43,9 @@ class Mask(BaseEstimation):
         return self._coreEstimation.maskInPlace
 
     @property
-    def isMaskInPlace(self) -> bool:
+    def maskInWrongPlace(self) -> float:
         """
-        Mask is on the face, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isMaskInPlace
-
-    @property
-    def maskNotInPlace(self) -> float:
-        """
-        Mask is not on the right place
+        Mask is in wrong place
 
         Returns:
             float in range(0, 1)
@@ -63,17 +53,7 @@ class Mask(BaseEstimation):
         return self._coreEstimation.maskNotInPlace
 
     @property
-    def isMaskNotInPlace(self) -> bool:
-        """
-        Mask is not on the right place, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isMaskNotInPlace
-
-    @property
-    def noMask(self) -> float:
+    def maskNotExists(self) -> float:
         """
         No mask on the face
 
@@ -81,16 +61,6 @@ class Mask(BaseEstimation):
             float in range(0, 1)
         """
         return self._coreEstimation.noMask
-
-    @property
-    def isNoMask(self) -> bool:
-        """
-        No mask on the face, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isNoMask
 
     @property
     def occludedFace(self) -> float:
@@ -102,32 +72,23 @@ class Mask(BaseEstimation):
         """
         return self._coreEstimation.occludedFace
 
-    @property
-    def isOccludedFace(self) -> bool:
-        """
-        Face is occluded by other object, boolean flag
-
-        Returns:
-            bool
-        """
-        return self._coreEstimation.isOccludedFace
-
     def asDict(self) -> Dict[str, float]:
         """
         Convert to dict.
 
         Returns:
-            {"score": self.maskInPlace}
+            {
+                "mask_exists": self.maskExists,
+                "mask_in_wrong_place": self.maskInWrongPlace,
+                "mask_not_exists": self.maskNotExists,
+                "occluded_face": self.occludedFace,
+            }
         """
         return {
-            "mask_in_place": self.maskInPlace,
-            "is_mask_in_place": self.isMaskInPlace,
-            "mask_not_in_place": self.maskNotInPlace,
-            "is_mask_not_in_place": self.isMaskNotInPlace,
-            "no_mask": self.noMask,
-            "is_no_mask": self.isNoMask,
+            "mask_exists": self.maskExists,
+            "mask_in_wrong_place": self.maskInWrongPlace,
+            "mask_not_exists": self.maskNotExists,
             "occluded_face": self.occludedFace,
-            "is_occluded_face": self.isOccludedFace,
         }
 
 

@@ -31,11 +31,8 @@ class TestMask(BaseTestClass):
         assert isinstance(mask, Mask), f"{mask.__class__} is not {Mask}"
         for propertyName in MASK_PROPERTIES:
             property = getattr(mask, propertyName)
-            if propertyName.startswith("is"):
-                assert isinstance(property, bool), f"{propertyName} is not bool"
-            else:
-                assert isinstance(property, float), f"{propertyName} is not float"
-                assert 0 <= property < 1, f"{propertyName} is out of range [0,1]"
+            assert isinstance(property, float), f"{propertyName} is not float"
+            assert 0 <= property < 1, f"{propertyName} is out of range [0,1]"
 
     @staticmethod
     def assertMaskReply(maskDict: dict):

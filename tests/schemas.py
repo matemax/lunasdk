@@ -5,7 +5,6 @@ jsonValidator = jsonschema.validators.extend(jsonschema.Draft6Validator, type_ch
 
 FLOAT = {"type": "number"}
 INT = {"type": "integer"}
-BOOL = {"type": "boolean"}
 COORDINATE_TYPE = {"type": "number", "minimum": 0}
 LANDMARKS_ITEM = {"type": "array", "maxItems": 2, "minItems": 2, "items": INT}
 
@@ -68,24 +67,16 @@ QUALITY_SCHEMA = {
 MASK_SCHEMA = {
     "type": "object",
     "properties": {
-        "mask_in_place": TYPE_SCORE,
-        "is_mask_in_place": BOOL,
-        "mask_not_in_place": TYPE_SCORE,
-        "is_mask_not_in_place": BOOL,
-        "no_mask": TYPE_SCORE,
-        "is_no_mask": BOOL,
+        "mask_exists": TYPE_SCORE,
+        "mask_in_wrong_place": TYPE_SCORE,
+        "mask_not_exists": TYPE_SCORE,
         "occluded_face": TYPE_SCORE,
-        "is_occluded_face": BOOL,
     },
     "additionalProperties": False,
     "required": [
-        "mask_in_place",
-        "is_mask_in_place",
-        "mask_not_in_place",
-        "is_mask_not_in_place",
-        "no_mask",
-        "is_no_mask",
-        "occluded_face",
-        "is_occluded_face",
+        "mask_exists",
+        "mask_in_wrong_place",
+        "mask_not_exists",
+        "occluded_face"
     ],
 }
