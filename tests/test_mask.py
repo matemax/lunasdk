@@ -10,7 +10,7 @@ from tests.schemas import jsonValidator, MASK_SCHEMA
 MASK_PROPERTIES = [key for key in Mask.__dict__.keys() if not (key.startswith("_") or key == "asDict")]
 
 MaskCase = namedtuple("MaskCase", ("propertyResult", "excludedProperties"))
-TEST_DATA_FOR_MASK = {
+MASK_TEST_DATA = {
     "maskInPlace": MaskCase(0.95, {"noMask": 0.01, "maskNotInPlace": 0.01, "occludedFace": 0.01}),
     "noMask": MaskCase(0.95, {"maskInPlace": 0.01, "maskNotInPlace": 0.02, "occludedFace": 0.01}),
     "maskNotInPlace": MaskCase(0.6, {"maskInPlace": 0.2, "noMask": 0.01, "occludedFace": 0.2}),
@@ -63,15 +63,12 @@ class TestMask(BaseTestClass):
         """
         lowerProbabilitySet = set(MASK_PROPERTIES) - {expectedPredominantProperty}
         actualPropertyResult = getattr(maskObj, expectedPredominantProperty)
-        expectedPropertyResult = TEST_DATA_FOR_MASK[expectedPredominantProperty].propertyResult
+        expectedPropertyResult = MASK_TEST_DATA[expectedPredominantProperty].propertyResult
         assert (
             actualPropertyResult > expectedPropertyResult
         ), f"Value of the Mask estimation '{actualPropertyResult}' is less than '{expectedPropertyResult}'"
         for propName in lowerProbabilitySet:
-            assert (
-                getattr(maskObj, propName)
-                < TEST_DATA_FOR_MASK[expectedPredominantProperty].excludedProperties[propName]
-            )
+            assert getattr(maskObj, propName) < MASK_TEST_DATA[expectedPredominantProperty].excludedProperties[propName]
 
     def test_estimate_mask(self):
         """
