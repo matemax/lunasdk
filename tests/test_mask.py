@@ -46,7 +46,7 @@ class TestMask(BaseTestClass):
     @staticmethod
     def assertMaskPropertyReply(replyMask: Mask, expectedPredominantProperty: str, lowerThreshold: float = 0.9):
         """
-        Function check predominant property from reply
+        Function checks predominant property from reply
 
         Args:
             replyMask: mask estimation object
