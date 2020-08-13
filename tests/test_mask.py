@@ -1,3 +1,4 @@
+from collections import namedtuple
 from typing import Dict
 
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
@@ -7,7 +8,7 @@ from tests.base import BaseTestClass
 from tests.resources import WARP_CLEAN_FACE, FACE_WITH_MASK, OCCLUDED_FACE, MASK_NOT_IN_PLACE
 from tests.schemas import jsonValidator, MASK_SCHEMA
 
-MASK_PROPERTIES = [key for key in Mask.__dict__.keys() if not (key.startswith("_") or key == "asDict")]
+MaskProperties = namedtuple("MaskProperties", ("maskInPlace", "maskNotInPlace", "noMask", "occludedFace"))
 
 
 class TestMask(BaseTestClass):
@@ -63,30 +64,30 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations with mask exists on the face
         """
-        expectedResult = {"maskInPlace": 0.977, "maskNotInPlace": 0.022, "noMask": 0.001, "occludedFace": 0.001}
+        expectedResult = MaskProperties(0.977, 0.022, 0.001, 0.001)
         mask = TestMask.maskEstimator.estimate(self.warpImageWithMask)
-        self.assertMaskEstimation(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
 
     def test_estimate_without_mask_on_the_face(self):
         """
         Test mask estimations without mask on the face
         """
-        expectedResult = {"maskInPlace": 0.007, "maskNotInPlace": 0.071, "noMask": 0.897, "occludedFace": 0.025}
+        expectedResult = MaskProperties(0.007, 0.071, 0.897, 0.025)
         mask = TestMask.maskEstimator.estimate(self.warpImageNoMask)
-        self.assertMaskEstimation(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
 
     def test_estimate_mask_not_in_place(self):
         """
         Test mask estimations with mask exists on the face and is not worn properly
         """
-        expectedResult = {"maskInPlace": 0.042, "maskNotInPlace": 0.386, "noMask": 0.003, "occludedFace": 0.567}
+        expectedResult = MaskProperties(0.042, 0.386, 0.003, 0.567)
         mask = TestMask.maskEstimator.estimate(self.warpImageMaskNotInPlace)
-        self.assertMaskEstimation(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
 
     def test_estimate_mask_occluded_face(self):
         """
         Test mask estimations with face is occluded by other object
         """
-        expectedResult = {"maskInPlace": 0.001, "maskNotInPlace": 0.141, "noMask": 0.326, "occludedFace": 0.531}
+        expectedResult = MaskProperties(0.001, 0.141, 0.326, 0.531)
         mask = TestMask.maskEstimator.estimate(self.warpImageOccludedFace)
-        self.assertMaskEstimation(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
