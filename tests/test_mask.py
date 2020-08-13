@@ -1,3 +1,5 @@
+from typing import Dict
+
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
 from lunavl.sdk.image_utils.image import VLImage
 from sdk.estimators.face_estimators.facewarper import FaceWarpedImage
@@ -26,35 +28,27 @@ class TestMask(BaseTestClass):
         cls.warpImageMaskNotInPlace = FaceWarpedImage(VLImage.load(filename=MASK_NOT_IN_PLACE))
         cls.warpImageOccludedFace = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
 
-    @staticmethod
-    def assertMaskEstimation(mask: Mask):
+    def assertMaskEstimation(self, mask: Mask, expectedEstimationResults: Dict[str, float]):
         """
-        Function checks if an instance is Mask class
+        Function checks if the instance belongs to the Mask class and compares the result with what is expected.
 
         Args:
             mask: mask estimation object
-        """
-        assert isinstance(mask, Mask), f"{mask.__class__} is not {Mask}"
-        for propertyName in MASK_PROPERTIES:
-            property = getattr(mask, propertyName)
-            assert isinstance(property, float), f"{propertyName} is not float"
-            assert 0 <= property < 1, f"{propertyName} is out of range [0,1]"
-
-    def assertMaskPropertyResult(self, maskObj: Mask, expectedEstimationResults: dict):
-        """
-        Function checks predominant property from result
-
-        Args:
-            maskObj: mask estimation object
             expectedEstimationResults: dictionary with probability scores
         """
-        for propName in expectedEstimationResults:
-            self.assertAlmostEqual(
-                getattr(maskObj, propName),
-                expectedEstimationResults[propName],
-                delta=0.001,
-                msg=f"property value '{propName}' is incorrect",
-            )
+        assert isinstance(mask, Mask), f"{mask.__class__} is not {Mask}"
+
+        for propertyName in expectedEstimationResults:
+            with self.subTest(propertyName=propertyName):
+                actualPropertyResult = getattr(mask, propertyName)
+                assert isinstance(actualPropertyResult, float), f"{propertyName} is not float"
+                assert 0 <= actualPropertyResult < 1, f"{propertyName} is out of range [0,1]"
+                self.assertAlmostEqual(
+                    actualPropertyResult,
+                    expectedEstimationResults[propertyName],
+                    delta=0.001,
+                    msg=f"property value '{propertyName}' is incorrect",
+                )
 
     def test_estimate_mask_as_dict(self):
         """
@@ -71,8 +65,7 @@ class TestMask(BaseTestClass):
         """
         expectedResult = {"maskInPlace": 0.977, "maskNotInPlace": 0.022, "noMask": 0.001, "occludedFace": 0.001}
         mask = TestMask.maskEstimator.estimate(self.warpImageWithMask)
-        self.assertMaskEstimation(mask)
-        self.assertMaskPropertyResult(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult)
 
     def test_estimate_without_mask_on_the_face(self):
         """
@@ -80,8 +73,7 @@ class TestMask(BaseTestClass):
         """
         expectedResult = {"maskInPlace": 0.007, "maskNotInPlace": 0.071, "noMask": 0.897, "occludedFace": 0.025}
         mask = TestMask.maskEstimator.estimate(self.warpImageNoMask)
-        self.assertMaskEstimation(mask)
-        self.assertMaskPropertyResult(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult)
 
     def test_estimate_mask_not_in_place(self):
         """
@@ -89,8 +81,7 @@ class TestMask(BaseTestClass):
         """
         expectedResult = {"maskInPlace": 0.042, "maskNotInPlace": 0.386, "noMask": 0.003, "occludedFace": 0.567}
         mask = TestMask.maskEstimator.estimate(self.warpImageMaskNotInPlace)
-        self.assertMaskEstimation(mask)
-        self.assertMaskPropertyResult(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult)
 
     def test_estimate_mask_occluded_face(self):
         """
@@ -98,5 +89,4 @@ class TestMask(BaseTestClass):
         """
         expectedResult = {"maskInPlace": 0.001, "maskNotInPlace": 0.141, "noMask": 0.326, "occludedFace": 0.531}
         mask = TestMask.maskEstimator.estimate(self.warpImageOccludedFace)
-        self.assertMaskEstimation(mask)
-        self.assertMaskPropertyResult(mask, expectedResult)
+        self.assertMaskEstimation(mask, expectedResult)
