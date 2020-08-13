@@ -1,20 +1,20 @@
 from collections import namedtuple
 
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
-from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
+from sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from tests.base import BaseTestClass
-from tests.resources import CLEAN_ONE_FACE, FACE_WITH_MASK, OCCLUDED_FACE, MASK_NOT_IN_PLACE
+from tests.resources import WARP_CLEAN_FACE, FACE_WITH_MASK, OCCLUDED_FACE, MASK_NOT_IN_PLACE
 from tests.schemas import jsonValidator, MASK_SCHEMA
 
 MASK_PROPERTIES = [key for key in Mask.__dict__.keys() if not (key.startswith("_") or key == "asDict")]
 
 MaskCase = namedtuple("MaskCase", ("propertyResult", "excludedProperties"))
 MASK_TEST_DATA = {
-    "maskInPlace": MaskCase(0.95, {"noMask": 0.01, "maskNotInPlace": 0.01, "occludedFace": 0.01}),
-    "noMask": MaskCase(0.95, {"maskInPlace": 0.01, "maskNotInPlace": 0.02, "occludedFace": 0.01}),
-    "maskNotInPlace": MaskCase(0.6, {"maskInPlace": 0.2, "noMask": 0.01, "occludedFace": 0.2}),
-    "occludedFace": MaskCase(0.3, {"maskInPlace": 0.01, "noMask": 0.5, "maskNotInPlace": 0.25}),
+    "maskInPlace": MaskCase(0.95, {"noMask": 0.01, "maskNotInPlace": 0.03, "occludedFace": 0.01}),
+    "noMask": MaskCase(0.88, {"maskInPlace": 0.01, "maskNotInPlace": 0.08, "occludedFace": 0.03}),
+    "maskNotInPlace": MaskCase(0.35, {"maskInPlace": 0.05, "noMask": 0.01, "occludedFace": 0.6}),
+    "occludedFace": MaskCase(0.5, {"maskInPlace": 0.01, "noMask": 0.35, "maskNotInPlace": 0.15}),
 }
 
 
@@ -31,12 +31,10 @@ class TestMask(BaseTestClass):
         super().setup_class()
         cls.maskEstimator = cls.faceEngine.createMaskEstimator()
 
-        defaultDetector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
-        warper = cls.faceEngine.createFaceWarper()
-        cls.warpImageWithMask = warper.warp(defaultDetector.detectOne(VLImage.load(filename=FACE_WITH_MASK)))
-        cls.warpImageNoMask = warper.warp(defaultDetector.detectOne(VLImage.load(filename=CLEAN_ONE_FACE)))
-        cls.warpImageMaskNotInPlace = warper.warp(defaultDetector.detectOne(VLImage.load(filename=MASK_NOT_IN_PLACE)))
-        cls.warpImageOccludedFace = warper.warp(defaultDetector.detectOne(VLImage.load(filename=OCCLUDED_FACE)))
+        cls.warpImageWithMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
+        cls.warpImageNoMask = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
+        cls.warpImageMaskNotInPlace = FaceWarpedImage(VLImage.load(filename=MASK_NOT_IN_PLACE))
+        cls.warpImageOccludedFace = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
 
     @staticmethod
     def assertMaskEstimation(mask: Mask):
@@ -69,15 +67,6 @@ class TestMask(BaseTestClass):
         ), f"Value of the Mask estimation '{actualPropertyResult}' is less than '{expectedPropertyResult}'"
         for propName in lowerProbabilitySet:
             assert getattr(maskObj, propName) < MASK_TEST_DATA[expectedPredominantProperty].excludedProperties[propName]
-
-    def test_estimate_mask(self):
-        """
-        Test mask estimations
-        """
-        for warp in (self.warpImageWithMask, self.warpImageWithMask.warpedImage):
-            with self.subTest(warp=type(warp).__name__):
-                mask = TestMask.maskEstimator.estimate(warp)
-                self.assertMaskEstimation(mask)
 
     def test_estimate_mask_as_dict(self):
         """
