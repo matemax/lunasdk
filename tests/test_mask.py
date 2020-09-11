@@ -1,14 +1,14 @@
 from collections import namedtuple
 from typing import Dict
 
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
 from lunavl.sdk.image_utils.image import VLImage
-from sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from tests.base import BaseTestClass
-from tests.resources import WARP_CLEAN_FACE, FACE_WITH_MASK, OCCLUDED_FACE, MASK_NOT_IN_PLACE
+from tests.resources import WARP_CLEAN_FACE, FACE_WITH_MASK, OCCLUDED_FACE
 from tests.schemas import jsonValidator, MASK_SCHEMA
 
-MaskProperties = namedtuple("MaskProperties", ("maskInPlace", "maskNotInPlace", "noMask", "occludedFace"))
+MaskProperties = namedtuple("MaskProperties", ("missing", "medicalMask", "occluded"))
 
 
 class TestMask(BaseTestClass):
@@ -24,10 +24,9 @@ class TestMask(BaseTestClass):
         super().setup_class()
         cls.maskEstimator = cls.faceEngine.createMaskEstimator()
 
-        cls.warpImageWithMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
-        cls.warpImageNoMask = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
-        cls.warpImageMaskNotInPlace = FaceWarpedImage(VLImage.load(filename=MASK_NOT_IN_PLACE))
-        cls.warpImageOccludedFace = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
+        cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
+        cls.warpImageMissing = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
+        cls.warpImageOccluded = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
 
     def assertMaskEstimation(self, mask: Mask, expectedEstimationResults: Dict[str, float]):
         """
@@ -55,39 +54,33 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations as dict
         """
-        maskDict = TestMask.maskEstimator.estimate(self.warpImageWithMask).asDict()
+        maskDict = TestMask.maskEstimator.estimate(self.warpImageMedicalMask).asDict()
         assert (
             jsonValidator(schema=MASK_SCHEMA).validate(maskDict) is None
         ), f"{maskDict} does not match with schema {MASK_SCHEMA}"
 
-    def test_estimate_with_mask(self):
+    def test_estimate_medical_mask(self):
         """
         Test mask estimations with mask exists on the face
         """
-        expectedResult = MaskProperties(0.977, 0.022, 0.001, 0.001)
-        mask = TestMask.maskEstimator.estimate(self.warpImageWithMask)
+        expectedResult = MaskProperties(0.0, 0.999, 0.000)
+        mask = TestMask.maskEstimator.estimate(self.warpImageMedicalMask)
         self.assertMaskEstimation(mask, expectedResult._asdict())
 
-    def test_estimate_without_mask_on_the_face(self):
+    def test_estimate_missing_mask(self):
         """
         Test mask estimations without mask on the face
         """
-        expectedResult = MaskProperties(0.007, 0.071, 0.897, 0.025)
-        mask = TestMask.maskEstimator.estimate(self.warpImageNoMask)
+        expectedResult = MaskProperties(0.896, 0.078, 0.024)
+        mask = TestMask.maskEstimator.estimate(self.warpImageMissing)
         self.assertMaskEstimation(mask, expectedResult._asdict())
 
-    def test_estimate_mask_not_in_place(self):
-        """
-        Test mask estimations with mask exists on the face and is not worn properly
-        """
-        expectedResult = MaskProperties(0.042, 0.386, 0.003, 0.567)
-        mask = TestMask.maskEstimator.estimate(self.warpImageMaskNotInPlace)
         self.assertMaskEstimation(mask, expectedResult._asdict())
 
-    def test_estimate_mask_occluded_face(self):
+    def test_estimate_mask_occluded(self):
         """
         Test mask estimations with face is occluded by other object
         """
-        expectedResult = MaskProperties(0.001, 0.141, 0.326, 0.531)
-        mask = TestMask.maskEstimator.estimate(self.warpImageOccludedFace)
+        expectedResult = MaskProperties(0.326, 0.142, 0.531)
+        mask = TestMask.maskEstimator.estimate(self.warpImageOccluded)
         self.assertMaskEstimation(mask, expectedResult._asdict())

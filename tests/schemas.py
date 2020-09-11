@@ -64,14 +64,22 @@ QUALITY_SCHEMA = {
     "required": ["blurriness", "dark", "illumination", "specularity", "light"],
 }
 
+MASK_ESTIMATION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "medical_mask": TYPE_SCORE,
+        "missing": TYPE_SCORE,
+        "occluded": TYPE_SCORE,
+    },
+    "additionalProperties": False,
+    "required": ["medical_mask", "missing", "occluded"],
+}
+
 MASK_SCHEMA = {
     "type": "object",
     "properties": {
-        "mask_in_place": TYPE_SCORE,
-        "mask_not_in_place": TYPE_SCORE,
-        "no_mask": TYPE_SCORE,
-        "occluded_face": TYPE_SCORE,
+        "estimations": MASK_ESTIMATION_SCHEMA,
+        "predominant_mask": {"type": "string", "enum": ["medical_mask", "missing", "occluded"]}
     },
-    "additionalProperties": False,
-    "required": ["mask_in_place", "mask_not_in_place", "no_mask", "occluded_face"],
+    "required": ["estimations", "predominant_mask"],
 }
