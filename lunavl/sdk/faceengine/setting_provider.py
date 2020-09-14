@@ -2086,6 +2086,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
         return FaceDetV2Settings(self._coreSettingProvider)
 
     @property
+    def humanDetectorSettings(self) -> HumanDetectorSettings:
+        """
+        Getter for human body settings section.
+
+        Returns:
+            Mutable HumanDetectorSettings section
+        """
+        return HumanDetectorSettings(self._coreSettingProvider)
+
+    @property
     def lNetSettings(self) -> LNetSettings:
         """
         Getter for LNet settings section.
