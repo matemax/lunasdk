@@ -66,11 +66,7 @@ QUALITY_SCHEMA = {
 
 MASK_ESTIMATION_SCHEMA = {
     "type": "object",
-    "properties": {
-        "medical_mask": TYPE_SCORE,
-        "missing": TYPE_SCORE,
-        "occluded": TYPE_SCORE,
-    },
+    "properties": {"medical_mask": TYPE_SCORE, "missing": TYPE_SCORE, "occluded": TYPE_SCORE,},
     "additionalProperties": False,
     "required": ["medical_mask", "missing", "occluded"],
 }
@@ -79,7 +75,7 @@ MASK_SCHEMA = {
     "type": "object",
     "properties": {
         "estimations": MASK_ESTIMATION_SCHEMA,
-        "predominant_mask": {"type": "string", "enum": ["medical_mask", "missing", "occluded"]}
+        "predominant_mask": {"type": "string", "enum": ["medical_mask", "missing", "occluded"]},
     },
     "required": ["estimations", "predominant_mask"],
 }

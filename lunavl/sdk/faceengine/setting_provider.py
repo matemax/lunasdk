@@ -1156,7 +1156,6 @@ class LNetBaseSettings(BaseSettingsSection):
         - mean (Point3): mean
         - sigma (Point3): sigma
 
-
     """
 
     @property

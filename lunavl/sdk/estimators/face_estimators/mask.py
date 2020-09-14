@@ -130,11 +130,7 @@ class Mask(BaseEstimation):
             predominantName = "missing"
         return {
             "predominant_mask": predominantName,
-            "estimations": {
-                "medical_mask": self.medicalMask,
-                "missing": self.missing,
-                "occluded": self.occluded,
-            }
+            "estimations": {"medical_mask": self.medicalMask, "missing": self.missing, "occluded": self.occluded,},
         }
 
 
