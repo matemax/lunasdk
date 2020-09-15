@@ -66,7 +66,7 @@ QUALITY_SCHEMA = {
 
 MASK_ESTIMATION_SCHEMA = {
     "type": "object",
-    "properties": {"medical_mask": TYPE_SCORE, "missing": TYPE_SCORE, "occluded": TYPE_SCORE,},
+    "properties": {"medical_mask": TYPE_SCORE, "missing": TYPE_SCORE, "occluded": TYPE_SCORE},
     "additionalProperties": False,
     "required": ["medical_mask", "missing", "occluded"],
 }
