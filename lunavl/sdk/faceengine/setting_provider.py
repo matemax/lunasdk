@@ -552,7 +552,7 @@ class FaceDetV3Settings(BaseSettingsSection):
         - paddings (Point4): paddings;
         - paddingsIR (Point4): paddingsIR;
         - planPrefix (str): planPrefix;
-        - useOrientationMode (bool): Usemode for rotated origin images or not;
+        - useOrientationMode (bool): use mode for rotated origin images or not;
     """
 
     sectionName = "FaceDetV3::Settings"
@@ -636,12 +636,12 @@ class FaceDetV3Settings(BaseSettingsSection):
     @property
     def maxFaceSize(self) -> int:
         """
-        Getter for imageSize
+        Getter for maxFaceSize
 
         Returns:
-            imageSize
+            maxFaceSize
         """
-        return self.getValueAsInt("imageSize")
+        return self.getValueAsInt("maxFaceSize")
 
     @maxFaceSize.setter
     def maxFaceSize(self, value: int) -> None:
@@ -979,15 +979,10 @@ class HumanDetectorSettings(BaseSettingsSection):
         - scoreThreshold (float): detection threshold in [0..1] range;
         - redetectScoreThreshold (float): redetect face threshold in [0..1] range;
         - NMSThreshold (float): overlap threshold for NMS [0..1] range;
-        - minFaceSize (int): Minimum face size in pixels;
-        - maxFaceSize (int): Maximum face size in pixels;
-        - nms (NMS): type of NMS: mean or best;
-        - redetectTensorSize (int): target face after preprocessing for redetect;
-        - redetectFaceTargetSize (int): target face size for redetect;
-        - paddings (Point4): paddings;
-        - paddingsIR (Point4): paddingsIR;
-        - planPrefix (str): planPrefix;
-        - useOrientationMode (bool): Usemode for rotated origin images or not;
+        - imageSize (int): Target image size for down scaling by load side;
+        - nms (NMS): type of NMS: mean or best
+        - redetectNMS: type of NMS: mean or best
+        - landmarks17Threshold (float): body landmarks threshold in [0..1] range;
     """
 
     sectionName = "HumanDetector::Settings"
