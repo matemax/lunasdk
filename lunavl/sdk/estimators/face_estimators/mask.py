@@ -112,7 +112,7 @@ class Mask(BaseEstimation):
 
         Returns:
             {
-            "predominant_emotion": predominantName,
+            "predominant_mask": predominantName,
             "estimations": {
                 "medical_mask": self.medicalMask,
                 "missing": self.missing,

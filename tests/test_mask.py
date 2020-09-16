@@ -75,8 +75,6 @@ class TestMask(BaseTestClass):
         mask = TestMask.maskEstimator.estimate(self.warpImageMissing)
         self.assertMaskEstimation(mask, expectedResult._asdict())
 
-        self.assertMaskEstimation(mask, expectedResult._asdict())
-
     def test_estimate_mask_occluded(self):
         """
         Test mask estimations with face is occluded by other object

@@ -78,4 +78,5 @@ MASK_SCHEMA = {
         "predominant_mask": {"type": "string", "enum": ["medical_mask", "missing", "occluded"]},
     },
     "required": ["estimations", "predominant_mask"],
+    "additionalProperties": False,
 }
