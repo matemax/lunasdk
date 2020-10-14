@@ -2,15 +2,49 @@
 
 See `warp quality`_.
 """
+from enum import Enum
 from typing import Union, Dict
 
 from FaceEngine import MedicalMaskEstimation, IMedicalMaskEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import MedicalMask as CoreMask  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
+
+
+class MaskState(Enum):
+    """
+    Emotions enum
+    """
+
+    #: Missing
+    Missing = 1
+    #: MedicalMask
+    MedicalMask = 2
+    #: Occluded
+    Occluded = 3
+
+    @staticmethod
+    def fromCoreEmotion(coreMask: CoreMask) -> "MaskState":
+        """
+        Get enum element by core emotion.
+
+        Args:
+            coreEmotion: enum value from core
+
+        Returns:
+            corresponding emotion
+        """
+        if coreMask == CoreMask.NoMask:
+            return MaskState.Missing
+        if coreMask == CoreMask.Mask:
+            return MaskState.MedicalMask
+        if coreMask == CoreMask.OccludedFace:
+            return MaskState.Occluded
+        raise RuntimeError(f"bad core mask state {coreMask}")
 
 
 class Mask(BaseEstimation):
@@ -33,62 +67,70 @@ class Mask(BaseEstimation):
         super().__init__(mask)
 
     @property
-    def maskInPlace(self) -> float:
+    def medicalMask(self) -> float:
         """
         The probability that the mask exists on the face and is worn properly
 
         Returns:
             float in range(0, 1)
         """
-        return self._coreEstimation.maskInPlace
+        return self._coreEstimation.maskScore
 
     @property
-    def maskNotInPlace(self) -> float:
-        """
-        The probability that the mask exists on the face and is not worn properly
-
-        Returns:
-            float in range(0, 1)
-        """
-        return self._coreEstimation.maskNotInPlace
-
-    @property
-    def noMask(self) -> float:
+    def missing(self) -> float:
         """
         The probability that the mask not exists on the face
 
         Returns:
             float in range(0, 1)
         """
-        return self._coreEstimation.noMask
+        return self._coreEstimation.noMaskScore
 
     @property
-    def occludedFace(self) -> float:
+    def occluded(self) -> float:
         """
         The probability that the face is occluded by other object (not by mask)
 
         Returns:
             float in range(0, 1)
         """
-        return self._coreEstimation.occludedFace
+        return self._coreEstimation.occludedFaceScore
 
-    def asDict(self) -> Dict[str, float]:
+    @property
+    def predominateMask(self) -> MaskState:
+        """
+        Get predominate mask state.
+
+        Returns:
+            emotion with max score value
+        """
+        return MaskState.fromCoreEmotion(self._coreEstimation.result)
+
+    def asDict(self) -> Dict[str, Union[str, Dict[str, float]]]:
         """
         Convert to dict.
 
         Returns:
             {
-                "mask_in_place": self.maskInPlace,
-                "mask_not_in_place": self.maskNotInPlace,
-                "no_mask": self.noMask,
-                "occluded_face": self.occludedFace,
+            "predominant_mask": predominantName,
+            "estimations": {
+                "medical_mask": self.medicalMask,
+                "missing": self.missing,
+                "occluded": self.occluded,
             }
+        }
+
         """
+        predominant = self.predominateMask
+        if predominant == MaskState.Occluded:
+            predominantName = "occluded"
+        elif predominant == MaskState.MedicalMask:
+            predominantName = "medical_mask"
+        else:
+            predominantName = "missing"
         return {
-            "mask_in_place": self.maskInPlace,
-            "mask_not_in_place": self.maskNotInPlace,
-            "no_mask": self.noMask,
-            "occluded_face": self.occludedFace,
+            "predominant_mask": predominantName,
+            "estimations": {"medical_mask": self.medicalMask, "missing": self.missing, "occluded": self.occluded},
         }
 
 
