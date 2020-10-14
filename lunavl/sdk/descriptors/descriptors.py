@@ -151,7 +151,10 @@ class BaseDescriptorBatch(BaseEstimation):
         """
         if i >= len(self):
             raise IndexError(f"Descriptor index '{i}' out of range")  # todo remove after
-        descriptor = self.__class__._descriptorFactory(self._coreEstimation.getDescriptorFast(i), self.scores[i])
+        error, descriptor = self._coreEstimation.getDescriptorFast(i)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        descriptor = self.__class__._descriptorFactory(descriptor, self.scores[i])
         return descriptor
 
     def __iter__(self) -> Iterator[BaseDescriptor]:

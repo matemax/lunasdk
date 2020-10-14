@@ -25,4 +25,7 @@ OPEN_EYES = getPathToImage("girl_front_face.jpg")
 MIXED_EYES = getPathToImage("one_face.jpg")
 CLOSED_EYES = getPathToImage("closed_eyes.jpg")
 
-FACE_WITH_MASK = getPathToImage("mask.jpg")
+FACE_WITH_MASK = getPathToImage("face_with_mask.jpg")
+OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
+MASK_NOT_IN_PLACE = getPathToImage("mask_not_in_place.jpg")
+WARP_CLEAN_FACE = getPathToImage("warp_clean_face.jpg")
