@@ -165,6 +165,6 @@ class TestHeadPose(BaseTestClass):
         angles0 = detector.detectOne(VLImage.load(filename=ROTATED0)).headPose
         angles90 = detector.detectOne(VLImage.load(filename=ROTATED90)).headPose
 
-        assert pytest.approx(angles90.pitch, 1) == angles0.pitch
-        assert pytest.approx(angles90.roll, 1) == angles0.roll
-        assert pytest.approx(angles90.yaw, 1) == angles0.yaw
+        assert pytest.approx(angles90.pitch, abs=2) == angles0.pitch
+        assert pytest.approx(angles90.roll, abs=2) == angles0.roll
+        assert pytest.approx(angles90.yaw, abs=2) == angles0.yaw
