@@ -88,7 +88,7 @@ def assertImageForDetection(image: VLImage) -> None:
     Raises:
         LunaSDKException: if image format is not R8G8B8
     """
-    if image.format != ColorFormat.R8G8B8:
+    if image.format.value != ColorFormat.R8G8B8.value:
         details = "Bad image format for detection, format: {}, image: {}".format(image.format.value, image.filename)
         raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
 
