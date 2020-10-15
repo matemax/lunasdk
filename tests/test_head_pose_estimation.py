@@ -90,7 +90,7 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose by bounding box test.
         """
-        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(self.detection.boundingBox, self.image.coreImage)
+        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(self.detection.boundingBox, self.image)
         self.assertHeadPose(angles)
 
     def test_estimate_head_pose_by_bounding_box_from_other_image(self):
@@ -98,7 +98,7 @@ class TestHeadPose(BaseTestClass):
         Estimating head pose on image without faces by bounding box from other image.
         """
         image = VLImage.load(filename=NO_FACES)
-        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(self.detection.boundingBox, image.coreImage)
+        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(self.detection.boundingBox, image)
         self.assertHeadPose(angles)
 
     def test_estimate_head_pose_by_image_and_bounding_box_without_intersection(self):
@@ -108,7 +108,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = DetectionFloat(RectFloat(3000.0, 3000.0, 100.0, 100.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image.coreImage)
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
@@ -118,7 +118,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = DetectionFloat(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image.coreImage)
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection)
 
     def test_default_estimation(self):
