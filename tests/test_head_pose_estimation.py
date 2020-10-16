@@ -10,8 +10,12 @@ from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
 from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.luna_faces import VLFaceDetector
+from sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, NO_FACES, GOST_HEAD_POSE_FACE, TURNED_HEAD_POSE_FACE, FRONTAL_HEAD_POSE_FACE
+from tests.resources import (
+    ONE_FACE, NO_FACES, GOST_HEAD_POSE_FACE, TURNED_HEAD_POSE_FACE, FRONTAL_HEAD_POSE_FACE, ROTATED0, ROTATED90,
+)
 
 
 class TestHeadPose(BaseTestClass):
@@ -152,3 +156,37 @@ class TestHeadPose(BaseTestClass):
                 angles = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(detection.landmarks68)
                 self.assertHeadPose(angles)
                 assert angles.getFrontalType() == case.type
+
+    def test_estimate_head_pose_hight_level_with_use_orientation_mode(self):
+        """
+        Estimating head pose by bounding box using high level detector with useOrientationMode=1.
+        """
+
+        faceEngine = VLFaceEngine()
+        faceEngine.faceEngineProvider.faceDetV3Settings.useOrientationMode = 1
+        detector = VLFaceDetector(DetectorType.FACE_DET_V3, faceEngine)
+
+        angles0 = detector.detectOne(VLImage.load(filename=ROTATED0)).headPose
+        angles90 = detector.detectOne(VLImage.load(filename=ROTATED90)).headPose
+
+        assert pytest.approx(angles90.pitch, abs=2) == angles0.pitch
+        assert pytest.approx(angles90.roll, abs=2) == angles0.roll
+        assert pytest.approx(angles90.yaw, abs=2) == angles0.yaw
+
+    def test_estimate_head_pose_with_use_orientation_mode(self):
+        """
+        Estimating head pose by bounding box with useOrientationMode=1.
+        """
+
+        faceEngine = VLFaceEngine()
+        faceEngine.faceEngineProvider.faceDetV3Settings.useOrientationMode = 1
+        detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+
+        images = [VLImage.load(filename=ROTATED0), VLImage.load(filename=ROTATED90)]
+        detections = detector.detect(images, detect68Landmarks=True)
+        angles0 = TestHeadPose.headPoseEstimator.estimate(detections[0][0].landmarks68)
+        angles90 = TestHeadPose.headPoseEstimator.estimate(detections[1][0].landmarks68)
+
+        assert pytest.approx(angles90.pitch, abs=2) == angles0.pitch
+        assert pytest.approx(angles90.roll, abs=2) == angles0.roll
+        assert pytest.approx(angles90.yaw, abs=2) == angles0.yaw
