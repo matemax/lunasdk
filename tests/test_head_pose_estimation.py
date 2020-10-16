@@ -14,7 +14,13 @@ from lunavl.sdk.luna_faces import VLFaceDetector
 from sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
 from tests.resources import (
-    ONE_FACE, NO_FACES, GOST_HEAD_POSE_FACE, TURNED_HEAD_POSE_FACE, FRONTAL_HEAD_POSE_FACE, ROTATED0, ROTATED90,
+    ONE_FACE,
+    NO_FACES,
+    GOST_HEAD_POSE_FACE,
+    TURNED_HEAD_POSE_FACE,
+    FRONTAL_HEAD_POSE_FACE,
+    ROTATED0,
+    ROTATED90,
 )
 
 
