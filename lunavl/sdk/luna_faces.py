@@ -102,7 +102,7 @@ class VLFaceDetection(FaceDetection):
         """
         if self._headPose is None:
             self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(
-                self.boundingBox, VLImage(body=self.coreEstimation.img, filename=self.image.filename)
+                self.boundingBox, self.image
             )
         return self._headPose
 

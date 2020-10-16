@@ -41,7 +41,7 @@ class BaseDetection(BaseEstimation):
     """
     Attributes:
         boundingBox (sdk.detectors.base.BoundingBox): face bounding box
-        _image (VLImage): source of detection
+        _image (VLImage): source of detection (may differ from the original image due to the orientation mode)
 
     """
 
@@ -53,11 +53,12 @@ class BaseDetection(BaseEstimation):
 
         Args:
             coreDetection: core detection
+            image: original image
         """
         super().__init__(coreDetection)
 
         self.boundingBox = BoundingBox(coreDetection.detection)
-        self._image = image
+        self._image = VLImage(body=coreDetection.img, filename=image.filename)
 
     @property
     def image(self) -> VLImage:
@@ -88,7 +89,7 @@ def assertImageForDetection(image: VLImage) -> None:
     Raises:
         LunaSDKException: if image format is not R8G8B8
     """
-    if image.format.value != ColorFormat.R8G8B8.value:
+    if image.format != ColorFormat.R8G8B8:
         details = "Bad image format for detection, format: {}, image: {}".format(image.format.value, image.filename)
         raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
 
