@@ -15,7 +15,7 @@ from .base import (
 )
 from ..base import LandmarksWithScore
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -213,13 +213,22 @@ class HumanDetector:
         Returns:
             detections
         Raises:
-            LunaSDKException if an error occurs
+            LunaSDKException if an error occurs, context contains all errors
         """
         res = []
+        errors = []
         for image in images:
             imageRes = []
+            isDetectionSuccess = True
             for bBox in image.bBoxes:
-                detection = self.redetectOne(image.image, bBox=bBox)
-                imageRes.append(detection)
-            res.append(imageRes)
+                try:
+                    detection = self.redetectOne(image.image, bBox=bBox)
+                    imageRes.append(detection)
+                except LunaSDKException as exc:
+                    errors.append(exc.error)
+                    isDetectionSuccess = False
+            if isDetectionSuccess:
+                res.append(imageRes)
+        if errors:
+            raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
         return res
