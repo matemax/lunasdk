@@ -272,16 +272,16 @@ class FaceDetector:
         Returns:
             detections
         Raises:
-            LunaSDKException if an error occurs
+            LunaSDKException if an error occurs, context contains all errors
         """
         faces = []
         for image in images:
             assertImageForDetection(image.image)
             faces.extend(_createCoreFaces(image))
-        error, detectRes, _ = self._detector.redetect(
+        mainError, detectRes, errors = self._detector.redetect(
             faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        assertError(error)
+        assertError(mainError, errors)
 
         detectIter = iter(detectRes)
         res = []
