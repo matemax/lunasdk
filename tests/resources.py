@@ -32,3 +32,5 @@ WARP_CLEAN_FACE = getPathToImage("warp_clean_face.jpg")
 
 ROTATED0 = getPathToImage("rotated0.jpg")
 ROTATED90 = getPathToImage("rotated90.png")
+
+BAD_IMAGE = getPathToImage("bad_image.jpg")

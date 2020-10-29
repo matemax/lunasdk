@@ -18,7 +18,7 @@ from ..detectors.base import (
     getArgsForCoreDetectorForImages,
 )
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -212,11 +212,19 @@ class FaceDetector:
 
         """
         imgs, detectAreas = getArgsForCoreDetectorForImages(images)
+        detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
-        error, detectRes = self._detector.detect(
-            imgs, detectAreas, limit, self._getDetectionType(detect5Landmarks, detect68Landmarks)
-        )
-        assertError(error)
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
+        if error.isError:
+            errors = []
+            for image, detectArea in zip(imgs, detectAreas):
+                errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
+                if errorOne.isOk:
+                    errors.append(LunaVLError.Ok)
+                else:
+                    errors.append(LunaVLError.fromSDKError(errorOne))
+            raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
+
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
             image_ = images[numberImage]

@@ -153,7 +153,7 @@ class TestsRedetectFace(FaceDetectTestClass):
                         ]
                     )
                 self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
-                assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+                assert len(exceptionInfo.value.context) == 2, "Expect two error in exception context"
                 assert exceptionInfo.value.context[0], LunaVLError.InvalidRect
 
     @pytest.mark.skip("core bug: Fatal error")

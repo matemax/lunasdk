@@ -4,7 +4,7 @@ Module realizes LunaSDKException - single exception for rising in sdk module
 from functools import wraps
 from typing import Optional, Any, Callable, List
 
-from FaceEngine import FSDKErrorResult, FSDKErrorValueBool  # pylint: disable=E0611,E0401
+from FaceEngine import FSDKErrorResult  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import ErrorInfo, LunaVLError
 
@@ -62,6 +62,4 @@ def assertError(error: FSDKErrorResult, context: Optional[List[Any]] = None) -> 
 
     """
     if error.isError:
-        if isinstance(error, FSDKErrorValueBool):
-            raise LunaSDKException(error, context)
         raise LunaSDKException(LunaVLError.fromSDKError(error), context)
