@@ -59,7 +59,7 @@ class BaseDetectorTestClass(BaseTestClass):
 
     def assertDetection(
         self,
-        detection: Union[FaceDetection, HumanDetection, List[FaceDetection], List[HumanDetection]],
+        detection: Union[FaceDetection, HumanDetection, List[Union[FaceDetection, HumanDetection]]],
         imageVl: VLImage,
     ):
         """
