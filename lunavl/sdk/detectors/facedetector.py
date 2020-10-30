@@ -220,7 +220,7 @@ class FaceDetector:
             for image, detectArea in zip(imgs, detectAreas):
                 errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
                 if errorOne.isOk:
-                    errors.append(LunaVLError.Ok)
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 else:
                     errors.append(LunaVLError.fromSDKError(errorOne))
             raise LunaSDKException(LunaVLError.BatchedInternalError, errors)

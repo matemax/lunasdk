@@ -8,8 +8,6 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 from tests.detect_test_class import FaceDetectTestClass, BAD_IMAGE
-from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
-from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 from tests.detect_test_class import (
     VLIMAGE_ONE_FACE,
     GOOD_AREA,
@@ -18,6 +16,8 @@ from tests.detect_test_class import (
     OUTSIDE_AREA,
     VLIMAGE_SMALL,
 )
+from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
+from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 
 
 class TestFaceDetector(FaceDetectTestClass):
@@ -135,8 +135,8 @@ class TestFaceDetector(FaceDetectTestClass):
             self.detectors[2].detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-        assert exceptionInfo.value.context[0] == LunaVLError.Ok
-        assert exceptionInfo.value.context[1].errorCode == LunaVLError.Internal.errorCode
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Internal)
 
     def test_detect_one_with_image_of_several_faces(self):
         """

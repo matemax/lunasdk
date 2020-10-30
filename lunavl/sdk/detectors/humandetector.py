@@ -140,7 +140,9 @@ class HumanDetector:
         else:
             forDetection = ImageForDetection(image=image, detectArea=detectArea)
         imgs, detectAreas = getArgsForCoreDetectorForImages([forDetection])
-        error, detectRes = self._detector.detect([imgs[0]], [detectAreas[0]], 1, self._getDetectionType(detectLandmarks))
+        error, detectRes = self._detector.detect(
+            [imgs[0]], [detectAreas[0]], 1, self._getDetectionType(detectLandmarks)
+        )
         assertError(error)
 
         return HumanDetection(detectRes[0][0], image) if detectRes[0] else None

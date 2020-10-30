@@ -5,6 +5,8 @@ import unittest
 from enum import Enum
 from typing import Tuple, Generator, NamedTuple, Callable, List, Union, ContextManager
 
+import pytest
+
 from lunavl.sdk.descriptors.descriptors import (
     FaceDescriptor,
     BaseDescriptor,
@@ -13,13 +15,17 @@ from lunavl.sdk.descriptors.descriptors import (
     FaceDescriptorBatch,
     HumanDescriptorBatch,
 )
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
 from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarpedImage
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
+from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import WARP_WHITE_MAN, HUMAN_WARP
+from tests.detect_test_class import VLIMAGE_SMALL
+from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
 
@@ -358,7 +364,6 @@ class TestEstimateDescriptor(BaseTestClass):
         """
         for case in self.cases:
             with self.subTest(type=case.type):
-
                 for planVersion in case.versions:
                     extractor = case.extractorFactory(descriptorVersion=planVersion)
                     for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(case.warps), case.type))):
@@ -376,6 +381,31 @@ class TestEstimateDescriptor(BaseTestClass):
                                     self.assertDescriptor(planVersion, descriptorAggregated, case.type)
                                 else:
                                     assert descriptorAggregated is None
+
+    def test_extract_descriptors_batch_positive_and_negative(self):
+        """
+        Test estimate descriptor batch with one good warp and one bad (expected error).
+        """
+        for case in self.cases:
+            with self.subTest(type=case.type):
+                for planVersion in case.versions:
+                    extractor = case.extractorFactory(descriptorVersion=planVersion)
+                    for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(case.warps), case.type))):
+                        for aggregate in (True, False):
+                            with self.subTest(
+                                plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)
+                            ):
+                                badWarp = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
+                                badWarp.coreImage = VLIMAGE_SMALL.coreImage
+                                with pytest.raises(LunaSDKException) as exceptionInfo:
+                                    extractor.estimateDescriptorsBatch(
+                                        [case.warps[0], badWarp], aggregate=aggregate, **kw
+                                    )
+                                assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
+                                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+                                self.assertReceivedAndRawExpectedErrors(
+                                    exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
+                                )
 
     @unittest.skip("dont do it FSDK-2186")
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):
