@@ -544,13 +544,15 @@ class FaceDetV3Settings(BaseSettingsSection):
         - scoreThreshold (float): detection threshold in [0..1] range;
         - redetectScoreThreshold (float): redetect face threshold in [0..1] range;
         - NMSThreshold (float): overlap threshold for NMS [0..1] range;
-        - imageSize (int): Target image size for down scaling by load side;
+        - minFaceSize (int): Minimum face size in pixels;
+        - maxFaceSize (int): Maximum face size in pixels;
         - nms (NMS): type of NMS: mean or best;
         - redetectTensorSize (int): target face after preprocessing for redetect;
         - redetectFaceTargetSize (int): target face size for redetect;
         - paddings (Point4): paddings;
         - paddingsIR (Point4): paddingsIR;
         - planPrefix (str): planPrefix;
+        - useOrientationMode (bool): use mode for rotated origin images or not;
     """
 
     sectionName = "FaceDetV3::Settings"
@@ -613,23 +615,42 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("NMSThreshold", value)
 
     @property
-    def imageSize(self) -> int:
+    def minFaceSize(self) -> int:
         """
-        Getter for imageSize
+        Getter for minFaceSize
 
         Returns:
-            imageSize
+            minFaceSize
         """
-        return self.getValueAsInt("imageSize")
+        return self.getValueAsInt("minFaceSize")
 
-    @imageSize.setter
-    def imageSize(self, value: int) -> None:
+    @minFaceSize.setter
+    def minFaceSize(self, value: int) -> None:
         """
-        Setter for imageSize
+        Setter for minFaceSize
         Args:
             value: new value
         """
-        self.setValue("imageSize", value)
+        self.setValue("minFaceSize", value)
+
+    @property
+    def maxFaceSize(self) -> int:
+        """
+        Getter for maxFaceSize
+
+        Returns:
+            maxFaceSize
+        """
+        return self.getValueAsInt("maxFaceSize")
+
+    @maxFaceSize.setter
+    def maxFaceSize(self, value: int) -> None:
+        """
+        Setter for maxFaceSize
+        Args:
+            value: new value
+        """
+        self.setValue("maxFaceSize", value)
 
     @property
     def nms(self) -> NMS:
@@ -745,6 +766,25 @@ class FaceDetV3Settings(BaseSettingsSection):
         """
         self.setValue("planPrefix", value)
 
+    @property
+    def useOrientationMode(self) -> bool:
+        """
+        Getter for useOrientationMode
+
+        Returns:
+            useEstimationByImage
+        """
+        return bool(self.getValueAsInt("useOrientationMode"))
+
+    @useOrientationMode.setter
+    def useOrientationMode(self, value: bool) -> None:
+        """
+        Setter for useOrientationMode
+        Args:
+            value: new value
+        """
+        self.setValue("useOrientationMode", int(value))
+
 
 class FaceDetV12Settings(BaseSettingsSection):
     """
@@ -755,7 +795,7 @@ class FaceDetV12Settings(BaseSettingsSection):
         - firstThreshold (float): 1-st threshold in [0..1] range;
         - secondThreshold (float): 2-st threshold in [0..1] range;
         - thirdTThreshold (float): 3-st threshold in [0..1] range;
-        - minSize (int): minimum face size in pixels;
+        - minFaceSize (int): minimum face size in pixels;
         - scaleFactor (float): image scale factor;
         - paddings (Point4): paddings;
         - redetectTolerance (float): redetect tolerance;
@@ -819,23 +859,23 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("ThirdThreshold", value)
 
     @property
-    def minSize(self) -> int:
+    def minFaceSize(self) -> int:
         """
-        Getter for minSize
+        Getter for minFaceSize
 
         Returns:
             minSize
         """
-        return self.getValueAsInt("minSize")
+        return self.getValueAsInt("minFaceSize")
 
-    @minSize.setter
-    def minSize(self, value: int) -> None:
+    @minFaceSize.setter
+    def minFaceSize(self, value: int) -> None:
         """
-        Setter for descriptorCountWarningLevel
+        Setter for minFaceSize
         Args:
             value: new value
         """
-        self.setValue("minSize", value)
+        self.setValue("minFaceSize", value)
 
     @property
     def scaleFactor(self) -> float:
@@ -894,6 +934,25 @@ class FaceDetV12Settings(BaseSettingsSection):
         """
         self.setValue("redetectTolerance", value)
 
+    @property
+    def useLNet(self) -> bool:
+        """
+        Getter for useLNet
+
+        Returns:
+            useEstimationByImage
+        """
+        return bool(self.getValueAsInt("useLNet"))
+
+    @useLNet.setter
+    def useLNet(self, value: bool) -> None:
+        """
+        Setter for useLNet
+        Args:
+            value: new value
+        """
+        self.setValue("useLNet", int(value))
+
 
 class FaceDetV1Settings(FaceDetV12Settings):
     """
@@ -911,6 +970,176 @@ class FaceDetV2Settings(FaceDetV12Settings):
     sectionName = "FaceDetV2::Settings"
 
 
+class HumanDetectorSettings(BaseSettingsSection):
+    """
+    HumanDetector detector settings.
+
+    Properties:
+
+        - scoreThreshold (float): detection threshold in [0..1] range;
+        - redetectScoreThreshold (float): redetect face threshold in [0..1] range;
+        - NMSThreshold (float): overlap threshold for NMS [0..1] range;
+        - imageSize (int): Target image size for down scaling by load side;
+        - nms (NMS): type of NMS: mean or best
+        - redetectNMS: type of NMS: mean or best
+        - landmarks17Threshold (float): body landmarks threshold in [0..1] range;
+    """
+
+    sectionName = "HumanDetector::Settings"
+
+    @property
+    def scoreThreshold(self) -> float:
+        """
+        Getter for scoreThreshold
+
+        Returns:
+            scoreThreshold
+        """
+        return self.getValueAsFloat("scoreThreshold")
+
+    @scoreThreshold.setter
+    def scoreThreshold(self, value: float) -> None:
+        """
+        Setter for descriptorCountWarningLevel
+        Args:
+            value: new value
+        """
+        self.setValue("ScoreThreshold", value)
+
+    @property
+    def redetectScoreThreshold(self) -> float:
+        """
+        Getter for redetectScoreThreshold
+
+        Returns:
+            redetectScoreThreshold
+        """
+        return self.getValueAsFloat("RedetectScoreThreshold")
+
+    @redetectScoreThreshold.setter
+    def redetectScoreThreshold(self, value: float) -> None:
+        """
+        Setter for redetectScoreThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("RedetectScoreThreshold", value)
+
+    @property
+    def NMSThreshold(self) -> float:
+        """
+        Getter for NMSThreshold
+
+        Returns:
+            NMSThreshold
+        """
+        return self.getValueAsFloat("NMSThreshold")
+
+    @NMSThreshold.setter
+    def NMSThreshold(self, value: float) -> None:
+        """
+        Setter for NMSThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("NMSThreshold", value)
+
+    @property
+    def redetectNMSThreshold(self) -> float:
+        """
+        Getter for redetectNMSThreshold
+
+        Returns:
+            redetectNMSThreshold
+        """
+        return self.getValueAsFloat("RedetectNMSThreshold")
+
+    @redetectNMSThreshold.setter
+    def redetectNMSThreshold(self, value: float) -> None:
+        """
+        Setter for redetectNMSThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("RedetectNMSThreshold", value)
+
+    @property
+    def imageSize(self) -> int:
+        """
+        Getter for imageSize
+
+        Returns:
+            imageSize
+        """
+        return self.getValueAsInt("imageSize")
+
+    @imageSize.setter
+    def imageSize(self, value: int) -> None:
+        """
+        Setter for imageSize
+        Args:
+            value: new value
+        """
+        self.setValue("imageSize", value)
+
+    @property
+    def nms(self) -> NMS:
+        """
+        Getter for nms
+
+        Returns:
+            nms
+        """
+        return NMS[self.getValueAsString("nms")]
+
+    @nms.setter
+    def nms(self, value: NMS) -> None:
+        """
+        Setter for nms
+        Args:
+            value: new value
+        """
+        self.setValue("nms", value.value)
+
+    @property
+    def redetectNMS(self) -> NMS:
+        """
+        Getter for redetectMms
+
+        Returns:
+            nms
+        """
+        return NMS[self.getValueAsString("RedetectNMS")]
+
+    @redetectNMS.setter
+    def redetectNMS(self, value: NMS) -> None:
+        """
+        Setter for redetectNMS
+        Args:
+            value: redetectNMS value
+        """
+        self.setValue("RedetectNMS", value.value)
+
+    @property
+    def landmarks17Threshold(self) -> float:
+        """
+        Getter for landmarks17Threshold
+
+        Returns:
+            scoreThreshold
+        """
+        return self.getValueAsFloat("landmarks17Threshold")
+
+    @landmarks17Threshold.setter
+    def landmarks17Threshold(self, value: float) -> None:
+        """
+        Setter for landmarks17Threshold
+        Args:
+            value: new value
+        """
+        self.setValue("landmarks17Threshold", value)
+
+
 class LNetBaseSettings(BaseSettingsSection):
     """
     Base class for configuration LNet neural network.
@@ -921,7 +1150,6 @@ class LNetBaseSettings(BaseSettingsSection):
         - size (int): size
         - mean (Point3): mean
         - sigma (Point3): sigma
-
 
     """
 
@@ -1231,6 +1459,36 @@ class EyeEstimatorSettings(BaseSettingsSection):
         self.setValue("useStatusPlan", int(value))
 
 
+class BestShotQualityEstimatorSettings(BaseSettingsSection):
+    """
+    Best shot quality estimator estimator settings section.
+
+    Properties:
+        - runSubestimatorsConcurrently (int): run sub estimators concurrently
+    """
+
+    sectionName = "BestShotQualityEstimator::Settings"
+
+    @property
+    def runSubestimatorsConcurrently(self) -> int:
+        """
+        Getter for runSubestimatorsConcurrently
+
+        Returns:
+            useStatusPlan
+        """
+        return self.getValueAsInt("runSubestimatorsConcurrently")
+
+    @runSubestimatorsConcurrently.setter
+    def runSubestimatorsConcurrently(self, value: int) -> None:
+        """
+        Setter for runSubestimatorsConcurrently
+        Args:
+            value: new value
+        """
+        self.setValue("runSubestimatorsConcurrently", value)
+
+
 class AttributeEstimatorSettings(BaseSettingsSection):
     """
     Attribute estimator settings section.
@@ -1481,6 +1739,146 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         self.setValue("irNonCooperativeThreshold", value)
 
 
+class MaskEstimatorSettings(BaseSettingsSection):
+    """
+    MaskEstimatorSettings settings section.
+
+    Properties:
+        - medicalMaskThreshold (float): medical mask state threshold in [0..1] range
+        - missingThreshold (float): missing mask state threshold in [0..1] range
+        - occludedThreshold (float): occluded mask state threshold in [0..1] range
+    """
+
+    sectionName = "MedicalMaskEstimator::Settings"
+
+    @property
+    def medicalMaskThreshold(self) -> float:
+        """
+        Getter for medicalMaskThreshold
+
+        Returns:
+            medicalMaskThreshold
+        """
+        return self.getValueAsFloat("maskThreshold")
+
+    @medicalMaskThreshold.setter
+    def medicalMaskThreshold(self, value: float) -> None:
+        """
+        Setter for medicalMaskThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("maskThreshold", value)
+
+    @property
+    def missingThreshold(self) -> float:
+        """
+        Getter for missingThreshold
+
+        Returns:
+            missingThreshold
+        """
+        return self.getValueAsFloat("noMaskThreshold")
+
+    @missingThreshold.setter
+    def missingThreshold(self, value: float) -> None:
+        """
+        Setter for missingThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("noMaskThreshold", value)
+
+    @property
+    def occludedThreshold(self) -> float:
+        """
+        Getter for occludedThreshold
+
+        Returns:
+            occludedThreshold
+        """
+        return self.getValueAsFloat("occludedFaceThreshold")
+
+    @occludedThreshold.setter
+    def occludedThreshold(self, value: float) -> None:
+        """
+        Setter for occludedThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("occludedFaceThreshold", value)
+
+
+class MouthEstimatorSettings(BaseSettingsSection):
+    """
+    MouthEstimator settings section.
+
+    Properties:
+        - occlusionThreshold (float): occlusion mouth threshold in [0..1] range
+        - smileThreshold (float): smile threshold in [0..1] range
+        - openThreshold (float): open mouth threshold in [0..1] range
+    """
+
+    sectionName = "MouthEstimator::Settings"
+
+    @property
+    def occlusionThreshold(self) -> float:
+        """
+        Getter for occlusionThreshold
+
+        Returns:
+            occlusionThreshold
+        """
+        return self.getValueAsFloat("occlusionThreshold")
+
+    @occlusionThreshold.setter
+    def occlusionThreshold(self, value: float) -> None:
+        """
+        Setter for medicalMaskThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("occlusionThreshold", value)
+
+    @property
+    def smileThreshold(self) -> float:
+        """
+        Getter for smileThreshold
+
+        Returns:
+            smileThreshold
+        """
+        return self.getValueAsFloat("smileThreshold")
+
+    @smileThreshold.setter
+    def smileThreshold(self, value: float) -> None:
+        """
+        Setter for smileThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("smileThreshold", value)
+
+    @property
+    def openThreshold(self) -> float:
+        """
+        Getter for openThreshold
+
+        Returns:
+            openThreshold
+        """
+        return self.getValueAsFloat("openThreshold")
+
+    @openThreshold.setter
+    def openThreshold(self, value: float) -> None:
+        """
+        Setter for occludedThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("openThreshold", value)
+
+
 class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
     """
     HeadAndShouldersLiveness settings section.
@@ -1683,6 +2081,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
         return FaceDetV2Settings(self._coreSettingProvider)
 
     @property
+    def humanDetectorSettings(self) -> HumanDetectorSettings:
+        """
+        Getter for human body settings section.
+
+        Returns:
+            Mutable HumanDetectorSettings section
+        """
+        return HumanDetectorSettings(self._coreSettingProvider)
+
+    @property
     def lNetSettings(self) -> LNetSettings:
         """
         Getter for LNet settings section.
@@ -1801,6 +2209,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
             Mutable HeadAndShouldersLivenessEstimator section
         """
         return HeadAndShouldersLivenessEstimatorSettings(self._coreSettingProvider)
+
+    @property
+    def bestShotQualityEstimator(self) -> BestShotQualityEstimatorSettings:
+        """
+        Getter for BestShotQualityEstimatorSettings settings section.
+
+        Returns:
+            Mutable BestShotQualityEstimatorSettings section
+        """
+        return BestShotQualityEstimatorSettings(self._coreSettingProvider)
 
 
 class RuntimeSettingsProvider(BaseSettingsProvider):

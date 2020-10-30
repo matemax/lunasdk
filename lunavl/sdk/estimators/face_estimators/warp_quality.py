@@ -8,8 +8,9 @@ from FaceEngine import SubjectiveQuality as CoreQuality, IQualityEstimatorPtr  #
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
+from lunavl.sdk.base import BaseEstimation
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class Quality(BaseEstimation):
@@ -119,7 +120,7 @@ class WarpQualityEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationWarpQualityError)
-    def estimate(self, warp: Union[Warp, WarpedImage]) -> Quality:
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> Quality:
         """
         Estimate quality from a warp.
 

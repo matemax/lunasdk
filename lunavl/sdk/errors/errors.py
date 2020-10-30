@@ -100,6 +100,7 @@ class LunaVLError:
     InvalidMemory = ErrorInfo(100032, "Error at image memory opening", "")
     InvalidType = ErrorInfo(100033, "Unsupported image type", "")
     InvalidWidth = ErrorInfo(100034, "Invalid image width", "")
+    BatchedInternalError = ErrorInfo(100035, "Batching error", "")
 
     CreationDescriptorError = ErrorInfo(110001, "Creation descriptor error", "")
     CreationBatchDescriptorsError = ErrorInfo(110002, "Creation descriptor error", "")
@@ -119,7 +120,11 @@ class LunaVLError:
     CreationWarpError = ErrorInfo(110016, "Creation warped image error", "")
     WarpTransformationError = ErrorInfo(110017, "Landmarks transformation error", "")
     DetectOneFaceError = ErrorInfo(110018, "Detect one face error", "")
-    DetectFacesError = ErrorInfo(110019, "Detect one face error", "")
+    DetectFacesError = ErrorInfo(110019, "Detect faces error", "")
+    HighMemoryUsage = ErrorInfo(110020, "High memory usage", "")
+    DetectHumanError = ErrorInfo(110021, "Detect one human body error", "")
+    DetectHumansError = ErrorInfo(110022, "Detect humans bodies error", "")
+    EstimationMaskError = ErrorInfo(110023, "Estimation mask error", "")
 
     @classmethod
     def fromSDKError(cls, sdkError: FSDKErrorResult) -> "ErrorInfo":

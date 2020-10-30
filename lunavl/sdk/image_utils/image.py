@@ -10,8 +10,8 @@ import numpy as np
 from PIL.Image import Image as PilImage
 from PIL import Image as pilImage
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+from ..errors.errors import LunaVLError
+from ..errors.exceptions import LunaSDKException
 from .geometry import Rect
 
 
@@ -185,7 +185,7 @@ class VLImage:
     ) -> "VLImage":
 
         """
-        Load imag from numpy array or file or url.
+        Load image from numpy array or file or url.
 
         Args:
             *: for positional argument removal

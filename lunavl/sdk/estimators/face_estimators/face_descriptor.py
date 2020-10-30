@@ -8,11 +8,12 @@ from typing import Union, Optional, List, Tuple
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.descriptors.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.estimators.base_estimation import BaseEstimator
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
-from lunavl.sdk.faceengine.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap
+from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class FaceDescriptorEstimator(BaseEstimator):
@@ -33,7 +34,7 @@ class FaceDescriptorEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     def estimate(  # type: ignore
-        self, warp: Union[Warp, WarpedImage], descriptor: Optional[FaceDescriptor] = None
+        self, warp: Union[FaceWarp, FaceWarpedImage], descriptor: Optional[FaceDescriptor] = None
     ) -> FaceDescriptor:
         """
         Estimate face descriptor from a warp image.
@@ -47,22 +48,18 @@ class FaceDescriptorEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation failed
         """
-        if descriptor is None:
-            descriptor = self.descriptorFactory.generateDescriptor()
-            coreDescriptor = descriptor.coreEstimation
-        else:
-            coreDescriptor = descriptor.coreEstimation
-
-        error, optionalGS = self._coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        descriptor.garbageScore = optionalGS
-        return descriptor
+        outputDescriptor = estimate(
+            warp=warp,
+            descriptor=descriptor,
+            descriptorFactory=self.descriptorFactory,
+            coreEstimator=self._coreEstimator,
+        )
+        return outputDescriptor  # type: ignore
 
     @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
         self,
-        warps: List[Union[Warp, WarpedImage]],
+        warps: List[Union[FaceWarp, FaceWarpedImage]],
         aggregate: bool = False,
         descriptorBatch: Optional[FaceDescriptorBatch] = None,
     ) -> Tuple[FaceDescriptorBatch, Union[FaceDescriptor, None]]:
@@ -80,26 +77,11 @@ class FaceDescriptorEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
 
         """
-        if descriptorBatch is None:
-            descriptorBatch = self.descriptorFactory.generateDescriptorsBatch(len(warps))
-        if aggregate:
-            aggregatedDescriptor = self.descriptorFactory.generateDescriptor()
-
-            error, optionalGSAggregateDescriptor, scores = self._coreEstimator.extractFromWarpedImageBatch(
-                [warp.warpedImage.coreImage for warp in warps],
-                descriptorBatch.coreEstimation,
-                aggregatedDescriptor.coreEstimation,
-                len(warps),
-            )
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
-            aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor
-        else:
-            aggregatedDescriptor = None
-            error, scores = self._coreEstimator.extractFromWarpedImageBatch(
-                [warp.warpedImage.coreImage for warp in warps], descriptorBatch.coreEstimation, len(warps)
-            )
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
-            descriptorBatch.scores = scores
-        return descriptorBatch, aggregatedDescriptor
+        batch, aggregatedDescriptor = estimateDescriptorsBatch(
+            warps=warps,
+            descriptorFactory=self.descriptorFactory,  # type: ignore
+            aggregate=aggregate,
+            descriptorBatch=descriptorBatch,
+            coreEstimator=self._coreEstimator,
+        )
+        return batch, aggregatedDescriptor  # type: ignore

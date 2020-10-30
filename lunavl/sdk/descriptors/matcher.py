@@ -9,7 +9,7 @@ from FaceEngine import IDescriptorMatcherPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
-from lunavl.sdk.faceengine.descriptors import FaceDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import FaceDescriptorFactory
 
 
 class MatchingResult:
@@ -72,9 +72,9 @@ class FaceMatcher:
             candidatesForMatcher = []
             for idx in range(len(candidates)):
                 if isinstance(candidates[idx], bytes):
-                    candidatesForMatcher[idx] = self.descriptorFactory.generateDescriptor(candidates[idx])
+                    candidatesForMatcher.append(self.descriptorFactory.generateDescriptor(candidates[idx]))
                 else:
-                    candidatesForMatcher[idx] = candidates[idx]
+                    candidatesForMatcher.append(candidates[idx])
         else:
             candidatesForMatcher = candidates
 

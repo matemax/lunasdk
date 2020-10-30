@@ -2,14 +2,15 @@
 
 see `mouth state`_
 """
-from typing import Union
+from typing import Union, Dict
 
 from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
+from lunavl.sdk.base import BaseEstimation
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class MouthStates(BaseEstimation):
@@ -20,6 +21,7 @@ class MouthStates(BaseEstimation):
 
         - smile
         - mouth
+        - occlusion
     """
 
     #  pylint: disable=W0235
@@ -37,7 +39,7 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.smile
 
     @property
-    def mouth(self):
+    def mouth(self) -> float:
         """
         Get mouth score value.
 
@@ -47,7 +49,7 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.mouth
 
     @property
-    def occlusion(self):
+    def occlusion(self) -> float:
         """
         Get occlusion score value.
 
@@ -56,9 +58,9 @@ class MouthStates(BaseEstimation):
         """
         return self._coreEstimation.occlusion
 
-    def asDict(self):
+    def asDict(self) -> Dict[str, float]:
         """
-        Convert ot dict.
+        Convert to dict.
 
         Returns:
             {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
@@ -83,7 +85,7 @@ class MouthStateEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationMouthStateError)
-    def estimate(self, warp: Union[Warp, WarpedImage]) -> MouthStates:
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> MouthStates:
         """
         Estimate mouth state on warp.
 

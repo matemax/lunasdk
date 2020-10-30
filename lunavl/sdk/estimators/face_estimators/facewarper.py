@@ -7,11 +7,11 @@ from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.faceengine.facedetector import FaceDetection, Landmarks68, Landmarks5
+from lunavl.sdk.detectors.facedetector import FaceDetection, Landmarks68, Landmarks5
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
-class WarpedImage(VLImage):
+class FaceWarpedImage(VLImage):
     """
     Raw warped image.
 
@@ -56,18 +56,17 @@ class WarpedImage(VLImage):
             this checks are not guarantee that image is warp. This function is intended for debug
         """
         if self.rect.size.height != 250 or self.rect.width != 250:
-            raise ValueError("Bad image size for warped image")
+            raise ValueError("Bad image size for face warped image")
         if self.format != self.format.R8G8B8:
             raise ValueError("Bad image format for warped image, must be R8G8B8")
 
     #  pylint: disable=W0221
     @classmethod
-    def load(cls, *_, filename: Optional[str] = None, url: Optional[str] = None) -> "WarpedImage":  # type: ignore
+    def load(cls, *, filename: Optional[str] = None, url: Optional[str] = None) -> "FaceWarpedImage":  # type: ignore
         """
-        Load imag from numpy array or file or url.
+        Load image from numpy array or file or url.
 
         Args:
-            *_: for remove positional argument
             filename: filename
             url: url
 
@@ -79,7 +78,7 @@ class WarpedImage(VLImage):
         return warp
 
     @property
-    def warpedImage(self) -> "WarpedImage":
+    def warpedImage(self) -> "FaceWarpedImage":
         """
         Property for compatibility with *Warp* for outside methods.
         Returns:
@@ -88,18 +87,18 @@ class WarpedImage(VLImage):
         return self
 
 
-class Warp:
+class FaceWarp:
     """
     Structure for storing warp.
 
     Attributes:
         sourceDetection (FaceDetection): detection which generated warp
-        warpedImage (WarpedImage):
+        warpedImage (FaceWarpedImage):
     """
 
     __slots__ = ["sourceDetection", "warpedImage"]
 
-    def __init__(self, warpedImage: WarpedImage, sourceDetection: FaceDetection):
+    def __init__(self, warpedImage: FaceWarpedImage, sourceDetection: FaceDetection):
         """
         Init.
 
@@ -111,7 +110,7 @@ class Warp:
         self.warpedImage = warpedImage
 
 
-class Warper:
+class FaceWarper:
     """
     Class warper.
 
@@ -150,7 +149,7 @@ class Warper:
         )
 
     @CoreExceptionWrap(LunaVLError.CreationWarpError)
-    def warp(self, faceDetection: FaceDetection) -> Warp:
+    def warp(self, faceDetection: FaceDetection) -> FaceWarp:
         """
         Create warp from detection.
 
@@ -163,13 +162,13 @@ class Warper:
             LunaSDKException: if creation failed
         """
         transformation = self._createWarpTransformation(faceDetection)
-        error, warp = self._coreWarper.warp(faceDetection.image.coreImage, transformation)
+        error, warp = self._coreWarper.warp(faceDetection.coreEstimation.img, transformation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
-        warpedImage = WarpedImage(body=warp, filename=faceDetection.image.filename)
+        warpedImage = FaceWarpedImage(body=warp, filename=faceDetection.image.filename)
 
-        return Warp(warpedImage, faceDetection)
+        return FaceWarp(warpedImage, faceDetection)
 
     def makeWarpTransformationWithLandmarks(
         self, faceDetection: FaceDetection, typeLandmarks: str

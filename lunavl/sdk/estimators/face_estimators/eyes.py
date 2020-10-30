@@ -5,22 +5,20 @@ See `eyes`_ and `gaze direction`_.
 
 """
 from enum import Enum
-from typing import Union, Dict
+from typing import Union
 
-from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr  # pylint: disable=E0611,E0401
-from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks  # pylint: disable=E0611,E0401
+from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr, GazeEstimation  # pylint: disable=E0611,E0401
+from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks, EyeAttributes  # pylint: disable=E0611,E0401
 from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
 from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
-from FaceEngine import GazeEstimation as CoreGazeEstimation  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
-from lunavl.sdk.estimators.base_estimation import BaseEstimation, BaseEstimator
-from lunavl.sdk.estimators.face_estimators.head_pose import HeadPose
-from lunavl.sdk.faceengine.facedetector import Landmarks5, Landmarks68
+from lunavl.sdk.base import BaseEstimation, Landmarks
+from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
 
-from lunavl.sdk.estimators.face_estimators.warper import Warp, WarpedImage
-from lunavl.sdk.image_utils.geometry import Landmarks
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class EyeState(Enum):
@@ -94,7 +92,7 @@ class Eye(BaseEstimation):
     __slots__ = ("irisLandmarks", "eyelidLandMarks", "state")
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimation):
+    def __init__(self, coreEstimation: EyeAttributes):
         """
         Init.
 
@@ -191,7 +189,7 @@ class EyeEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(
-        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
+        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[FaceWarp, FaceWarpedImage]
     ) -> EyesEstimation:
         """
         Estimate mouth state on warp.
@@ -243,7 +241,7 @@ class GazeDirection(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimation):
+    def __init__(self, coreEstimation: GazeEstimation):
         """
         Init.
         """
@@ -299,9 +297,7 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(
-        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[Warp, WarpedImage]
-    ) -> GazeDirection:
+    def estimate(self, transformedLandmarks: Landmarks5, warp: Union[FaceWarp, FaceWarpedImage]) -> GazeDirection:
         """
         Estimate a gaze direction
 

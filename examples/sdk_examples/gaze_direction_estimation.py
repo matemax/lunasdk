@@ -18,7 +18,7 @@ def estimateGazeDirection():
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image, detect68Landmarks=True)
 
-    warper = faceEngine.createWarper()
+    warper = faceEngine.createFaceWarper()
     warp = warper.warp(faceDetection)
     landMarks5Transformation = warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
 

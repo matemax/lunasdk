@@ -1,7 +1,7 @@
 """
 Module contains function for detection faces on images.
 """
-from typing import Optional, Union, List, NamedTuple, Dict, Any, overload
+from typing import Optional, Union, List, Dict, Any
 
 from FaceEngine import DetectionFloat  # pylint: disable=E0611,E0401
 from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
@@ -9,37 +9,29 @@ from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E04
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
 from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
 
+from ..base import Landmarks
+from ..detectors.base import (
+    ImageForDetection,
+    ImageForRedetection,
+    BaseDetection,
+    assertImageForDetection,
+    getArgsForCoreDetectorForImages,
+)
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import LunaSDKException, CoreExceptionWrap
-from ..estimators.base_estimation import BaseEstimation
-from ..image_utils.geometry import Rect, Landmarks
-from ..image_utils.image import VLImage, ColorFormat
+from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..image_utils.geometry import Rect
+from ..image_utils.image import VLImage
 
 
-class ImageForDetection(NamedTuple):
+def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
     """
-    Structure for the transfer to detector an image and detect an area.
-
-    Attributes
-        image (VLImage): image for detection
-        detectArea (Rect[float]): area for face detection
+    Create core faces for redetection
+    Args:
+        image: image and bounding boxes for redetection
+    Returns:
+        Face object list. one object for one bbox
     """
-
-    image: VLImage
-    detectArea: Rect
-
-
-class ImageForRedetection(NamedTuple):
-    """
-    Structure for a redetector with an image and a area to detect in.
-
-    Attributes
-        image (VLImage): image for detection
-        bBoxes (Rect): face bounding boxes
-    """
-
-    image: VLImage
-    bBoxes: List[Rect]
+    return [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
 
 
 class Landmarks5(Landmarks):
@@ -74,66 +66,14 @@ class Landmarks68(Landmarks):
         super().__init__(coreLandmark68)
 
 
-class BoundingBox(BaseEstimation):
-    """
-    Detection bounding box, it is characterized of rect and score:
-
-        - rect (Rect[float]): face bounding box
-        - score (float): face score (0,1), detection score is the measure of classification confidence
-                         and not the source image quality. It may be used topick the most "*confident*" face of many.
-    """
-
-    #  pylint: disable=W0235
-    def __init__(self, boundingBox: DetectionFloat):
-        """
-        Init.
-
-        Args:
-            boundingBox: core bounding box
-        """
-        super().__init__(boundingBox)
-
-    @property
-    def score(self) -> float:
-        """
-        Get score
-
-        Returns:
-            number in range [0,1]
-        """
-        return self._coreEstimation.score
-
-    @property
-    def rect(self) -> Rect[float]:
-        """
-        Get rect.
-
-        Returns:
-            float rect
-        """
-        return Rect.fromCoreRect(self._coreEstimation.rect)
-
-    def asDict(self) -> Dict[str, Union[Dict[str, float], float]]:
-        """
-        Convert to  dict.
-
-        Returns:
-            {"rect": self.rect, "score": self.score}
-        """
-        return {"rect": self.rect.asDict(), "score": self.score}
-
-
-class FaceDetection(BaseEstimation):
+class FaceDetection(BaseDetection):
     """
     Attributes:
-        boundingBox (BoundingBox): face bounding box
         landmarks5 (Optional[Landmarks5]): optional landmarks5
         landmarks68 (Optional[Landmarks68]): optional landmarks5
-        _image (VLImage): source of detection
-
     """
 
-    __slots__ = ("boundingBox", "landmarks5", "landmarks68", "_coreDetection", "_image")
+    __slots__ = ("landmarks5", "landmarks68")
 
     def __init__(self, coreDetection: Face, image: VLImage):
         """
@@ -142,9 +82,8 @@ class FaceDetection(BaseEstimation):
         Args:
             coreDetection: core detection
         """
-        super().__init__(coreDetection)
+        super().__init__(coreDetection, image)
 
-        self.boundingBox = BoundingBox(coreDetection.detection)
         if coreDetection.landmarks5_opt.isValid():
             self.landmarks5: Optional[Landmarks5] = Landmarks5(coreDetection.landmarks5_opt.value())
         else:
@@ -154,17 +93,6 @@ class FaceDetection(BaseEstimation):
             self.landmarks68: Optional[Landmarks68] = Landmarks68(coreDetection.landmarks68_opt.value())
         else:
             self.landmarks68 = None
-        self._image = image
-
-    @property
-    def image(self) -> VLImage:
-        """
-        Get source of detection.
-
-        Returns:
-            source image
-        """
-        return self._image
 
     def asDict(self) -> Dict[str, Any]:
         """
@@ -173,13 +101,17 @@ class FaceDetection(BaseEstimation):
         Returns:
             dict. required keys: 'rect', 'score'. optional keys: 'landmarks5', 'landmarks68'
         """
-        res = {"rect": self.boundingBox.rect.asDict(), "score": self.boundingBox.score}
+        res = super().asDict()
         if self.landmarks5 is not None:
             coreLandmarks5 = self.landmarks5.coreEstimation
-            res["landmarks5"] = tuple((coreLandmarks5[index].x, coreLandmarks5[index].y) for index in range(5))
+            res["landmarks5"] = tuple(
+                (int(coreLandmarks5[index].x), int(coreLandmarks5[index].y)) for index in range(5)
+            )
         if self.landmarks68 is not None:
             coreLandmarks68 = self.landmarks68.coreEstimation
-            res["landmarks68"] = tuple((coreLandmarks68[index].x, coreLandmarks68[index].y) for index in range(68))
+            res["landmarks68"] = tuple(
+                (int(coreLandmarks68[index].x), int(coreLandmarks68[index].y)) for index in range(68)
+            )
         return res
 
 
@@ -232,7 +164,7 @@ class FaceDetector:
         Detect just one best detection on the image.
 
         Args:
-            image: image. Format must be R8G8B8 (todo check)
+            image: image. Format must be R8G8B8
             detectArea: rectangle area which contains face to detect. If not set will be set image.rect
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
@@ -241,9 +173,7 @@ class FaceDetector:
         Raises:
             LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
-        if image.format != ColorFormat.R8G8B8:
-            details = "Bad image format for detection, format: {}, image: {}".format(image.format.value, image.filename)
-            raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
+        assertImageForDetection(image)
 
         if detectArea is None:
             _detectArea = image.coreImage.getRect()
@@ -253,8 +183,7 @@ class FaceDetector:
         error, detectRes = self._detector.detectOne(
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         if not detectRes.isValid():
             return None
         coreDetection = detectRes
@@ -282,26 +211,12 @@ class FaceDetector:
             LunaSDKException(LunaVLError.InvalidImageFormat): if any image has bad format or detect is failed
 
         """
-        imgs = []
-        detectAreas = []
-        for image in images:
-
-            if isinstance(image, VLImage):
-                img = image
-                detectAreas.append(image.coreImage.getRect())
-            else:
-                img = image.image
-                detectAreas.append(image.detectArea.coreRectI)
-            if img.format != ColorFormat.R8G8B8:
-                details = "Bad image format for detection, format: {}, image: {}".format(img.format.value, img.filename)
-                raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
-            imgs.append(img.coreImage)
+        imgs, detectAreas = getArgsForCoreDetectorForImages(images)
 
         error, detectRes = self._detector.detect(
             imgs, detectAreas, limit, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
             image_ = images[numberImage]
@@ -310,32 +225,9 @@ class FaceDetector:
 
         return res
 
-    @overload  # noqa: F811
-    def redetectOne(
-        self, image: VLImage, *, bBox: Optional[Rect], detect5Landmarks: bool = True, detect68Landmarks: bool = False
-    ) -> DetectionFloat:
-        ...
-
-    @overload  # noqa: F811
-    def redetectOne(
-        self,
-        image: VLImage,
-        *,
-        detection: Optional[FaceDetection],
-        detect5Landmarks: bool = True,
-        detect68Landmarks: bool = False,
-    ) -> DetectionFloat:
-        ...
-
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)  # noqa: F811
-    def redetectOne(
-        self,
-        image,
-        *,
-        bBox: Optional[Rect] = None,
-        detection: Optional[FaceDetection] = None,
-        detect5Landmarks=True,
-        detect68Landmarks=False,
+    @CoreExceptionWrap(LunaVLError.DetectFacesError)
+    def redetectOne(  # noqa: F811
+        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
     ) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
@@ -343,8 +235,7 @@ class FaceDetector:
         Args:
             image: image with a bounding box, or just VLImage. If VLImage provided, one of bBox or detection
                 should be defined.
-            bBox: bounding box
-            detection: core detection
+            bBox: detection bounding box
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
 
@@ -353,25 +244,17 @@ class FaceDetector:
         Raises:
             LunaSDKException if an error occurs
         """
-        if isinstance(image, VLImage) and (bBox is not None) and (detection is None):
-            error, detectRes = self._detector.redetectOne(
-                image.coreImage, bBox.coreRectF, self._getDetectionType(detect5Landmarks, detect68Landmarks)
-            )
-            vlImage = image
-        elif isinstance(image, VLImage) and (bBox is None) and (detection is not None):
-            error, detectRes = self._detector.redetectOne(
-                image.coreImage,
-                detection.coreEstimation.detection.rect,
-                self._getDetectionType(detect5Landmarks, detect68Landmarks),
-            )
-            vlImage = image
+        assertImageForDetection(image)
+        if isinstance(bBox, Rect):
+            coreBBox = bBox.coreRectF
         else:
-            raise NotImplementedError
-
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+            coreBBox = bBox.coreEstimation.detection.rect
+        error, detectRes = self._detector.redetectOne(
+            image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+        )
+        assertError(error)
         if detectRes.isValid():
-            return FaceDetection(detectRes, vlImage)
+            return FaceDetection(detectRes, image)
         return None
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
@@ -391,17 +274,14 @@ class FaceDetector:
         Raises:
             LunaSDKException if an error occurs
         """
-
-        def facesFactory(image: ImageForRedetection) -> List[Face]:
-            faces = [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
-            return faces
-
         faces = []
         for image in images:
-            faces.extend(facesFactory(image))
-        error, detectRes = self._detector.redetect(faces, self._getDetectionType(detect5Landmarks, detect68Landmarks))
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+            assertImageForDetection(image.image)
+            faces.extend(_createCoreFaces(image))
+        error, detectRes, _ = self._detector.redetect(
+            faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+        )
+        assertError(error)
 
         detectIter = iter(detectRes)
         res = []
@@ -419,8 +299,5 @@ class FaceDetector:
 
     def setDetectionComparer(self):
         """
-        todo: wtf
-        Returns:
-
         """
         pass
