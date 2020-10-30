@@ -289,7 +289,7 @@ class FaceDetector:
         mainError, detectRes, errors = self._detector.redetect(
             faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        assertError(mainError, errors)
+        assertError(mainError, [LunaVLError.fromSDKError(error) for error in errors])
 
         detectIter = iter(detectRes)
         res = []

@@ -110,8 +110,8 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-        assert exceptionInfo.value.context[0], LunaVLError.InvalidRect
-        assert exceptionInfo.value.context[1], LunaVLError.Ok
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)
 
     def test_detect_one_with_image_of_several_humans(self):
         """
@@ -267,7 +267,7 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)])
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
         assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-        assert exceptionInfo.value.context[0], LunaVLError.InvalidRect
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
 
     @pytest.mark.skip("unstable")
     def test_excessive_image_list_detection(self):
@@ -294,7 +294,7 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=Rect())])
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
         assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-        assert exceptionInfo.value.context[0], LunaVLError.InvalidRect
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
 
     def test_match_detection_one_image(self):
         """

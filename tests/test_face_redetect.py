@@ -154,7 +154,8 @@ class TestsRedetectFace(FaceDetectTestClass):
                     )
                 self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
                 assert len(exceptionInfo.value.context) == 2, "Expect two error in exception context"
-                assert exceptionInfo.value.context[0], LunaVLError.InvalidRect
+                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
+                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
 
     @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):

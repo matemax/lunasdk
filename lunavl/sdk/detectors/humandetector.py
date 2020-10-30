@@ -171,7 +171,7 @@ class HumanDetector:
             for image, detectArea in zip(imgs, detectAreas):
                 errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
                 if errorOne.isOk:
-                    errors.append(LunaVLError.Ok)
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 else:
                     errors.append(LunaVLError.fromSDKError(errorOne))
             raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
@@ -235,7 +235,7 @@ class HumanDetector:
                 try:
                     detection = self.redetectOne(image.image, bBox=bBox)
                     imageRes.append(detection)
-                    errors.append(LunaVLError.Ok)
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 except LunaSDKException as exc:
                     errors.append(exc.error)
                     errorDuringProgress = True

@@ -8,6 +8,7 @@ from lunavl.sdk.base import BoundingBox, LandmarkWithScore
 from lunavl.sdk.detectors.base import BaseDetection
 from lunavl.sdk.detectors.facedetector import FaceDetection, FaceDetector, Landmarks5, Landmarks68
 from lunavl.sdk.detectors.humandetector import HumanDetection, HumanDetector, Landmarks17
+from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.faceengine.engine import DetectorType
 from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.geometry import Rect
@@ -80,6 +81,18 @@ class BaseDetectorTestClass(BaseTestClass):
             )
             assert detection.image.asPillow() == imageVl.asPillow(), "Detection image does not match VLImage"
             self.assertBoundingBox(detection.boundingBox)
+
+    @staticmethod
+    def assertReceivedAndRawExpectedErrors(receivedError: ErrorInfo, expectedErrorWithoutDesc: ErrorInfo):
+        """
+        Assert expected and received errors as dicts
+        Args:
+            receivedError: received error
+            expectedErrorWithoutDesc: expected error without description (expected same as detail)
+        """
+        assert expectedErrorWithoutDesc.errorCode == receivedError.errorCode
+        assert expectedErrorWithoutDesc.description == receivedError.description
+        assert expectedErrorWithoutDesc.description == receivedError.detail
 
 
 class HumanDetectTestClass(BaseDetectorTestClass):
