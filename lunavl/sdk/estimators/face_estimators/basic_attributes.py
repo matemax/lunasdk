@@ -282,7 +282,17 @@ class BasicAttributesEstimator(BaseEstimator):
 
         error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
         if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+            errors = []
+            for image in images:
+                errorOne, baseAttributesOne = self._coreEstimator.estimate(image, AttributeRequest(dtAttributes))
+                if errorOne.isOk:
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+                else:
+                    errors.append(LunaVLError.fromSDKError(error))
+            raise LunaSDKException(
+                LunaVLError.BatchedInternalError.format(str(LunaVLError.fromSDKError(error))),
+                errors)
+
         attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
         if aggregate:
             return attributes, BasicAttributes(aggregateAttribute)
