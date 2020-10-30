@@ -161,8 +161,8 @@ class BaseDescriptorBatch(BaseEstimation):
         """
         Iterator by batch.
 
-        Returns:
-            iterator by descriptors.
+        Yields:
+            descriptors
         """
         for index in range(len(self)):
             error, descriptor = self._coreEstimation.getDescriptorFast(index)
