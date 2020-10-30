@@ -177,8 +177,8 @@ class HumanDetector:
                 else:
                     errors.append(LunaVLError.fromSDKError(errorOne))
             raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(str(LunaVLError.fromSDKError(error))),
-                errors)
+                LunaVLError.BatchedInternalError.format(str(LunaVLError.fromSDKError(error))), errors
+            )
 
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
