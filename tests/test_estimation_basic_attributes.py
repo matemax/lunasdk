@@ -1,59 +1,47 @@
 from collections import namedtuple
-from dataclasses import dataclass
-from operator import attrgetter
+from dataclasses import dataclass, asdict
+from operator import attrgetter, itemgetter
+from statistics import mean
 from time import time
-from typing import List, Optional, Union, Callable, Tuple
+from typing import List, Union, Callable, Tuple
 
 from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     BasicAttributesEstimator,
     BasicAttributes,
     Ethnicities,
+    Ethnicity,
 )
-from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarper, FaceWarp
-from lunavl.sdk.faceengine.setting_provider import DetectorType
-from lunavl.sdk.image_utils.image import VLImage
-from lunavl.sdk.faceengine.engine import VLFaceEngine
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarp
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE
-
-
-def generateWarp(faceEngine: VLFaceEngine, imagePath: Optional[str] = ONE_FACE) -> FaceWarp:
-    """
-    Generate warps.
-
-    Args:
-        faceEngine: Face Engine instance
-        imagePath: path to image
-
-    Returns:
-        first 1000 warps sorted by coordinates
-    """
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
-    warper: FaceWarper = faceEngine.createFaceWarper()
-
-    img = VLImage.load(filename=imagePath)
-    detection = detector.detect(images=[img], limit=1000, detect68Landmarks=True)[0][0]
-
-    warp = warper.warp(detection)
-    return warp
+from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE
 
 
 @dataclass
 class Eth:
     """ Class for Ethnicities estimation. """
 
+    class Predominant(str):
+        def __eq__(self, other):
+            if isinstance(other, Ethnicity):
+                return str(other) == self
+            return super().__eq__(other)
+
     asian: float
     indian: float
     caucasian: float
     africanAmerican: float
 
-    def __eq__(self, other):
-        return all(getattr(self, name) == getattr(other, name) for name in self.__dict__)
+    @property
+    def predominantEthnicity(self) -> Predominant:
+        ethnicities = list(asdict(self).items())
+        ethnicities.sort(key=itemgetter(1), reverse=True)
+        return self.Predominant(ethnicities[0][0])
 
-    def __sub__(self, other):
-        return sum((getattr(self, name) - getattr(other, name)) ** 2 for name in self.__dict__) ** (1 / 2) / len(
-            self.__dict__
-        )
+    @classmethod
+    def fromSeveral(cls, eths: List[Ethnicities]):
+        args = ("asian", "indian", "caucasian", "africanAmerican")
+        kwargs = {arg: mean(map(attrgetter(arg), eths)) for arg in args}
+        return cls(**kwargs)
 
 
 Estimation = namedtuple("Estimation", ("Age", "Gender", "Ethnicity"))
@@ -64,12 +52,14 @@ class TestBasicAttributes(BaseTestClass):
 
     estimator: BasicAttributesEstimator = BaseTestClass.faceEngine.createBasicAttributesEstimator()
 
-    _warp: FaceWarp
+    _warp: FaceWarpedImage
+    _warp2: FaceWarpedImage
 
     @classmethod
     def setUpClass(cls) -> None:
         """ Load warps. """
-        cls._warp = generateWarp(cls.faceEngine)
+        cls._warp = FaceWarpedImage.load(filename=WARP_ONE_FACE)
+        cls._warp2 = FaceWarpedImage.load(filename=WARP_CLEAN_FACE)
 
     def estimate(
         self,
@@ -96,7 +86,7 @@ class TestBasicAttributes(BaseTestClass):
 
     def estimateBatch(
         self,
-        warps: Union[List[FaceWarpedImage], List[FaceWarp]],
+        warps: List[Union[FaceWarp, FaceWarpedImage]],
         estimateAge: bool = False,
         estimateGender: bool = False,
         estimateEthnicity: bool = False,
@@ -123,33 +113,71 @@ class TestBasicAttributes(BaseTestClass):
             aggregate=aggregate,
         )
 
+    @staticmethod
+    def assertEth(eth1: Union[Ethnicities, Eth], eth2: Union[Ethnicities, Eth], delta: float = 0.001) -> None:
+        """
+        Assert ethnicities.
+
+        Args:
+            eth1: first ethnicities
+            eth2: second ethnicities
+            delta: allowed delta
+        """
+        for attrName in ("asian", "indian", "caucasian", "africanAmerican"):
+            fstAttr, sndAttr = map(attrgetter(attrName), (eth1, eth2))
+            assert abs(fstAttr - sndAttr) <= delta, f"Attribute '{attrName}' differ: {fstAttr} {sndAttr}"
+        assert eth1.predominantEthnicity == eth2.predominantEthnicity
+
     def test_correctness(self):
         """
         Test estimation correctness.
         """
-        AGE_DELTA = 3
-        GENDER_DELTA = 0
-        ETH_DELTA = 0.001
         expectedEstimation = Estimation(20, 0, Eth(0, 0, 1, 0))
-        for estimationType, delta in (("Age", AGE_DELTA), ("Gender", GENDER_DELTA), ("Ethnicity", ETH_DELTA)):
+        for estimationType in ("Age", "Gender", "Ethnicity"):
             estimationFlag = f"estimate{estimationType}"
             basicAttributeGetter: Callable[[BasicAttributes], Union[Ethnicities, float, None]] = attrgetter(
                 estimationType.lower()
             )
-            expectedAttr = getattr(expectedEstimation, estimationType)
+            expectedValue = getattr(expectedEstimation, estimationType)
             with self.subTest(estimationType=estimationType):
-                singleAttr = basicAttributeGetter(self.estimate(self._warp, **{estimationFlag: True}))
-                batchAttr = basicAttributeGetter(self.estimateBatch([self._warp], **{estimationFlag: True})[0][0])
-                self.assertNotIn(None, (singleAttr, batchAttr))
+                singleValue = basicAttributeGetter(self.estimate(self._warp, **{estimationFlag: True}))
+                batchValue = basicAttributeGetter(self.estimateBatch([self._warp] * 2, **{estimationFlag: True})[0][0])
+                assert type(singleValue) == type(batchValue)
+                assert isinstance(singleValue, (float, Ethnicities))
 
                 filename = f"./{time()}.jpg"
                 msg = f"Batch estimation '{estimationType}' differs from single one. Saved as '{filename}'."
-                if isinstance(singleAttr, Ethnicities):
-                    self.assertEqual(singleAttr.asian, batchAttr.asian, msg)
-                    self.assertEqual(singleAttr.indian, batchAttr.indian, msg)
-                    self.assertEqual(singleAttr.caucasian, batchAttr.caucasian, msg)
-                    self.assertEqual(singleAttr.africanAmerican, batchAttr.africanAmerican, msg)
-                else:
-                    self.assertEqual(singleAttr, batchAttr, msg)
+                if isinstance(singleValue, Ethnicities):
+                    self.assertEth(expectedValue, singleValue)
+                    self.assertEth(expectedValue, batchValue)
+                else:  # age or gender
+                    assert expectedValue == int(singleValue) == int(batchValue), msg
 
-                self.assertAlmostEqual(expectedAttr, singleAttr, delta=delta)
+    def test_aggregation(self):
+        """
+        Test aggregation correctness.
+        """
+        estimations, aggregatedEstimation = self.estimateBatch(
+            [self._warp, self._warp2], estimateAge=True, estimateGender=True, estimateEthnicity=True, aggregate=True
+        )
+        for estimationType in ("Age", "Gender", "Ethnicity"):
+            estimationGetter: Callable[[Union[BasicAttributes, Eth]], Union[Ethnicities, float]] = attrgetter(
+                estimationType.lower()
+            )
+            with self.subTest(estimationType):
+                raw = list(map(estimationGetter, estimations))
+                aggregated = estimationGetter(aggregatedEstimation)
+                if isinstance(aggregated, Ethnicities):
+                    self.assertEth(Eth.fromSeveral(raw), aggregated)
+                else:  # age or gender
+                    assert int(mean(raw)) == int(aggregated)
+
+    def test_as_dict(self):
+        """
+        Test asDict method.
+        """
+        raw, aggregated = self.estimateBatch(
+            [self._warp, self._warp2], estimateAge=True, estimateGender=True, estimateEthnicity=True, aggregate=True
+        )
+        for estimation in [*raw, aggregated]:
+            assert isinstance(estimation.asDict(), dict)
