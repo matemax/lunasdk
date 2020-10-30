@@ -12,7 +12,7 @@ from lunavl.sdk.estimators.face_estimators.basic_attributes import (
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarper, FaceWarp
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from sdk.faceengine.engine import VLFaceEngine
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 
