@@ -4,21 +4,20 @@ from operator import attrgetter
 from time import time
 from typing import List, Optional, Union, Callable, Tuple
 
-import FaceEngine
-
 from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     BasicAttributesEstimator,
     BasicAttributes,
     Ethnicities,
 )
-from lunavl.sdk.estimators.face_estimators.warper import Warp
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarper, FaceWarp
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
+from sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 
 
-def generateWarp(faceEngine: FaceEngine, imagePath: Optional[str] = ONE_FACE) -> Warp:
+def generateWarp(faceEngine: VLFaceEngine, imagePath: Optional[str] = ONE_FACE) -> FaceWarp:
     """
     Generate warps.
 
@@ -30,7 +29,7 @@ def generateWarp(faceEngine: FaceEngine, imagePath: Optional[str] = ONE_FACE) ->
         first 1000 warps sorted by coordinates
     """
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
-    warper = faceEngine.createWarper()
+    warper: FaceWarper = faceEngine.createFaceWarper()
 
     img = VLImage.load(filename=imagePath)
     detection = detector.detect(images=[img], limit=1000, detect68Landmarks=True)[0][0]
@@ -65,7 +64,7 @@ class TestBasicAttributes(BaseTestClass):
 
     estimator: BasicAttributesEstimator = BaseTestClass.faceEngine.createBasicAttributesEstimator()
 
-    _warp: Warp
+    _warp: FaceWarp
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -73,7 +72,11 @@ class TestBasicAttributes(BaseTestClass):
         cls._warp = generateWarp(cls.faceEngine)
 
     def estimate(
-        self, warp: Warp, estimateAge: bool = False, estimateGender: bool = False, estimateEthnicity: bool = False
+        self,
+        warp: Union[FaceWarpedImage, FaceWarp],
+        estimateAge: bool = False,
+        estimateGender: bool = False,
+        estimateEthnicity: bool = False,
     ) -> BasicAttributes:
         """
         Estimate warp.
@@ -93,7 +96,7 @@ class TestBasicAttributes(BaseTestClass):
 
     def estimateBatch(
         self,
-        warps: List[Warp],
+        warps: Union[List[FaceWarpedImage], List[FaceWarp]],
         estimateAge: bool = False,
         estimateGender: bool = False,
         estimateEthnicity: bool = False,
