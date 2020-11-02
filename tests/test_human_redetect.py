@@ -87,6 +87,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         receivedError = exceptionInfo.value.error
         self.assertReceivedAndRawExpectedErrors(receivedError, LunaVLError.InvalidRect)
 
+    @pytest.mark.skip()  # TODO get resolution from n.feofanov
     def test_redetect_invalid_rectangle(self):
         """
         Test batch re-detection with an invalid rect

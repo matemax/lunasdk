@@ -30,7 +30,7 @@ class Ethnicity(Enum):
     Caucasian = 4
 
     @staticmethod
-    def fromCoreEmotion(coreEthnicity: CoreEthnicity) -> "Ethnicity":
+    def fromCoreEthnicity(coreEthnicity: CoreEthnicity) -> "Ethnicity":
         """
         Get enum element by core ethnicity.
 
@@ -126,7 +126,7 @@ class Ethnicities(BaseEstimation):
             dict in platform format
         """
         return {
-            "predominant_ethnicity": str(self.predominateEmotion),
+            "predominant_ethnicity": str(self.predominantEthnicity),
             "estimations": {
                 "asian": self.asian,
                 "indian": self.indian,
@@ -136,14 +136,14 @@ class Ethnicities(BaseEstimation):
         }
 
     @property
-    def predominateEmotion(self) -> Ethnicity:
+    def predominantEthnicity(self) -> Ethnicity:
         """
         Get predominate ethnicity (ethnicity with max score value).
 
         Returns:
             ethnicity with max score value
         """
-        return Ethnicity.fromCoreEmotion(self._coreEstimation.getPredominantEthnicity())
+        return Ethnicity.fromCoreEthnicity(self._coreEstimation.getPredominantEthnicity())
 
 
 class BasicAttributes(BaseEstimation):
