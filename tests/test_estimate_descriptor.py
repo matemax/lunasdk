@@ -387,25 +387,25 @@ class TestEstimateDescriptor(BaseTestClass):
         Test estimate descriptor batch with one good warp and one bad (expected error).
         """
         for case in self.cases:
-            with self.subTest(type=case.type):
-                for planVersion in case.versions:
-                    extractor = case.extractorFactory(descriptorVersion=planVersion)
-                    for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(case.warps), case.type))):
-                        for aggregate in (True, False):
-                            with self.subTest(
-                                plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)
-                            ):
-                                badWarp = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
-                                badWarp.coreImage = VLIMAGE_SMALL.coreImage
-                                with pytest.raises(LunaSDKException) as exceptionInfo:
-                                    extractor.estimateDescriptorsBatch(
-                                        [case.warps[0], badWarp], aggregate=aggregate, **kw
-                                    )
-                                assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-                                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
-                                self.assertReceivedAndRawExpectedErrors(
-                                    exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
+            for planVersion in case.versions:
+                extractor = case.extractorFactory(descriptorVersion=planVersion)
+                for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(case.warps), case.type))):
+                    for aggregate in (True, False):
+                        with self.subTest(
+                                type=case.type, plan_version=planVersion, aggregate=aggregate,
+                                external_descriptor=bool(kw)
+                        ):
+                            badWarp = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
+                            badWarp.coreImage = VLIMAGE_SMALL.coreImage
+                            with pytest.raises(LunaSDKException) as exceptionInfo:
+                                extractor.estimateDescriptorsBatch(
+                                    [case.warps[0], badWarp], aggregate=aggregate, **kw
                                 )
+                            assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
+                            self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+                            self.assertReceivedAndRawExpectedErrors(
+                                exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
+                            )
 
     @unittest.skip("dont do it FSDK-2186")
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):

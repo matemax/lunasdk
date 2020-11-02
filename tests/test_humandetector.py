@@ -104,7 +104,7 @@ class TestHumanDetector(HumanDetectTestClass):
 
     def test_batch_detect_with_success_and_error(self):
         """
-        Test batch detection with success and error using FACE_DET_V3 (only need to check errors)
+        Test batch detection with success and error using FACE_DET_V3 (there is not error with other detector)
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])

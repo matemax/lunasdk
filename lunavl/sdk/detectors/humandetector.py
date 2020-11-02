@@ -171,13 +171,14 @@ class HumanDetector:
         if error.isError:
             errors = []
             for image, detectArea in zip(imgs, detectAreas):
+                # 1 is the detection limit
                 errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
                 if errorOne.isOk:
                     errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 else:
                     errors.append(LunaVLError.fromSDKError(errorOne))
             raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(str(LunaVLError.fromSDKError(error))), errors
+                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors
             )
 
         res = []

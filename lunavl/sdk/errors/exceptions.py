@@ -55,7 +55,7 @@ def assertError(error: FSDKErrorResult, context: Optional[List[Any]] = None) -> 
     Assert core optional.
     Args:
         error: optional
-        context: list with LunaSdkExceptions
+        context: list with errors
 
     Raises:
         LunaSDKException: if optional contains error

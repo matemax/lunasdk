@@ -7,7 +7,6 @@ from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
-from tests.detect_test_class import FaceDetectTestClass, BAD_IMAGE
 from tests.detect_test_class import (
     VLIMAGE_ONE_FACE,
     GOOD_AREA,
@@ -15,6 +14,8 @@ from tests.detect_test_class import (
     AREA_WITHOUT_FACE,
     OUTSIDE_AREA,
     VLIMAGE_SMALL,
+    FaceDetectTestClass,
+    BAD_IMAGE,
 )
 from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
 from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
@@ -129,7 +130,7 @@ class TestFaceDetector(FaceDetectTestClass):
 
     def test_batch_detect_with_success_and_error(self):
         """
-        Test batch detection with success and error using FACE_DET_V3 (only need to check errors)
+        Test batch detection with success and error using FACE_DET_V3 (there is not error with other detector)
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detectors[2].detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])

@@ -64,8 +64,12 @@ def estimateDescriptorsBatch(
         LunaSDKException: if estimation failed
     """
 
-    def collectErrorByExtractingOneByOne():
-        """Extract descriptor without batching and collect errors"""
+    def getErrorsExtractingOneByOne() -> List[LunaVLError]:
+        """
+        Extract descriptor without batching and collect errors
+        Returns:
+            list with errors
+        """
         errors = []
         for idx, warp in enumerate(warps):
             if len(descriptorBatch):
@@ -80,7 +84,7 @@ def estimateDescriptorsBatch(
             else:
                 errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
 
-        raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
+            return errors
 
     if descriptorBatch is None:
         descriptorBatch = descriptorFactory.generateDescriptorsBatch(len(warps))
@@ -94,7 +98,9 @@ def estimateDescriptorsBatch(
             len(warps),
         )
         if error.isError:
-            collectErrorByExtractingOneByOne()
+            errors = getErrorsExtractingOneByOne()
+            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)),
+                                   errors)
 
         aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor
     else:
@@ -103,7 +109,8 @@ def estimateDescriptorsBatch(
             [warp.warpedImage.coreImage for warp in warps], descriptorBatch.coreEstimation, len(warps)
         )
         if error.isError:
-            collectErrorByExtractingOneByOne()
+            errors = getErrorsExtractingOneByOne()
+            raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
 
         descriptorBatch.scores = scores
     return descriptorBatch, aggregatedDescriptor
