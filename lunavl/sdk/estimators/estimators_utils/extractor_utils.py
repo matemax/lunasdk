@@ -99,8 +99,7 @@ def estimateDescriptorsBatch(
         )
         if error.isError:
             errors = getErrorsExtractingOneByOne()
-            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)),
-                                   errors)
+            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors)
 
         aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor
     else:

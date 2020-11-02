@@ -289,9 +289,7 @@ class BasicAttributesEstimator(BaseEstimator):
                     errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 else:
                     errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors
-            )
+            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors)
 
         attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
         if aggregate:

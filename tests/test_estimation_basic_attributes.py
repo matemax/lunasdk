@@ -2,6 +2,8 @@ from collections import namedtuple
 from dataclasses import dataclass, asdict
 from operator import attrgetter, itemgetter
 from statistics import mean
+
+import pytest
 from time import time
 from typing import List, Union, Callable, Tuple
 
@@ -14,7 +16,9 @@ from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     Ethnicity,
 )
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarp
+from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
+from tests.detect_test_class import VLIMAGE_SMALL
 from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE
 
 

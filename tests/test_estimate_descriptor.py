@@ -392,47 +392,39 @@ class TestEstimateDescriptor(BaseTestClass):
                 for kw in (dict(), dict(descriptorBatch=self.getBatch(planVersion, len(case.warps), case.type))):
                     for aggregate in (True, False):
                         with self.subTest(
-                                type=case.type, plan_version=planVersion, aggregate=aggregate,
-                                external_descriptor=bool(kw)
+                            type=case.type, plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)
                         ):
                             badWarp = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
                             badWarp.coreImage = VLIMAGE_SMALL.coreImage
                             with pytest.raises(LunaSDKException) as exceptionInfo:
-                                extractor.estimateDescriptorsBatch(
-                                    [case.warps[0], badWarp], aggregate=aggregate, **kw
-                                )
+                                extractor.estimateDescriptorsBatch([case.warps[0], badWarp], aggregate=aggregate, **kw)
                             assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
                             self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
                             self.assertReceivedAndRawExpectedErrors(
                                 exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
                             )
 
-    @unittest.skip("dont do it FSDK-2186")
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):
         """
         Test correctly estimate descriptor batch.
         """
         for case in self.cases:
-            with self.subTest(type=case.type):
-
-                for planVersion in case.versions:
-                    extractor = case.extractorFactory(descriptorVersion=planVersion)
-                    for descriptorVersion in set(EFDVa) - {planVersion}:
-                        for kw in (
-                            dict(),
-                            dict(descriptorBatch=self.getBatch(descriptorVersion, len(case.warps), case.type)),
-                        ):
-                            for aggregate in (True, False):
-                                with self.subTest(
-                                    plan_version=planVersion, aggregate=aggregate, external_descriptor=bool(kw)
-                                ):
-                                    descriptorsRaw, descriptorAggregated = extractor.estimateDescriptorsBatch(
-                                        case.warps, aggregate=aggregate, **kw
-                                    )
-                                    for descriptorRaw in descriptorsRaw:
-                                        self.assertDescriptor(planVersion, descriptorRaw, case.type)
-
-                                    if aggregate:
-                                        self.assertDescriptor(planVersion, descriptorAggregated, case.type)
-                                    else:
-                                        assert descriptorAggregated is not None
+            for planVersion in case.versions:
+                extractor = case.extractorFactory(descriptorVersion=planVersion)
+                for descriptorVersion in set(EFDVa) - {planVersion}:
+                    for kw in (
+                        dict(),
+                        dict(descriptorBatch=self.getBatch(descriptorVersion, len(case.warps), case.type)),
+                    ):
+                        for aggregate in (True, False):
+                            with self.subTest(
+                                type=case.type,
+                                plan_version=planVersion,
+                                aggregate=aggregate,
+                                external_descriptor=bool(kw),
+                            ):
+                                with pytest.raises(LunaSDKException) as exceptionInfo:
+                                    extractor.estimateDescriptorsBatch(case.warps, aggregate=aggregate, **kw)
+                                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                                assert len(exceptionInfo.value.context) == 1, "Expect only one error"
+                                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
