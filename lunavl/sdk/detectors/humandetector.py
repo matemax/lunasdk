@@ -14,8 +14,8 @@ from .base import (
     getArgsForCoreDetectorForImages,
 )
 from ..base import LandmarksWithScore
-from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.errors import LunaVLError, ErrorInfo
+from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -139,10 +139,13 @@ class HumanDetector:
             forDetection = ImageForDetection(image=image, detectArea=image.rect)
         else:
             forDetection = ImageForDetection(image=image, detectArea=detectArea)
-        detections = self.detect([forDetection], limit=1, detectLandmarks=detectLandmarks)
-        if detections[0]:
-            return detections[0][0]
-        return None
+        imgs, detectAreas = getArgsForCoreDetectorForImages([forDetection])
+        error, detectRes = self._detector.detect(
+            [imgs[0]], [detectAreas[0]], 1, self._getDetectionType(detectLandmarks)
+        )
+        assertError(error)
+
+        return HumanDetection(detectRes[0][0], image) if detectRes[0] else None
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def detect(
@@ -162,9 +165,20 @@ class HumanDetector:
 
         """
         imgs, detectAreas = getArgsForCoreDetectorForImages(images)
+        detectionType = self._getDetectionType(detectLandmarks)
 
-        error, detectRes = self._detector.detect(imgs, detectAreas, limit, self._getDetectionType(detectLandmarks))
-        assertError(error)
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
+        if error.isError:
+            errors = []
+            for image, detectArea in zip(imgs, detectAreas):
+                # 1 is the detection limit
+                errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
+                if errorOne.isOk:
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+                else:
+                    errors.append(LunaVLError.fromSDKError(errorOne))
+            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors)
+
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
             image_ = images[numberImage]
@@ -213,13 +227,23 @@ class HumanDetector:
         Returns:
             detections
         Raises:
-            LunaSDKException if an error occurs
+            LunaSDKException if an error occurs, context contains all errors
         """
         res = []
+        errors = []
+        errorDuringProgress = False
         for image in images:
             imageRes = []
             for bBox in image.bBoxes:
-                detection = self.redetectOne(image.image, bBox=bBox)
-                imageRes.append(detection)
+                try:
+                    detection = self.redetectOne(image.image, bBox=bBox)
+                    imageRes.append(detection)
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+                except LunaSDKException as exc:
+                    errors.append(exc.error)
+                    errorDuringProgress = True
+                    break
             res.append(imageRes)
+        if errorDuringProgress:
+            raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
         return res

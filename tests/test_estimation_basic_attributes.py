@@ -2,11 +2,15 @@ from collections import namedtuple
 from dataclasses import dataclass, asdict
 from operator import attrgetter, itemgetter
 from statistics import mean
+
+import pytest
 from time import time
 from typing import List, Union, Callable, Tuple
 
 import jsonschema
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     BasicAttributesEstimator,
     BasicAttributes,
@@ -14,7 +18,9 @@ from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     Ethnicity,
 )
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarp
+from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
+from tests.detect_test_class import VLIMAGE_SMALL
 from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE
 
 
@@ -210,3 +216,23 @@ class TestBasicAttributes(BaseTestClass):
         )
         for estimation in [*raw, aggregated]:
             jsonschema.validate(estimation.asDict(), schema)
+            assert isinstance(estimation.asDict(), dict)
+
+    def test_batch_estimate_with_success_and_error(self):
+        """
+        Test batch estimate with good and bad warp.
+        """
+        badWarp = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
+        badWarp.coreImage = VLIMAGE_SMALL.coreImage
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.estimator.estimateBasicAttributesBatch(
+                warps=[self._warp, badWarp],
+                estimateAge=True,
+                estimateGender=True,
+                estimateEthnicity=True,
+                aggregate=False,
+            )
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)

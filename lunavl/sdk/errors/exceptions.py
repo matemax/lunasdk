@@ -2,7 +2,7 @@
 Module realizes LunaSDKException - single exception for rising in sdk module
 """
 from functools import wraps
-from typing import Optional, Any, Callable
+from typing import Optional, Any, Callable, List
 
 from FaceEngine import FSDKErrorResult  # pylint: disable=E0611,E0401
 
@@ -50,15 +50,16 @@ def CoreExceptionWrap(error: ErrorInfo):
     return realWarp
 
 
-def assertError(error: FSDKErrorResult) -> None:
+def assertError(error: FSDKErrorResult, context: Optional[List[Any]] = None) -> None:
     """
     Assert core optional.
     Args:
         error: optional
+        context: list with errors
 
     Raises:
         LunaSDKException: if optional contains error
 
     """
     if error.isError:
-        raise LunaSDKException(LunaVLError.fromSDKError(error))
+        raise LunaSDKException(LunaVLError.fromSDKError(error), context)

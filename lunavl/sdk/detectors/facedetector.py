@@ -18,7 +18,7 @@ from ..detectors.base import (
     getArgsForCoreDetectorForImages,
 )
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -212,11 +212,19 @@ class FaceDetector:
 
         """
         imgs, detectAreas = getArgsForCoreDetectorForImages(images)
+        detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
-        error, detectRes = self._detector.detect(
-            imgs, detectAreas, limit, self._getDetectionType(detect5Landmarks, detect68Landmarks)
-        )
-        assertError(error)
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
+        if error.isError:
+            errors = []
+            for image, detectArea in zip(imgs, detectAreas):
+                errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
+                if errorOne.isOk:
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+                else:
+                    errors.append(LunaVLError.fromSDKError(errorOne))
+            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors)
+
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
             image_ = images[numberImage]
@@ -272,16 +280,16 @@ class FaceDetector:
         Returns:
             detections
         Raises:
-            LunaSDKException if an error occurs
+            LunaSDKException if an error occurs, context contains all errors
         """
         faces = []
         for image in images:
             assertImageForDetection(image.image)
             faces.extend(_createCoreFaces(image))
-        error, detectRes, _ = self._detector.redetect(
+        mainError, detectRes, errors = self._detector.redetect(
             faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        assertError(error)
+        assertError(mainError, [LunaVLError.fromSDKError(error) for error in errors])
 
         detectIter = iter(detectRes)
         res = []

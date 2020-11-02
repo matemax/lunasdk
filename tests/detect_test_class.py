@@ -1,8 +1,7 @@
-import itertools
 from collections import namedtuple
 from typing import List, Union, Type
 
-from PIL import Image
+import itertools
 
 from lunavl.sdk.base import BoundingBox, LandmarkWithScore
 from lunavl.sdk.detectors.base import BaseDetection
@@ -13,11 +12,11 @@ from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE
+from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE, BAD_IMAGE
 
-SINGLE_CHANNEL_IMAGE = Image.open(ONE_FACE).convert("L")
 VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)
+BAD_IMAGE = VLImage.load(filename=BAD_IMAGE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
 GOOD_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width - 100, VLIMAGE_ONE_FACE.rect.height - 100)
 OUTSIDE_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)

@@ -39,6 +39,18 @@ class BaseTestClass(unittest.TestCase):
             assert exceptionInfo.value.error.detail == expectedError.detail, exceptionInfo.value
 
     @staticmethod
+    def assertReceivedAndRawExpectedErrors(receivedError: ErrorInfo, expectedErrorEmptyDetail: ErrorInfo):
+        """
+        Assert expected and received errors as dicts
+        Args:
+            receivedError: received error
+            expectedErrorEmptyDetail: expected error with empty detail
+        """
+        assert expectedErrorEmptyDetail.errorCode == receivedError.errorCode
+        assert expectedErrorEmptyDetail.description == receivedError.description
+        assert expectedErrorEmptyDetail.description == receivedError.detail
+
+    @staticmethod
     def checkRectAttr(defaultRect: Rect):
         """
         Validate attributes of Rect

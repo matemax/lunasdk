@@ -7,9 +7,6 @@ from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
-from tests.detect_test_class import FaceDetectTestClass
-from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
-from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 from tests.detect_test_class import (
     VLIMAGE_ONE_FACE,
     GOOD_AREA,
@@ -17,7 +14,11 @@ from tests.detect_test_class import (
     AREA_WITHOUT_FACE,
     OUTSIDE_AREA,
     VLIMAGE_SMALL,
+    FaceDetectTestClass,
+    BAD_IMAGE,
 )
+from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
+from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
 
 
 class TestFaceDetector(FaceDetectTestClass):
@@ -126,6 +127,17 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 detection = detector.detect(images=[VLIMAGE_ONE_FACE])[0]
                 self.assertFaceDetection(detection, VLIMAGE_ONE_FACE)
+
+    def test_batch_detect_with_success_and_error(self):
+        """
+        Test batch detection with success and error using FACE_DET_V3 (there is no error with other detector)
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.detectors[2].detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Internal)
 
     def test_detect_one_with_image_of_several_faces(self):
         """
@@ -325,7 +337,9 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)])
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
 
     @pytest.mark.skip("unstable")
     def test_excessive_image_list_detection(self):
@@ -354,7 +368,9 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=Rect())])
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
 
     def test_match_detection_one_image(self):
         """
