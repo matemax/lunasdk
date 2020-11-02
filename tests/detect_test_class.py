@@ -57,24 +57,28 @@ class BaseDetectorTestClass(BaseTestClass):
         assert isinstance(point, Point), "Landmarks does not contains Point"
         assert isinstance(point.x, float) and isinstance(point.y, float), "point coordinate is not float"
 
-    def assertDetection(self, detection: Union[FaceDetection, List[FaceDetection]], imageVl: VLImage):
+    def assertDetection(
+        self,
+        detection: Union[FaceDetection, HumanDetection, List[Union[FaceDetection, HumanDetection]]],
+        imageVl: VLImage,
+    ):
         """
-        Function checks if an instance is FaceDetection class
+        Function checks if an instance is Detection class, image and bounding box
 
         Args:
-            detection: face detection
+            detection: detection
             imageVl: class image
         """
         if isinstance(detection, list):
-            listOfFaceDetection = detection
+            detectionList = detection
         else:
-            listOfFaceDetection = [detection]
+            detectionList = [detection]
 
-        for detection in listOfFaceDetection:
+        for detection in detectionList:
             assert isinstance(detection, self.__class__.detectionClass), (
                 f"{detection.__class__} is not " f"{self.__class__.detectionClass}"
             )
-            assert detection.image == imageVl, "Detection image does not match VLImage"
+            assert detection.image.asPillow() == imageVl.asPillow(), "Detection image does not match VLImage"
             self.assertBoundingBox(detection.boundingBox)
 
 
@@ -105,15 +109,7 @@ class HumanDetectTestClass(BaseDetectorTestClass):
             detection: face detection
             imageVl: class image
         """
-        if isinstance(detection, list):
-            listOfFaceDetection = detection
-        else:
-            listOfFaceDetection = [detection]
-
-        for detection in listOfFaceDetection:
-            assert isinstance(detection, HumanDetection), f"{detection.__class__} is not {HumanDetection}"
-            assert detection.image == imageVl, "Detection image does not match VLImage"
-            self.assertBoundingBox(detection.boundingBox)
+        self.assertDetection(detection, imageVl)
 
     @staticmethod
     def assertDetectionLandmarks(detection: HumanDetection, landmarksIsExpected: bool = False):
@@ -174,15 +170,7 @@ class FaceDetectTestClass(BaseDetectorTestClass):
             detection: face detection
             imageVl: class image
         """
-        if isinstance(detection, list):
-            listOfFaceDetection = detection
-        else:
-            listOfFaceDetection = [detection]
-
-        for detection in listOfFaceDetection:
-            assert isinstance(detection, FaceDetection), f"{detection.__class__} is not {FaceDetection}"
-            assert detection.image == imageVl, "Detection image does not match VLImage"
-            self.assertBoundingBox(detection.boundingBox)
+        self.assertDetection(detection, imageVl)
 
     @staticmethod
     def assertDetectionLandmarks(

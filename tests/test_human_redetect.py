@@ -86,6 +86,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
             self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=INVALID_RECT)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
+    @pytest.mark.skip()  # TODO get resolution from n.feofanov
     def test_redetect_invalid_rectangle(self):
         """
         Test batch re-detection with an invalid rect
@@ -97,7 +98,9 @@ class TestsRedetectHuman(HumanDetectTestClass):
                     ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)]),
                 ]
             )
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+        assert exceptionInfo.value.context[0], LunaVLError.InvalidRect
 
     @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):

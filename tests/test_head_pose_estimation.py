@@ -11,7 +11,7 @@ from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from lunavl.sdk.luna_faces import VLFaceDetector
-from sdk.faceengine.engine import VLFaceEngine
+from lunavl.sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
 from tests.resources import (
     ONE_FACE,
