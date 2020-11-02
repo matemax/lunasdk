@@ -2,11 +2,15 @@ from collections import namedtuple
 from dataclasses import dataclass, asdict
 from operator import attrgetter, itemgetter
 from statistics import mean
+
+import pytest
 from time import time
 from typing import List, Union, Callable, Tuple
 
 import jsonschema
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     BasicAttributesEstimator,
     BasicAttributes,
@@ -14,8 +18,10 @@ from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     Ethnicity,
 )
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarp
+from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE, VLIMAGE_SMALL
+from tests.detect_test_class import VLIMAGE_SMALL
+from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE
 
 
 @dataclass
