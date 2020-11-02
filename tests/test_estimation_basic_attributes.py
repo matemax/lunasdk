@@ -2,13 +2,11 @@ from collections import namedtuple
 from dataclasses import dataclass, asdict
 from operator import attrgetter, itemgetter
 from statistics import mean
-
-import pytest
 from time import time
 from typing import List, Union, Callable, Tuple
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+import jsonschema
+
 from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     BasicAttributesEstimator,
     BasicAttributes,
@@ -16,10 +14,8 @@ from lunavl.sdk.estimators.face_estimators.basic_attributes import (
     Ethnicity,
 )
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage, FaceWarp
-from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.detect_test_class import VLIMAGE_SMALL
-from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE
+from tests.resources import WARP_ONE_FACE, WARP_CLEAN_FACE, VLIMAGE_SMALL
 
 
 @dataclass
@@ -56,9 +52,12 @@ Estimation = namedtuple("Estimation", ("Age", "Gender", "Ethnicity"))
 class TestBasicAttributes(BaseTestClass):
     """ Test basic attributes. """
 
+    # estimator to call
     estimator: BasicAttributesEstimator = BaseTestClass.faceEngine.createBasicAttributesEstimator()
 
+    # warped image
     _warp: FaceWarpedImage
+    # second warped image
     _warp2: FaceWarpedImage
 
     @classmethod
@@ -182,10 +181,35 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test asDict method.
         """
+        schema = {
+            "type": "object",
+            "properties": {
+                "age": {"type": "integer", "maximum": 100, "minimum": 0},
+                "gender": {"type": "integer", "maximum": 1, "minimum": 0},
+                "ethnicities": {
+                    "type": "object",
+                    "properties": {
+                        "predominant_ethnicity": {"type": "string"},
+                        "estimations": {
+                            "properties": {
+                                "asian": {"type": "number", "maximum": 1, "minimum": 0},
+                                "indian": {"type": "number", "maximum": 1, "minimum": 0},
+                                "caucasian": {"type": "number", "maximum": 1, "minimum": 0},
+                                "african_american": {"type": "number", "maximum": 1, "minimum": 0},
+                            },
+                            "required": ["asian", "indian", "caucasian", "african_american"],
+                        },
+                    },
+                    "required": ["predominant_ethnicity", "estimations"],
+                },
+            },
+            "required": ["ethnicities", "age", "gender"],
+        }
         raw, aggregated = self.estimateBatch(
             [self._warp, self._warp2], estimateAge=True, estimateGender=True, estimateEthnicity=True, aggregate=True
         )
         for estimation in [*raw, aggregated]:
+            jsonschema.validate(estimation.asDict(), schema)
             assert isinstance(estimation.asDict(), dict)
 
     def test_batch_estimate_with_success_and_error(self):
