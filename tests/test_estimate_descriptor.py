@@ -25,7 +25,7 @@ from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.detect_test_class import VLIMAGE_SMALL
-from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE
+from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE, BAD_THRESHOLD_WARP
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [46, 52, 54, 56]
 
@@ -428,3 +428,21 @@ class TestEstimateDescriptor(BaseTestClass):
                                 self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
                                 assert len(exceptionInfo.value.context) == 1, "Expect only one error"
                                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+
+    def test_descriptor_batch_bad_threshold_aggregation(self):
+        """
+        Test descriptor batch with bad threshold warps with aggregation
+        """
+        faceWarp = FaceWarpedImage.load(filename=BAD_THRESHOLD_WARP)
+        for descriptorVersion in [56]:
+            with self.subTest(planVersion=descriptorVersion):
+                extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion)
+                descriptorBatch = self.getBatch(descriptorVersion, 2, DescriptorType.face)
+                with pytest.raises(LunaSDKException) as exceptionInfo:
+                    extractor.estimateDescriptorsBatch([faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch)
+                self.assertLunaVlError(
+                    exceptionInfo,
+                    LunaVLError.BatchedInternalError.format(
+                        "Cant aggregate descriptors - all images'a GSs are less the threashold"
+                    ),
+                )
