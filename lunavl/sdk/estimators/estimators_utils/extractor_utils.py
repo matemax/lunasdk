@@ -4,7 +4,7 @@ from typing import Optional, Union, List, Tuple, Type
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory, BaseDescriptorBatch
-from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.errors import LunaVLError, ErrorInfo
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -64,7 +64,7 @@ def estimateDescriptorsBatch(
         LunaSDKException: if estimation failed
     """
 
-    def getErrorsExtractingOneByOne() -> List[LunaVLError]:
+    def getErrorsExtractingOneByOne() -> List[ErrorInfo]:
         """
         Extract descriptor without batching and collect errors
         Returns:
@@ -72,7 +72,7 @@ def estimateDescriptorsBatch(
         """
         errors = []
         for idx, warp in enumerate(warps):
-            if len(descriptorBatch):
+            if descriptorBatch is not None and len(descriptorBatch):
                 coreDescriptor = descriptorBatch[idx].coreEstimation
             else:
                 descriptor = descriptorFactory.generateDescriptor()
@@ -84,7 +84,7 @@ def estimateDescriptorsBatch(
             else:
                 errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
 
-            return errors
+        return errors
 
     if descriptorBatch is None:
         descriptorBatch = descriptorFactory.generateDescriptorsBatch(len(warps))
