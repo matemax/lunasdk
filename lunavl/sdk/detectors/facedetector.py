@@ -223,7 +223,9 @@ class FaceDetector:
                     errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 else:
                     errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error)), errors)
+            raise LunaSDKException(
+                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
+            )
 
         res = []
         for numberImage, imageDetections in enumerate(detectRes):
