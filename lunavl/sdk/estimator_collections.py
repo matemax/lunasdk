@@ -12,6 +12,7 @@ from .estimators.face_estimators.head_pose import HeadPoseEstimator
 from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
 from .estimators.face_estimators.mask import MaskEstimator
+from .estimators.face_estimators.glasses import GlassesEstimator
 from .estimators.face_estimators.facewarper import FaceWarper
 from .faceengine.engine import VLFaceEngine
 
@@ -41,7 +42,8 @@ class FaceEstimator(Enum):
     Descriptor = 9
     #: mask estimator
     Mask = 10
-
+    #: glasses estimator
+    Glasses = 11
 
 class FaceEstimatorsCollection:
     """
@@ -58,6 +60,7 @@ class FaceEstimatorsCollection:
         _AGSEstimator (Optional[AGSEstimator]): lazy load ags estimator
         _descriptorEstimator (Optional[FaceDescriptorEstimator]): lazy load face descriptor estimator
         _maskEstimator (Optional[MaskEstimator]): lazy mask estimator
+        _glassesEstimator (Optional[GlassesEstimator]): lazy glasses estimator
         warper (Optional[Warper]): warper
     """
 
@@ -74,6 +77,7 @@ class FaceEstimatorsCollection:
         "warper",
         "_descriptorEstimator",
         "_maskEstimator",
+        "_glassesEstimator"
     )
 
     def __init__(
@@ -101,6 +105,7 @@ class FaceEstimatorsCollection:
         self._AGSEstimator: Union[None, AGSEstimator] = None
         self._descriptorEstimator: Union[None, FaceDescriptorEstimator] = None
         self._maskEstimator: Union[None, MaskEstimator] = None
+        self._glassesEstimator: Union[None, GlassesEstimator] = None
         self.warper: FaceWarper = self._faceEngine.createFaceWarper()
 
         if startEstimators:
@@ -175,6 +180,8 @@ class FaceEstimatorsCollection:
             self._descriptorEstimator = self._faceEngine.createFaceDescriptorEstimator()
         elif estimator == FaceEstimator.Mask:
             self._maskEstimator = self._faceEngine.createMaskEstimator()
+        elif estimator == FaceEstimator.Glasses:
+            self._glassesEstimator = self._faceEngine.createGlassesEstimator()
         else:
             raise ValueError("Bad estimator type")
 
@@ -408,6 +415,29 @@ class FaceEstimatorsCollection:
             newEstimator: new mask estimator
         """
         self._maskEstimator = newEstimator
+
+    @property
+    def glassesEstimator(self) -> GlassesEstimator:
+        """
+        Get glasses estimator.
+
+        If estimator is initialized it will be returned otherwise it will be initialized and returned
+
+        Returns:
+            glasses estimator
+        """
+        if self._glassesEstimator is None:
+            self._glassesEstimator = self._faceEngine.createGlassesEstimator()
+        return self._glassesEstimator
+
+    @glassesEstimator.setter
+    def glassesEstimator(self, newEstimator: GlassesEstimator) -> None:
+        """
+        Set warp glasses estimator.
+        Args:
+            newEstimator: new glasses estimator
+        """
+        self._glassesEstimator = newEstimator
 
     @property
     def faceEngine(self) -> VLFaceEngine:

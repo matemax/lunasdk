@@ -75,7 +75,7 @@ class Glasses(BaseEstimation):
 
         """
         return {
-            "glasses": self.glasses.name,
+            "glasses": self.glasses.name.lower() if self.glasses.name != 'NoGlasses' else 'no_glasses',
         }
 
 

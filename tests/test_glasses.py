@@ -34,7 +34,7 @@ class TestGlasses(BaseTestClass):
             expectedEstimationResults: dictionary with result
         """
         assert isinstance(glasses, Glasses), f"{glasses.__class__} is not {Glasses}"
-        self.assertAlmostEqual(glasses.asDict(), expectedEstimationResults)
+        self.assertEqual(glasses.asDict(), expectedEstimationResults)
 
     def test_estimate_glasses_as_dict(self):
         """
@@ -49,7 +49,7 @@ class TestGlasses(BaseTestClass):
         """
         Test glasses estimations without glasses on the face
         """
-        expectedResult = {'glasses': 'NoGlasses'}
+        expectedResult = {'glasses': 'no_glasses'}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpNoGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
 
@@ -57,7 +57,7 @@ class TestGlasses(BaseTestClass):
         """
         Test glasses estimations with eyeglasses on the face
         """
-        expectedResult = {'glasses': 'EyeGlasses'}
+        expectedResult = {'glasses': 'eyeglasses'}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpEyeGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
 
@@ -65,6 +65,6 @@ class TestGlasses(BaseTestClass):
         """
         Test glasses estimations with sunglasses on the face
         """
-        expectedResult = {'glasses': 'SunGlasses'}
+        expectedResult = {'glasses': 'sunglasses'}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpSunGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
