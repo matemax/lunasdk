@@ -80,3 +80,12 @@ MASK_SCHEMA = {
     "required": ["estimations", "predominant_mask"],
     "additionalProperties": False,
 }
+
+GLASSES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "glasses": {"type": "string", "enum": ["NoGlasses", "EyeGlasses", "SunGlasses"]},
+    },
+    "required": ["glasses"],
+    "additionalProperties": False,
+}
