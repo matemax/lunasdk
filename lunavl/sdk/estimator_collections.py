@@ -45,6 +45,7 @@ class FaceEstimator(Enum):
     #: glasses estimator
     Glasses = 11
 
+
 class FaceEstimatorsCollection:
     """
     Collection of lazy load face estimators.
