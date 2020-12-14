@@ -83,7 +83,7 @@ MASK_SCHEMA = {
 
 GLASSES_SCHEMA = {
     "type": "object",
-    "properties": {"glasses": {"type": "string", "enum": ["no_glasses", "eyeglasses", "sunglasses"]},},
+    "properties": {"glasses": {"type": "string", "enum": ["no_glasses", "eyeglasses", "sunglasses"]}},
     "required": ["glasses"],
     "additionalProperties": False,
 }

@@ -78,9 +78,7 @@ class Glasses(BaseEstimation):
             }
 
         """
-        return {
-            "glasses": str(self.glasses),
-        }
+        return {"glasses": str(self.glasses)}
 
 
 class GlassesEstimator(BaseEstimator):
