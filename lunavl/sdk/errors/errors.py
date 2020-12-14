@@ -126,7 +126,7 @@ class LunaVLError:
     DetectHumansError = ErrorInfo(110022, "Detect humans bodies error", "")
     EstimationMaskError = ErrorInfo(110023, "Estimation mask error", "")
     BadAggregationThreshold = ErrorInfo(110024, "Filtered aggregation error", "")
-    EstimationGlassesError = ErrorInfo(110023, "Estimation glasses error", "")
+    EstimationGlassesError = ErrorInfo(110025, "Estimation glasses error", "")
 
     @classmethod
     def fromSDKError(cls, sdkError: FSDKErrorResult) -> "ErrorInfo":
