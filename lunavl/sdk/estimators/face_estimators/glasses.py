@@ -27,16 +27,16 @@ class GlassesState(Enum):
     SunGlasses = 3
 
     def fromCoreGlasses(coreGlassesName: str) -> "GlassesState":
-        if coreGlassesName == 'NoGlasses':
+        if coreGlassesName == "NoGlasses":
             return GlassesState.NoGlasses
-        if coreGlassesName == 'EyeGlasses':
+        if coreGlassesName == "EyeGlasses":
             return GlassesState.EyeGlasses
-        if coreGlassesName == 'SunGlasses':
+        if coreGlassesName == "SunGlasses":
             return GlassesState.SunGlasses
         raise RuntimeError(f"bad core glasses state {coreGlassesName}")
 
     def __str__(self):
-        return self.name.lower() if self.name != 'NoGlasses' else 'no_glasses'
+        return self.name.lower() if self.name != "NoGlasses" else "no_glasses"
 
 
 class Glasses(BaseEstimation):

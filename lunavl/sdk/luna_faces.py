@@ -58,7 +58,7 @@ class VLFaceDetection(FaceDetection):
         "_ags",
         "_descriptor",
         "_mask",
-        "_glasses"
+        "_glasses",
     )
 
     def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):

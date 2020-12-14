@@ -78,7 +78,7 @@ class FaceEstimatorsCollection:
         "warper",
         "_descriptorEstimator",
         "_maskEstimator",
-        "_glassesEstimator"
+        "_glassesEstimator",
     )
 
     def __init__(

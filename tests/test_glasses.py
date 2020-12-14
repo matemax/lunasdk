@@ -49,7 +49,7 @@ class TestGlasses(BaseTestClass):
         """
         Test glasses estimations without glasses on the face
         """
-        expectedResult = {'glasses': 'no_glasses'}
+        expectedResult = {"glasses": "no_glasses"}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpNoGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
 
@@ -57,7 +57,7 @@ class TestGlasses(BaseTestClass):
         """
         Test glasses estimations with eyeglasses on the face
         """
-        expectedResult = {'glasses': 'eyeglasses'}
+        expectedResult = {"glasses": "eyeglasses"}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpEyeGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
 
@@ -65,6 +65,6 @@ class TestGlasses(BaseTestClass):
         """
         Test glasses estimations with sunglasses on the face
         """
-        expectedResult = {'glasses': 'sunglasses'}
+        expectedResult = {"glasses": "sunglasses"}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpSunGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
