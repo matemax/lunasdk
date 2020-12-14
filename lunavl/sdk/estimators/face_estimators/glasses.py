@@ -26,6 +26,7 @@ class GlassesState(Enum):
     #: SunGlasses
     SunGlasses = 3
 
+    @staticmethod
     def fromCoreGlasses(coreGlassesName: str) -> "GlassesState":
         if coreGlassesName == "NoGlasses":
             return GlassesState.NoGlasses
