@@ -203,3 +203,9 @@ Classes and methods
 
 .. automodule:: lunavl.sdk.estimators.face_estimators.face_descriptor
     :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.mask
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.glasses
+    :members:

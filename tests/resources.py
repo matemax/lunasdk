@@ -31,7 +31,11 @@ OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
 MASK_NOT_IN_PLACE = getPathToImage("mask_not_in_place.jpg")
 WARP_CLEAN_FACE = getPathToImage("warp_clean_face.jpg")
 
+WARP_FACE_WITH_EYEGLASSES = getPathToImage("warp_face_with_eyeglasses.jpg")
+WARP_FACE_WITH_SUNGLASSES = getPathToImage("warp_face_with_sunglasses.jpg")
+
 ROTATED0 = getPathToImage("rotated0.jpg")
 ROTATED90 = getPathToImage("rotated90.png")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
+BAD_THRESHOLD_WARP = ""  # Skip test. Import error
