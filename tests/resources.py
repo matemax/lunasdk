@@ -38,4 +38,4 @@ ROTATED0 = getPathToImage("rotated0.jpg")
 ROTATED90 = getPathToImage("rotated90.png")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
-BAD_THRESHOLD_WARP = ""  # Skip test. Import error
+BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")

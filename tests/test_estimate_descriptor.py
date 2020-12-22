@@ -430,7 +430,6 @@ class TestEstimateDescriptor(BaseTestClass):
                                 assert len(exceptionInfo.value.context) == 1, "Expect only one error"
                                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
 
-    @pytest.mark.skip(msg="required correct image")
     def test_descriptor_batch_bad_threshold_aggregation(self):
         """
         Test descriptor batch with bad threshold warps with aggregation
