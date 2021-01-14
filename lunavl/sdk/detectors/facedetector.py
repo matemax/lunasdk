@@ -1,12 +1,11 @@
 """
 Module contains function for detection faces on images.
 """
-from typing import Optional, Union, List, Dict, Any, Callable
+from typing import Optional, Union, List, Dict, Any
 
 from FaceEngine import Detection, IFaceDetectionBatchPtr, DetectionType, Face, Landmarks5 as CoreLandmarks5, \
     Landmarks68 as CoreLandmarks68, DT_LANDMARKS5, DT_LANDMARKS68, Image as CoreImage, \
-    Rect as CoreRectI, \
-    FSDKErrorResult  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+    Rect as CoreRectI  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from ..base import Landmarks
 from ..detectors.base import (
@@ -15,9 +14,9 @@ from ..detectors.base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-    getArgsForCoreRedetectForImages)
+    getArgsForCoreRedetectForImages, collectAndRaiseErrorIfOccurred)
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
+from ..errors.exceptions import CoreExceptionWrap, assertError
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -167,34 +166,6 @@ class FaceDetector:
         return res
 
     @staticmethod
-    def collectAndRaiseErrorIfOccurred(
-            error: FSDKErrorResult,
-            coreImages: List[CoreImage],
-            detectAreas: List[CoreImage],
-            getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult]) -> None:
-        """
-        If occurred an error during batch operation, collect errors from single operations and raise complex exception
-        Args:
-            error: fsdk error from core reply
-            coreImages: list of core images
-            detectAreas: list of detect areas for core images
-            getErrorFunction: function to collect error by
-        Raises:
-            LunaSDKException(LunaVLError.BatchedInternalError) with collected errors in context
-        """
-        if error.isError:
-            errors = []
-            for image, detectArea in zip(coreImages, detectAreas):
-                errorOne = getErrorFunction(image, detectArea)
-                if errorOne.isOk:
-                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-                else:
-                    errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-            )
-
-    @staticmethod
     def _getDetectionType(detect5Landmarks: bool = True, detect68Landmarks: bool = False) -> DetectionType:
         """
         Get  core detection type
@@ -271,6 +242,7 @@ class FaceDetector:
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
         """
+
         def getSingleError(image: CoreImage, detectArea: CoreRectI):
             errorOne, _ = self._detector.detect(image, detectArea, detectionType)
             return errorOne
@@ -279,7 +251,7 @@ class FaceDetector:
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
-        self.collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
@@ -332,12 +304,8 @@ class FaceDetector:
 
         Returns:
             detections
-        Raises:
-            LunaSDKException if an error occurs, context contains all errors
-
-        Warnings:
-            returns so many detections as send it detection batch
         """
+
         def getSingleError(image: CoreImage, detectArea: CoreRectI):
             errorOne, _ = self._detector.redetect([image], [detectArea], detectionType)
             return errorOne
@@ -347,7 +315,7 @@ class FaceDetector:
         coreImages, detectAreas = getArgsForCoreRedetectForImages(images)
         fsdkErrorRes, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
 
-        self.collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res

@@ -1,6 +1,6 @@
-from typing import NamedTuple, List, Any, Dict, Union, Tuple
+from typing import NamedTuple, List, Any, Dict, Union, Tuple, Callable
 
-from FaceEngine import Rect as CoreRectI, Detection  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, FSDKErrorResult  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 
 from ..errors.errors import LunaVLError
@@ -141,3 +141,31 @@ def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[
         detectAreas.append([Detection(bbox.coreRect, 1.0) for bbox in image.bBoxes])
 
     return coreImages, detectAreas
+
+
+def collectAndRaiseErrorIfOccurred(
+        error: FSDKErrorResult,
+        coreImages: List[CoreImage],
+        detectAreas: List[CoreImage],
+        getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult]) -> None:
+    """
+    If occurred an error during batch operation, collect errors from single operations and raise complex exception
+    Args:
+        error: fsdk error from core reply
+        coreImages: list of core images
+        detectAreas: list of detect areas for core images
+        getErrorFunction: function to collect error by
+    Raises:
+        LunaSDKException(LunaVLError.BatchedInternalError) with collected errors in context
+    """
+    if error.isError:
+        errors = []
+        for image, detectArea in zip(coreImages, detectAreas):
+            errorOne = getErrorFunction(image, detectArea)
+            if errorOne.isOk:
+                errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+            else:
+                errors.append(LunaVLError.fromSDKError(errorOne))
+        raise LunaSDKException(
+            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
+        )
