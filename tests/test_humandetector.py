@@ -251,6 +251,7 @@ class TestHumanDetector(HumanDetectTestClass):
         assert 1 == len(detection[0])
         self.assertHumanDetection(detection[0], VLIMAGE_ONE_FACE)
 
+    @pytest.mark.skip("FSDK-2659")
     def test_bad_area_detection(self):
         """
         Test detection of one human in area outside image
@@ -259,6 +260,7 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
+    @pytest.mark.skip("FSDK-2659")
     def test_batch_detect_in_area_outside_image(self):
         """
         Test batch detection in area outside image
@@ -278,6 +280,7 @@ class TestHumanDetector(HumanDetectTestClass):
             TestHumanDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 1000)
         self.assertLunaVlError(exceptionInfo, LunaVLError.HighMemoryUsage)
 
+    @pytest.mark.skip("FSDK-2659")
     def test_detect_one_invalid_rectangle(self):
         """
         Test detection of one human with an invalid rect
@@ -286,6 +289,7 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=Rect())
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
+    @pytest.mark.skip("FSDK-2659")
     def test_batch_detect_invalid_rectangle(self):
         """
         Test batch human detection with an invalid rect

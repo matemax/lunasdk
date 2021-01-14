@@ -3,7 +3,7 @@ Module contains function for detection human bodies on images.
 """
 from typing import Optional, Union, List, Dict, Any
 
-from FaceEngine import HumanDetectionType, Human  # pylint: disable=E0611,E0401
+from FaceEngine import HumanDetectionType, Human, HumanLandmarks17, Detection  # pylint: disable=E0611,E0401
 from FaceEngine import HumanLandmarks17 as CoreLandmarks17  # pylint: disable=E0611,E0401
 
 from .base import (
@@ -32,8 +32,8 @@ def _createCoreHumans(image: ImageForRedetection) -> List[Human]:
     humans = [Human() for _ in range(len(image.bBoxes))]
     for index, human in enumerate(humans):
         human.img = image.image.coreImage
-        human.detection.rect = image.bBoxes[index].coreRectF
-        human.detection.score = 1
+        human.detection.setRawRect(image.bBoxes[index].coreRectF)
+        human.detection.setScore(1)
     return humans
 
 
@@ -111,10 +111,10 @@ class HumanDetector:
         Returns:
             detection type
         """
-        toDetect = HumanDetectionType.DCT_BOX
+        toDetect = HumanDetectionType.HDT_BOX
 
         if detectLandmarks:
-            toDetect = HumanDetectionType.DCT_ALL
+            toDetect = HumanDetectionType.HDT_ALL
         return toDetect
 
     @CoreExceptionWrap(LunaVLError.DetectHumanError)
@@ -134,18 +134,27 @@ class HumanDetector:
             LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
         assertImageForDetection(image)
+        detectionType = self._getDetectionType(detectLandmarks)
 
         if detectArea is None:
             forDetection = ImageForDetection(image=image, detectArea=image.rect)
         else:
             forDetection = ImageForDetection(image=image, detectArea=detectArea)
         imgs, detectAreas = getArgsForCoreDetectorForImages([forDetection])
-        error, detectRes = self._detector.detect(
-            [imgs[0]], [detectAreas[0]], 1, self._getDetectionType(detectLandmarks)
-        )
+        error, detectRes = self._detector.detect([imgs[0]], [detectAreas[0]], 1, detectionType)
         assertError(error)
 
-        return HumanDetection(detectRes[0][0], image) if detectRes[0] else None
+        detections = detectRes.getDetections(0)
+        landmarks17Array = detectRes.getLandmarks17(0)
+
+        if detectRes.getSize() != 1 or not detections or detections[0].isValid() is False:
+            return None
+        human = Human()
+        human.img = image.coreImage
+        human.detection = detections[0]
+        if landmarks17Array and landmarks17Array[0] is not None:
+            human.landmarks17_opt.set(landmarks17Array[0])
+        return HumanDetection(human, image)
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def detect(
@@ -182,10 +191,22 @@ class HumanDetector:
             )
 
         res = []
-        for numberImage, imageDetections in enumerate(detectRes):
-            image_ = images[numberImage]
-            image = image_ if isinstance(image_, VLImage) else image_.image
-            res.append([HumanDetection(coreDetection, image) for coreDetection in imageDetections])
+        for imageIdx in range(detectRes.getSize()):
+            imagesDetections = []
+            detections = detectRes.getDetections(imageIdx)
+            landmarks17Array = detectRes.getLandmarks17(imageIdx)
+
+            for detection, landmarks17 in zip(detections, landmarks17Array):
+                human = Human()
+                human.img = imgs[imageIdx]
+                human.detection = detection
+                if landmarks17:
+                    human.landmarks17_opt.set(landmarks17)
+                imagesDetections.append(human)
+
+            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            res.append([HumanDetection(human, image) for human in imagesDetections])
+
         return res
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
@@ -205,13 +226,14 @@ class HumanDetector:
         Raises:
             LunaSDKException if an error occurs
         """
+        assertImageForDetection(image)
         if isinstance(bBox, Rect):
-            area = bBox
+            coreBBox = Detection(bBox.coreRectF, 1.0)
         else:
-            area = bBox.boundingBox.rect
+            coreBBox = bBox.coreEstimation.detection
 
-        human = _createCoreHumans(ImageForRedetection(image, [area]))[0]
-        error, detectRes = self._detector.redetectOne(human)
+        # human = _createCoreHumans(ImageForRedetection(image, [area]))[0]
+        error, detectRes = self._detector.redetectOne(image.coreImage, coreBBox)
 
         assertError(error)
         if detectRes.isValid():

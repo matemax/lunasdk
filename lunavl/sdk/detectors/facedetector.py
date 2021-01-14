@@ -3,11 +3,11 @@ Module contains function for detection faces on images.
 """
 from typing import Optional, Union, List, Dict, Any
 
-from FaceEngine import DetectionFloat  # pylint: disable=E0611,E0401
+from FaceEngine import Detection  # pylint: disable=E0611,E0401
 from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
 from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
-from FaceEngine import dt5Landmarks, dt68Landmarks  # pylint: disable=E0611,E0401
+from FaceEngine import DT_LANDMARKS5, DT_LANDMARKS68  # pylint: disable=E0611,E0401
 
 from ..base import Landmarks
 from ..detectors.base import (
@@ -31,7 +31,7 @@ def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
     Returns:
         Face object list. one object for one bbox
     """
-    return [Face(image.image.coreImage, DetectionFloat(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
+    return [Face(image.image.coreImage, Detection(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
 
 
 class Landmarks5(Landmarks):
@@ -146,9 +146,9 @@ class FaceDetector:
         toDetect = 0
 
         if detect5Landmarks:
-            toDetect = toDetect | dt5Landmarks
+            toDetect = toDetect | DT_LANDMARKS5
         if detect68Landmarks:
-            toDetect = toDetect | dt68Landmarks
+            toDetect = toDetect | DT_LANDMARKS68
 
         return DetectionType(toDetect)
 
@@ -184,10 +184,9 @@ class FaceDetector:
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
         assertError(error)
-        if not detectRes.isValid():
+        if detectRes.isValid() is False:
             return None
-        coreDetection = detectRes
-        return FaceDetection(coreDetection, image)
+        return FaceDetection(detectRes, image)
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
@@ -228,10 +227,22 @@ class FaceDetector:
             )
 
         res = []
-        for numberImage, imageDetections in enumerate(detectRes):
-            image_ = images[numberImage]
-            image = image_ if isinstance(image_, VLImage) else image_.image
-            res.append([FaceDetection(coreDetection, image) for coreDetection in imageDetections])
+        for imageIdx in range(detectRes.getSize()):
+            imagesDetections = []
+            detections = detectRes.getDetections(imageIdx)
+            landmarks5Array = detectRes.getLandmarks5(imageIdx)
+            landmarks68Array = detectRes.getLandmarks68(imageIdx)
+
+            for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
+                face = Face(imgs[imageIdx], detection)
+                if landmarks5 is not None:
+                    face.landmarks5_opt.set(landmarks5)
+                if landmarks68 is not None:
+                    face.landmarks68_opt.set(landmarks68)
+                imagesDetections.append(face)
+
+            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            res.append([FaceDetection(coreDetection, image) for coreDetection in imagesDetections])
 
         return res
 
@@ -256,13 +267,15 @@ class FaceDetector:
         """
         assertImageForDetection(image)
         if isinstance(bBox, Rect):
-            coreBBox = bBox.coreRectF
+            coreBBox = Detection(bBox.coreRectF, 1.0)
         else:
-            coreBBox = bBox.coreEstimation.detection.rect
+            coreBBox = bBox.coreEstimation.detection
+
         error, detectRes = self._detector.redetectOne(
             image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
         assertError(error)
+
         if detectRes.isValid():
             return FaceDetection(detectRes, image)
         return None
@@ -283,27 +296,54 @@ class FaceDetector:
             detections
         Raises:
             LunaSDKException if an error occurs, context contains all errors
+
+        Warnings:
+            returns so many detections as send it detection batch
         """
+        detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
+
         faces = []
+        imgs = []
         for image in images:
             assertImageForDetection(image.image)
-            faces.extend(_createCoreFaces(image))
-        mainError, detectRes, errors = self._detector.redetect(
-            faces, self._getDetectionType(detect5Landmarks, detect68Landmarks)
-        )
-        assertError(mainError, [LunaVLError.fromSDKError(error) for error in errors])
+            imgs.append(image.image.coreImage)
+            faces.append([face.detection for face in _createCoreFaces(image)])
+        error, detectRes = self._detector.redetect(imgs, faces, detectionType)
 
-        detectIter = iter(detectRes)
-        res = []
-        for image in images:
-            imageRes: List[Union[FaceDetection, None]] = []
-            for _ in range(len(image.bBoxes)):
-                detection = next(detectIter)
-                if detection.isValid():
-                    imageRes.append(FaceDetection(detection, image.image))
+        if error.isError:
+            errors = []
+            for image, face in zip(imgs, faces):
+                errorOne, _ = self._detector.redetect([image], [face], detectionType)
+                if errorOne.isOk:
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
                 else:
-                    imageRes.append(None)
-            res.append(imageRes)
+                    errors.append(LunaVLError.fromSDKError(errorOne))
+            raise LunaSDKException(
+                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
+            )
+
+        res = []
+        for imageIdx in range(detectRes.getSize()):
+            imagesDetections = []
+            detections = detectRes.getDetections(imageIdx)
+            landmarks5Array = detectRes.getLandmarks5(imageIdx)
+            landmarks68Array = detectRes.getLandmarks68(imageIdx)
+
+            for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
+                face = Face(imgs[imageIdx], detection)
+                if landmarks5 is not None:
+                    face.landmarks5_opt.set(landmarks5)
+                if landmarks68 is not None:
+                    face.landmarks68_opt.set(landmarks68)
+                imagesDetections.append(face)
+
+            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            res.append(
+                [
+                    FaceDetection(coreDetection, image) if coreDetection.isValid() else None
+                    for coreDetection in imagesDetections
+                ]
+            )
 
         return res
 

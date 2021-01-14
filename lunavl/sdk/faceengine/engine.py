@@ -137,7 +137,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        return MouthStateEstimator(self._faceEngine.createSmileEstimator())
+        return MouthStateEstimator(self._faceEngine.createMouthEstimator())
 
     def createEyeEstimator(self) -> EyeEstimator:
         """

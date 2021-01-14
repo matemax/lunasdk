@@ -95,7 +95,6 @@ def estimateDescriptorsBatch(
             [warp.warpedImage.coreImage for warp in warps],
             descriptorBatch.coreEstimation,
             aggregatedDescriptor.coreEstimation,
-            len(warps),
         )
         if error.isError:
             errors = getErrorsExtractingOneByOne()
@@ -107,7 +106,7 @@ def estimateDescriptorsBatch(
     else:
         aggregatedDescriptor = None
         error, scores = coreEstimator.extractFromWarpedImageBatch(
-            [warp.warpedImage.coreImage for warp in warps], descriptorBatch.coreEstimation, len(warps)
+            [warp.warpedImage.coreImage for warp in warps], descriptorBatch.coreEstimation
         )
         if error.isError:
             errors = getErrorsExtractingOneByOne()
