@@ -1,6 +1,6 @@
 from typing import NamedTuple, List, Any, Dict, Union, Tuple
 
-from FaceEngine import Rect as CoreRectI  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 
 from ..errors.errors import LunaVLError
@@ -107,10 +107,9 @@ def getArgsForCoreDetectorForImages(
                second - detect area for corresponding images
     """
 
-    coreImages = []
-    detectAreas = []
-    for image in images:
+    coreImages, detectAreas = [], []
 
+    for image in images:
         if isinstance(image, VLImage):
             img = image
             detectAreas.append(image.coreImage.getRect())
@@ -120,4 +119,25 @@ def getArgsForCoreDetectorForImages(
             detectAreas.append(image.detectArea.coreRectI)
             assertImageForDetection(image.image)
         coreImages.append(img.coreImage)
+
+    return coreImages, detectAreas
+
+
+def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[List[CoreImage], List[CoreRectI]]:
+    """
+    Create args for redetect for image list
+    Args:
+        images: list of images for redetection
+
+    Returns:
+        tuple: first - list core images
+               second - detect area for corresponding images
+    """
+    coreImages, detectAreas = [], []
+
+    for image in images:
+        assertImageForDetection(image.image)
+        coreImages.append(image.image.coreImage)
+        detectAreas.append([Detection(bbox.coreRect, 1.0) for bbox in image.bBoxes])
+
     return coreImages, detectAreas

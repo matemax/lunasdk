@@ -232,7 +232,6 @@ class HumanDetector:
         else:
             coreBBox = bBox.coreEstimation.detection
 
-        # human = _createCoreHumans(ImageForRedetection(image, [area]))[0]
         error, detectRes = self._detector.redetectOne(image.coreImage, coreBBox)
 
         assertError(error)

@@ -1,13 +1,12 @@
 """
 Module contains function for detection faces on images.
 """
-from typing import Optional, Union, List, Dict, Any
+from typing import Optional, Union, List, Dict, Any, Callable
 
-from FaceEngine import Detection  # pylint: disable=E0611,E0401
-from FaceEngine import DetectionType, Face  # pylint: disable=E0611,E0401
-from FaceEngine import Landmarks5 as CoreLandmarks5  # pylint: disable=E0611,E0401
-from FaceEngine import Landmarks68 as CoreLandmarks68  # pylint: disable=E0611,E0401
-from FaceEngine import DT_LANDMARKS5, DT_LANDMARKS68  # pylint: disable=E0611,E0401
+from FaceEngine import Detection, IFaceDetectionBatchPtr, DetectionType, Face, Landmarks5 as CoreLandmarks5, \
+    Landmarks68 as CoreLandmarks68, DT_LANDMARKS5, DT_LANDMARKS68, Image as CoreImage, \
+    Rect as CoreRectI, \
+    FSDKErrorResult  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from ..base import Landmarks
 from ..detectors.base import (
@@ -16,7 +15,7 @@ from ..detectors.base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-)
+    getArgsForCoreRedetectForImages)
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
@@ -132,6 +131,70 @@ class FaceDetector:
         self.detectorType = detectorType
 
     @staticmethod
+    def collectDetectionsResult(fsdkDetectRes: IFaceDetectionBatchPtr, coreImages: List[CoreImage],
+                                images: List[Union[VLImage, ImageForDetection, ImageForRedetection]]):
+        """
+        Collect detection results from core reply and prepare face detections
+        Args:
+            fsdkDetectRes: fsdk (re)detect results
+            coreImages: core images
+            images: incoming images
+        Returns:
+            return list of lists detection, order of detection lists is corresponding to order input images
+        """
+        res = []
+        for imageIdx in range(fsdkDetectRes.getSize()):
+            imagesDetections = []
+            detections = fsdkDetectRes.getDetections(imageIdx)
+            landmarks5Array = fsdkDetectRes.getLandmarks5(imageIdx)
+            landmarks68Array = fsdkDetectRes.getLandmarks68(imageIdx)
+
+            for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
+                face = Face(coreImages[imageIdx], detection)
+                if landmarks5 is not None:
+                    face.landmarks5_opt.set(landmarks5)
+                if landmarks68 is not None:
+                    face.landmarks68_opt.set(landmarks68)
+                imagesDetections.append(face)
+
+            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            res.append(
+                [
+                    FaceDetection(coreDetection, image) if coreDetection.isValid() else None
+                    for coreDetection in imagesDetections
+                ]
+            )
+        return res
+
+    @staticmethod
+    def collectAndRaiseErrorIfOccurred(
+            error: FSDKErrorResult,
+            coreImages: List[CoreImage],
+            detectAreas: List[CoreImage],
+            getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult]) -> None:
+        """
+        If occurred an error during batch operation, collect errors from single operations and raise complex exception
+        Args:
+            error: fsdk error from core reply
+            coreImages: list of core images
+            detectAreas: list of detect areas for core images
+            getErrorFunction: function to collect error by
+        Raises:
+            LunaSDKException(LunaVLError.BatchedInternalError) with collected errors in context
+        """
+        if error.isError:
+            errors = []
+            for image, detectArea in zip(coreImages, detectAreas):
+                errorOne = getErrorFunction(image, detectArea)
+                if errorOne.isOk:
+                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+                else:
+                    errors.append(LunaVLError.fromSDKError(errorOne))
+            raise LunaSDKException(
+                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
+            )
+
+    @staticmethod
     def _getDetectionType(detect5Landmarks: bool = True, detect68Landmarks: bool = False) -> DetectionType:
         """
         Get  core detection type
@@ -154,11 +217,11 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectOneFaceError)
     def detectOne(
-        self,
-        image: VLImage,
-        detectArea: Optional[Rect] = None,
-        detect5Landmarks: bool = True,
-        detect68Landmarks: bool = False,
+            self,
+            image: VLImage,
+            detectArea: Optional[Rect] = None,
+            detect5Landmarks: bool = True,
+            detect68Landmarks: bool = False,
     ) -> Union[None, FaceDetection]:
         """
         Detect just one best detection on the image.
@@ -184,17 +247,18 @@ class FaceDetector:
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
         assertError(error)
+
         if detectRes.isValid() is False:
             return None
         return FaceDetection(detectRes, image)
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
-        self,
-        images: List[Union[VLImage, ImageForDetection]],
-        limit: int = 5,
-        detect5Landmarks: bool = True,
-        detect68Landmarks: bool = False,
+            self,
+            images: List[Union[VLImage, ImageForDetection]],
+            limit: int = 5,
+            detect5Landmarks: bool = True,
+            detect68Landmarks: bool = False,
     ) -> List[List[FaceDetection]]:
         """
         Batch detect faces on images.
@@ -206,49 +270,23 @@ class FaceDetector:
             detect68Landmarks: detect or not landmarks68
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
-        Raises:
-            LunaSDKException(LunaVLError.InvalidImageFormat): if any image has bad format or detect is failed
-
         """
-        imgs, detectAreas = getArgsForCoreDetectorForImages(images)
+        def getSingleError(image: CoreImage, detectArea: CoreRectI):
+            errorOne, _ = self._detector.detect(image, detectArea, detectionType)
+            return errorOne
+
+        coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
-        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
-        if error.isError:
-            errors = []
-            for image, detectArea in zip(imgs, detectAreas):
-                errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
-                if errorOne.isOk:
-                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-                else:
-                    errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-            )
+        fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
+        self.collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
-        res = []
-        for imageIdx in range(detectRes.getSize()):
-            imagesDetections = []
-            detections = detectRes.getDetections(imageIdx)
-            landmarks5Array = detectRes.getLandmarks5(imageIdx)
-            landmarks68Array = detectRes.getLandmarks68(imageIdx)
-
-            for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
-                face = Face(imgs[imageIdx], detection)
-                if landmarks5 is not None:
-                    face.landmarks5_opt.set(landmarks5)
-                if landmarks68 is not None:
-                    face.landmarks68_opt.set(landmarks68)
-                imagesDetections.append(face)
-
-            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
-            res.append([FaceDetection(coreDetection, image) for coreDetection in imagesDetections])
-
+        res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetectOne(  # noqa: F811
-        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
+            self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
     ) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
@@ -282,7 +320,7 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
-        self, images: List[ImageForRedetection], detect5Landmarks: bool = True, detect68Landmarks: bool = False
+            self, images: List[ImageForRedetection], detect5Landmarks: bool = True, detect68Landmarks: bool = False
     ) -> List[List[Union[FaceDetection, None]]]:
         """
         Redetect face on each image.image in area, restricted with image.bBox.
@@ -300,51 +338,18 @@ class FaceDetector:
         Warnings:
             returns so many detections as send it detection batch
         """
+        def getSingleError(image: CoreImage, detectArea: CoreRectI):
+            errorOne, _ = self._detector.redetect([image], [detectArea], detectionType)
+            return errorOne
+
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
-        faces = []
-        imgs = []
-        for image in images:
-            assertImageForDetection(image.image)
-            imgs.append(image.image.coreImage)
-            faces.append([face.detection for face in _createCoreFaces(image)])
-        error, detectRes = self._detector.redetect(imgs, faces, detectionType)
+        coreImages, detectAreas = getArgsForCoreRedetectForImages(images)
+        fsdkErrorRes, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
 
-        if error.isError:
-            errors = []
-            for image, face in zip(imgs, faces):
-                errorOne, _ = self._detector.redetect([image], [face], detectionType)
-                if errorOne.isOk:
-                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-                else:
-                    errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-            )
+        self.collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
-        res = []
-        for imageIdx in range(detectRes.getSize()):
-            imagesDetections = []
-            detections = detectRes.getDetections(imageIdx)
-            landmarks5Array = detectRes.getLandmarks5(imageIdx)
-            landmarks68Array = detectRes.getLandmarks68(imageIdx)
-
-            for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
-                face = Face(imgs[imageIdx], detection)
-                if landmarks5 is not None:
-                    face.landmarks5_opt.set(landmarks5)
-                if landmarks68 is not None:
-                    face.landmarks68_opt.set(landmarks68)
-                imagesDetections.append(face)
-
-            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
-            res.append(
-                [
-                    FaceDetection(coreDetection, image) if coreDetection.isValid() else None
-                    for coreDetection in imagesDetections
-                ]
-            )
-
+        res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
 
     def setDetectionComparer(self):
