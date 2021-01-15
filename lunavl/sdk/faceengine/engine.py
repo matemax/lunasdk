@@ -22,6 +22,7 @@ from ..estimators.face_estimators.mouth_state import MouthStateEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
+from ..estimators.face_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
@@ -279,3 +280,12 @@ class VLFaceEngine:
             estimator
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
+
+    def createOrientationModeEstimator(self) -> OrientationModeEstimator:
+        """
+        Create an orientation mode estimator
+
+        Returns:
+            estimator
+        """
+        return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
