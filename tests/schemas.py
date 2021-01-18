@@ -87,3 +87,10 @@ GLASSES_SCHEMA = {
     "required": ["glasses"],
     "additionalProperties": False,
 }
+
+ORIENTATION_MODE_SCHEMA = {
+    "type": "object",
+    "properties": {"orientation_mode": {"type": "string", "enum": ["Left", "Normal", "Right", "UpsideDown"]}},
+    "required": ["orientation_mode"],
+    "additionalProperties": False,
+}

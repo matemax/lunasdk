@@ -35,7 +35,9 @@ WARP_FACE_WITH_EYEGLASSES = getPathToImage("warp_face_with_eyeglasses.jpg")
 WARP_FACE_WITH_SUNGLASSES = getPathToImage("warp_face_with_sunglasses.jpg")
 
 ROTATED0 = getPathToImage("rotated0.jpg")
-ROTATED90 = getPathToImage("rotated90.png")
+ROTATED90 = getPathToImage("rotated90.jpg")
+ROTATED180 = getPathToImage("rotated180.jpg")
+ROTATED270 = getPathToImage("rotated270.jpg")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
