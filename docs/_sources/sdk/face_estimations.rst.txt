@@ -181,6 +181,10 @@ of confidence in the result of estimation. You can add information about a detec
 a prediction accuracy. Also function contains face detection constrain checkers (detection size and others), if
 a face detection does not satisfy these constraints estimation is failed.
 
+.. warning::
+    Current estimator version estimates correct liveness state for images from mobile and web camera only.
+    A correctness of a liveness prediction are not guarantee for other images source.
+
 Classes and methods
 -------------------
 
