@@ -3,8 +3,14 @@ Module contains function for detection human bodies on images.
 """
 from typing import Optional, Union, List, Dict, Any
 
-from FaceEngine import HumanDetectionType, Human, HumanLandmarks17 as CoreLandmarks17, Detection, Image as CoreImage, \
-    Rect as CoreRectI  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+from FaceEngine import (
+    HumanDetectionType,
+    Human,
+    HumanLandmarks17 as CoreLandmarks17,
+    Detection,
+    Image as CoreImage,
+    Rect as CoreRectI,
+)  # pylint: disable=E0611,E0401
 
 from .base import (
     ImageForDetection,
@@ -12,7 +18,8 @@ from .base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-    collectAndRaiseErrorIfOccurred)
+    collectAndRaiseErrorIfOccurred,
+)
 from ..base import LandmarksWithScore
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
@@ -119,7 +126,7 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumanError)
     def detectOne(
-            self, image: VLImage, detectArea: Optional[Rect] = None, detectLandmarks: bool = True
+        self, image: VLImage, detectArea: Optional[Rect] = None, detectLandmarks: bool = True
     ) -> Union[None, HumanDetection]:
         """
         Detect just one best detection on the image.
@@ -163,7 +170,7 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def detect(
-            self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detectLandmarks: bool = True
+        self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detectLandmarks: bool = True
     ) -> List[List[HumanDetection]]:
         """
         Batch detect human bodies on images.
@@ -200,14 +207,15 @@ class HumanDetector:
                     human.landmarks17_opt.set(landmarks17)
                 imagesDetections.append(human)
 
-            vlImage = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            image = images[imageIdx]
+            vlImage = image if isinstance(image, VLImage) else image.image
             res.append([HumanDetection(human, vlImage) for human in imagesDetections])
 
         return res
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetectOne(  # noqa: F811
-            self, image: VLImage, bBox: Union[Rect, HumanDetection]
+        self, image: VLImage, bBox: Union[Rect, HumanDetection]
     ) -> Union[None, HumanDetection]:
         """
         Redetect human body on an image in area, restricted with image.bBox, bBox or detection.

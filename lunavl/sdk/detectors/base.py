@@ -1,11 +1,14 @@
 from typing import NamedTuple, List, Any, Dict, Union, Tuple, Callable
 
-from FaceEngine import Rect as CoreRectI, Detection, FSDKErrorResult  # pylint: disable=E0611,E0401
-from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
+from FaceEngine import (
+    Rect as CoreRectI,
+    Detection,
+    FSDKErrorResult,
+    Image as CoreImage,
+)  # pylint: disable=E0611,E0401
 
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
-
 from ..base import BaseEstimation, BoundingBox
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage, ColorFormat
@@ -144,10 +147,11 @@ def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[
 
 
 def collectAndRaiseErrorIfOccurred(
-        error: FSDKErrorResult,
-        coreImages: List[CoreImage],
-        detectAreas: List[CoreImage],
-        getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult]) -> None:
+    error: FSDKErrorResult,
+    coreImages: List[CoreImage],
+    detectAreas: List[CoreImage],
+    getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult],
+) -> None:
     """
     If occurred an error during batch operation, collect errors from single operations and raise complex exception
     Args:
@@ -166,6 +170,4 @@ def collectAndRaiseErrorIfOccurred(
                 errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
             else:
                 errors.append(LunaVLError.fromSDKError(errorOne))
-        raise LunaSDKException(
-            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-        )
+        raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors)
