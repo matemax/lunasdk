@@ -111,14 +111,14 @@ class LivenessV1Estimator(BaseEstimator):
         ...
 
     @overload
-    def estimate(self, faceDetection: FaceDetection, headPose: HeadPose) -> LivenessV1:  # type: ignore
+    def estimate(self, faceDetection: FaceDetection, headPose: HeadPose) -> LivenessV1:
         """
         Estimate liveness by detection with head pose validation
         """
         ...
 
     @overload
-    def estimate(self, faceDetection: FaceDetection, yaw: float, pitch: float, roll) -> LivenessV1:  # type: ignore
+    def estimate(self, faceDetection: FaceDetection, yaw: float, pitch: float, roll) -> LivenessV1:
         """
         Estimate liveness by detection with head pose validation
         """
