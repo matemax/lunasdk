@@ -295,11 +295,11 @@ class VLFaceEngine:
         if principalAxes is None:
             principalAxes = self.faceEngineProvider.livenessV1Estimator.principalAxes
         return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator(), principalAxes)
-        
+
     def createOrientationModeEstimator(self) -> OrientationModeEstimator:
         """
         Create an orientation mode estimator
-        
+
         Returns:
             estimator
         """

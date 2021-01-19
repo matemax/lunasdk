@@ -127,3 +127,12 @@ class TestEstimateLivenessV1(BaseTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             livenessEstimator.estimate(faceDetection=faceDetection)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput.format(details="Invalid input"))
+
+    def test_estimate_liveness_by_detection_without_landmarks5(self):
+        """
+        Test estimate liveness by face detection without landmarks5. Todo: remove after FSDK-2811
+        """
+        faceDetection = self.detector.detectOne(VLImage.load(filename=SMALL_IMAGE), detect5Landmarks=False)
+        with pytest.raises(ValueError) as exceptionInfo:
+            self.livenessEstimator.estimate(faceDetection=faceDetection)
+        assert "Landmarks5 is required for liveness estimation" == str(exceptionInfo), str(exceptionInfo)

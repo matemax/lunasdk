@@ -100,7 +100,7 @@ LIVENESSV1_SCHEMA = {
         },
     },
     "required": ["prediction", "estimations"],
-        "additionalProperties": False,
+    "additionalProperties": False,
 }
 
 ORIENTATION_MODE_SCHEMA = {
