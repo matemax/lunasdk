@@ -3,9 +3,18 @@ Module contains function for detection faces on images.
 """
 from typing import Optional, Union, List, Dict, Any
 
-from FaceEngine import Detection, IFaceDetectionBatchPtr, DetectionType, Face, Landmarks5 as CoreLandmarks5, \
-    Landmarks68 as CoreLandmarks68, DT_LANDMARKS5, DT_LANDMARKS68, Image as CoreImage, \
-    Rect as CoreRectI  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+from FaceEngine import (
+    Detection,
+    IFaceDetectionBatchPtr,
+    DetectionType,
+    Face,
+    Landmarks5 as CoreLandmarks5,
+    Landmarks68 as CoreLandmarks68,
+    DT_LANDMARKS5,
+    DT_LANDMARKS68,
+    Image as CoreImage,
+    Rect as CoreRectI,
+)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from ..base import Landmarks
 from ..detectors.base import (
@@ -14,7 +23,9 @@ from ..detectors.base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-    getArgsForCoreRedetectForImages, collectAndRaiseErrorIfOccurred)
+    getArgsForCoreRedetectForImages,
+    collectAndRaiseErrorIfOccurred,
+)
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError
 from ..image_utils.geometry import Rect
@@ -130,8 +141,11 @@ class FaceDetector:
         self.detectorType = detectorType
 
     @staticmethod
-    def collectDetectionsResult(fsdkDetectRes: IFaceDetectionBatchPtr, coreImages: List[CoreImage],
-                                images: List[Union[VLImage, ImageForDetection, ImageForRedetection]]):
+    def collectDetectionsResult(
+        fsdkDetectRes: IFaceDetectionBatchPtr,
+        coreImages: List[CoreImage],
+        images: List[Union[VLImage, ImageForDetection, ImageForRedetection]],
+    ):
         """
         Collect detection results from core reply and prepare face detections
         Args:
@@ -188,11 +202,11 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectOneFaceError)
     def detectOne(
-            self,
-            image: VLImage,
-            detectArea: Optional[Rect] = None,
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self,
+        image: VLImage,
+        detectArea: Optional[Rect] = None,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
     ) -> Union[None, FaceDetection]:
         """
         Detect just one best detection on the image.
@@ -225,11 +239,11 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
-            self,
-            images: List[Union[VLImage, ImageForDetection]],
-            limit: int = 5,
-            detect5Landmarks: bool = True,
-            detect68Landmarks: bool = False,
+        self,
+        images: List[Union[VLImage, ImageForDetection]],
+        limit: int = 5,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
     ) -> List[List[FaceDetection]]:
         """
         Batch detect faces on images.
@@ -258,7 +272,7 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetectOne(  # noqa: F811
-            self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
+        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
     ) -> Union[None, FaceDetection]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
@@ -292,7 +306,7 @@ class FaceDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
-            self, images: List[ImageForRedetection], detect5Landmarks: bool = True, detect68Landmarks: bool = False
+        self, images: List[ImageForRedetection], detect5Landmarks: bool = True, detect68Landmarks: bool = False
     ) -> List[List[Union[FaceDetection, None]]]:
         """
         Redetect face on each image.image in area, restricted with image.bBox.
