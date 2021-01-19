@@ -1,7 +1,9 @@
 """
 Module realize VLImage - structure for storing image in special format.
 """
+from copy import copy
 from enum import Enum
+from io import BytesIO
 from pathlib import Path
 from typing import Optional, Union
 import requests
@@ -13,6 +15,8 @@ from PIL import Image as pilImage
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
 from .geometry import Rect
+
+from ..estimators.face_estimators.orientation_mode import OrientationType
 
 
 class ImageFormat(Enum):
@@ -178,6 +182,31 @@ class VLImage:
 
         self.source = body
         self.filename = filename
+
+    @classmethod
+    def getRotated(cls, image: "VLImage", angle: OrientationType):
+        """
+        Get rotated copy of VLImage
+        Args:
+            image: vl image
+            angle: angle for rotation
+        Warnings:
+            remove after FSDK-2809
+        Returns:
+            rotated vl image
+        """
+        if angle == OrientationType.LEFT:
+            angleForRotation = pilImage.ROTATE_90
+        elif angle == OrientationType.RIGHT:
+            angleForRotation = pilImage.ROTATE_270
+        elif angle == OrientationType.UPSIDE_DOWN:
+            angleForRotation = pilImage.ROTATE_180
+        else:
+            return copy(image)
+
+        newPilImage = pilImage.open(BytesIO(image.source)).transpose(angleForRotation)
+
+        return cls(newPilImage, filename=image.filename)
 
     @classmethod
     def load(
