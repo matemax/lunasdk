@@ -356,7 +356,7 @@ class TestEstimateDescriptor(BaseTestClass):
                             with pytest.raises(LunaSDKException) as exceptionInfo:
                                 extractor.estimate(case.warps[0], descriptor=descriptorOfAnotherVersion)
                             assert exceptionInfo.value.error.errorCode == LunaVLError.UnknownError.errorCode
-                            assert exceptionInfo.value.error.detail == 'Incompatible model versions'
+                            assert exceptionInfo.value.error.detail == "Incompatible model versions"
 
     def test_extract_descriptors_batch_positive(self):
         """

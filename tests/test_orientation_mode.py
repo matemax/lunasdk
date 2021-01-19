@@ -1,5 +1,8 @@
-from lunavl.sdk.estimators.face_estimators.orientation_mode import OrientationType, OrientationModeEstimator, \
-    OrientationMode
+from lunavl.sdk.estimators.face_estimators.orientation_mode import (
+    OrientationType,
+    OrientationModeEstimator,
+    OrientationMode,
+)
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import ROTATED0, ROTATED90, ROTATED180, ROTATED270
@@ -35,8 +38,9 @@ class TestOrientationMode(BaseTestClass):
             expectedOrientation: expected image orientation
         """
         assert isinstance(orientationType, OrientationMode), f"{orientationType.__class__} is not {OrientationMode}"
-        assert orientationType.orientationMode == expectedOrientation.value, \
-            f"Expected {expectedOrientation.value}, got {orientationType.orientationMode}"
+        assert (
+            orientationType.orientationMode == expectedOrientation.value
+        ), f"Expected {expectedOrientation.value}, got {orientationType.orientationMode}"
 
     def test_orientation_mode_as_dict(self):
         """
@@ -44,7 +48,7 @@ class TestOrientationMode(BaseTestClass):
         """
         orientationModeDict = TestOrientationMode.orientationModeEstimator.estimate(self.normalImage).asDict()
         assert (
-                jsonValidator(schema=ORIENTATION_MODE_SCHEMA).validate(orientationModeDict) is None
+            jsonValidator(schema=ORIENTATION_MODE_SCHEMA).validate(orientationModeDict) is None
         ), f"{orientationModeDict} does not match with schema {ORIENTATION_MODE_SCHEMA}"
 
     def test_orientation_mode_normal(self):

@@ -144,10 +144,11 @@ def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[
 
 
 def collectAndRaiseErrorIfOccurred(
-        error: FSDKErrorResult,
-        coreImages: List[CoreImage],
-        detectAreas: List[CoreImage],
-        getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult]) -> None:
+    error: FSDKErrorResult,
+    coreImages: List[CoreImage],
+    detectAreas: List[CoreImage],
+    getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult],
+) -> None:
     """
     If occurred an error during batch operation, collect errors from single operations and raise complex exception
     Args:
@@ -166,6 +167,4 @@ def collectAndRaiseErrorIfOccurred(
                 errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
             else:
                 errors.append(LunaVLError.fromSDKError(errorOne))
-        raise LunaSDKException(
-            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-        )
+        raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors)
