@@ -100,5 +100,12 @@ LIVENESSV1_SCHEMA = {
         },
     },
     "required": ["prediction", "estimations"],
+        "additionalProperties": False,
+}
+
+ORIENTATION_MODE_SCHEMA = {
+    "type": "object",
+    "properties": {"orientation_mode": {"type": "string", "enum": ["Left", "Normal", "Right", "UpsideDown"]}},
+    "required": ["orientation_mode"],
     "additionalProperties": False,
 }

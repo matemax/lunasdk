@@ -341,7 +341,6 @@ class TestEstimateDescriptor(BaseTestClass):
                             descriptor = extractor.estimate(case.warps[0], **kw)
                             self.assertDescriptor(planVersion, descriptor, case.type)
 
-    @unittest.skip("dont do it FSDK-2186")
     def test_extract_descriptors_incorrect_source_descriptors(self):
         """
         Test estimate descriptor using incorrect source descriptor.
@@ -354,9 +353,10 @@ class TestEstimateDescriptor(BaseTestClass):
                     for descriptorVersion in set(EFDVa) - {planVersion}:
                         descriptorOfAnotherVersion = self.getDescr(descriptorVersion, case.type)
                         with self.subTest(plan_version=planVersion, descriptor_version=descriptorVersion):
-                            print(f"Plan {planVersion}, empty descriptor version {descriptorVersion}")
-                            descriptor = extractor.estimate(case.warps[0], descriptor=descriptorOfAnotherVersion)
-                            self.assertDescriptor(planVersion, descriptor, case.type)
+                            with pytest.raises(LunaSDKException) as exceptionInfo:
+                                extractor.estimate(case.warps[0], descriptor=descriptorOfAnotherVersion)
+                            assert exceptionInfo.value.error.errorCode == LunaVLError.UnknownError.errorCode
+                            assert exceptionInfo.value.error.detail == 'Incompatible model versions'
 
     def test_extract_descriptors_batch_positive(self):
         """
