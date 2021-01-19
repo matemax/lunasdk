@@ -14,7 +14,7 @@ from FaceEngine import (
     DT_LANDMARKS68,
     Image as CoreImage,
     Rect as CoreRectI,
-)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+)  # pylint: disable=E0611,E0401
 
 from ..base import Landmarks
 from ..detectors.base import (
@@ -144,7 +144,7 @@ class FaceDetector:
     def collectDetectionsResult(
         fsdkDetectRes: IFaceDetectionBatchPtr,
         coreImages: List[CoreImage],
-        images: List[Union[VLImage, ImageForDetection, ImageForRedetection]],
+        images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
     ):
         """
         Collect detection results from core reply and prepare face detections
@@ -170,10 +170,11 @@ class FaceDetector:
                     face.landmarks68_opt.set(landmarks68)
                 imagesDetections.append(face)
 
-            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            image = images[imageIdx]
+            vlImage = image if isinstance(image, VLImage) else image.image
             res.append(
                 [
-                    FaceDetection(coreDetection, image) if coreDetection.isValid() else None
+                    FaceDetection(coreDetection, vlImage) if coreDetection.isValid() else None
                     for coreDetection in imagesDetections
                 ]
             )

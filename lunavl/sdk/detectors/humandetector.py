@@ -10,7 +10,7 @@ from FaceEngine import (
     Detection,
     Image as CoreImage,
     Rect as CoreRectI,
-)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+)  # pylint: disable=E0611,E0401
 
 from .base import (
     ImageForDetection,
@@ -207,7 +207,8 @@ class HumanDetector:
                     human.landmarks17_opt.set(landmarks17)
                 imagesDetections.append(human)
 
-            vlImage = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            image = images[imageIdx]
+            vlImage = image if isinstance(image, VLImage) else image.image
             res.append([HumanDetection(human, vlImage) for human in imagesDetections])
 
         return res
