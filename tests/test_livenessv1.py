@@ -135,4 +135,4 @@ class TestEstimateLivenessV1(BaseTestClass):
         faceDetection = self.detector.detectOne(VLImage.load(filename=SMALL_IMAGE), detect5Landmarks=False)
         with pytest.raises(ValueError) as exceptionInfo:
             self.livenessEstimator.estimate(faceDetection=faceDetection)
-        assert "Landmarks5 is required for liveness estimation" == str(exceptionInfo), str(exceptionInfo)
+        assert "Landmarks5 is required for liveness estimation" == str(exceptionInfo.value)
