@@ -1,11 +1,6 @@
 from typing import NamedTuple, List, Any, Dict, Union, Tuple, Callable
 
-from FaceEngine import (
-    Rect as CoreRectI,
-    Detection,
-    FSDKErrorResult,
-    Image as CoreImage,
-)  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, FSDKErrorResult, Image as CoreImage  # pylint: disable=E0611,E0401
 
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
