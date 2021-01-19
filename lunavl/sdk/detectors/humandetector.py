@@ -3,7 +3,7 @@ Module contains function for detection human bodies on images.
 """
 from typing import Optional, Union, List, Dict, Any
 
-from FaceEngine import HumanDetectionType, Human, HumanLandmarks17, Detection  # pylint: disable=E0611,E0401
+from FaceEngine import HumanDetectionType, Human, Detection  # pylint: disable=E0611,E0401
 from FaceEngine import HumanLandmarks17 as CoreLandmarks17  # pylint: disable=E0611,E0401
 
 from .base import (
@@ -14,7 +14,7 @@ from .base import (
     getArgsForCoreDetectorForImages,
 )
 from ..base import LandmarksWithScore
-from ..errors.errors import LunaVLError, ErrorInfo
+from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
@@ -203,8 +203,11 @@ class HumanDetector:
                 if landmarks17:
                     human.landmarks17_opt.set(landmarks17)
                 imagesDetections.append(human)
-
-            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            img = images[imageIdx]
+            if isinstance(img, ImageForDetection):
+                image = img.image
+            else:
+                image = img
             res.append([HumanDetection(human, image) for human in imagesDetections])
 
         return res

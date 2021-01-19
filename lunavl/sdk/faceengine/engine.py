@@ -19,6 +19,7 @@ from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from ..estimators.face_estimators.facewarper import FaceWarper
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
+from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
@@ -279,3 +280,17 @@ class VLFaceEngine:
             estimator
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
+
+    def createLivenessV1Estimator(self, principalAxes: Optional[float] = None) -> LivenessV1Estimator:
+        """
+        Create an one shot liveness estimator.
+
+        Args:
+            principalAxes: maximum value of Yaw, pitch and roll angles for estimation
+
+        Returns:
+            estimator
+        """
+        if principalAxes is None:
+            principalAxes = self.faceEngineProvider.livenessV1Estimator.principalAxes
+        return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator(), principalAxes)

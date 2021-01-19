@@ -240,8 +240,11 @@ class FaceDetector:
                 if landmarks68 is not None:
                     face.landmarks68_opt.set(landmarks68)
                 imagesDetections.append(face)
-
-            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            img = images[imageIdx]
+            if isinstance(img, ImageForDetection):
+                image = img.image
+            else:
+                image = img
             res.append([FaceDetection(coreDetection, image) for coreDetection in imagesDetections])
 
         return res
@@ -330,17 +333,17 @@ class FaceDetector:
             landmarks68Array = detectRes.getLandmarks68(imageIdx)
 
             for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
-                face = Face(imgs[imageIdx], detection)
+                detectedFace = Face(imgs[imageIdx], detection)
                 if landmarks5 is not None:
-                    face.landmarks5_opt.set(landmarks5)
+                    detectedFace.landmarks5_opt.set(landmarks5)
                 if landmarks68 is not None:
-                    face.landmarks68_opt.set(landmarks68)
-                imagesDetections.append(face)
+                    detectedFace.landmarks68_opt.set(landmarks68)
+                imagesDetections.append(detectedFace)
 
-            image = images[imageIdx] if isinstance(images[imageIdx], VLImage) else images[imageIdx].image
+            detectionImage = images[imageIdx].image
             res.append(
                 [
-                    FaceDetection(coreDetection, image) if coreDetection.isValid() else None
+                    FaceDetection(coreDetection, detectionImage) if coreDetection.isValid() else None
                     for coreDetection in imagesDetections
                 ]
             )
@@ -348,6 +351,5 @@ class FaceDetector:
         return res
 
     def setDetectionComparer(self):
-        """
-        """
+        """"""
         pass
