@@ -240,7 +240,7 @@ class BaseSettingsSection:
         Returns:
             a int
         """
-        return self.getValue(name).asInt()
+        return self.getValue(name)[0]
 
     def getValueAsFloat(self, name: str) -> float:
         """
@@ -1969,6 +1969,116 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         self.setValue("shouldersHeightKoeff", value)
 
 
+class LivenessV1Estimator(BaseSettingsSection):
+    """
+    LivenessV1(LivenessOneShotRGBEstimator) settings section.
+
+    Properties:
+        - realThreshold (float): realThreshold
+        - useFilter (bool): useFilter
+        - minDetSize (int): minDetSize
+        - borderDistance (int): borderDistance
+        - principalAxes(int): principalAxes
+    """
+
+    sectionName = "LivenessOneShotRGBEstimator::Settings"
+
+    @property
+    def realThreshold(self) -> float:
+        """
+        Getter for realThreshold
+
+        Returns:
+            realThreshold
+        """
+        return self.getValueAsFloat("realThreshold")
+
+    @realThreshold.setter
+    def realThreshold(self, value: float) -> None:
+        """
+        Setter for realThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("realThreshold", value)
+
+    @property
+    def useFilter(self) -> bool:
+        """
+        Getter for useFilter
+
+        Returns:
+            useFilter
+        """
+        return bool(self.getValueAsInt("useFilter"))
+
+    @useFilter.setter
+    def useFilter(self, value: bool) -> None:
+        """
+        Setter for useFilter
+        Args:
+            value: new value
+        """
+        self.setValue("useFilter", int(value))
+
+    @property
+    def minDetSize(self) -> int:
+        """
+        Getter for minDetSize
+
+        Returns:
+            minDetSize
+        """
+        return self.getValueAsInt("minDetSize")
+
+    @minDetSize.setter
+    def minDetSize(self, value: int) -> None:
+        """
+        Setter for descriptorCountWarningLevel
+        Args:
+            value: new value
+        """
+        self.setValue("minDetSize", value)
+
+    @property
+    def borderDistance(self) -> int:
+        """
+        Getter for borderDistance
+
+        Returns:
+            borderDistance
+        """
+        return self.getValueAsInt("borderDistance")
+
+    @borderDistance.setter
+    def borderDistance(self, value: int) -> None:
+        """
+        Setter for borderDistance
+        Args:
+            value: new value
+        """
+        self.setValue("borderDistance", value)
+
+    @property
+    def principalAxes(self) -> int:
+        """
+        Getter for principalAxes
+
+        Returns:
+            principalAxes
+        """
+        return self.getValueAsInt("principalAxes")
+
+    @principalAxes.setter
+    def principalAxes(self, value: int) -> None:
+        """
+        Setter for principalAxes
+        Args:
+            value: new value
+        """
+        self.setValue("principalAxes", value)
+
+
 class BaseSettingsProvider:
     """
     Runtime SDK Setting faceEngineProvider.
@@ -2219,6 +2329,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
             Mutable BestShotQualityEstimatorSettings section
         """
         return BestShotQualityEstimatorSettings(self._coreSettingProvider)
+
+    @property
+    def livenessV1Estimator(self) -> LivenessV1Estimator:
+        """
+        Getter for LivenessV1Estimator (LivenessOneShotRGBEstimator) settings section.
+
+        Returns:
+            Mutable LivenessV1Estimator section
+        """
+        return LivenessV1Estimator(self._coreSettingProvider)
 
 
 class RuntimeSettingsProvider(BaseSettingsProvider):
