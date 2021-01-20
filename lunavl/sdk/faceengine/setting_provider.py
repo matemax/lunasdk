@@ -1989,7 +1989,7 @@ class LivenessV1Estimator(BaseSettingsSection):
         Getter for realThreshold
 
         Returns:
-            betaMode
+            realThreshold
         """
         return self.getValueAsFloat("realThreshold")
 
