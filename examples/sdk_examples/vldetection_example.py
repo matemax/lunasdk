@@ -23,6 +23,7 @@ def estimateAll():
     pprint.pprint(detection.mouthState.asDict())
     pprint.pprint(detection.ags)
     pprint.pprint(detection.descriptor.asDict())
+    pprint.pprint(detection.liveness.asDict())
 
 
 if __name__ == "__main__":

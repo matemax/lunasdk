@@ -88,6 +88,21 @@ GLASSES_SCHEMA = {
     "additionalProperties": False,
 }
 
+LIVENESSV1_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "prediction": {"type": "string", "enum": ["real", "spoof", "unknown"]},
+        "estimations": {
+            "type": "object",
+            "required": ["quality", "score"],
+            "properties": {"quality": TYPE_SCORE, "score": TYPE_SCORE},
+            "additionalProperties": False,
+        },
+    },
+    "required": ["prediction", "estimations"],
+    "additionalProperties": False,
+}
+
 ORIENTATION_MODE_SCHEMA = {
     "type": "object",
     "properties": {"orientation_mode": {"type": "string", "enum": ["Left", "Normal", "Right", "UpsideDown"]}},

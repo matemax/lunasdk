@@ -41,3 +41,7 @@ ROTATED270 = getPathToImage("rotated270.jpg")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
+
+SPOOF = getPathToImage("spoof.jpg")
+UNKNOWN_LIVENESS = getPathToImage("disgust.jpg")
+LIVENESS_FACE = getPathToImage("one_face.jpg")
