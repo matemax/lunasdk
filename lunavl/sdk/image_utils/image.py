@@ -16,8 +16,6 @@ from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
 from .geometry import Rect
 
-from ..estimators.face_estimators.orientation_mode import OrientationType
-
 
 class ImageFormat(Enum):
     """
@@ -34,6 +32,17 @@ class ImageFormat(Enum):
     TIFF = "tif"
     #: bmp
     BMP = "bmp"
+
+
+class ImageAngle(Enum):
+    """
+    Enum for image angle
+    """
+
+    ANGLE_90 = "Left"
+    ANGLE_0 = "Normal"
+    ANGLE_270 = "Right"
+    ANGLE_180 = "UpsideDown"
 
 
 class ColorFormat(Enum):
@@ -186,7 +195,7 @@ class VLImage:
         self.filename = filename
 
     @classmethod
-    def getRotated(cls, image: "VLImage", angle: OrientationType):
+    def getRotated(cls, image: "VLImage", angle: ImageAngle):
         """
         Get rotated copy of VLImage
         Args:
@@ -197,11 +206,11 @@ class VLImage:
         Returns:
             rotated vl image
         """
-        if angle == OrientationType.LEFT:
+        if angle == ImageAngle.ANGLE_90:
             angleForRotation = pilImage.ROTATE_90
-        elif angle == OrientationType.RIGHT:
+        elif angle == ImageAngle.ANGLE_270:
             angleForRotation = pilImage.ROTATE_270
-        elif angle == OrientationType.UPSIDE_DOWN:
+        elif angle == ImageAngle.ANGLE_180:
             angleForRotation = pilImage.ROTATE_180
         else:
             return copy(image)
