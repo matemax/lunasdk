@@ -162,12 +162,12 @@ class FaceDetector:
             landmarks5Array = fsdkDetectRes.getLandmarks5(imageIdx)
             landmarks68Array = fsdkDetectRes.getLandmarks68(imageIdx)
 
-            for detection, landmarks5, landmarks68 in zip(detections, landmarks5Array, landmarks68Array):
+            for detectionIdx, detection in enumerate(detections):
                 face = Face(coreImages[imageIdx], detection)
-                if landmarks5 is not None:
-                    face.landmarks5_opt.set(landmarks5)
-                if landmarks68 is not None:
-                    face.landmarks68_opt.set(landmarks68)
+                if landmarks5Array:
+                    face.landmarks5_opt.set(landmarks5Array[detectionIdx])
+                if landmarks68Array:
+                    face.landmarks68_opt.set(landmarks68Array[detectionIdx])
                 imagesDetections.append(face)
 
             image = images[imageIdx]
@@ -259,7 +259,7 @@ class FaceDetector:
         """
 
         def getSingleError(image: CoreImage, detectArea: CoreRectI):
-            errorOne, _ = self._detector.detect(image, detectArea, detectionType)
+            errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
             return errorOne
 
         coreImages, detectAreas = getArgsForCoreDetectorForImages(images)

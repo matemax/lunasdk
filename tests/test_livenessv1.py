@@ -42,9 +42,9 @@ class TestEstimateLivenessV1(BaseTestClass):
             expectedPrediction: expected prediction
         """
         assert isinstance(estimation, LivenessV1), f"wrong estimation type {type(estimation)}"
-        assert isinstance(estimation.prediction, LivenessPrediction), (
-            f"wrong estimation type {type(estimation.prediction)}"
-        )
+        assert isinstance(
+            estimation.prediction, LivenessPrediction
+        ), f"wrong estimation type {type(estimation.prediction)}"
         assert isinstance(estimation.quality, float)
         assert isinstance(estimation.score, float)
         if expectedPrediction:

@@ -198,8 +198,7 @@ class TestFaceDetector(FaceDetectTestClass):
         """
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                # todo update after FSDK-2787
-                detection = detector.detect(images=[VLIMAGE_SEVERAL_FACE], detect68Landmarks=True)
+                detection = detector.detect(images=[VLIMAGE_SEVERAL_FACE])
                 self.assertFaceDetection(detection[0], VLIMAGE_SEVERAL_FACE)
                 assert 1 == len(detection)
                 assert 5 == len(detection[0])
@@ -208,12 +207,9 @@ class TestFaceDetector(FaceDetectTestClass):
         """
         Test batch detection of multiple images
         """
-        # todo update after FSDK-2787
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                detection = detector.detect(
-                    images=[VLIMAGE_SEVERAL_FACE, VLIMAGE_ONE_FACE], detect68Landmarks=True, detect5Landmarks=True
-                )
+                detection = detector.detect(images=[VLIMAGE_SEVERAL_FACE, VLIMAGE_ONE_FACE])
                 self.assertFaceDetection(detection[0], VLIMAGE_SEVERAL_FACE)
                 self.assertFaceDetection(detection[1], VLIMAGE_ONE_FACE)
                 assert 2 == len(detection)
@@ -254,7 +250,6 @@ class TestFaceDetector(FaceDetectTestClass):
                             detection=detection, landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks
                         )
 
-    @pytest.mark.skip("FSDK-2787")
     def test_batch_detect_limit(self):
         """
         Test checking detection limit for an image

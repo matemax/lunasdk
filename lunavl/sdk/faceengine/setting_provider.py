@@ -259,7 +259,7 @@ class SystemSettings(BaseSettingsSection):
     Common system settings.
 
     Properties:
-        - verboseLogging (VerboseLogging): Level of log versobing
+        - verboseLogging (VerboseLogging): Level of log verbosing
         - betaMode (bool): enable experimental features.
         - defaultDetectorType (DetectorType): default detector type
     """

@@ -101,18 +101,14 @@ class TestsRedetectFace(FaceDetectTestClass):
         """
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                detectSeveral = detector.detect(
-                    images=[VLIMAGE_ONE_FACE, VLIMAGE_SEVERAL_FACE], detect5Landmarks=True, detect68Landmarks=True
-                )
+                detectSeveral = detector.detect(images=[VLIMAGE_ONE_FACE, VLIMAGE_SEVERAL_FACE])
                 redetect = detector.redetect(
                     images=[
                         ImageForRedetection(
                             image=VLIMAGE_SEVERAL_FACE, bBoxes=[face.boundingBox.rect for face in detectSeveral[1]]
                         ),
                         ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[detectSeveral[0][0].boundingBox.rect]),
-                    ],
-                    detect5Landmarks=True,
-                    detect68Landmarks=True,
+                    ]
                 )
                 self.assertFaceDetection(redetect[0], VLIMAGE_SEVERAL_FACE)
                 self.assertFaceDetection(redetect[1], VLIMAGE_ONE_FACE)
