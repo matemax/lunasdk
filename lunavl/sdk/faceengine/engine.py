@@ -23,7 +23,7 @@ from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
-from ..estimators.face_estimators.orientation_mode import OrientationModeEstimator
+from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
@@ -68,6 +68,7 @@ class VLFaceEngine:
         else:
             self.faceEngineProvider = faceEngineConf
 
+        print(self.faceEngineProvider.faceDetV3Settings.redetectScoreThreshold)
         if runtimeConf is None:
             self.runtimeProvider = RuntimeSettingsProvider()
         elif isinstance(runtimeConf, str):

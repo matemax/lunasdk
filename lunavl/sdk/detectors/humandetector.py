@@ -18,7 +18,7 @@ from .base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-    collectAndRaiseErrorIfOccurred,
+    collectAndRaiseError,
 )
 from ..base import LandmarksWithScore
 from ..errors.errors import LunaVLError
@@ -156,8 +156,7 @@ class HumanDetector:
 
         isReplyNotAssumesDetection = detectRes.getSize() == 1
         if isReplyNotAssumesDetection:
-            isDetectionExists = len(detections) != 0
-            isDetectionExistsNValid = isDetectionExists and detections[0].isValid()
+            isDetectionExistsNValid = len(detections) != 0 and detections[0].isValid()
             if not isDetectionExistsNValid:
                 return None
 
@@ -184,6 +183,7 @@ class HumanDetector:
         """
 
         def getSingleError(image: CoreImage, detectArea: CoreRectI):
+            """Get error from one image detect"""
             errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
             return errorOne
 
@@ -191,7 +191,8 @@ class HumanDetector:
         detectionType = self._getDetectionType(detectLandmarks)
 
         fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
-        collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        if fsdkErrorRes.isError:
+            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
         res = []
         for imageIdx in range(fsdkDetectRes.getSize()):

@@ -39,9 +39,13 @@ class ImageAngle(Enum):
     Enum for image angle
     """
 
-    ANGLE_90 = "Left"
+    #: normal-rotated image
     ANGLE_0 = "Normal"
+    #: left-rotated image | counter-clockwise
+    ANGLE_90 = "Left"
+    #: right-rotated image | clockwise
     ANGLE_270 = "Right"
+    #: upside-down image
     ANGLE_180 = "UpsideDown"
 
 
@@ -184,9 +188,7 @@ class VLImage:
             array = np.array(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array,
-                inputColorFormat=inputColorFormat,
-                colorFormat=colorFormat or ColorFormat.R8G8B8
+                ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         else:
             raise TypeError(f"Bad image type: {type(body)}")
@@ -215,7 +217,7 @@ class VLImage:
         else:
             return copy(image)
 
-        newPilImage = pilImage.open(BytesIO(image.source)).transpose(angleForRotation)
+        newPilImage = image.asPillow().transpose(angleForRotation)
 
         return cls(newPilImage, filename=image.filename)
 
@@ -308,9 +310,7 @@ class VLImage:
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
         coreImage = cls._coreImageFromNumpyArray(
-            ndarray=arr,
-            inputColorFormat=inputColorFormat,
-            colorFormat=colorFormat
+            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
         )
         return cls(coreImage, filename=filename)
 

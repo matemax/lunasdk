@@ -15,6 +15,7 @@ from .estimators.face_estimators.mask import MaskEstimator
 from .estimators.face_estimators.glasses import GlassesEstimator
 from .estimators.face_estimators.facewarper import FaceWarper
 from .estimators.face_estimators.livenessv1 import LivenessV1Estimator
+from lunavl.sdk.estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from .faceengine.engine import VLFaceEngine
 
 
@@ -47,6 +48,8 @@ class FaceEstimator(Enum):
     Glasses = 11
     #: liveness v1 estimator
     LivebessV1 = 12
+    #: orientation mode estimator
+    OrientationMode = 13
 
 
 class FaceEstimatorsCollection:
@@ -65,7 +68,8 @@ class FaceEstimatorsCollection:
         _descriptorEstimator (Optional[FaceDescriptorEstimator]): lazy load face descriptor estimator
         _maskEstimator (Optional[MaskEstimator]): lazy mask estimator
         _glassesEstimator (Optional[GlassesEstimator]): lazy glasses estimator
-        _livenessV1Estimator (Optional[LivenessV1Estimator]):  lazy livenessv1 estimator
+        _livenessV1Estimator (Optional[LivenessV1Estimator]): lazy livenessv1 estimator
+        _orientationModeEstimator (Optional[OrientationModeEstimator]): lazy orientation mode estimator
         warper (Optional[Warper]): warper
     """
 
@@ -84,6 +88,7 @@ class FaceEstimatorsCollection:
         "_maskEstimator",
         "_glassesEstimator",
         "_livenessV1Estimator",
+        "_orientationModeEstimator",
     )
 
     def __init__(
@@ -113,6 +118,7 @@ class FaceEstimatorsCollection:
         self._maskEstimator: Union[None, MaskEstimator] = None
         self._glassesEstimator: Union[None, GlassesEstimator] = None
         self._livenessV1Estimator: Union[None, LivenessV1Estimator] = None
+        self._orientationModeEstimator: Union[None, OrientationModeEstimator] = None
         self.warper: FaceWarper = self._faceEngine.createFaceWarper()
 
         if startEstimators:
@@ -191,6 +197,8 @@ class FaceEstimatorsCollection:
             self._glassesEstimator = self._faceEngine.createGlassesEstimator()
         elif estimator == FaceEstimator.LivebessV1:
             self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator()
+        elif estimator == FaceEstimator.OrientationMode:
+            self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
         else:
             raise ValueError("Bad estimator type")
 
@@ -471,6 +479,29 @@ class FaceEstimatorsCollection:
             newEstimator: new estimator
         """
         self._livenessV1Estimator = newEstimator
+
+    @property
+    def orientationModeEstimator(self) -> OrientationModeEstimator:
+        """
+        Orientation mode estimator.
+
+        If estimator is initialized it will be returned otherwise it will be initialized and returned
+
+        Returns:
+            estimator
+        """
+        if self._orientationModeEstimator is None:
+            self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
+        return self._orientationModeEstimator
+
+    @orientationModeEstimator.setter
+    def orientationModeEstimator(self, newEstimator: OrientationModeEstimator) -> None:
+        """
+        Set orientation mode estimator
+        Args:
+            newEstimator: new estimator
+        """
+        self._orientationModeEstimator = newEstimator
 
     @property
     def faceEngine(self) -> VLFaceEngine:

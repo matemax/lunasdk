@@ -23,8 +23,8 @@ from ..detectors.base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-    getArgsForCoreRedetectForImages,
-    collectAndRaiseErrorIfOccurred,
+    getArgsForCoreRedetect,
+    collectAndRaiseError,
 )
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError
@@ -259,6 +259,7 @@ class FaceDetector:
         """
 
         def getSingleError(image: CoreImage, detectArea: CoreRectI):
+            """Get error from one image detect"""
             errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
             return errorOne
 
@@ -266,7 +267,8 @@ class FaceDetector:
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
-        collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        if fsdkErrorRes.isError:
+            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
@@ -322,15 +324,17 @@ class FaceDetector:
         """
 
         def getSingleError(image: CoreImage, detectArea: CoreRectI):
+            """Get error from one image redetect"""
             errorOne, _ = self._detector.redetect([image], [detectArea], detectionType)
             return errorOne
 
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
-        coreImages, detectAreas = getArgsForCoreRedetectForImages(images)
+        coreImages, detectAreas = getArgsForCoreRedetect(images)
         fsdkErrorRes, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
 
-        collectAndRaiseErrorIfOccurred(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        if fsdkErrorRes.isError:
+            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res

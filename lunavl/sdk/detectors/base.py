@@ -121,7 +121,7 @@ def getArgsForCoreDetectorForImages(
     return coreImages, detectAreas
 
 
-def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[List[CoreImage], List[CoreRectI]]:
+def getArgsForCoreRedetect(images: List[ImageForRedetection]) -> Tuple[List[CoreImage], List[List[Detection]]]:
     """
     Create args for redetect for image list
     Args:
@@ -129,7 +129,7 @@ def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[
 
     Returns:
         tuple: first - list core images
-               second - detect area for corresponding images
+               second - list detect area for corresponding images
     """
     coreImages, detectAreas = [], []
 
@@ -141,14 +141,14 @@ def getArgsForCoreRedetectForImages(images: List[ImageForRedetection]) -> Tuple[
     return coreImages, detectAreas
 
 
-def collectAndRaiseErrorIfOccurred(
+def collectAndRaiseError(
     error: FSDKErrorResult,
     coreImages: List[CoreImage],
     detectAreas: List[CoreImage],
     getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult],
 ) -> None:
     """
-    If occurred an error during batch operation, collect errors from single operations and raise complex exception
+    Collect errors from single operations and raise complex exception
     Args:
         error: fsdk error from core reply
         coreImages: list of core images
@@ -157,12 +157,11 @@ def collectAndRaiseErrorIfOccurred(
     Raises:
         LunaSDKException(LunaVLError.BatchedInternalError) with collected errors in context
     """
-    if error.isError:
-        errors = []
-        for image, detectArea in zip(coreImages, detectAreas):
-            errorOne = getErrorFunction(image, detectArea)
-            if errorOne.isOk:
-                errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-            else:
-                errors.append(LunaVLError.fromSDKError(errorOne))
-        raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors)
+    errors = []
+    for image, detectArea in zip(coreImages, detectAreas):
+        errorOne = getErrorFunction(image, detectArea)
+        if errorOne.isOk:
+            errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+        else:
+            errors.append(LunaVLError.fromSDKError(errorOne))
+    raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors)

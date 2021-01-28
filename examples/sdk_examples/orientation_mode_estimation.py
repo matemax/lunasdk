@@ -18,7 +18,7 @@ def estimateOrientationMode():
     faceEngine = VLFaceEngine()
     orientationModeEstimator = faceEngine.createOrientationModeEstimator()
     #: estimate
-    pprint.pprint(orientationModeEstimator.estimate(image.coreImage))
+    pprint.pprint(orientationModeEstimator.estimate(image))
 
 
 if __name__ == "__main__":

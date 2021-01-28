@@ -218,7 +218,11 @@ class BaseSettingsSection:
         Returns:
             a value
         """
-        return self._coreSettingProvider.getValue(self.__class__.sectionName, name)
+        value = self._coreSettingProvider.getValue(self.__class__.sectionName, name)
+        if value is []:
+            # todo optional
+            raise RuntimeError(f"Setting {name} not found")
+        return value
 
     def getValueAsString(self, name: str) -> str:
         """
@@ -229,7 +233,7 @@ class BaseSettingsSection:
         Returns:
             a string
         """
-        return self.getValue(name).asString()
+        return self.getValue(name)[0]
 
     def getValueAsInt(self, name: str) -> int:
         """
@@ -251,7 +255,7 @@ class BaseSettingsSection:
         Returns:
             a float
         """
-        return self.getValue(name).asFloat()
+        return self.getValue(name)[0]
 
 
 class SystemSettings(BaseSettingsSection):

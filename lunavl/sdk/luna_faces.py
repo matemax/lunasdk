@@ -2,7 +2,7 @@
 """
 from typing import Optional, Union, List, Dict
 
-from FaceEngine import Face  # pylint: disable=E0611,E0401
+from FaceEngine import Face, OrientationType  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from .estimator_collections import FaceEstimatorsCollection
@@ -43,7 +43,7 @@ class VLFaceDetection(FaceDetection):
         _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
         _liveness (Optional[LivenessV1]): lazy load liveness estimation
-
+        _orientationMode (Optional[OrientationType]): lazy orientation mode estimation
     """
 
     __slots__ = (
@@ -62,6 +62,7 @@ class VLFaceDetection(FaceDetection):
         "_mask",
         "_glasses",
         "_liveness",
+        "_orientationMode",
     )
 
     def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
@@ -86,6 +87,7 @@ class VLFaceDetection(FaceDetection):
         self._mask: Optional[Mask] = None
         self._glasses: Optional[Glasses] = None
         self._liveness: Optional[LivenessV1] = None
+        self._orientationMode: Optional[OrientationType] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
 
     @property
@@ -259,6 +261,18 @@ class VLFaceDetection(FaceDetection):
             self._liveness = self.estimatorCollection.livenessV1Estimator.estimate(self, self.headPose)
         return self._liveness
 
+    @property
+    def orientationMode(self) -> OrientationType:
+        """
+        Get orientation mode estimation
+
+        Returns:
+            orientation mode
+        """
+        if self._orientationMode is None:
+            self._orientationMode = self.estimatorCollection.orientationModeEstimator.estimate(self.image)
+        return self._orientationMode
+
     def asDict(self) -> Dict[str, Union[str, dict, list, float, tuple]]:
         """
         Convert to dict.
@@ -280,6 +294,8 @@ class VLFaceDetection(FaceDetection):
             res["landmarks5"] = self.landmarks5.asDict()
         if self.landmarks68 is not None:
             res["landmarks68"] = self.landmarks68.asDict()
+        if self._orientationMode is not None:
+            res["orientation_mode"] = self._orientationMode.name
 
         attributes = {}
 
