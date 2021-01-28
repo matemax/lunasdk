@@ -173,9 +173,11 @@ class VLImage:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, PilImage):
             array = np.array(body)
-            colorFormat = ColorFormat.load(body.mode)
+            inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array, inputColorFormat=colorFormat, colorFormat=colorFormat
+                ndarray=array,
+                inputColorFormat=inputColorFormat,
+                colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         else:
             raise TypeError(f"Bad image type: {type(body)}")
@@ -296,8 +298,12 @@ class VLImage:
         if isinstance(inputColorFormat, str):
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
-        coreImage = cls._coreImageFromNumpyArray(ndarray=arr, inputColorFormat=inputColorFormat)
-        return cls(coreImage, filename=filename, colorFormat=colorFormat)
+        coreImage = cls._coreImageFromNumpyArray(
+            ndarray=arr,
+            inputColorFormat=inputColorFormat,
+            colorFormat=colorFormat
+        )
+        return cls(coreImage, filename=filename)
 
     @property
     def format(self) -> ColorFormat:
