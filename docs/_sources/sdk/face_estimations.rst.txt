@@ -185,6 +185,14 @@ a face detection does not satisfy these constraints estimation is failed.
     Current estimator version estimates correct liveness state for images from mobile and web camera only.
     A correctness of a liveness prediction is not guaranteed for other images source.
 
+.. _`orientation mode`:
+
+Orientation mode
+----------------
+
+This estimator is designed to determine image orientation. Possible estimations are: Left, Normal, Right or UpsideDown.
+
+
 Classes and methods
 -------------------
 
@@ -229,4 +237,7 @@ Classes and methods
     :members:
 
 .. automodule:: lunavl.sdk.estimators.face_estimators.livenessv1
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.orientation_mode
     :members:
