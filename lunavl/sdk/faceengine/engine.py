@@ -68,7 +68,6 @@ class VLFaceEngine:
         else:
             self.faceEngineProvider = faceEngineConf
 
-        print(self.faceEngineProvider.faceDetV3Settings.redetectScoreThreshold)
         if runtimeConf is None:
             self.runtimeProvider = RuntimeSettingsProvider()
         elif isinstance(runtimeConf, str):

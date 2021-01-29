@@ -47,7 +47,7 @@ class FaceEstimator(Enum):
     #: glasses estimator
     Glasses = 11
     #: liveness v1 estimator
-    LivebessV1 = 12
+    LivenessV1 = 12
     #: orientation mode estimator
     OrientationMode = 13
 
@@ -195,7 +195,7 @@ class FaceEstimatorsCollection:
             self._maskEstimator = self._faceEngine.createMaskEstimator()
         elif estimator == FaceEstimator.Glasses:
             self._glassesEstimator = self._faceEngine.createGlassesEstimator()
-        elif estimator == FaceEstimator.LivebessV1:
+        elif estimator == FaceEstimator.LivenessV1:
             self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator()
         elif estimator == FaceEstimator.OrientationMode:
             self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
