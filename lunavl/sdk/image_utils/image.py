@@ -197,7 +197,7 @@ class VLImage:
         self.filename = filename
 
     @classmethod
-    def getRotated(cls, image: "VLImage", angle: ImageAngle):
+    def rotate(cls, image: "VLImage", angle: ImageAngle):
         """
         Get rotated copy of VLImage
         Args:

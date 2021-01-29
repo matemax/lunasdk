@@ -18,16 +18,16 @@ def rotateNEstimateImage():
     faceEngine = VLFaceEngine()
     orientationModeEstimator = faceEngine.createOrientationModeEstimator()
     #: rotate & estimate | not rotated
-    image = VLImage.getRotated(nonRotatedImage, ImageAngle.ANGLE_0)
+    image = VLImage.rotate(nonRotatedImage, ImageAngle.ANGLE_0)
     pprint.pprint(orientationModeEstimator.estimate(image))
     #: rotate & estimate | left
-    image = VLImage.getRotated(nonRotatedImage, ImageAngle.ANGLE_90)
+    image = VLImage.rotate(nonRotatedImage, ImageAngle.ANGLE_90)
     pprint.pprint(orientationModeEstimator.estimate(image))
     #: rotate & estimate | right
-    image = VLImage.getRotated(nonRotatedImage, ImageAngle.ANGLE_270)
+    image = VLImage.rotate(nonRotatedImage, ImageAngle.ANGLE_270)
     pprint.pprint(orientationModeEstimator.estimate(image))
     #: rotate & estimate | upside down
-    image = VLImage.getRotated(nonRotatedImage, ImageAngle.ANGLE_180)
+    image = VLImage.rotate(nonRotatedImage, ImageAngle.ANGLE_180)
     pprint.pprint(orientationModeEstimator.estimate(image))
 
 

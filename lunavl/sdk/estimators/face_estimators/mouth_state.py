@@ -39,9 +39,9 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.smile
 
     @property
-    def mouth(self) -> float:
+    def opened(self) -> float:
         """
-        Get mouth score value.
+        Get opened score value.
 
         Returns:
             value in range [0, 1]
@@ -63,9 +63,9 @@ class MouthStates(BaseEstimation):
         Convert to dict.
 
         Returns:
-            {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
+            {'opened': self.opened, 'occlusion': self.occlusion, 'smile': self.smile}
         """
-        return {"score": self.mouth, "occluded": self.occlusion, "smile": self.smile}
+        return {"opened": self.opened, "occluded": self.occlusion, "smile": self.smile}
 
 
 class MouthStateEstimator(BaseEstimator):
