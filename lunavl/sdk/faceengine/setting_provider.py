@@ -209,53 +209,19 @@ class BaseSettingsSection:
         """
         self._coreSettingProvider.setValue(self.__class__.sectionName, name, CoreFE.SettingsProviderValue(value))
 
-    def getValue(self, name: str) -> Any:
+    def getValue(self, name: str) -> Optional[Any]:
         """
         Get setting value
         Args:
             name: setting name
 
         Returns:
-            a value
+            a value or None if settings does not exists
         """
         value = self._coreSettingProvider.getValue(self.__class__.sectionName, name)
         if value is []:
-            # todo optional
-            raise RuntimeError(f"Setting {name} not found")
-        return value
-
-    def getValueAsString(self, name: str) -> str:
-        """
-        Get setting value as string
-        Args:
-            name: setting name
-
-        Returns:
-            a string
-        """
-        return self.getValue(name)[0]
-
-    def getValueAsInt(self, name: str) -> int:
-        """
-        Get setting value as int
-        Args:
-            name: setting name
-
-        Returns:
-            a int
-        """
-        return self.getValue(name)[0]
-
-    def getValueAsFloat(self, name: str) -> float:
-        """
-        Get setting value as float
-        Args:
-            name: setting name
-
-        Returns:
-            a float
-        """
-        return self.getValue(name)[0]
+            return None
+        return value[0]
 
 
 class SystemSettings(BaseSettingsSection):
@@ -271,14 +237,17 @@ class SystemSettings(BaseSettingsSection):
     sectionName = "system"
 
     @property
-    def verboseLogging(self) -> VerboseLogging:
+    def verboseLogging(self) -> Optional[VerboseLogging]:
         """
         Getter for verboseLogging
 
         Returns:
             verboseLogging
         """
-        return VerboseLogging.getEnum(self.getValueAsInt("verboseLogging"))
+        value = self.getValue("verboseLogging")
+        if value is None:
+            return None
+        return VerboseLogging.getEnum(value)
 
     @verboseLogging.setter
     def verboseLogging(self, value: VerboseLogging) -> None:
@@ -291,14 +260,17 @@ class SystemSettings(BaseSettingsSection):
         self.setValue("verboseLogging", value.value)
 
     @property
-    def betaMode(self) -> bool:
+    def betaMode(self) -> Optional[bool]:
         """
         Getter for betaMode
 
         Returns:
             betaMode
         """
-        return bool(self.getValueAsInt("betaMode"))
+        value = self.getValue("betaMode")
+        if value is None:
+            return None
+        return bool(value)
 
     @betaMode.setter
     def betaMode(self, value: bool) -> None:
@@ -310,14 +282,17 @@ class SystemSettings(BaseSettingsSection):
         self.setValue("betaMode", int(value))
 
     @property
-    def defaultDetectorType(self) -> DetectorType:
+    def defaultDetectorType(self) -> Optional[DetectorType]:
         """
         Getter for defaultDetectorType
 
         Returns:
-            betaMode
+            default detector type
         """
-        return DetectorType.getEnum(self.getValueAsString("defaultDetectorType"))
+        value = self.getValue("defaultDetectorType")
+        if value is None:
+            return None
+        return DetectorType.getEnum(value)
 
     @defaultDetectorType.setter
     def defaultDetectorType(self, value: DetectorType) -> None:
@@ -349,15 +324,17 @@ class RuntimeSettings(BaseSettingsSection):
     sectionName = "Runtime"
 
     @property
-    def deviceClass(self) -> DeviceClass:
+    def deviceClass(self) -> Optional[DeviceClass]:
         """
         Get device class.
 
         Returns:
             device class
         """
-
-        return DeviceClass[self.getValueAsString("deviceClass")]
+        value = self.getValue("deviceClass")
+        if value is None:
+            return None
+        return DeviceClass[value]
 
     @deviceClass.setter
     def deviceClass(self, value: DeviceClass) -> None:
@@ -369,14 +346,17 @@ class RuntimeSettings(BaseSettingsSection):
         self.setValue("deviceClass", value.value)
 
     @property
-    def cpuClass(self) -> CpuClass:
+    def cpuClass(self) -> Optional[CpuClass]:
         """
         Getter for cpuClass
 
         Returns:
             cpuClass
         """
-        return CpuClass[self.getValueAsString("cpuClass")]
+        value = self.getValue("cpuClass")
+        if value is None:
+            return None
+        return CpuClass[value]
 
     @cpuClass.setter
     def cpuClass(self, value: CpuClass) -> None:
@@ -389,14 +369,14 @@ class RuntimeSettings(BaseSettingsSection):
         self.setValue("cpuClass", value.value)
 
     @property
-    def numThreads(self) -> int:
+    def numThreads(self) -> Optional[int]:
         """
         Getter for numThreads
 
         Returns:
             numThreads
         """
-        return self.getValueAsInt("numThreads")
+        return self.getValue("numThreads")
 
     @numThreads.setter
     def numThreads(self, value: int) -> None:
@@ -408,14 +388,17 @@ class RuntimeSettings(BaseSettingsSection):
         self.setValue("numThreads", value)
 
     @property
-    def verboseLogging(self) -> VerboseLogging:
+    def verboseLogging(self) -> Optional[VerboseLogging]:
         """
         Getter for verboseLogging
 
         Returns:
             verboseLogging
         """
-        return VerboseLogging.getEnum(self.getValueAsInt("verboseLogging"))
+        value = self.getValue("verboseLogging")
+        if value is None:
+            return None
+        return VerboseLogging.getEnum(value)
 
     @verboseLogging.setter
     def verboseLogging(self, value: VerboseLogging) -> None:
@@ -427,14 +410,14 @@ class RuntimeSettings(BaseSettingsSection):
         self.setValue("verboseLogging", value.value)
 
     @property
-    def numComputeStreams(self) -> int:
+    def numComputeStreams(self) -> Optional[int]:
         """
         Getter for numComputeStreams
 
         Returns:
             numComputeStreams
         """
-        return self.getValueAsInt("numComputeStreams")
+        return self.getValue("numComputeStreams")
 
     @numComputeStreams.setter
     def numComputeStreams(self, value: int) -> None:
@@ -463,14 +446,14 @@ class DescriptorFactorySettings(BaseSettingsSection):
     sectionName = "DescriptorFactory::Settings"
 
     @property
-    def model(self) -> int:
+    def model(self) -> Optional[int]:
         """
         Getter for model
 
         Returns:
             model
         """
-        return self.getValueAsInt("model")
+        return self.getValue("model")
 
     @model.setter
     def model(self, value: int) -> None:
@@ -482,14 +465,17 @@ class DescriptorFactorySettings(BaseSettingsSection):
         self.setValue("model", value)
 
     @property
-    def useMobileNet(self) -> bool:
+    def useMobileNet(self) -> Optional[bool]:
         """
         Getter for useMobileNet
 
         Returns:
             useMobileNet
         """
-        return bool(self.getValueAsInt("useMobileNet"))
+        value = self.getValue("useMobileNet")
+        if value is None:
+            return None
+        return bool(value)
 
     @useMobileNet.setter
     def useMobileNet(self, value: bool) -> None:
@@ -501,14 +487,17 @@ class DescriptorFactorySettings(BaseSettingsSection):
         self.setValue("useMobileNet", int(value))
 
     @property
-    def distance(self) -> Distance:
+    def distance(self) -> Optional[Distance]:
         """
         Getter for distance
 
         Returns:
             distance
         """
-        return Distance.getEnum(self.getValueAsString("distance"))
+        value = self.getValue("distance")
+        if value is None:
+            return None
+        return Distance.getEnum(value)
 
     @distance.setter
     def distance(self, value: Distance) -> None:
@@ -520,14 +509,14 @@ class DescriptorFactorySettings(BaseSettingsSection):
         self.setValue("distance", value.value)
 
     @property
-    def descriptorCountWarningLevel(self) -> str:
+    def descriptorCountWarningLevel(self) -> Optional[str]:
         """
         Getter for descriptorCountWarningLevel
 
         Returns:
             descriptorCountWarningLevel
         """
-        return self.getValueAsString("descriptorCountWarningLevel")
+        return self.getValue("descriptorCountWarningLevel")
 
     @descriptorCountWarningLevel.setter
     def descriptorCountWarningLevel(self, value: str) -> None:
@@ -562,14 +551,14 @@ class FaceDetV3Settings(BaseSettingsSection):
     sectionName = "FaceDetV3::Settings"
 
     @property
-    def scoreThreshold(self) -> float:
+    def scoreThreshold(self) -> Optional[float]:
         """
         Getter for scoreThreshold
 
         Returns:
             scoreThreshold
         """
-        return self.getValueAsFloat("scoreThreshold")
+        return self.getValue("scoreThreshold")
 
     @scoreThreshold.setter
     def scoreThreshold(self, value: float) -> None:
@@ -581,14 +570,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("ScoreThreshold", value)
 
     @property
-    def redetectScoreThreshold(self) -> float:
+    def redetectScoreThreshold(self) -> Optional[float]:
         """
         Getter for redetectScoreThreshold
 
         Returns:
             redetectScoreThreshold
         """
-        return self.getValueAsFloat("RedetectScoreThreshold")
+        return self.getValue("RedetectScoreThreshold")
 
     @redetectScoreThreshold.setter
     def redetectScoreThreshold(self, value: float) -> None:
@@ -600,14 +589,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("RedetectScoreThreshold", value)
 
     @property
-    def NMSThreshold(self) -> float:
+    def NMSThreshold(self) -> Optional[float]:
         """
         Getter for NMSThreshold
 
         Returns:
             NMSThreshold
         """
-        return self.getValueAsFloat("NMSThreshold")
+        return self.getValue("NMSThreshold")
 
     @NMSThreshold.setter
     def NMSThreshold(self, value: float) -> None:
@@ -619,14 +608,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("NMSThreshold", value)
 
     @property
-    def minFaceSize(self) -> int:
+    def minFaceSize(self) -> Optional[int]:
         """
         Getter for minFaceSize
 
         Returns:
             minFaceSize
         """
-        return self.getValueAsInt("minFaceSize")
+        return self.getValue("minFaceSize")
 
     @minFaceSize.setter
     def minFaceSize(self, value: int) -> None:
@@ -638,14 +627,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("minFaceSize", value)
 
     @property
-    def maxFaceSize(self) -> int:
+    def maxFaceSize(self) -> Optional[int]:
         """
         Getter for maxFaceSize
 
         Returns:
             maxFaceSize
         """
-        return self.getValueAsInt("maxFaceSize")
+        return self.getValue("maxFaceSize")
 
     @maxFaceSize.setter
     def maxFaceSize(self, value: int) -> None:
@@ -657,14 +646,17 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("maxFaceSize", value)
 
     @property
-    def nms(self) -> NMS:
+    def nms(self) -> Optional[NMS]:
         """
         Getter for nms
 
         Returns:
             nms
         """
-        return NMS[self.getValueAsString("nms")]
+        value = self.getValue("nms")
+        if value is None:
+            return None
+        return NMS[value]
 
     @nms.setter
     def nms(self, value: NMS) -> None:
@@ -676,14 +668,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("nms", value.value)
 
     @property
-    def redetectTensorSize(self) -> int:
+    def redetectTensorSize(self) -> Optional[int]:
         """
         Getter for redetectTensorSize
 
         Returns:
             redetectTensorSize
         """
-        return self.getValueAsInt("RedetectTensorSize")
+        return self.getValue("RedetectTensorSize")
 
     @redetectTensorSize.setter
     def redetectTensorSize(self, value: int) -> None:
@@ -695,14 +687,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("RedetectTensorSize", value)
 
     @property
-    def redetectFaceTargetSize(self) -> int:
+    def redetectFaceTargetSize(self) -> Optional[int]:
         """
         Getter for redetectFaceTargetSize
 
         Returns:
             redetectFaceTargetSize
         """
-        return self.getValueAsInt("RedetectFaceTargetSize")
+        return self.getValue("RedetectFaceTargetSize")
 
     @redetectFaceTargetSize.setter
     def redetectFaceTargetSize(self, value: int) -> None:
@@ -714,14 +706,17 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("RedetectFaceTargetSize", value)
 
     @property
-    def paddings(self) -> Point4:
+    def paddings(self) -> Optional[Point4]:
         """
         Getter for paddings
 
         Returns:
             paddings
         """
-        return Point4(*self.getValue("paddings"))
+        value = self.getValue("paddings")
+        if value is None:
+            return None
+        return Point4(*value)
 
     @paddings.setter
     def paddings(self, value: Point4) -> None:
@@ -733,14 +728,17 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("paddings", value.asTuple())
 
     @property
-    def paddingsIR(self) -> Point4:
+    def paddingsIR(self) -> Optional[Point4]:
         """
         Getter for paddingsIR
 
         Returns:
             paddingsIR
         """
-        return Point4(*self.getValue("paddingsIR"))
+        value = self.getValue("paddingsIR")
+        if value is None:
+            return None
+        return Point4(*value)
 
     @paddingsIR.setter
     def paddingsIR(self, value: Point4) -> None:
@@ -752,14 +750,14 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("paddingsIR", value.asTuple())
 
     @property
-    def planPrefix(self) -> str:
+    def planPrefix(self) -> Optional[str]:
         """
         Getter for planPrefix
 
         Returns:
             planPrefix
         """
-        return self.getValueAsString("planPrefix")
+        return self.getValue("planPrefix")
 
     @planPrefix.setter
     def planPrefix(self, value: str) -> None:
@@ -771,14 +769,17 @@ class FaceDetV3Settings(BaseSettingsSection):
         self.setValue("planPrefix", value)
 
     @property
-    def useOrientationMode(self) -> bool:
+    def useOrientationMode(self) -> Optional[bool]:
         """
         Getter for useOrientationMode
 
         Returns:
             useEstimationByImage
         """
-        return bool(self.getValueAsInt("useOrientationMode"))
+        value = self.getValue("useOrientationM4de")
+        if value is None:
+            return None
+        return bool(value)
 
     @useOrientationMode.setter
     def useOrientationMode(self, value: bool) -> None:
@@ -806,14 +807,14 @@ class FaceDetV12Settings(BaseSettingsSection):
     """
 
     @property
-    def firstThreshold(self) -> float:
+    def firstThreshold(self) -> Optional[float]:
         """
         Getter for firstThreshold
 
         Returns:
             float in [0..1] range
         """
-        return self.getValueAsFloat("FirstThreshold")
+        return self.getValue("FirstThreshold")
 
     @firstThreshold.setter
     def firstThreshold(self, value: float) -> None:
@@ -825,14 +826,14 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("FirstThreshold", value)
 
     @property
-    def secondThreshold(self) -> float:
+    def secondThreshold(self) -> Optional[float]:
         """
         Getter for secondThreshold
 
         Returns:
             secondThreshold
         """
-        return self.getValueAsFloat("SecondThreshold")
+        return self.getValue("SecondThreshold")
 
     @secondThreshold.setter
     def secondThreshold(self, value: float) -> None:
@@ -844,14 +845,14 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("SecondThreshold", value)
 
     @property
-    def thirdThreshold(self) -> float:
+    def thirdThreshold(self) -> Optional[float]:
         """
         Getter for thirdThreshold
 
         Returns:
             thirdThreshold
         """
-        return self.getValueAsFloat("ThirdThreshold")
+        return self.getValue("ThirdThreshold")
 
     @thirdThreshold.setter
     def thirdThreshold(self, value: float) -> None:
@@ -863,14 +864,14 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("ThirdThreshold", value)
 
     @property
-    def minFaceSize(self) -> int:
+    def minFaceSize(self) -> Optional[int]:
         """
         Getter for minFaceSize
 
         Returns:
             minSize
         """
-        return self.getValueAsInt("minFaceSize")
+        return self.getValue("minFaceSize")
 
     @minFaceSize.setter
     def minFaceSize(self, value: int) -> None:
@@ -882,14 +883,14 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("minFaceSize", value)
 
     @property
-    def scaleFactor(self) -> float:
+    def scaleFactor(self) -> Optional[float]:
         """
         Getter for scaleFactor
 
         Returns:
             scaleFactor
         """
-        return self.getValueAsFloat("scaleFactor")
+        return self.getValue("scaleFactor")
 
     @scaleFactor.setter
     def scaleFactor(self, value: float) -> None:
@@ -901,14 +902,17 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("scaleFactor", value)
 
     @property
-    def paddings(self) -> Point4:
+    def paddings(self) -> Optional[Point4]:
         """
         Getter for paddings
 
         Returns:
             paddings
         """
-        return Point4(*self.getValue("paddings"))
+        value = self.getValue("paddings")
+        if value is None:
+            return None
+        return Point4(*value)
 
     @paddings.setter
     def paddings(self, value: Point4) -> None:
@@ -920,14 +924,14 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("paddings", value.asTuple())
 
     @property
-    def redetectTolerance(self) -> float:
+    def redetectTolerance(self) -> Optional[float]:
         """
         Getter for redetectTolerance
 
         Returns:
             redetectTolerance
         """
-        return self.getValueAsFloat("redetectTolerance")
+        return self.getValue("redetectTolerance")
 
     @redetectTolerance.setter
     def redetectTolerance(self, value: float) -> None:
@@ -939,14 +943,17 @@ class FaceDetV12Settings(BaseSettingsSection):
         self.setValue("redetectTolerance", value)
 
     @property
-    def useLNet(self) -> bool:
+    def useLNet(self) -> Optional[bool]:
         """
         Getter for useLNet
 
         Returns:
             useEstimationByImage
         """
-        return bool(self.getValueAsInt("useLNet"))
+        value = self.getValue("useLNet")
+        if value is None:
+            return None
+        return bool(value)
 
     @useLNet.setter
     def useLNet(self, value: bool) -> None:
@@ -992,14 +999,14 @@ class HumanDetectorSettings(BaseSettingsSection):
     sectionName = "HumanDetector::Settings"
 
     @property
-    def scoreThreshold(self) -> float:
+    def scoreThreshold(self) -> Optional[float]:
         """
         Getter for scoreThreshold
 
         Returns:
             scoreThreshold
         """
-        return self.getValueAsFloat("scoreThreshold")
+        return self.getValue("scoreThreshold")
 
     @scoreThreshold.setter
     def scoreThreshold(self, value: float) -> None:
@@ -1011,14 +1018,14 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("ScoreThreshold", value)
 
     @property
-    def redetectScoreThreshold(self) -> float:
+    def redetectScoreThreshold(self) -> Optional[float]:
         """
         Getter for redetectScoreThreshold
 
         Returns:
             redetectScoreThreshold
         """
-        return self.getValueAsFloat("RedetectScoreThreshold")
+        return self.getValue("RedetectScoreThreshold")
 
     @redetectScoreThreshold.setter
     def redetectScoreThreshold(self, value: float) -> None:
@@ -1030,14 +1037,14 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("RedetectScoreThreshold", value)
 
     @property
-    def NMSThreshold(self) -> float:
+    def NMSThreshold(self) -> Optional[float]:
         """
         Getter for NMSThreshold
 
         Returns:
             NMSThreshold
         """
-        return self.getValueAsFloat("NMSThreshold")
+        return self.getValue("NMSThreshold")
 
     @NMSThreshold.setter
     def NMSThreshold(self, value: float) -> None:
@@ -1049,14 +1056,14 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("NMSThreshold", value)
 
     @property
-    def redetectNMSThreshold(self) -> float:
+    def redetectNMSThreshold(self) -> Optional[float]:
         """
         Getter for redetectNMSThreshold
 
         Returns:
             redetectNMSThreshold
         """
-        return self.getValueAsFloat("RedetectNMSThreshold")
+        return self.getValue("RedetectNMSThreshold")
 
     @redetectNMSThreshold.setter
     def redetectNMSThreshold(self, value: float) -> None:
@@ -1068,14 +1075,14 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("RedetectNMSThreshold", value)
 
     @property
-    def imageSize(self) -> int:
+    def imageSize(self) -> Optional[int]:
         """
         Getter for imageSize
 
         Returns:
             imageSize
         """
-        return self.getValueAsInt("imageSize")
+        return self.getValue("imageSize")
 
     @imageSize.setter
     def imageSize(self, value: int) -> None:
@@ -1087,14 +1094,17 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("imageSize", value)
 
     @property
-    def nms(self) -> NMS:
+    def nms(self) -> Optional[NMS]:
         """
         Getter for nms
 
         Returns:
             nms
         """
-        return NMS[self.getValueAsString("nms")]
+        value = self.getValue("nms")
+        if value is None:
+            return None
+        return NMS[value]
 
     @nms.setter
     def nms(self, value: NMS) -> None:
@@ -1106,14 +1116,17 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("nms", value.value)
 
     @property
-    def redetectNMS(self) -> NMS:
+    def redetectNMS(self) -> Optional[NMS]:
         """
         Getter for redetectMms
 
         Returns:
             nms
         """
-        return NMS[self.getValueAsString("RedetectNMS")]
+        value = self.getValue("RedetectNMS")
+        if value is None:
+            return None
+        return NMS[value]
 
     @redetectNMS.setter
     def redetectNMS(self, value: NMS) -> None:
@@ -1125,14 +1138,14 @@ class HumanDetectorSettings(BaseSettingsSection):
         self.setValue("RedetectNMS", value.value)
 
     @property
-    def landmarks17Threshold(self) -> float:
+    def landmarks17Threshold(self) -> Optional[float]:
         """
         Getter for landmarks17Threshold
 
         Returns:
             scoreThreshold
         """
-        return self.getValueAsFloat("landmarks17Threshold")
+        return self.getValue("landmarks17Threshold")
 
     @landmarks17Threshold.setter
     def landmarks17Threshold(self, value: float) -> None:
@@ -1158,14 +1171,14 @@ class LNetBaseSettings(BaseSettingsSection):
     """
 
     @property
-    def planName(self) -> str:
+    def planName(self) -> Optional[str]:
         """
         Getter for planName
 
         Returns:
             planName
         """
-        return self.getValueAsString("planName")
+        return self.getValue("planName")
 
     @planName.setter
     def planName(self, value: str) -> None:
@@ -1177,14 +1190,14 @@ class LNetBaseSettings(BaseSettingsSection):
         self.setValue("planName", value)
 
     @property
-    def size(self) -> int:
+    def size(self) -> Optional[int]:
         """
         Getter for size
 
         Returns:
             size
         """
-        return self.getValueAsInt("size")
+        return self.getValue("size")
 
     @size.setter
     def size(self, value: int) -> None:
@@ -1196,14 +1209,17 @@ class LNetBaseSettings(BaseSettingsSection):
         self.setValue("size", value)
 
     @property
-    def mean(self) -> Point3:
+    def mean(self) -> Optional[Point3]:
         """
         Getter for mean
 
         Returns:
             mean
         """
-        return Point3(*self.getValue("mean"))
+        value = self.getValue("mean")
+        if value is None:
+            return value
+        return Point3(*value)
 
     @mean.setter
     def mean(self, value: Point3) -> None:
@@ -1215,14 +1231,17 @@ class LNetBaseSettings(BaseSettingsSection):
         self.setValue("mean", value.asTuple())
 
     @property
-    def sigma(self) -> Point3:
+    def sigma(self) -> Optional[Point3]:
         """
         Getter for sigma
 
         Returns:
             sigma
         """
-        return Point3(*self.getValue("sigma"))
+        value = self.getValue("sigma")
+        if value is None:
+            return None
+        return Point3(*value)
 
     @sigma.setter
     def sigma(self, value: Point3) -> None:
@@ -1269,14 +1288,14 @@ class QualityEstimatorSettings(BaseSettingsSection):
     sectionName = "QualityEstimator::Settings"
 
     @property
-    def size(self) -> int:
+    def size(self) -> Optional[int]:
         """
         Getter for size
 
         Returns:
             size
         """
-        return self.getValueAsInt("size")
+        return self.getValue("size")
 
     @size.setter
     def size(self, value: int) -> None:
@@ -1288,14 +1307,17 @@ class QualityEstimatorSettings(BaseSettingsSection):
         self.setValue("size", value)
 
     @property
-    def expLight(self) -> Point3:
+    def expLight(self) -> Optional[Point3]:
         """
         Getter for expLight
 
         Returns:
             expLight
         """
-        return Point3(*self.getValue("expLight"))
+        value = self.getValue("expLight")
+        if value is None:
+            return None
+        return Point3(*value)
 
     @expLight.setter
     def expLight(self, value: Point3) -> None:
@@ -1307,14 +1329,17 @@ class QualityEstimatorSettings(BaseSettingsSection):
         self.setValue("expLight", value.asTuple())
 
     @property
-    def expDark(self) -> Point3:
+    def expDark(self) -> Optional[Point3]:
         """
         Getter for expDark
 
         Returns:
             expDark
         """
-        return Point3(*self.getValue("expDark"))
+        value = self.getValue("expDark")
+        if value is None:
+            return None
+        return Point3(*value)
 
     @expDark.setter
     def expDark(self, value: Point3) -> None:
@@ -1326,14 +1351,17 @@ class QualityEstimatorSettings(BaseSettingsSection):
         self.setValue("expDark", value.asTuple())
 
     @property
-    def logGray(self) -> Point4:
+    def logGray(self) -> Optional[Point4]:
         """
         Getter for logGray
 
         Returns:
             logGray
         """
-        return Point4(*self.getValue("logGray"))
+        value = self.getValue("logGray")
+        if value is None:
+            return None
+        return Point4(*value)
 
     @logGray.setter
     def logGray(self, value: Point4) -> None:
@@ -1345,14 +1373,17 @@ class QualityEstimatorSettings(BaseSettingsSection):
         self.setValue("logGray", value.asTuple())
 
     @property
-    def expBlur(self) -> Point3:
+    def expBlur(self) -> Optional[Point3]:
         """
         Getter for expBlur
 
         Returns:
             expBlur
         """
-        return Point3(*self.getValue("expBlur"))
+        value = self.getValue("expBlur")
+        if value is None:
+            return None
+        return Point3(*value)
 
     @expBlur.setter
     def expBlur(self, value: Point3) -> None:
@@ -1364,14 +1395,17 @@ class QualityEstimatorSettings(BaseSettingsSection):
         self.setValue("expBlur", value.asTuple())
 
     @property
-    def platt(self) -> Point2:
+    def platt(self) -> Optional[Point2]:
         """
         Getter for platt
 
         Returns:
             platt
         """
-        return Point2(*self.getValue("platt"))
+        value = self.getValue("platt")
+        if value is None:
+            return None
+        return Point2(*value)
 
     @platt.setter
     def platt(self, value: Point2) -> None:
@@ -1395,14 +1429,17 @@ class HeadPoseEstimatorSettings(BaseSettingsSection):
     sectionName = "HeadPoseEstimator::Settings"
 
     @property
-    def useEstimationByImage(self) -> bool:
+    def useEstimationByImage(self) -> Optional[bool]:
         """
         Getter for useEstimationByImage
 
         Returns:
             useEstimationByImage
         """
-        return bool(self.getValueAsInt("useEstimationByImage"))
+        value = self.getValue("useEstimationByImage")
+        if value is None:
+            return None
+        return bool(value)
 
     @useEstimationByImage.setter
     def useEstimationByImage(self, value: bool) -> None:
@@ -1414,14 +1451,17 @@ class HeadPoseEstimatorSettings(BaseSettingsSection):
         self.setValue("useEstimationByImage", int(value))
 
     @property
-    def useEstimationByLandmarks(self) -> bool:
+    def useEstimationByLandmarks(self) -> Optional[bool]:
         """
         Getter for useEstimationByLandmarks
 
         Returns:
             useEstimationByLandmarks
         """
-        return bool(self.getValueAsInt("useEstimationByLandmarks"))
+        value = self.getValue("useEstimationByLandmarks")
+        if value is None:
+            return None
+        return bool(value)
 
     @useEstimationByLandmarks.setter
     def useEstimationByLandmarks(self, value: bool) -> None:
@@ -1444,14 +1484,17 @@ class EyeEstimatorSettings(BaseSettingsSection):
     sectionName = "EyeEstimator::Settings"
 
     @property
-    def useStatusPlan(self) -> bool:
+    def useStatusPlan(self) -> Optional[bool]:
         """
         Getter for useStatusPlan
 
         Returns:
             useStatusPlan
         """
-        return bool(self.getValueAsInt("useStatusPlan"))
+        value = self.getValue("useStatusPlan")
+        if value is None:
+            return None
+        return bool(value)
 
     @useStatusPlan.setter
     def useStatusPlan(self, value: bool) -> None:
@@ -1474,14 +1517,14 @@ class BestShotQualityEstimatorSettings(BaseSettingsSection):
     sectionName = "BestShotQualityEstimator::Settings"
 
     @property
-    def runSubestimatorsConcurrently(self) -> int:
+    def runSubestimatorsConcurrently(self) -> Optional[int]:
         """
         Getter for runSubestimatorsConcurrently
 
         Returns:
             useStatusPlan
         """
-        return self.getValueAsInt("runSubestimatorsConcurrently")
+        return self.getValue("runSubestimatorsConcurrently")
 
     @runSubestimatorsConcurrently.setter
     def runSubestimatorsConcurrently(self, value: int) -> None:
@@ -1505,14 +1548,14 @@ class AttributeEstimatorSettings(BaseSettingsSection):
     sectionName = "AttributeEstimator::Settings"
 
     @property
-    def genderThreshold(self) -> float:
+    def genderThreshold(self) -> Optional[float]:
         """
         Getter for genderThreshold
 
         Returns:
             genderThreshold
         """
-        return self.getValueAsFloat("genderThreshold")
+        return self.getValue("genderThreshold")
 
     @genderThreshold.setter
     def genderThreshold(self, value: float) -> None:
@@ -1524,14 +1567,14 @@ class AttributeEstimatorSettings(BaseSettingsSection):
         self.setValue("genderThreshold", value)
 
     @property
-    def adultThreshold(self) -> float:
+    def adultThreshold(self) -> Optional[float]:
         """
         Getter for adultThreshold
 
         Returns:
             adultThreshold
         """
-        return self.getValueAsFloat("adultThreshold")
+        return self.getValue("adultThreshold")
 
     @adultThreshold.setter
     def adultThreshold(self, value: float) -> None:
@@ -1556,14 +1599,14 @@ class GlassesEstimatorSettings(BaseSettingsSection):
     sectionName = "GlassesEstimator::Settings"
 
     @property
-    def noGlassesThreshold(self) -> float:
+    def noGlassesThreshold(self) -> Optional[float]:
         """
         Getter for noGlassesThreshold
 
         Returns:
             noGlassesThreshold
         """
-        return self.getValueAsFloat("noGlassesThreshold")
+        return self.getValue("noGlassesThreshold")
 
     @noGlassesThreshold.setter
     def noGlassesThreshold(self, value: float) -> None:
@@ -1575,14 +1618,14 @@ class GlassesEstimatorSettings(BaseSettingsSection):
         self.setValue("noGlassesThreshold", value)
 
     @property
-    def eyeGlassesThreshold(self) -> float:
+    def eyeGlassesThreshold(self) -> Optional[float]:
         """
         Getter for eyeGlassesThreshold
 
         Returns:
             eyeGlassesThreshold
         """
-        return self.getValueAsFloat("eyeGlassesThreshold")
+        return self.getValue("eyeGlassesThreshold")
 
     @eyeGlassesThreshold.setter
     def eyeGlassesThreshold(self, value: float) -> None:
@@ -1594,14 +1637,14 @@ class GlassesEstimatorSettings(BaseSettingsSection):
         self.setValue("eyeGlassesThreshold", value)
 
     @property
-    def sunGlassesThreshold(self) -> float:
+    def sunGlassesThreshold(self) -> Optional[float]:
         """
         Getter for sunGlassesThreshold
 
         Returns:
             sunGlassesThreshold
         """
-        return self.getValueAsFloat("sunGlassesThreshold")
+        return self.getValue("sunGlassesThreshold")
 
     @sunGlassesThreshold.setter
     def sunGlassesThreshold(self, value: float) -> None:
@@ -1624,14 +1667,14 @@ class OverlapEstimatorSettings(BaseSettingsSection):
     sectionName = "OverlapEstimator::Settings"
 
     @property
-    def overlapThreshold(self) -> float:
+    def overlapThreshold(self) -> Optional[float]:
         """
         Getter for overlapThreshold
 
         Returns:
             overlapThreshold
         """
-        return self.getValueAsFloat("overlapThreshold")
+        return self.getValue("overlapThreshold")
 
     @overlapThreshold.setter
     def overlapThreshold(self, value: float) -> None:
@@ -1654,14 +1697,14 @@ class ChildEstimatorSettings(BaseSettingsSection):
     sectionName = "ChildEstimator::Settings"
 
     @property
-    def childThreshold(self) -> float:
+    def childThreshold(self) -> Optional[float]:
         """
         Getter for childThreshold
 
         Returns:
             childThreshold
         """
-        return self.getValueAsFloat("childThreshold")
+        return self.getValue("childThreshold")
 
     @childThreshold.setter
     def childThreshold(self, value: float) -> None:
@@ -1686,14 +1729,17 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
     sectionName = "LivenessIREstimator::Settings"
 
     @property
-    def cooperativeMode(self) -> bool:
+    def cooperativeMode(self) -> Optional[bool]:
         """
         Getter for cooperativeMode
 
         Returns:
             cooperativeMode
         """
-        return bool(self.getValueAsInt("cooperativeMode"))
+        value = self.getValue("cooperativeMode")
+        if value is None:
+            return None
+        return bool(value)
 
     @cooperativeMode.setter
     def cooperativeMode(self, value: bool) -> None:
@@ -1705,14 +1751,14 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         self.setValue("cooperativeMode", int(value))
 
     @property
-    def irCooperativeThreshold(self) -> float:
+    def irCooperativeThreshold(self) -> Optional[float]:
         """
         Getter for irCooperativeThreshold
 
         Returns:
             irCooperativeThreshold
         """
-        return self.getValueAsFloat("irCooperativeThreshold")
+        return self.getValue("irCooperativeThreshold")
 
     @irCooperativeThreshold.setter
     def irCooperativeThreshold(self, value: float) -> None:
@@ -1724,14 +1770,14 @@ class LivenessIREstimatorSettings(BaseSettingsSection):
         self.setValue("irCooperativeThreshold", value)
 
     @property
-    def irNonCooperativeThreshold(self) -> float:
+    def irNonCooperativeThreshold(self) -> Optional[float]:
         """
         Getter for irNonCooperativeThreshold
 
         Returns:
             irNonCooperativeThreshold
         """
-        return self.getValueAsFloat("irNonCooperativeThreshold")
+        return self.getValue("irNonCooperativeThreshold")
 
     @irNonCooperativeThreshold.setter
     def irNonCooperativeThreshold(self, value: float) -> None:
@@ -1756,14 +1802,14 @@ class MaskEstimatorSettings(BaseSettingsSection):
     sectionName = "MedicalMaskEstimator::Settings"
 
     @property
-    def medicalMaskThreshold(self) -> float:
+    def medicalMaskThreshold(self) -> Optional[float]:
         """
         Getter for medicalMaskThreshold
 
         Returns:
             medicalMaskThreshold
         """
-        return self.getValueAsFloat("maskThreshold")
+        return self.getValue("maskThreshold")
 
     @medicalMaskThreshold.setter
     def medicalMaskThreshold(self, value: float) -> None:
@@ -1775,14 +1821,14 @@ class MaskEstimatorSettings(BaseSettingsSection):
         self.setValue("maskThreshold", value)
 
     @property
-    def missingThreshold(self) -> float:
+    def missingThreshold(self) -> Optional[float]:
         """
         Getter for missingThreshold
 
         Returns:
             missingThreshold
         """
-        return self.getValueAsFloat("noMaskThreshold")
+        return self.getValue("noMaskThreshold")
 
     @missingThreshold.setter
     def missingThreshold(self, value: float) -> None:
@@ -1794,14 +1840,14 @@ class MaskEstimatorSettings(BaseSettingsSection):
         self.setValue("noMaskThreshold", value)
 
     @property
-    def occludedThreshold(self) -> float:
+    def occludedThreshold(self) -> Optional[float]:
         """
         Getter for occludedThreshold
 
         Returns:
             occludedThreshold
         """
-        return self.getValueAsFloat("occludedFaceThreshold")
+        return self.getValue("occludedFaceThreshold")
 
     @occludedThreshold.setter
     def occludedThreshold(self, value: float) -> None:
@@ -1826,14 +1872,14 @@ class MouthEstimatorSettings(BaseSettingsSection):
     sectionName = "MouthEstimator::Settings"
 
     @property
-    def occlusionThreshold(self) -> float:
+    def occlusionThreshold(self) -> Optional[float]:
         """
         Getter for occlusionThreshold
 
         Returns:
             occlusionThreshold
         """
-        return self.getValueAsFloat("occlusionThreshold")
+        return self.getValue("occlusionThreshold")
 
     @occlusionThreshold.setter
     def occlusionThreshold(self, value: float) -> None:
@@ -1845,14 +1891,14 @@ class MouthEstimatorSettings(BaseSettingsSection):
         self.setValue("occlusionThreshold", value)
 
     @property
-    def smileThreshold(self) -> float:
+    def smileThreshold(self) -> Optional[float]:
         """
         Getter for smileThreshold
 
         Returns:
             smileThreshold
         """
-        return self.getValueAsFloat("smileThreshold")
+        return self.getValue("smileThreshold")
 
     @smileThreshold.setter
     def smileThreshold(self, value: float) -> None:
@@ -1864,14 +1910,14 @@ class MouthEstimatorSettings(BaseSettingsSection):
         self.setValue("smileThreshold", value)
 
     @property
-    def openThreshold(self) -> float:
+    def openThreshold(self) -> Optional[float]:
         """
         Getter for openThreshold
 
         Returns:
             openThreshold
         """
-        return self.getValueAsFloat("openThreshold")
+        return self.getValue("openThreshold")
 
     @openThreshold.setter
     def openThreshold(self, value: float) -> None:
@@ -1897,14 +1943,14 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
     sectionName = "HeadAndShouldersLivenessEstimator::Settings"
 
     @property
-    def headWidthKoeff(self) -> float:
+    def headWidthKoeff(self) -> Optional[float]:
         """
         Getter for betaMode
 
         Returns:
             betaMode
         """
-        return self.getValueAsFloat("headWidthKoeff")
+        return self.getValue("headWidthKoeff")
 
     @headWidthKoeff.setter
     def headWidthKoeff(self, value: float) -> None:
@@ -1916,14 +1962,14 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         self.setValue("headWidthKoeff", value)
 
     @property
-    def headHeightKoeff(self) -> float:
+    def headHeightKoeff(self) -> Optional[float]:
         """
         Getter for betaMode
 
         Returns:
             betaMode
         """
-        return self.getValueAsFloat("headHeightKoeff")
+        return self.getValue("headHeightKoeff")
 
     @headHeightKoeff.setter
     def headHeightKoeff(self, value: float) -> None:
@@ -1935,14 +1981,14 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         self.setValue("headHeightKoeff", value)
 
     @property
-    def shouldersWidthKoeff(self) -> float:
+    def shouldersWidthKoeff(self) -> Optional[float]:
         """
         Getter for betaMode
 
         Returns:
             betaMode
         """
-        return self.getValueAsFloat("shouldersWidthKoeff")
+        return self.getValue("shouldersWidthKoeff")
 
     @shouldersWidthKoeff.setter
     def shouldersWidthKoeff(self, value: float) -> None:
@@ -1954,14 +2000,14 @@ class HeadAndShouldersLivenessEstimatorSettings(BaseSettingsSection):
         self.setValue("shouldersWidthKoeff", value)
 
     @property
-    def shouldersHeightKoeff(self) -> float:
+    def shouldersHeightKoeff(self) -> Optional[float]:
         """
         Getter for betaMode
 
         Returns:
             betaMode
         """
-        return self.getValueAsFloat("shouldersHeightKoeff")
+        return self.getValue("shouldersHeightKoeff")
 
     @shouldersHeightKoeff.setter
     def shouldersHeightKoeff(self, value: float) -> None:
@@ -1988,14 +2034,14 @@ class LivenessV1Estimator(BaseSettingsSection):
     sectionName = "LivenessOneShotRGBEstimator::Settings"
 
     @property
-    def realThreshold(self) -> float:
+    def realThreshold(self) -> Optional[float]:
         """
         Getter for realThreshold
 
         Returns:
             realThreshold
         """
-        return self.getValueAsFloat("realThreshold")
+        return self.getValue("realThreshold")
 
     @realThreshold.setter
     def realThreshold(self, value: float) -> None:
@@ -2007,14 +2053,17 @@ class LivenessV1Estimator(BaseSettingsSection):
         self.setValue("realThreshold", value)
 
     @property
-    def useFilter(self) -> bool:
+    def useFilter(self) -> Optional[bool]:
         """
         Getter for useFilter
 
         Returns:
             useFilter
         """
-        return bool(self.getValueAsInt("useFilter"))
+        value = self.getValue("useFilter")
+        if value is None:
+            return None
+        return bool(value)
 
     @useFilter.setter
     def useFilter(self, value: bool) -> None:
@@ -2026,14 +2075,14 @@ class LivenessV1Estimator(BaseSettingsSection):
         self.setValue("useFilter", int(value))
 
     @property
-    def minDetSize(self) -> int:
+    def minDetSize(self) -> Optional[int]:
         """
         Getter for minDetSize
 
         Returns:
             minDetSize
         """
-        return self.getValueAsInt("minDetSize")
+        return self.getValue("minDetSize")
 
     @minDetSize.setter
     def minDetSize(self, value: int) -> None:
@@ -2045,14 +2094,14 @@ class LivenessV1Estimator(BaseSettingsSection):
         self.setValue("minDetSize", value)
 
     @property
-    def borderDistance(self) -> int:
+    def borderDistance(self) -> Optional[int]:
         """
         Getter for borderDistance
 
         Returns:
             borderDistance
         """
-        return self.getValueAsInt("borderDistance")
+        return self.getValue("borderDistance")
 
     @borderDistance.setter
     def borderDistance(self, value: int) -> None:
@@ -2064,14 +2113,14 @@ class LivenessV1Estimator(BaseSettingsSection):
         self.setValue("borderDistance", value)
 
     @property
-    def principalAxes(self) -> int:
+    def principalAxes(self) -> Optional[int]:
         """
         Getter for principalAxes
 
         Returns:
             principalAxes
         """
-        return self.getValueAsInt("principalAxes")
+        return self.getValue("principalAxes")
 
     @principalAxes.setter
     def principalAxes(self, value: int) -> None:

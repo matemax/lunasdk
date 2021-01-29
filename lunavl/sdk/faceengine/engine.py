@@ -25,7 +25,7 @@ from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
-from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
+from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV, DEFAULT_LIVENESS_PRINCIPAL_AXES as DLPA
 
 
 class VLFaceEngine:
@@ -294,7 +294,7 @@ class VLFaceEngine:
             estimator
         """
         if principalAxes is None:
-            principalAxes = self.faceEngineProvider.livenessV1Estimator.principalAxes
+            principalAxes = self.faceEngineProvider.livenessV1Estimator.principalAxes or DLPA
         return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator(), principalAxes)
 
     def createOrientationModeEstimator(self) -> OrientationModeEstimator:
