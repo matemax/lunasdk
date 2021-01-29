@@ -219,7 +219,7 @@ class BaseSettingsSection:
             a value or None if settings does not exists
         """
         value = self._coreSettingProvider.getValue(self.__class__.sectionName, name)
-        if value is []:
+        if value == []:
             return None
         return value[0]
 

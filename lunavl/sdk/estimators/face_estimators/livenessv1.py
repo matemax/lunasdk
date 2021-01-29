@@ -120,7 +120,7 @@ class LivenessV1Estimator(BaseEstimator):
     @overload
     def estimate(self, faceDetection: FaceDetection, yaw: float, pitch: float, roll) -> LivenessV1:
         """
-        Estimate liveness by detection with head pose validation
+        Estimate liveness by detection with angles validation
         """
         ...
 

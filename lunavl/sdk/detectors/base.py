@@ -144,8 +144,8 @@ def getArgsForCoreRedetect(images: List[ImageForRedetection]) -> Tuple[List[Core
 def collectAndRaiseError(
     error: FSDKErrorResult,
     coreImages: List[CoreImage],
-    detectAreas: List[CoreImage],
-    getErrorFunction: Callable[[CoreImage, CoreRectI], FSDKErrorResult],
+    detectAreas: Union[List[Detection], List[CoreRectI]],
+    getErrorFunction: Callable[[CoreImage, Union[Detection, CoreRectI]], FSDKErrorResult],
 ) -> None:
     """
     Collect errors from single operations and raise complex exception

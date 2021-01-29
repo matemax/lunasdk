@@ -239,5 +239,5 @@ Classes and methods
 .. automodule:: lunavl.sdk.estimators.face_estimators.livenessv1
     :members:
 
-.. automodule:: lunavl.sdk.estimators.face_estimators.orientation_mode
+.. automodule:: lunavl.sdk.estimators.image_estimators.orientation_mode
     :members:

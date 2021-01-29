@@ -126,7 +126,7 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumanError)
     def detectOne(
-        self, image: VLImage, detectArea: Optional[Rect] = None, detectLandmarks: bool = True
+        self, image: VLImage, detectArea: Optional[Rect] = None, limit: int = 5, detectLandmarks: bool = True
     ) -> Union[None, HumanDetection]:
         """
         Detect just one best detection on the image.
@@ -134,11 +134,12 @@ class HumanDetector:
         Args:
             image: image. Format must be R8G8B8
             detectArea: rectangle area which contains human to detect. If not set will be set image.rect
+            limit: max number of detections for input image
             detectLandmarks: detect or not landmarks
         Returns:
             human detection if human is found otherwise None
         Raises:
-            LunaSDKException: if detectOne is failed or image format has wrong  the format
+            LunaSDKException: if detectOne is failed or image format has wrong the format
         """
         assertImageForDetection(image)
         detectionType = self._getDetectionType(detectLandmarks)
@@ -148,7 +149,7 @@ class HumanDetector:
         else:
             forDetection = ImageForDetection(image=image, detectArea=detectArea)
         imgs, detectAreas = getArgsForCoreDetectorForImages([forDetection])
-        error, detectRes = self._detector.detect(imgs, detectAreas, 1, detectionType)
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
         assertError(error)
 
         detections = detectRes.getDetections(0)

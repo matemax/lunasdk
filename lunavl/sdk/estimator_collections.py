@@ -15,7 +15,7 @@ from .estimators.face_estimators.mask import MaskEstimator
 from .estimators.face_estimators.glasses import GlassesEstimator
 from .estimators.face_estimators.facewarper import FaceWarper
 from .estimators.face_estimators.livenessv1 import LivenessV1Estimator
-from lunavl.sdk.estimators.image_estimators.orientation_mode import OrientationModeEstimator
+from .estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from .faceengine.engine import VLFaceEngine
 
 
