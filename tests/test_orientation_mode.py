@@ -17,11 +17,6 @@ class TestOrientationMode(BaseTestClass):
         super().setup_class()
         cls.orientationModeEstimator = cls.faceEngine.createOrientationModeEstimator()
 
-        cls.normalImage = VLImage.load(filename=ROTATED0)
-        cls.rotatedLeftImage = VLImage.load(filename=ROTATED90)
-        cls.rotatedRightImage = VLImage.load(filename=ROTATED270)
-        cls.upsideDownImage = VLImage.load(filename=ROTATED180)
-
     @staticmethod
     def assertOrientationModeEstimation(estimatedOrientation: OrientationType, expectedOrientation: OrientationType):
         """
@@ -39,30 +34,18 @@ class TestOrientationMode(BaseTestClass):
             estimatedOrientation == expectedOrientation
         ), f"Expected {expectedOrientation.value}, got {estimatedOrientation}"
 
-    def test_orientation_mode_normal(self):
+    def test_orientation_mode(self):
         """
-        Test orientation mode with normal rotation
+        Test orientation mode with normal, left, right and upside-down rotation
         """
-        orientationMode = TestOrientationMode.orientationModeEstimator.estimate(self.normalImage)
-        self.assertOrientationModeEstimation(orientationMode, OrientationType.NORMAL)
+        testData = [
+            (VLImage.load(filename=ROTATED0), OrientationType.NORMAL),
+            (VLImage.load(filename=ROTATED90), OrientationType.LEFT),
+            (VLImage.load(filename=ROTATED270), OrientationType.RIGHT),
+            (VLImage.load(filename=ROTATED180), OrientationType.UPSIDE_DOWN),
+        ]
 
-    def test_orientation_mode_rotated_left(self):
-        """
-        Test orientation mode with left rotation
-        """
-        orientationMode = TestOrientationMode.orientationModeEstimator.estimate(self.rotatedLeftImage)
-        self.assertOrientationModeEstimation(orientationMode, OrientationType.LEFT)
-
-    def test_orientation_mode_rotated_right(self):
-        """
-        Test orientation mode with right rotation
-        """
-        orientationMode = TestOrientationMode.orientationModeEstimator.estimate(self.rotatedRightImage)
-        self.assertOrientationModeEstimation(orientationMode, OrientationType.RIGHT)
-
-    def test_orientation_mode_rotated_upside_down(self):
-        """
-        Test orientation mode with upside-down rotation
-        """
-        orientationMode = TestOrientationMode.orientationModeEstimator.estimate(self.upsideDownImage)
-        self.assertOrientationModeEstimation(orientationMode, OrientationType.UPSIDE_DOWN)
+        for image, expectedOrientationType in testData:
+            with self.subTest(expectedOrientationType=expectedOrientationType):
+                orientationMode = TestOrientationMode.orientationModeEstimator.estimate(image)
+                self.assertOrientationModeEstimation(orientationMode, expectedOrientationType)
