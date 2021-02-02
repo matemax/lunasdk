@@ -1,5 +1,5 @@
 from lunavl.sdk.estimators.image_estimators.orientation_mode import OrientationModeEstimator, OrientationType
-from lunavl.sdk.image_utils.image import VLImage, ImageAngle
+from lunavl.sdk.image_utils.image import VLImage, RotationAngle
 from tests.base import BaseTestClass
 from tests.resources import ROTATED0, ROTATED90, ROTATED180, ROTATED270
 
@@ -23,10 +23,10 @@ class TestImageRotation(BaseTestClass):
         Test image rotation: 0, 90, 180 and 270 degrees
         """
         testData = [
-            (ImageAngle.ANGLE_0, OrientationType.NORMAL, ROTATED0),
-            (ImageAngle.ANGLE_90, OrientationType.LEFT, ROTATED90),
-            (ImageAngle.ANGLE_180, OrientationType.UPSIDE_DOWN, ROTATED180),
-            (ImageAngle.ANGLE_270, OrientationType.RIGHT, ROTATED270),
+            (RotationAngle.ANGLE_0, OrientationType.NORMAL, ROTATED0),
+            (RotationAngle.ANGLE_90, OrientationType.LEFT, ROTATED90),
+            (RotationAngle.ANGLE_180, OrientationType.UPSIDE_DOWN, ROTATED180),
+            (RotationAngle.ANGLE_270, OrientationType.RIGHT, ROTATED270),
         ]
 
         for rotationAngle, expectedOrientationMode, expectedImageFileName in testData:

@@ -34,18 +34,18 @@ class ImageFormat(Enum):
     BMP = "bmp"
 
 
-class ImageAngle(Enum):
+class RotationAngle(Enum):
     """
-    Enum for image angle
+    Enum for rotation angle
     """
 
-    #: normal-rotated image
+    #: zero rotation angle
     ANGLE_0 = "Normal"
-    #: left-rotated image | counter-clockwise
+    #: rotate counter-clockwise
     ANGLE_90 = "Left"
-    #: right-rotated image | clockwise
+    #:  clockwise
     ANGLE_270 = "Right"
-    #: upside-down image
+    #: rotate upside-down
     ANGLE_180 = "UpsideDown"
 
 
@@ -197,7 +197,7 @@ class VLImage:
         self.filename = filename
 
     @classmethod
-    def rotate(cls, image: "VLImage", angle: ImageAngle):
+    def rotate(cls, image: "VLImage", angle: RotationAngle):
         """
         Get rotated copy of VLImage
         Args:
@@ -208,11 +208,11 @@ class VLImage:
         Returns:
             rotated vl image
         """
-        if angle == ImageAngle.ANGLE_90:
+        if angle == RotationAngle.ANGLE_90:
             angleForRotation = pilImage.ROTATE_90
-        elif angle == ImageAngle.ANGLE_270:
+        elif angle == RotationAngle.ANGLE_270:
             angleForRotation = pilImage.ROTATE_270
-        elif angle == ImageAngle.ANGLE_180:
+        elif angle == RotationAngle.ANGLE_180:
             angleForRotation = pilImage.ROTATE_180
         else:
             return copy(image)
