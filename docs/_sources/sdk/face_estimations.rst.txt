@@ -167,6 +167,32 @@ these properties from the source image. Together these parameters determine desc
 descriptors are compatible to each other. It is impossible to batch and match in compatible descriptors, so you
 should pay attention what settings do you use when extracting them.
 
+.. _`livenessv1`:
+
+Livenessv1
+----------
+
+This estimator tells whether the person’s face is real or fake (photo, printed image).
+
+The estimator (see ILivenessOneShotRGBEstimator in sdk). The method estimates whether a person is real or not. Output
+estimation is a structure `LivenessV1Estimation`with float score, which is normalized in range [0..1],
+where 1 - is real person, 0 - is fake. Also `LivenessV1Estimation` contains  a parameter `quality` which means a degree
+of confidence in the result of estimation. You can add information about a detection head pose to improve
+a prediction accuracy. Also, the function contains face detection constraint checkers (detection size and others), if
+a face detection does not satisfy these constraints estimation is failed.
+
+.. warning::
+    Current estimator version estimates correct liveness state for images from mobile and web camera only.
+    A correctness of a liveness prediction is not guaranteed for other images source.
+
+.. _`orientation mode`:
+
+Orientation mode
+----------------
+
+This estimator is designed to determine image orientation. Possible estimations are: Left, Normal, Right or UpsideDown.
+
+
 Classes and methods
 -------------------
 
@@ -208,4 +234,10 @@ Classes and methods
     :members:
 
 .. automodule:: lunavl.sdk.estimators.face_estimators.glasses
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.livenessv1
+    :members:
+
+.. automodule:: lunavl.sdk.estimators.image_estimators.orientation_mode
     :members:

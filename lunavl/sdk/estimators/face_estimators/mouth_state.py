@@ -4,7 +4,7 @@ see `mouth state`_
 """
 from typing import Union, Dict
 
-from FaceEngine import ISmileEstimatorPtr, SmileEstimation  # pylint: disable=E0611,E0401
+from FaceEngine import MouthEstimation, IMouthEstimatorPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
@@ -25,7 +25,7 @@ class MouthStates(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimation: SmileEstimation):
+    def __init__(self, coreEstimation: MouthEstimation):
         super().__init__(coreEstimation)
 
     @property
@@ -39,14 +39,14 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.smile
 
     @property
-    def mouth(self) -> float:
+    def opened(self) -> float:
         """
-        Get mouth score value.
+        Get opened score value.
 
         Returns:
             value in range [0, 1]
         """
-        return self._coreEstimation.mouth
+        return self._coreEstimation.opened
 
     @property
     def occlusion(self) -> float:
@@ -56,16 +56,16 @@ class MouthStates(BaseEstimation):
         Returns:
             value in range [0, 1]
         """
-        return self._coreEstimation.occlusion
+        return self._coreEstimation.occluded
 
     def asDict(self) -> Dict[str, float]:
         """
         Convert to dict.
 
         Returns:
-            {'score': self.mouth, 'occlusion': self.occlusion, 'smile': self.smile}
+            {'opened': self.opened, 'occlusion': self.occlusion, 'smile': self.smile}
         """
-        return {"score": self.mouth, "occluded": self.occlusion, "smile": self.smile}
+        return {"opened": self.opened, "occluded": self.occlusion, "smile": self.smile}
 
 
 class MouthStateEstimator(BaseEstimator):
@@ -74,7 +74,7 @@ class MouthStateEstimator(BaseEstimator):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreEstimator: ISmileEstimatorPtr):
+    def __init__(self, coreEstimator: IMouthEstimatorPtr):
         """
         Init.
 

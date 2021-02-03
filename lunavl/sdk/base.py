@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Union, Optional, Tuple, Dict, Any
 
-from FaceEngine import DetectionFloat, HumanLandmark, HumanLandmarks17  # pylint: disable=E0611,E0401
+from FaceEngine import Detection, HumanLandmark, HumanLandmarks17  # pylint: disable=E0611,E0401
 
 from .image_utils.geometry import LANDMARKS, Point, Rect
 
@@ -199,7 +199,7 @@ class BoundingBox(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, boundingBox: DetectionFloat):
+    def __init__(self, boundingBox: Detection):
         """
         Init.
 
@@ -216,7 +216,7 @@ class BoundingBox(BaseEstimation):
         Returns:
             number in range [0,1]
         """
-        return self._coreEstimation.score
+        return self._coreEstimation.getScore()
 
     @property
     def rect(self) -> Rect[float]:
@@ -226,7 +226,7 @@ class BoundingBox(BaseEstimation):
         Returns:
             float rect
         """
-        return Rect.fromCoreRect(self._coreEstimation.rect)
+        return Rect.fromCoreRect(self._coreEstimation.getRect())
 
     def asDict(self) -> Dict[str, Union[Dict[str, float], float]]:
         """

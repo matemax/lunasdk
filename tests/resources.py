@@ -34,8 +34,14 @@ WARP_CLEAN_FACE = getPathToImage("warp_clean_face.jpg")
 WARP_FACE_WITH_EYEGLASSES = getPathToImage("warp_face_with_eyeglasses.jpg")
 WARP_FACE_WITH_SUNGLASSES = getPathToImage("warp_face_with_sunglasses.jpg")
 
-ROTATED0 = getPathToImage("rotated0.jpg")
+ROTATED0 = getPathToImage("rotated0.png")
 ROTATED90 = getPathToImage("rotated90.png")
+ROTATED180 = getPathToImage("rotated180.png")
+ROTATED270 = getPathToImage("rotated270.png")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
+
+SPOOF = getPathToImage("spoof.jpg")
+UNKNOWN_LIVENESS = getPathToImage("disgust.jpg")
+LIVENESS_FACE = getPathToImage("one_face.jpg")

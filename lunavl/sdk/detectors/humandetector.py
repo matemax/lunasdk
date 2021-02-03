@@ -3,8 +3,14 @@ Module contains function for detection human bodies on images.
 """
 from typing import Optional, Union, List, Dict, Any
 
-from FaceEngine import HumanDetectionType, Human  # pylint: disable=E0611,E0401
-from FaceEngine import HumanLandmarks17 as CoreLandmarks17  # pylint: disable=E0611,E0401
+from FaceEngine import (
+    HumanDetectionType,
+    Human,
+    HumanLandmarks17 as CoreLandmarks17,
+    Detection,
+    Image as CoreImage,
+    Rect as CoreRectI,
+)  # pylint: disable=E0611,E0401
 
 from .base import (
     ImageForDetection,
@@ -12,9 +18,10 @@ from .base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
+    collectAndRaiseError,
 )
 from ..base import LandmarksWithScore
-from ..errors.errors import LunaVLError, ErrorInfo
+from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
@@ -32,8 +39,8 @@ def _createCoreHumans(image: ImageForRedetection) -> List[Human]:
     humans = [Human() for _ in range(len(image.bBoxes))]
     for index, human in enumerate(humans):
         human.img = image.image.coreImage
-        human.detection.rect = image.bBoxes[index].coreRectF
-        human.detection.score = 1
+        human.detection.setRawRect(image.bBoxes[index].coreRectF)
+        human.detection.setScore(1)
     return humans
 
 
@@ -111,15 +118,15 @@ class HumanDetector:
         Returns:
             detection type
         """
-        toDetect = HumanDetectionType.DCT_BOX
+        toDetect = HumanDetectionType.HDT_BOX
 
         if detectLandmarks:
-            toDetect = HumanDetectionType.DCT_ALL
+            toDetect = HumanDetectionType.HDT_ALL
         return toDetect
 
     @CoreExceptionWrap(LunaVLError.DetectHumanError)
     def detectOne(
-        self, image: VLImage, detectArea: Optional[Rect] = None, detectLandmarks: bool = True
+        self, image: VLImage, detectArea: Optional[Rect] = None, limit: int = 5, detectLandmarks: bool = True
     ) -> Union[None, HumanDetection]:
         """
         Detect just one best detection on the image.
@@ -127,25 +134,39 @@ class HumanDetector:
         Args:
             image: image. Format must be R8G8B8
             detectArea: rectangle area which contains human to detect. If not set will be set image.rect
+            limit: max number of detections for input image
             detectLandmarks: detect or not landmarks
         Returns:
             human detection if human is found otherwise None
         Raises:
-            LunaSDKException: if detectOne is failed or image format has wrong  the format
+            LunaSDKException: if detectOne is failed or image format has wrong the format
         """
         assertImageForDetection(image)
+        detectionType = self._getDetectionType(detectLandmarks)
 
         if detectArea is None:
             forDetection = ImageForDetection(image=image, detectArea=image.rect)
         else:
             forDetection = ImageForDetection(image=image, detectArea=detectArea)
         imgs, detectAreas = getArgsForCoreDetectorForImages([forDetection])
-        error, detectRes = self._detector.detect(
-            [imgs[0]], [detectAreas[0]], 1, self._getDetectionType(detectLandmarks)
-        )
+        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
         assertError(error)
 
-        return HumanDetection(detectRes[0][0], image) if detectRes[0] else None
+        detections = detectRes.getDetections(0)
+        landmarks17Array = detectRes.getLandmarks17(0)
+
+        isReplyNotAssumesDetection = detectRes.getSize() == 1
+        if isReplyNotAssumesDetection:
+            isDetectionExistsNValid = len(detections) != 0 and detections[0].isValid()
+            if not isDetectionExistsNValid:
+                return None
+
+        human = Human()
+        human.img = image.coreImage
+        human.detection = detections[0]
+        if landmarks17Array and landmarks17Array[0] is not None:
+            human.landmarks17_opt.set(landmarks17Array[0])
+        return HumanDetection(human, image)
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def detect(
@@ -160,32 +181,38 @@ class HumanDetector:
             detectLandmarks: detect or not landmarks
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
-        Raises:
-            LunaSDKException(LunaVLError.InvalidImageFormat): if any image has bad format or detect is failed
-
         """
-        imgs, detectAreas = getArgsForCoreDetectorForImages(images)
+
+        def getSingleError(image: CoreImage, detectArea: CoreRectI):
+            """Get error from one image detect"""
+            errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
+            return errorOne
+
+        coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detectLandmarks)
 
-        error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
-        if error.isError:
-            errors = []
-            for image, detectArea in zip(imgs, detectAreas):
-                # 1 is the detection limit
-                errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
-                if errorOne.isOk:
-                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-                else:
-                    errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-            )
+        fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
+        if fsdkErrorRes.isError:
+            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
 
         res = []
-        for numberImage, imageDetections in enumerate(detectRes):
-            image_ = images[numberImage]
-            image = image_ if isinstance(image_, VLImage) else image_.image
-            res.append([HumanDetection(coreDetection, image) for coreDetection in imageDetections])
+        for imageIdx in range(fsdkDetectRes.getSize()):
+            imagesDetections = []
+            detections = fsdkDetectRes.getDetections(imageIdx)
+            landmarks17Array = fsdkDetectRes.getLandmarks17(imageIdx)
+
+            for detection, landmarks17 in zip(detections, landmarks17Array):
+                human = Human()
+                human.img = coreImages[imageIdx]
+                human.detection = detection
+                if landmarks17:
+                    human.landmarks17_opt.set(landmarks17)
+                imagesDetections.append(human)
+
+            image = images[imageIdx]
+            vlImage = image if isinstance(image, VLImage) else image.image
+            res.append([HumanDetection(human, vlImage) for human in imagesDetections])
+
         return res
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
@@ -205,13 +232,13 @@ class HumanDetector:
         Raises:
             LunaSDKException if an error occurs
         """
+        assertImageForDetection(image)
         if isinstance(bBox, Rect):
-            area = bBox
+            coreBBox = Detection(bBox.coreRectF, 1.0)
         else:
-            area = bBox.boundingBox.rect
+            coreBBox = bBox.coreEstimation.detection
 
-        human = _createCoreHumans(ImageForRedetection(image, [area]))[0]
-        error, detectRes = self._detector.redetectOne(human)
+        error, detectRes = self._detector.redetectOne(image.coreImage, coreBBox)
 
         assertError(error)
         if detectRes.isValid():

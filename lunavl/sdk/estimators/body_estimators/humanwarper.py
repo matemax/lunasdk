@@ -140,7 +140,7 @@ class HumanWarper:
         Raises:
             LunaSDKException: if creation failed
         """
-        error, warp = self._coreWarper.warp(humanDetection.coreEstimation)
+        error, warp = self._coreWarper.warp(humanDetection.image.coreImage, humanDetection.coreEstimation.detection)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 

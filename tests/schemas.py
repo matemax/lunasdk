@@ -46,9 +46,9 @@ REQUIRED_HUMAN_BODY_DETECTION = {
 
 MOUTH_STATES_SCHEMA = {
     "type": "object",
-    "properties": {"score": TYPE_SCORE, "occluded": TYPE_SCORE, "smile": TYPE_SCORE},
+    "properties": {"opened": TYPE_SCORE, "occluded": TYPE_SCORE, "smile": TYPE_SCORE},
     "additionalProperties": False,
-    "required": ["score", "occluded", "smile"],
+    "required": ["opened", "occluded", "smile"],
 }
 
 QUALITY_SCHEMA = {
@@ -85,5 +85,20 @@ GLASSES_SCHEMA = {
     "type": "object",
     "properties": {"glasses": {"type": "string", "enum": ["no_glasses", "eyeglasses", "sunglasses"]}},
     "required": ["glasses"],
+    "additionalProperties": False,
+}
+
+LIVENESSV1_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "prediction": {"type": "string", "enum": ["real", "spoof", "unknown"]},
+        "estimations": {
+            "type": "object",
+            "required": ["quality", "score"],
+            "properties": {"quality": TYPE_SCORE, "score": TYPE_SCORE},
+            "additionalProperties": False,
+        },
+    },
+    "required": ["prediction", "estimations"],
     "additionalProperties": False,
 }

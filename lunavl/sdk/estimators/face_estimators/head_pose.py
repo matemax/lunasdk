@@ -21,9 +21,9 @@ class FrontalType(Enum):
     Enum for frontal types
     """
 
-    TURNED = "FrontalFace0"  #: Non-frontal face
-    FRONTAL = "FrontalFace1"  #: Good for recognition; Doesn't descrease recall and looks fine
-    BY_GOST = "FrontalFace2"  #: GOST/ISO angles
+    TURNED = "Non"  #: Non-frontal face
+    FRONTAL = "Good"  #: Good for recognition; Doesn't descrease recall and looks fine
+    BY_GOST = "ISO"  #: GOST/ISO angles
 
     @classmethod
     def fromCoreFrontalType(cls, frontalFaceType: FrontalFaceType) -> "FrontalType":

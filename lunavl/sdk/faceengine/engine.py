@@ -19,11 +19,13 @@ from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from ..estimators.face_estimators.facewarper import FaceWarper
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
+from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
+from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
-from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
+from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV, DEFAULT_LIVENESS_PRINCIPAL_AXES as DLPA
 
 
 class VLFaceEngine:
@@ -137,7 +139,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        return MouthStateEstimator(self._faceEngine.createSmileEstimator())
+        return MouthStateEstimator(self._faceEngine.createMouthEstimator())
 
     def createEyeEstimator(self) -> EyeEstimator:
         """
@@ -279,3 +281,26 @@ class VLFaceEngine:
             estimator
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
+
+    def createLivenessV1Estimator(self, principalAxes: Optional[float] = None) -> LivenessV1Estimator:
+        """
+        Create an one shot liveness estimator.
+
+        Args:
+            principalAxes: maximum value of Yaw, pitch and roll angles for estimation
+
+        Returns:
+            estimator
+        """
+        if principalAxes is None:
+            principalAxes = self.faceEngineProvider.livenessV1Estimator.principalAxes or DLPA
+        return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator(), principalAxes)
+
+    def createOrientationModeEstimator(self) -> OrientationModeEstimator:
+        """
+        Create an orientation mode estimator
+
+        Returns:
+            estimator
+        """
+        return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())

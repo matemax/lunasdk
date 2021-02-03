@@ -78,6 +78,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         assert redetectOne is None, "excepted None but found {}".format(redetectOne)
         assert redetect is None, "excepted None but found {}".format(redetectOne)
 
+    @pytest.mark.skip("FSDK-2659")
     def test_redetect_one_invalid_rectangle(self):
         """
         Test re-detection of one human with an invalid rect

@@ -1,7 +1,9 @@
 """
 Module realize VLImage - structure for storing image in special format.
 """
+from copy import copy
 from enum import Enum
+from io import BytesIO
 from pathlib import Path
 from typing import Optional, Union
 import requests
@@ -30,6 +32,21 @@ class ImageFormat(Enum):
     TIFF = "tif"
     #: bmp
     BMP = "bmp"
+
+
+class RotationAngle(Enum):
+    """
+    Enum for rotation angle
+    """
+
+    #: zero rotation angle
+    ANGLE_0 = "Normal"
+    #: rotate counter-clockwise
+    ANGLE_90 = "Left"
+    #:  clockwise
+    ANGLE_270 = "Right"
+    #: rotate upside-down
+    ANGLE_180 = "UpsideDown"
 
 
 class ColorFormat(Enum):
@@ -171,15 +188,38 @@ class VLImage:
             array = np.array(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array,
-                inputColorFormat=inputColorFormat,
-                colorFormat=colorFormat or ColorFormat.R8G8B8
+                ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         else:
             raise TypeError(f"Bad image type: {type(body)}")
 
         self.source = body
         self.filename = filename
+
+    @classmethod
+    def rotate(cls, image: "VLImage", angle: RotationAngle):
+        """
+        Get rotated copy of VLImage
+        Args:
+            image: vl image
+            angle: angle for rotation
+        Warnings:
+            remove after FSDK-2809
+        Returns:
+            rotated vl image
+        """
+        if angle == RotationAngle.ANGLE_90:
+            angleForRotation = pilImage.ROTATE_90
+        elif angle == RotationAngle.ANGLE_270:
+            angleForRotation = pilImage.ROTATE_270
+        elif angle == RotationAngle.ANGLE_180:
+            angleForRotation = pilImage.ROTATE_180
+        else:
+            return copy(image)
+
+        newPilImage = image.asPillow().transpose(angleForRotation)
+
+        return cls(newPilImage, filename=image.filename)
 
     @classmethod
     def load(
@@ -270,9 +310,7 @@ class VLImage:
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
         coreImage = cls._coreImageFromNumpyArray(
-            ndarray=arr,
-            inputColorFormat=inputColorFormat,
-            colorFormat=colorFormat
+            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
         )
         return cls(coreImage, filename=filename)
 

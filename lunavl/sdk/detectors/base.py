@@ -1,11 +1,9 @@
-from typing import NamedTuple, List, Any, Dict, Union, Tuple
+from typing import NamedTuple, List, Any, Dict, Union, Tuple, Callable
 
-from FaceEngine import Rect as CoreRectI  # pylint: disable=E0611,E0401
-from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, FSDKErrorResult, Image as CoreImage  # pylint: disable=E0611,E0401
 
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
-
 from ..base import BaseEstimation, BoundingBox
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage, ColorFormat
@@ -107,10 +105,9 @@ def getArgsForCoreDetectorForImages(
                second - detect area for corresponding images
     """
 
-    coreImages = []
-    detectAreas = []
-    for image in images:
+    coreImages, detectAreas = [], []
 
+    for image in images:
         if isinstance(image, VLImage):
             img = image
             detectAreas.append(image.coreImage.getRect())
@@ -120,4 +117,51 @@ def getArgsForCoreDetectorForImages(
             detectAreas.append(image.detectArea.coreRectI)
             assertImageForDetection(image.image)
         coreImages.append(img.coreImage)
+
     return coreImages, detectAreas
+
+
+def getArgsForCoreRedetect(images: List[ImageForRedetection]) -> Tuple[List[CoreImage], List[List[Detection]]]:
+    """
+    Create args for redetect for image list
+    Args:
+        images: list of images for redetection
+
+    Returns:
+        tuple: first - list core images
+               second - list detect area for corresponding images
+    """
+    coreImages, detectAreas = [], []
+
+    for image in images:
+        assertImageForDetection(image.image)
+        coreImages.append(image.image.coreImage)
+        detectAreas.append([Detection(bbox.coreRect, 1.0) for bbox in image.bBoxes])
+
+    return coreImages, detectAreas
+
+
+def collectAndRaiseError(
+    error: FSDKErrorResult,
+    coreImages: List[CoreImage],
+    detectAreas: Union[List[Detection], List[CoreRectI]],
+    getErrorFunction: Callable[[CoreImage, Union[Detection, CoreRectI]], FSDKErrorResult],
+) -> None:
+    """
+    Collect errors from single operations and raise complex exception
+    Args:
+        error: fsdk error from core reply
+        coreImages: list of core images
+        detectAreas: list of detect areas for core images
+        getErrorFunction: function to collect error by
+    Raises:
+        LunaSDKException(LunaVLError.BatchedInternalError) with collected errors in context
+    """
+    errors = []
+    for image, detectArea in zip(coreImages, detectAreas):
+        errorOne = getErrorFunction(image, detectArea)
+        if errorOne.isOk:
+            errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+        else:
+            errors.append(LunaVLError.fromSDKError(errorOne))
+    raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors)

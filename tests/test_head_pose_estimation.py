@@ -1,4 +1,4 @@
-from FaceEngine import DetectionFloat, RectFloat
+from FaceEngine import Detection, RectFloat
 from collections import namedtuple
 
 import pytest
@@ -112,7 +112,7 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose by image and bounding box without intersection
         """
-        fakeDetection = DetectionFloat(RectFloat(3000.0, 3000.0, 100.0, 100.0), 0.9)
+        fakeDetection = Detection(RectFloat(3000.0, 3000.0, 100.0, 100.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
@@ -122,7 +122,7 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose by image and empty bounding box
         """
-        fakeDetection = DetectionFloat(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
+        fakeDetection = Detection(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
@@ -162,37 +162,3 @@ class TestHeadPose(BaseTestClass):
                 angles = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(detection.landmarks68)
                 self.assertHeadPose(angles)
                 assert angles.getFrontalType() == case.type
-
-    def test_estimate_head_pose_hight_level_with_use_orientation_mode(self):
-        """
-        Estimating head pose by bounding box using high level detector with useOrientationMode=1.
-        """
-
-        faceEngine = VLFaceEngine()
-        faceEngine.faceEngineProvider.faceDetV3Settings.useOrientationMode = 1
-        detector = VLFaceDetector(DetectorType.FACE_DET_V3, faceEngine)
-
-        angles0 = detector.detectOne(VLImage.load(filename=ROTATED0)).headPose
-        angles90 = detector.detectOne(VLImage.load(filename=ROTATED90)).headPose
-
-        assert pytest.approx(angles90.pitch, abs=2) == angles0.pitch
-        assert pytest.approx(angles90.roll, abs=2) == angles0.roll
-        assert pytest.approx(angles90.yaw, abs=2) == angles0.yaw
-
-    def test_estimate_head_pose_with_use_orientation_mode(self):
-        """
-        Estimating head pose by bounding box with useOrientationMode=1.
-        """
-
-        faceEngine = VLFaceEngine()
-        faceEngine.faceEngineProvider.faceDetV3Settings.useOrientationMode = 1
-        detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
-
-        images = [VLImage.load(filename=ROTATED0), VLImage.load(filename=ROTATED90)]
-        detections = detector.detect(images, detect68Landmarks=True)
-        angles0 = TestHeadPose.headPoseEstimator.estimate(detections[0][0].landmarks68)
-        angles90 = TestHeadPose.headPoseEstimator.estimate(detections[1][0].landmarks68)
-
-        assert pytest.approx(angles90.pitch, abs=2) == angles0.pitch
-        assert pytest.approx(angles90.roll, abs=2) == angles0.roll
-        assert pytest.approx(angles90.yaw, abs=2) == angles0.yaw

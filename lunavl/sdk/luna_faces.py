@@ -2,7 +2,7 @@
 """
 from typing import Optional, Union, List, Dict
 
-from FaceEngine import Face  # pylint: disable=E0611,E0401
+from FaceEngine import Face, OrientationType  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from .estimator_collections import FaceEstimatorsCollection
@@ -16,6 +16,7 @@ from .estimators.face_estimators.warp_quality import Quality
 from .estimators.face_estimators.mask import Mask
 from .estimators.face_estimators.glasses import Glasses
 from .estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from .estimators.face_estimators.livenessv1 import LivenessV1
 from .faceengine.engine import VLFaceEngine
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .detectors.base import ImageForDetection, ImageForRedetection
@@ -41,7 +42,7 @@ class VLFaceDetection(FaceDetection):
         _headPose (Optional[HeadPose]): lazy load head pose estimation
         _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
-
+        _liveness (Optional[LivenessV1]): lazy load liveness estimation
     """
 
     __slots__ = (
@@ -59,6 +60,7 @@ class VLFaceDetection(FaceDetection):
         "_descriptor",
         "_mask",
         "_glasses",
+        "_liveness",
     )
 
     def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
@@ -82,6 +84,7 @@ class VLFaceDetection(FaceDetection):
         self._descriptor: Optional[FaceDescriptor] = None
         self._mask: Optional[Mask] = None
         self._glasses: Optional[Glasses] = None
+        self._liveness: Optional[LivenessV1] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
 
     @property
@@ -243,6 +246,18 @@ class VLFaceDetection(FaceDetection):
             )
         return self._gaze
 
+    @property
+    def liveness(self) -> LivenessV1:
+        """
+        Get livenessv1 estimation.
+
+        Returns:
+            livenessv1
+        """
+        if self._liveness is None:
+            self._liveness = self.estimatorCollection.livenessV1Estimator.estimate(self, self.headPose)
+        return self._liveness
+
     def asDict(self) -> Dict[str, Union[str, dict, list, float, tuple]]:
         """
         Convert to dict.
@@ -290,6 +305,9 @@ class VLFaceDetection(FaceDetection):
 
         if self._glasses is not None:
             attributes["glasses"] = self._glasses.asDict()
+
+        if self._liveness is not None:
+            attributes["liveness"] = self._liveness.asDict()
 
         res["attributes"] = attributes
         return res
