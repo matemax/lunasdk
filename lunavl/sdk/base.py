@@ -91,7 +91,7 @@ class Landmarks(BaseEstimation):
         """
         pointCount = len(self._coreEstimation)
         points = self._coreEstimation
-        return tuple(((int(points[index].x), int(points[index].x)) for index in range(pointCount)))
+        return tuple(((int(points[index].x), int(points[index].y)) for index in range(pointCount)))
 
 
 class LandmarkWithScore(BaseEstimation):
