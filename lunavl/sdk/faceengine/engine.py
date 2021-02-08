@@ -26,6 +26,7 @@ from ..estimators.face_estimators.glasses import GlassesEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV, DEFAULT_LIVENESS_PRINCIPAL_AXES as DLPA
+from ..indexes.base import IndexBuilder
 
 
 class VLFaceEngine:
@@ -304,3 +305,12 @@ class VLFaceEngine:
             estimator
         """
         return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
+
+    def createIndexBuilder(self):
+        """
+        Create an index builder
+
+        Returns:
+            index builder
+        """
+        return IndexBuilder(self._faceEngine.createIndexBuilder())
