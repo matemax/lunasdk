@@ -13,16 +13,16 @@ class IndexBuilder:
     """
     Class index builder
     """
-    __slots__ = ["_indexBuilder"]
+    __slots__ = ("_coreIndexBuilder",)
 
-    def __init__(self, indexBuilder: IIndexBuilderPtr):
+    def __init__(self, coreIndexBuilder: IIndexBuilderPtr):
         """
         Init.
 
         Args:
-            indexBuilder: index builder
+            coreIndexBuilder: index builder
         """
-        self._indexBuilder = indexBuilder
+        self._coreIndexBuilder = coreIndexBuilder
 
     @property
     def indexBuilder(self):
@@ -31,7 +31,7 @@ class IndexBuilder:
         Returns:
             _indexBuilder
         """
-        return self._indexBuilder
+        return self._coreIndexBuilder
 
     def append(self, descriptor: BaseDescriptor) -> None:
         """
@@ -41,7 +41,7 @@ class IndexBuilder:
         Raises:
             LunaSDKException: if an error occurs while adding the descriptor
         """
-        error = self._indexBuilder.appendDescriptor(descriptor.coreEstimation)
+        error = self._coreIndexBuilder.appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
@@ -53,7 +53,7 @@ class IndexBuilder:
         Raises:
             LunaSDKException: if an error occurs while adding the batch of descriptors
         """
-        error = self._indexBuilder.appendBatch(descriptorsBatch.coreEstimation)
+        error = self._coreIndexBuilder.appendBatch(descriptorsBatch.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
@@ -65,7 +65,7 @@ class IndexBuilder:
         Returns:
             DynamicIndex
         """
-        error, index = self._indexBuilder.buildIndex()
+        error, index = self._coreIndexBuilder.buildIndex()
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return DynamicIndex(index)
