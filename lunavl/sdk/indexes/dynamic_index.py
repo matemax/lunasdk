@@ -1,12 +1,12 @@
 from enum import Enum
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Optional
 
 from FaceEngine import SearchResult as _SearchResult, IDynamicIndexPtr
 
-from sdk.base import BaseEstimation
-from sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorBatch
-from sdk.errors.errors import LunaVLError
-from sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.base import BaseEstimation
+from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorBatch
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 
 
 class IndexType(Enum):
@@ -38,7 +38,7 @@ class IndexResult(BaseEstimation):
         """
         Get descriptor distance
         Returns:
-            value in range [0, 1]
+            float value
         """
         return self._coreEstimation.distance
 
@@ -81,7 +81,7 @@ class DynamicIndex:
 
     @property
     def bufSize(self) -> int:
-        """Get storage size with indexes."""
+        """Get storage size with descriptors."""
         return self._coreDynamicIndex.size()
 
     @property
@@ -120,10 +120,13 @@ class DynamicIndex:
             index: identification of descriptors position in internal storage
             descriptor: class container for writing the descriptor data
         Raises:
+            IndexError: if index out of range
             LunaSDKException: if an error occurs while getting descriptor
         Returns:
             descriptor
         """
+        if index >= self.bufSize:
+            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
         error, descriptor = self._coreDynamicIndex.descriptorByIndex(index, descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -135,8 +138,11 @@ class DynamicIndex:
         Args:
             index: identification of descriptors position in internal storage
         Raises:
+            IndexError: if index out of range
             LunaSDKException: if an error occurs while remove descriptor failed
         """
+        if index >= self.bufSize:
+            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
         error = self._coreDynamicIndex.removeDescriptor(index)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -159,12 +165,12 @@ class DynamicIndex:
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
-    def search(self, descriptor: BaseDescriptor, maxCount: int) -> List[IndexResult]:
+    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
         """
         Search for descriptors with the shorter distance to passed descriptor.
         Args:
             descriptor: descriptor to match against index
-            maxCount: max count of results
+            maxCount: max count of results (default is 1)
         Raises:
             LunaSDKException: if an error occurs while searching for descriptors
         Returns:

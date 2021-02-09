@@ -3,10 +3,10 @@ Module contains core index builder.
 """
 from FaceEngine import IIndexBuilderPtr
 
-from sdk.descriptors.descriptors import BaseDescriptorBatch, BaseDescriptor
-from sdk.errors.errors import LunaVLError
-from sdk.errors.exceptions import LunaSDKException
-from sdk.indexes.dynamic_index import DynamicIndex
+from lunavl.sdk.descriptors.descriptors import BaseDescriptorBatch, BaseDescriptor
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
+from .dynamic_index import DynamicIndex
 
 
 class IndexBuilder:
@@ -67,10 +67,13 @@ class IndexBuilder:
             index: identification of descriptors position in internal storage
             descriptor: class container for writing the descriptor data
         Raises:
+            IndexError: if index out of range
             LunaSDKException: if an error occurs while getting descriptor
         Returns:
             descriptor
         """
+        if index >= self.bufSize:
+            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
         error, descriptor = self._coreIndexBuilder.descriptorByIndex(index, descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -82,8 +85,11 @@ class IndexBuilder:
         Args:
             index: identification of descriptors position in internal storage
         Raises:
+            IndexError: if index out of range
             LunaSDKException: if an error occurs while remove descriptor failed
         """
+        if index >= self.bufSize:
+            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
         error = self._coreIndexBuilder.removeDescriptor(index)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
