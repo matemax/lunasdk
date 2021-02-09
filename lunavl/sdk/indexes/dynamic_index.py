@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Union, Dict
 
 from FaceEngine import SearchResult as _SearchResult, IDynamicIndexPtr
@@ -6,6 +7,15 @@ from sdk.base import BaseEstimation
 from sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorBatch
 from sdk.errors.errors import LunaVLError
 from sdk.errors.exceptions import LunaSDKException
+
+
+class IndexType(Enum):
+    """Available index type to save."""
+
+    # dense index
+    dense = "dense"
+    # dynamic index
+    dynamic = "dynamic"
 
 
 class IndexResult(BaseEstimation):
@@ -70,13 +80,18 @@ class DynamicIndex:
         self._coreDynamicIndex = coreDynamicIndex
 
     @property
-    def size(self) -> int:
+    def bufSize(self) -> int:
         """Get storage size with indexes."""
         return self._coreDynamicIndex.size()
 
+    @property
+    def count(self):
+        """Get actual count of descriptor in internal storage."""
+        return self._coreDynamicIndex.countOfIndexedDescriptors()
+
     def append(self, descriptor: BaseDescriptor) -> None:
         """
-        Appends descriptor to internal storage
+        Appends descriptor to internal storage.
         Args:
             descriptor: descriptor with correct length, version and data
         Raises:
@@ -88,7 +103,7 @@ class DynamicIndex:
 
     def appendBatch(self, descriptorsBatch: BaseDescriptorBatch) -> None:
         """
-        Appends batch of descriptors to internal storage
+        Appends batch of descriptors to internal storage.
         Args:
             descriptorsBatch: Batch of descriptors with correct length, version and data
         Raises:
@@ -98,9 +113,55 @@ class DynamicIndex:
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
+    def getDescriptor(self, index: int, descriptor: BaseDescriptor) -> BaseDescriptor:
+        """
+        Get descriptor by index from internal storage.  # todo: remove descriptor after FSDK-2867
+        Args:
+            index: identification of descriptors position in internal storage
+            descriptor: class container for writing the descriptor data
+        Raises:
+            LunaSDKException: if an error occurs while getting descriptor
+        Returns:
+            descriptor
+        """
+        error, descriptor = self._coreDynamicIndex.descriptorByIndex(index, descriptor.coreEstimation)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return BaseDescriptor(descriptor)
+
+    def __delitem__(self, index: int):
+        """
+        Descriptor will be removed from the graph (not from the internal storage), so it is not available for search.
+        Args:
+            index: identification of descriptors position in internal storage
+        Raises:
+            LunaSDKException: if an error occurs while remove descriptor failed
+        """
+        error = self._coreDynamicIndex.removeDescriptor(index)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+
+    def save(self, path: str, indexType: IndexType):
+        """
+        Save index as 'dynamic' or 'dense' to local storage.
+        Args:
+            path: path to file to be created
+            indexType: index type ('dynamic' or 'dense')
+        Raises:
+            LunaSDKException: if an error occurs while saving the index
+        """
+        if indexType == IndexType.dynamic:
+            error = self._coreDynamicIndex.saveToDynamicIndex(path)
+        elif indexType == IndexType.dense:
+            error = self._coreDynamicIndex.saveToDenseIndex(path)
+        else:
+            raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+
     def search(self, descriptor: BaseDescriptor, maxCount: int) -> List[IndexResult]:
         """
-        Search for descriptors with the shorter distance to passed descriptor
+        Search for descriptors with the shorter distance to passed descriptor.
         Args:
             descriptor: descriptor to match against index
             maxCount: max count of results
