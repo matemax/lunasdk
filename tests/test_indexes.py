@@ -1,8 +1,10 @@
 """
 Test build an index with descriptors.
 """
-import pytest
+from typing import Union
 
+import pytest
+import os
 from lunavl.sdk.descriptors.descriptors import (
     FaceDescriptor,
     FaceDescriptorBatch,
@@ -10,18 +12,23 @@ from lunavl.sdk.descriptors.descriptors import (
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
-from lunavl.sdk.indexes.base import IndexBuilder
-from lunavl.sdk.indexes.dynamic_index import DynamicIndex, IndexResult, IndexType
+from lunavl.sdk.indexes.base import IndexResult
+from lunavl.sdk.indexes.builder import IndexBuilder
+from lunavl.sdk.indexes.stored_index import DynamicIndex, DenseIndex, IndexType
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from tests.base import BaseTestClass
 from tests.resources import WARP_WHITE_MAN, WARP_ONE_FACE, WARP_CLEAN_FACE
 
 faceWarp = FaceWarpedImage.load(filename=WARP_WHITE_MAN)
 faceWarps = [FaceWarpedImage.load(filename=WARP_CLEAN_FACE), FaceWarpedImage.load(filename=WARP_ONE_FACE)]
+currDir = os.path.dirname(__file__)
+pathToStoredIndex = os.path.join(currDir, "stored.index")
 
 
 class TestIndexFunctionality(BaseTestClass):
     """Test of indexes."""
 
+    defaultFaceEstimator: FaceDescriptorEstimator
     faceDescriptor: FaceDescriptor
     nonDefaultFaceDescriptor: FaceDescriptor
     faceDescriptorBatch: FaceDescriptorBatch
@@ -30,19 +37,23 @@ class TestIndexFunctionality(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        defaultEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(54)
-        cls.faceDescriptor = defaultEstimator.estimate(faceWarp)
-        cls.faceDescriptorBatch, _ = defaultEstimator.estimateDescriptorsBatch(faceWarps)
+        cls.defaultFaceEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(54)
 
-        otherEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(56)
-        cls.nonDefaultFaceDescriptor = otherEstimator.estimate(faceWarp)
+        nonDefaultEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(56)
+        cls.nonDefaultFaceDescriptor = nonDefaultEstimator.estimate(faceWarp)
 
     def setUp(self) -> None:
         super().setUp()
         self.indexBuilder = self.faceEngine.createIndexBuilder()
+        self.faceDescriptor = self.defaultFaceEstimator.estimate(faceWarp)
+        self.faceDescriptorBatch, _ = self.defaultFaceEstimator.estimateDescriptorsBatch(faceWarps)
 
-    @staticmethod
-    def assertDynamicIndex(dynamicIndex: DynamicIndex, expectedDescriptorCount: int, expectedBufSize: int):
+    def tearDown(self) -> None:
+        super().tearDown()
+        if os.path.exists(pathToStoredIndex):
+            os.remove(pathToStoredIndex)
+
+    def assertDynamicIndex(self, dynamicIndex: DynamicIndex, expectedDescriptorCount: int, expectedBufSize: int):
         """
         Assert instance class for dynamic index and check storage size.
         Args:
@@ -52,35 +63,58 @@ class TestIndexFunctionality(BaseTestClass):
         """
         assert isinstance(dynamicIndex, DynamicIndex), f"created {dynamicIndex} is not {DynamicIndex}"
         assert isinstance(dynamicIndex.bufSize, int), f"expected int but found {dynamicIndex.bufSize}"
-        assert expectedBufSize == dynamicIndex.bufSize, "dynamic buf size is not equal to the expected"
         assert isinstance(dynamicIndex.count, int), f"expected int but found {dynamicIndex.count}"
+        assert expectedBufSize == dynamicIndex.bufSize, "dynamic buf size is not equal to the expected"
         assert expectedDescriptorCount == dynamicIndex.count, "count of descriptors is not equal to the expected"
+        assert self.getCountOfDescriptorsInStorage(dynamicIndex) == dynamicIndex.bufSize, \
+            "wrong size of internal storage"
+
+    def getCountOfDescriptorsInStorage(self, indexObject: Union[IndexBuilder, DynamicIndex, DenseIndex]) -> int:
+        """
+        Get actual count of descriptor in internal storage.
+        Args:
+            indexObject: an initialized index object with `getDescriptor` method
+        Returns:
+            count of descriptors
+        """
+        count = 0
+        sourceDescriptor = self.defaultFaceEstimator.estimate(faceWarp)
+        while True:
+            try:
+                indexObject.getDescriptor(count, sourceDescriptor)
+            except IndexError:
+                break
+            else:
+                count += 1
+        return count
 
     def test_build_empty_index(self):
         """Test build empty index."""
+        expectedDescriptorsCount = 0
         index = self.indexBuilder.buildIndex()
-        assert 0 == self.indexBuilder.bufSize
-        self.assertDynamicIndex(index, 0, 0)
+        assert expectedDescriptorsCount == self.indexBuilder.bufSize
+        self.assertDynamicIndex(index, expectedDescriptorCount=expectedDescriptorsCount, expectedBufSize=0)
 
     def test_append_descriptor_to_builder(self):
         """Test append descriptor to index builder."""
+        expectedDescriptorsCount = 1
         self.indexBuilder.append(self.faceDescriptor)
-        assert 1 == self.indexBuilder.bufSize
-        index = self.indexBuilder.buildIndex()
-        self.assertDynamicIndex(index, 1, 1)
+        assert expectedDescriptorsCount == self.indexBuilder.bufSize
+        assert expectedDescriptorsCount == self.getCountOfDescriptorsInStorage(self.indexBuilder)
 
     def test_append_descriptors_batch_to_builder(self):
         """Test append descriptors batch to index builder."""
+        expectedDescriptorsCount = 2
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
-        assert 2 == self.indexBuilder.bufSize
-        index = self.indexBuilder.buildIndex()
-        self.assertDynamicIndex(index, 2, 2)
+        assert expectedDescriptorsCount == self.indexBuilder.bufSize
+        assert expectedDescriptorsCount == self.getCountOfDescriptorsInStorage(self.indexBuilder)
 
     def test_get_descriptor_from_builder(self):
         """Test get descriptor from internal storage."""
+        expectedDescriptorsCount = 2
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
-        assert 2 == self.indexBuilder.bufSize
-        for idx in range(len(self.faceDescriptorBatch)):
+        assert expectedDescriptorsCount == self.indexBuilder.bufSize
+        for idx in range(expectedDescriptorsCount):
             with self.subTest(case=f"get descriptor with index: {idx}"):
                 descriptor = self.indexBuilder.getDescriptor(idx, self.faceDescriptor)
                 assert self.faceDescriptorBatch[idx].rawDescriptor == descriptor.rawDescriptor
@@ -88,25 +122,25 @@ class TestIndexFunctionality(BaseTestClass):
     def test_get_descriptor_from_builder_bad_index(self):
         """Test get descriptor with invalid index from internal storage."""
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
-        assert 2 == self.indexBuilder.bufSize
+        assert len(self.faceDescriptorBatch) == self.indexBuilder.bufSize
         nonexistentIndex = 2
         with self.assertRaises(IndexError) as ex:
             self.indexBuilder.getDescriptor(nonexistentIndex, self.faceDescriptor)
         assert str(nonexistentIndex) in ex.exception.args[0]
 
-    @pytest.mark.skip("FSDK get descriptor error: version mismatch")
     def test_get_non_default_descriptor_from_builder(self):
         """Test get non default descriptor from internal storage."""
         self.indexBuilder.append(self.faceDescriptor)
         assert 1 == self.indexBuilder.bufSize
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.getDescriptor(0, self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidInput)
+        self.assertLunaVlError(ex, LunaVLError.InvalidInput.format("Invalid input"))
 
     def test_remove_descriptor_from_builder(self):
         """Test remove descriptor from internal storage."""
+        expectedDescriptorsCount = 2
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
-        assert 2 == self.indexBuilder.bufSize
+        assert expectedDescriptorsCount == self.indexBuilder.bufSize
         for index, expectedBufSize in ((1, 1), (0, 0)):
             with self.subTest(case=f"remove descriptor with index: {index}"):
                 del self.indexBuilder[index]
@@ -114,14 +148,15 @@ class TestIndexFunctionality(BaseTestClass):
 
     def test_remove_descriptor_from_builder_bad(self):
         """Test remove descriptor with invalid index from internal storage."""
+        expectedDescriptorsCount = 2
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
-        assert 2 == self.indexBuilder.bufSize
+        assert expectedDescriptorsCount == self.indexBuilder.bufSize
         nonexistentIndex = 2
         with self.assertRaises(IndexError) as ex:
             del self.indexBuilder[nonexistentIndex]
         assert str(nonexistentIndex) in ex.exception.args[0]
 
-    @pytest.mark.skip("Segmentation fault")
+    @pytest.mark.skip("FSDK-2877 Segmentation fault")
     def test_append_descriptor_to_empty_dynamic_index(self):
         """Test append descriptor to empty dynamic index."""
         dynamicIndex = self.indexBuilder.buildIndex()
@@ -179,4 +214,75 @@ class TestIndexFunctionality(BaseTestClass):
         assert isinstance(topResult.similarity, float), f"expected float but found {topResult.similarity}"
         assert isinstance(topResult.index, int), f"expected int but found {topResult.index}"
         assert len(self.faceDescriptorBatch) > topResult.index, "dynamic index out of range"
-        assert 0.0 < topResult.similarity < 1.0, "similarity out of range [0,1]"
+        assert 0.0 < topResult.similarity <= 1.0, "similarity out of range [0,1]"
+
+    def test_search_result_non_default_descriptor(self):
+        """Test search result by descriptor different version."""
+        self.indexBuilder.appendBatch(self.faceDescriptorBatch)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, 2, 2)
+        with pytest.raises(LunaSDKException) as ex:
+            dynamicIndex.search(self.nonDefaultFaceDescriptor)
+        self.assertLunaVlError(ex, LunaVLError.InvalidInput.format("Invalid input"))
+
+    @pytest.mark.skip("FSDK-2877 internal error")
+    def test_search_result_empty(self):
+        """Test search with empty result."""
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, 0, 0)
+        result = dynamicIndex.search(self.faceDescriptor)
+        assert [] == result
+
+    def test_search_result_invalid_input(self):
+        """Test search with invalid parameter."""
+        self.indexBuilder.append(self.faceDescriptor)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, 1, 1)
+        with pytest.raises(LunaSDKException) as ex:
+            dynamicIndex.search(self.faceDescriptor, maxCount=0)
+        self.assertLunaVlError(ex, LunaVLError.InvalidInput.format("Invalid input"))
+
+    def test_save_index_as_dynamic(self):
+        """Test save index as dynamic."""
+        self.indexBuilder.append(self.faceDescriptor)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, 1, 1)
+
+        dynamicIndex.save(pathToStoredIndex, IndexType.dynamic)
+        assert os.path.isfile(pathToStoredIndex), "dynamic index file not found"
+        dynamicIndex = self.faceEngine.loadDynamicIndex(pathToStoredIndex)
+        self.assertDynamicIndex(dynamicIndex, 1, 1)
+
+    def test_save_index_as_dense(self):
+        """Test save index as dense."""
+        self.indexBuilder.append(self.faceDescriptor)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, 1, 1)
+
+        dynamicIndex.save(pathToStoredIndex, IndexType.dense)
+        assert os.path.isfile(pathToStoredIndex), "dense index file not found"
+        denseIndex = self.faceEngine.loadDenseIndex(pathToStoredIndex)
+        assert isinstance(denseIndex, DenseIndex), f"created {denseIndex} is not {DenseIndex}"
+        assert isinstance(denseIndex.bufSize, int), f"expected int but found {denseIndex.bufSize}"
+        assert 1 == dynamicIndex.bufSize, "dense buf size is not equal to the expected"
+        assert self.getCountOfDescriptorsInStorage(denseIndex) == denseIndex.bufSize, \
+            "wrong size of internal storage"
+
+    def test_save_index_bad_filename(self):
+        """Test save index to local storage with bad filename."""
+        self.indexBuilder.append(self.faceDescriptor)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, 1, 1)
+
+        for path in (os.path.join(currDir, ".."), os.path.join(currDir, "./"), currDir):
+            with self.subTest(path=path):
+                with self.assertRaises(ValueError) as ex:
+                    dynamicIndex.save(path, IndexType.dynamic)
+                assert f"{path} must not be a directory" in ex.exception.args[0]
+
+    @pytest.mark.skip("FSDK RuntimeError: Failed to read index metadata")
+    def test_load_index_unknown_file(self):
+        """Test load index unknown file."""
+        with pytest.raises(LunaSDKException) as ex:
+            self.faceEngine.loadDynamicIndex(WARP_ONE_FACE)
+        self.assertLunaVlError(ex, LunaVLError.InvalidInput)

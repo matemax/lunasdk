@@ -1,71 +1,95 @@
 """
-Module contains core index builder.
+Module contains base index class and search result.
 """
-from FaceEngine import IIndexBuilderPtr
+from __future__ import annotations
 
-from lunavl.sdk.descriptors.descriptors import BaseDescriptorBatch, BaseDescriptor
+from typing import Any, Dict, Union, Optional, List, Tuple
+
+from FaceEngine import SearchResult, IDenseIndexPtr, IDynamicIndexPtr, FSDKErrorResult
+
+from lunavl.sdk.base import BaseEstimation
+from lunavl.sdk.descriptors.descriptors import BaseDescriptor
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from .dynamic_index import DynamicIndex
 
 
-class IndexBuilder:
+class IndexResult(BaseEstimation):
     """
-    Class index builder
+    Class for index result
     """
-    __slots__ = ("_coreIndexBuilder", "bufSize")
 
-    def __init__(self, coreIndexBuilder: IIndexBuilderPtr):
+    _coreEstimation: SearchResult
+
+    def __init__(self, coreEstimation: SearchResult):
         """
-        Init index builder.
-
+        Init index result.
         Args:
-            coreIndexBuilder: index builder
+            coreEstimation: core index result
         """
-        self._coreIndexBuilder = coreIndexBuilder
-        self.bufSize = 0
+        super().__init__(coreEstimation)
 
     @property
-    def indexBuilder(self):
+    def distance(self) -> float:
         """
-        Core index builder.
+        Get descriptor distance
         Returns:
-            _indexBuilder
+            float value
         """
-        return self._coreIndexBuilder
+        return self._coreEstimation.distance
 
-    def append(self, descriptor: BaseDescriptor) -> None:
+    @property
+    def similarity(self) -> float:
         """
-        Appends descriptor to internal storage.
-        Args:
-            descriptor: descriptor with correct length, version and data
-        Raises:
-            LunaSDKException: if an error occurs while adding the descriptor
+        Get descriptor similarity
+        Returns:
+            value in range [0, 1]
         """
-        error = self._coreIndexBuilder.appendDescriptor(descriptor.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self.bufSize += 1
+        return self._coreEstimation.similarity
 
-    def appendBatch(self, descriptorsBatch: BaseDescriptorBatch) -> None:
+    @property
+    def index(self) -> int:
         """
-        Appends batch of descriptors to internal storage.
+        Get descriptor index
+        Returns:
+            int value
+        """
+        return self._coreEstimation.index
+
+    def asDict(self) -> Dict[str, Union[float, int]]:
+        """
+        Convert index search result to dict
+        Returns:
+            dict of index results
+        """
+        return {"distance": self.distance, "similarity": self.similarity, "index": self.index}
+
+
+class CoreIndex:
+    """
+    Core index class
+    """
+    __slots__ = ("_coreIndex",)
+
+    def __init__(self, coreIndex: Any):
+        """
+        Init index.
+
         Args:
-            descriptorsBatch: Batch of descriptors with correct length, version and data
-        Raises:
-            LunaSDKException: if an error occurs while adding the batch of descriptors
+            coreIndex: core index class
         """
-        error = self._coreIndexBuilder.appendBatch(descriptorsBatch.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self.bufSize += len(descriptorsBatch)
+        self._coreIndex = coreIndex
+
+    @property
+    def bufSize(self) -> int:
+        """Get storage size with descriptors."""
+        return self._coreIndex.size()
 
     def getDescriptor(self, index: int, descriptor: BaseDescriptor) -> BaseDescriptor:
         """
-        Get descriptor by index from internal storage.  # todo: remove descriptor after FSDK-2867
+        Get descriptor by index from internal storage.
         Args:
             index: identification of descriptors position in internal storage
-            descriptor: class container for writing the descriptor data
+            descriptor: class container for writing the descriptor data # todo: remove descriptor after FSDK-2867
         Raises:
             IndexError: if index out of range
             LunaSDKException: if an error occurs while getting descriptor
@@ -74,36 +98,45 @@ class IndexBuilder:
         """
         if index >= self.bufSize:
             raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
-        error, descriptor = self._coreIndexBuilder.descriptorByIndex(index, descriptor.coreEstimation)
+        error, descriptor = self._coreIndex.descriptorByIndex(index, descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return BaseDescriptor(descriptor)
 
-    def __delitem__(self, index: int):
-        """
-        Removes descriptor out of internal storage.
-        Args:
-            index: identification of descriptors position in internal storage
-        Raises:
-            IndexError: if index out of range
-            LunaSDKException: if an error occurs while remove descriptor failed
-        """
-        if index >= self.bufSize:
-            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
-        error = self._coreIndexBuilder.removeDescriptor(index)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self.bufSize -= 1
 
-    def buildIndex(self) -> DynamicIndex:
+class BaseIndex(CoreIndex):
+    """
+    Base class for indexes
+    """
+
+    _coreIndex: Union[IDenseIndexPtr, IDynamicIndexPtr]
+
+    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
         """
-        Builds index with every descriptor appended.
+        Search for descriptors with the shorter distance to passed descriptor.
+        Args:
+            descriptor: descriptor to match against index
+            maxCount: max count of results (default is 1)
         Raises:
-            LunaSDKException: if an error occurs while building the index
+            LunaSDKException: if an error occurs while searching for descriptors
         Returns:
-            DynamicIndex
+            list with index search results
         """
-        error, index = self._coreIndexBuilder.buildIndex()
+        error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return DynamicIndex(index)
+        return [IndexResult(result) for result in resIndex]
+
+    @classmethod
+    def load(cls, faceEngineResult: Tuple[FSDKErrorResult, Union[IDenseIndexPtr, IDynamicIndexPtr]]) -> BaseIndex:
+        """
+        Load 'dynamic' or 'dense' index from face engine result.
+        Args:
+            faceEngineResult: tuple with FSDKErrorResult and index
+        Returns:
+            class: dense or dynamic index
+        """
+        error, loadedIndex = faceEngineResult
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return cls(loadedIndex)
