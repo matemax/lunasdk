@@ -1,28 +1,39 @@
 """
 Module contains core index builder.
 """
-from FaceEngine import IIndexBuilderPtr
+from pathlib import Path
+from typing import Union
 
-from lunavl.sdk.descriptors.descriptors import BaseDescriptorBatch, BaseDescriptor
+from FaceEngine import PyIFaceEngine
+
+from lunavl.sdk.descriptors.descriptors import (
+    BaseDescriptorBatch,
+    BaseDescriptor,
+    FaceDescriptorFactory,
+    HumanDescriptorFactory,
+)
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from .base import CoreIndex
-from .stored_index import DynamicIndex
+from .stored_index import DynamicIndex, IndexType, DenseIndex
 
 
 class IndexBuilder(CoreIndex):
     """
     Index builder class
+
+    Attributes:
+        _bufSize (int): storage size with descriptors
+        _faceEngine (VLFaceEngine): faceEngine
+        _descriptorFactory (BaseDescriptorFactory): descriptor factory
     """
 
-    _coreIndex: IIndexBuilderPtr
-
-    def __init__(self, indexBuilder: IIndexBuilderPtr):
-        """
-        Init index builder.
-        """
-        super().__init__(coreIndex=indexBuilder)
+    def __init__(self, faceEngine: PyIFaceEngine,
+                 descriptorFactory: Union[FaceDescriptorFactory, HumanDescriptorFactory]):
+        super().__init__(faceEngine.createIndexBuilder(), descriptorFactory)
         self._bufSize = 0
+        self._faceEngine = faceEngine
+        self._descriptorFactory = descriptorFactory
 
     @property
     def bufSize(self) -> int:
@@ -64,12 +75,31 @@ class IndexBuilder(CoreIndex):
             IndexError: if index out of range
             LunaSDKException: if an error occurs while remove descriptor failed
         """
-        if index >= self._bufSize:
-            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
-        error = self._coreIndex.removeDescriptor(index)
+        super().__delitem__(index=index)
+        self._bufSize -= 1
+
+    def loadIndex(self, path: str, indexType: IndexType) -> Union[DynamicIndex, DenseIndex]:
+        """
+        Load 'dynamic' or 'dense' index from file.
+        Args:
+            path: path to saved index
+            indexType: index type ('dynamic' or 'dense')
+        Raises:
+            LunaSDKException: if an error occurs while loading the index
+        """
+        if not Path(path).exists():
+            raise FileNotFoundError(f"No such file or directory: {path}")
+        if indexType == IndexType.dynamic:
+            error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
+            _cls = DynamicIndex
+        elif indexType == IndexType.dense:
+            error, loadedIndex = self._faceEngine.loadDenseIndex(path)
+            _cls = DenseIndex
+        else:
+            raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self._bufSize -= 1
+        return _cls(loadedIndex, self._descriptorFactory)
 
     def buildIndex(self) -> DynamicIndex:
         """
@@ -82,4 +112,4 @@ class IndexBuilder(CoreIndex):
         error, index = self._coreIndex.buildIndex()
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return DynamicIndex(index)
+        return DynamicIndex(index, self._descriptorFactory)

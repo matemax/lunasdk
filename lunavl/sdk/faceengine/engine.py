@@ -27,7 +27,6 @@ from ..estimators.image_estimators.orientation_mode import OrientationModeEstima
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV, DEFAULT_LIVENESS_PRINCIPAL_AXES as DLPA
 from ..indexes.builder import IndexBuilder
-from ..indexes.stored_index import DynamicIndex, DenseIndex
 
 
 class VLFaceEngine:
@@ -307,35 +306,20 @@ class VLFaceEngine:
         """
         return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
 
-    def createIndexBuilder(self) -> IndexBuilder:
+    def createFaceIndex(self, descriptorVersion: int = 0) -> IndexBuilder:
         """
-        Create an index builder
+        Create an index builder for face
 
         Returns:
             index builder
         """
-        return IndexBuilder(self._faceEngine.createIndexBuilder())
+        return IndexBuilder(self.coreFaceEngine, self.createFaceDescriptorFactory(descriptorVersion=descriptorVersion))
 
-    def loadDenseIndex(self, indexPath: str) -> DenseIndex:
+    def createHumanIndex(self, descriptorVersion: int = 0) -> IndexBuilder:
         """
-        Load dense index
-
-        Args:
-            indexPath: path to index to be loaded
+        Create an index builder for human
 
         Returns:
-            dense index
+            index builder
         """
-        return DenseIndex.load(self._faceEngine.loadDenseIndex(indexPath))
-
-    def loadDynamicIndex(self, indexPath: str) -> DynamicIndex:
-        """
-        Load dynamic index
-
-        Args:
-            indexPath: path to index to be loaded
-
-        Returns:
-            dynamic index
-        """
-        return DynamicIndex.load(self._faceEngine.loadDynamicIndex(indexPath))
+        return IndexBuilder(self.coreFaceEngine, self.createHumanDescriptorFactory(descriptorVersion=descriptorVersion))

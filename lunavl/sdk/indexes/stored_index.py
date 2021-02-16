@@ -1,17 +1,16 @@
 """Module realize dynamic and dense index."""
 from enum import Enum
-
 from pathlib import Path
-from FaceEngine import IDynamicIndexPtr, IDenseIndexPtr
+from typing import List, Optional
 
 from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from .base import BaseIndex
+from .base import CoreIndex, IndexResult
 
 
 class IndexType(Enum):
-    """Available index type to save."""
+    """Available index type to save|load."""
 
     # dense index
     dense = "dense"
@@ -19,15 +18,13 @@ class IndexType(Enum):
     dynamic = "dynamic"
 
 
-class DynamicIndex(BaseIndex):
+class DynamicIndex(CoreIndex):
     """
     Dynamic Index
     """
 
-    _coreIndex: IDynamicIndexPtr
-
     @property
-    def count(self):
+    def descriptorsCount(self):
         """Get actual count of descriptor in internal storage."""
         return self._coreIndex.countOfIndexedDescriptors()
 
@@ -55,20 +52,21 @@ class DynamicIndex(BaseIndex):
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
-    def __delitem__(self, index: int):
+    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
         """
-        Descriptor will be removed from the graph (not from the internal storage), so it is not available for search.
+        Search for descriptors with the shorter distance to passed descriptor.
         Args:
-            index: identification of descriptors position in internal storage
+            descriptor: descriptor to match against index
+            maxCount: max count of results (default is 1)
         Raises:
-            IndexError: if index out of range
-            LunaSDKException: if an error occurs while remove descriptor failed
+            LunaSDKException: if an error occurs while searching for descriptors
+        Returns:
+            list with index search results
         """
-        if index >= self.bufSize:
-            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
-        error = self._coreIndex.removeDescriptor(index)
+        error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [IndexResult(result) for result in resIndex]
 
     def save(self, path: str, indexType: IndexType):
         """
@@ -91,9 +89,27 @@ class DynamicIndex(BaseIndex):
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
 
-class DenseIndex(BaseIndex):
+class DenseIndex(CoreIndex):
     """
-    Dense Index (read only)
+    Dense Index
     """
 
-    _coreIndex: IDenseIndexPtr
+    def __delitem__(self, index: int):
+        """Remove descriptor for a dense index is not supported."""
+        raise AttributeError("'DenseIndex' object has no attribute '__delitem__'")
+
+    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
+        """
+        Search for descriptors with the shorter distance to passed descriptor.
+        Args:
+            descriptor: descriptor to match against index
+            maxCount: max count of results (default is 1)
+        Raises:
+            LunaSDKException: if an error occurs while searching for descriptors
+        Returns:
+            list with index search results
+        """
+        error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [IndexResult(result) for result in resIndex]

@@ -27,11 +27,13 @@ def buildDescriptorIndex():
         lastDescriptor = extractor.estimate(warp.warpedImage)
         descriptorsBatch.append(lastDescriptor)
 
-    indexBuilder = faceEngine.createIndexBuilder()
+    indexBuilder = faceEngine.createFaceIndex()
     indexBuilder.appendBatch(descriptorsBatch)
+    pprint.pprint(f"index buf size: {indexBuilder.bufSize}")
     index = indexBuilder.buildIndex()
+    pprint.pprint(index[0])
     result = index.search(lastDescriptor, 1)
-    pprint.pprint(result)
+    pprint.pprint(f"result: {result}")
 
 
 if __name__ == "__main__":

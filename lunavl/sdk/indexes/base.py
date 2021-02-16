@@ -3,12 +3,12 @@ Module contains base index class and search result.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Union, Optional, List, Tuple
+from typing import Dict, Union
 
-from FaceEngine import SearchResult, IDenseIndexPtr, IDynamicIndexPtr, FSDKErrorResult
+from FaceEngine import SearchResult, IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.descriptors.descriptors import BaseDescriptor
+from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 
@@ -68,9 +68,10 @@ class CoreIndex:
     """
     Core index class
     """
-    __slots__ = ("_coreIndex",)
+    __slots__ = ("_coreIndex", "descriptorFactory")
 
-    def __init__(self, coreIndex: Any):
+    def __init__(self, coreIndex: Union[IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr],
+                 descriptorFactory: BaseDescriptorFactory):
         """
         Init index.
 
@@ -78,18 +79,18 @@ class CoreIndex:
             coreIndex: core index class
         """
         self._coreIndex = coreIndex
+        self.descriptorFactory = descriptorFactory     # todo: remove descriptor factory after FSDK-2867
 
     @property
     def bufSize(self) -> int:
         """Get storage size with descriptors."""
         return self._coreIndex.size()
 
-    def getDescriptor(self, index: int, descriptor: BaseDescriptor) -> BaseDescriptor:
+    def __getitem__(self, index: int) -> BaseDescriptor:
         """
         Get descriptor by index from internal storage.
         Args:
             index: identification of descriptors position in internal storage
-            descriptor: class container for writing the descriptor data # todo: remove descriptor after FSDK-2867
         Raises:
             IndexError: if index out of range
             LunaSDKException: if an error occurs while getting descriptor
@@ -98,45 +99,23 @@ class CoreIndex:
         """
         if index >= self.bufSize:
             raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
+        descriptor = self.descriptorFactory.generateDescriptor()
         error, descriptor = self._coreIndex.descriptorByIndex(index, descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return BaseDescriptor(descriptor)
 
-
-class BaseIndex(CoreIndex):
-    """
-    Base class for indexes
-    """
-
-    _coreIndex: Union[IDenseIndexPtr, IDynamicIndexPtr]
-
-    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
+    def __delitem__(self, index: int):
         """
-        Search for descriptors with the shorter distance to passed descriptor.
+        Descriptor will be removed from the graph (not from the internal storage), so it is not available for search.
         Args:
-            descriptor: descriptor to match against index
-            maxCount: max count of results (default is 1)
+            index: identification of descriptors position in internal storage
         Raises:
-            LunaSDKException: if an error occurs while searching for descriptors
-        Returns:
-            list with index search results
+            IndexError: if index out of range
+            LunaSDKException: if an error occurs while remove descriptor failed
         """
-        error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
+        if index >= self.bufSize:
+            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
+        error = self._coreIndex.removeDescriptor(index)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return [IndexResult(result) for result in resIndex]
-
-    @classmethod
-    def load(cls, faceEngineResult: Tuple[FSDKErrorResult, Union[IDenseIndexPtr, IDynamicIndexPtr]]) -> BaseIndex:
-        """
-        Load 'dynamic' or 'dense' index from face engine result.
-        Args:
-            faceEngineResult: tuple with FSDKErrorResult and index
-        Returns:
-            class: dense or dynamic index
-        """
-        error, loadedIndex = faceEngineResult
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return cls(loadedIndex)
