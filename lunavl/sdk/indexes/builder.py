@@ -28,8 +28,9 @@ class IndexBuilder(CoreIndex):
         _descriptorFactory (BaseDescriptorFactory): descriptor factory
     """
 
-    def __init__(self, faceEngine: PyIFaceEngine,
-                 descriptorFactory: Union[FaceDescriptorFactory, HumanDescriptorFactory]):
+    def __init__(
+            self, faceEngine: PyIFaceEngine, descriptorFactory: Union[FaceDescriptorFactory, HumanDescriptorFactory]
+    ):
         super().__init__(faceEngine.createIndexBuilder(), descriptorFactory)
         self._bufSize = 0
         self._faceEngine = faceEngine

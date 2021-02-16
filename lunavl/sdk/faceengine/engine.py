@@ -309,7 +309,8 @@ class VLFaceEngine:
     def createFaceIndex(self, descriptorVersion: int = 0) -> IndexBuilder:
         """
         Create an index builder for face
-
+        Args:
+            descriptorVersion: descriptor version or zero for use default descriptor version
         Returns:
             index builder
         """
@@ -318,7 +319,8 @@ class VLFaceEngine:
     def createHumanIndex(self, descriptorVersion: int = 0) -> IndexBuilder:
         """
         Create an index builder for human
-
+        Args:
+            descriptorVersion: descriptor version or zero for use default descriptor version
         Returns:
             index builder
         """
