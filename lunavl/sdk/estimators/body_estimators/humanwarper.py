@@ -16,7 +16,6 @@ from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 class HumanWarpedImage(VLImage):
     """
     Raw warped image.
-
     Properties of a warped image:
 
         - it's always in RGB color format
