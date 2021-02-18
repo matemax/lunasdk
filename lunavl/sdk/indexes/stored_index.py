@@ -1,9 +1,9 @@
 """Module realize dynamic and dense index."""
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
-from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorBatch
+from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from .base import CoreIndex, IndexResult
@@ -28,31 +28,26 @@ class DynamicIndex(CoreIndex):
         """Get actual count of descriptor in internal storage."""
         return self._coreIndex.countOfIndexedDescriptors()
 
-    def append(self, descriptor: BaseDescriptor) -> None:
+    def append(self, descriptor: Union[FaceDescriptor, FaceDescriptorBatch]) -> None:
         """
         Appends descriptor to internal storage.
         Args:
-            descriptor: descriptor with correct length, version and data
+            descriptor: descriptor or batch of descriptors with correct length, version and data
         Raises:
+            RuntimeError: if descriptor type is not supported
             LunaSDKException: if an error occurs while adding the descriptor
         """
-        error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
+        if isinstance(descriptor, FaceDescriptor):
+            error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
+        elif isinstance(descriptor, FaceDescriptorBatch):
+            error = self._coreIndex.appendBatch(descriptor.coreEstimation)
+        else:
+            raise RuntimeError(f"Not supported descriptor class: {descriptor.__class__}")
+
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
-    def appendBatch(self, descriptorsBatch: BaseDescriptorBatch) -> None:
-        """
-        Appends batch of descriptors to internal storage.
-        Args:
-            descriptorsBatch: Batch of descriptors with correct length, version and data
-        Raises:
-            LunaSDKException: if an error occurs while adding the batch of descriptors
-        """
-        error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-
-    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
+    def search(self, descriptor: FaceDescriptor, maxCount: int = 1) -> List[IndexResult]:
         """
         Search for descriptors with the shorter distance to passed descriptor.
         Args:
@@ -98,7 +93,7 @@ class DenseIndex(CoreIndex):
         """Remove descriptor for a dense index is not supported."""
         raise AttributeError("'DenseIndex' object has no attribute '__delitem__'")
 
-    def search(self, descriptor: BaseDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
+    def search(self, descriptor: FaceDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
         """
         Search for descriptors with the shorter distance to passed descriptor.
         Args:

@@ -315,13 +315,3 @@ class VLFaceEngine:
             index builder
         """
         return IndexBuilder(self.coreFaceEngine, self.createFaceDescriptorFactory(descriptorVersion=descriptorVersion))
-
-    def createHumanIndex(self, descriptorVersion: int = 0) -> IndexBuilder:
-        """
-        Create an index builder for human
-        Args:
-            descriptorVersion: descriptor version or zero for use default descriptor version
-        Returns:
-            index builder
-        """
-        return IndexBuilder(self.coreFaceEngine, self.createHumanDescriptorFactory(descriptorVersion=descriptorVersion))

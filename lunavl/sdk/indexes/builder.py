@@ -7,10 +7,9 @@ from typing import Union
 from FaceEngine import PyIFaceEngine
 
 from lunavl.sdk.descriptors.descriptors import (
-    BaseDescriptorBatch,
-    BaseDescriptor,
     FaceDescriptorFactory,
-    HumanDescriptorFactory,
+    FaceDescriptor,
+    FaceDescriptorBatch,
 )
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
@@ -25,47 +24,39 @@ class IndexBuilder(CoreIndex):
     Attributes:
         _bufSize (int): storage size with descriptors
         _faceEngine (VLFaceEngine): faceEngine
-        _descriptorFactory (BaseDescriptorFactory): descriptor factory
     """
 
     def __init__(
-            self, faceEngine: PyIFaceEngine, descriptorFactory: Union[FaceDescriptorFactory, HumanDescriptorFactory]
+            self, faceEngine: PyIFaceEngine, descriptorFactory: FaceDescriptorFactory
     ):
         super().__init__(faceEngine.createIndexBuilder(), descriptorFactory)
         self._bufSize = 0
         self._faceEngine = faceEngine
-        self._descriptorFactory = descriptorFactory
 
     @property
     def bufSize(self) -> int:
         """Get storage size with descriptors."""
         return self._bufSize
 
-    def append(self, descriptor: BaseDescriptor) -> None:
+    def append(self, descriptor: Union[FaceDescriptor, FaceDescriptorBatch]) -> None:
         """
         Appends descriptor to internal storage.
         Args:
-            descriptor: descriptor with correct length, version and data
+            descriptor: descriptor or batch of descriptors with correct length, version and data
         Raises:
+            RuntimeError: if descriptor type is not supported
             LunaSDKException: if an error occurs while adding the descriptor
         """
-        error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self._bufSize += 1
+        if isinstance(descriptor, FaceDescriptor):
+            error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
+        elif isinstance(descriptor, FaceDescriptorBatch):
+            error = self._coreIndex.appendBatch(descriptor.coreEstimation)
+        else:
+            raise RuntimeError(f"Not supported descriptor class: {descriptor.__class__}")
 
-    def appendBatch(self, descriptorsBatch: BaseDescriptorBatch) -> None:
-        """
-        Appends batch of descriptors to internal storage.
-        Args:
-            descriptorsBatch: Batch of descriptors with correct length, version and data
-        Raises:
-            LunaSDKException: if an error occurs while adding the batch of descriptors
-        """
-        error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self._bufSize += len(descriptorsBatch)
+        self._bufSize += len(descriptor) if hasattr(descriptor, "__len__") else 1
 
     def __delitem__(self, index: int):
         """
@@ -100,7 +91,7 @@ class IndexBuilder(CoreIndex):
             raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return _cls(loadedIndex, self._descriptorFactory)
+        return _cls(loadedIndex, self.descriptorFactory)
 
     def buildIndex(self) -> DynamicIndex:
         """
@@ -113,4 +104,4 @@ class IndexBuilder(CoreIndex):
         error, index = self._coreIndex.buildIndex()
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return DynamicIndex(index, self._descriptorFactory)
+        return DynamicIndex(index, self.descriptorFactory)

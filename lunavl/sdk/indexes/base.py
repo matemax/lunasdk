@@ -8,7 +8,7 @@ from typing import Dict, Union
 from FaceEngine import SearchResult, IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorFactory
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 
@@ -71,7 +71,7 @@ class CoreIndex:
     __slots__ = ("_coreIndex", "descriptorFactory")
 
     def __init__(self, coreIndex: Union[IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr],
-                 descriptorFactory: BaseDescriptorFactory):
+                 descriptorFactory: FaceDescriptorFactory):
         """
         Init index.
 
@@ -79,14 +79,14 @@ class CoreIndex:
             coreIndex: core index class
         """
         self._coreIndex = coreIndex
-        self.descriptorFactory = descriptorFactory     # todo: remove descriptor factory after FSDK-2867
+        self.descriptorFactory = descriptorFactory
 
     @property
     def bufSize(self) -> int:
         """Get storage size with descriptors."""
         return self._coreIndex.size()
 
-    def __getitem__(self, index: int) -> BaseDescriptor:
+    def __getitem__(self, index: int) -> FaceDescriptor:
         """
         Get descriptor by index from internal storage.
         Args:
@@ -103,7 +103,7 @@ class CoreIndex:
         error, descriptor = self._coreIndex.descriptorByIndex(index, descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return BaseDescriptor(descriptor)
+        return FaceDescriptor(descriptor)
 
     def __delitem__(self, index: int):
         """
