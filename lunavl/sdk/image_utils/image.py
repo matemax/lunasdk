@@ -168,9 +168,9 @@ class VLImage:
             if error.isError:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, np.ndarray):
-            arr = body.__array_interface__
             try:
-                typekey = (1, 1) + arr["shape"][2:], arr["typestr"]
+                # typekey ((shape), (array type as str))
+                typekey = (1, 1) + body.shape[2:], body.dtype.str
                 mode, _ = imageModeMap[typekey]
             except KeyError:
                 raise TypeError(f"Bad image type: {type(body)}")
