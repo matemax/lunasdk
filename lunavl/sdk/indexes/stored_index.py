@@ -82,12 +82,12 @@ class DynamicIndex(CoreIndex):
             raise ValueError(f"{path} must not be a directory")
         if not os.access(Path(path).parent, os.W_OK):
             raise PermissionError(f"Access is denied: {path}")
-        if indexType == IndexType.dynamic:
+
+        if IndexType(indexType) == IndexType.dynamic:
             error = self._coreIndex.saveToDynamicIndex(path)
-        elif indexType == IndexType.dense:
-            error = self._coreIndex.saveToDenseIndex(path)
         else:
-            raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
+            error = self._coreIndex.saveToDenseIndex(path)
+
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 

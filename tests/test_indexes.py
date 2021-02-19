@@ -292,6 +292,16 @@ class TestIndexFunctionality(BaseTestClass):
                     dynamicIndex.save(path, IndexType.dynamic)
                 assert f"{path} must not be a directory" in ex.exception.args[0]
 
+    def test_save_index_invalid_index_type(self):
+        """Test save index with invalid index type."""
+        self.indexBuilder.append(self.faceDescriptor)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=1, expectedBufSize=1)
+
+        with pytest.raises(ValueError) as ex:
+            dynamicIndex.save(pathToStoredIndex, "someType")
+        assert ex.value.args[0] == "'someType' is not a valid IndexType"
+
     @pytest.mark.skip("FSDK-2897 RuntimeError: Failed to read index metadata")
     def test_load_index_unknown_file(self):
         """Test load index unknown file."""

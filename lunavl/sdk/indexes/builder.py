@@ -56,7 +56,7 @@ class IndexBuilder(CoreIndex):
         error = appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self._bufSize += len(descriptor) if hasattr(descriptor, "__len__") else 1
+        self._bufSize += len(descriptor) if isinstance(descriptor, FaceDescriptorBatch) else 1
 
     def __delitem__(self, index: int):
         """
@@ -91,6 +91,7 @@ class IndexBuilder(CoreIndex):
             _cls = DenseIndex
         else:
             raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
+        # todo: check descriptor version from index, after task FSDK-2867
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return _cls(loadedIndex, self._descriptorFactory)
