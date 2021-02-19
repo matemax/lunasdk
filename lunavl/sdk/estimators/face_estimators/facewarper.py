@@ -5,6 +5,7 @@ from typing import Union, Optional
 from FaceEngine import IWarperPtr, Transformation  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
+from numpy import ndarray
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.detectors.facedetector import FaceDetection, Landmarks68, Landmarks5
@@ -25,7 +26,7 @@ class FaceWarpedImage(VLImage):
 
     def __init__(
         self,
-        body: Union[bytes, bytearray, PilImage, CoreImage, VLImage],
+        body: Union[bytes, bytearray, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
     ):

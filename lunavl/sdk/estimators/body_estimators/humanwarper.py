@@ -5,6 +5,7 @@ from typing import Union, Optional
 from FaceEngine import IHumanWarperPtr  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
+from numpy import ndarray
 
 from lunavl.sdk.detectors.humandetector import HumanDetection
 from lunavl.sdk.errors.errors import LunaVLError
@@ -15,7 +16,6 @@ from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 class HumanWarpedImage(VLImage):
     """
     Raw warped image.
-
     Properties of a warped image:
 
         - it's always in RGB color format
@@ -24,7 +24,7 @@ class HumanWarpedImage(VLImage):
 
     def __init__(
         self,
-        body: Union[bytes, bytearray, PilImage, CoreImage, VLImage],
+        body: Union[bytes, bytearray, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
     ):
