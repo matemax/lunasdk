@@ -78,6 +78,8 @@ class IndexBuilder(CoreIndex):
             indexType: index type ('dynamic' or 'dense')
         Raises:
             LunaSDKException: if an error occurs while loading the index
+        Returns:
+            class of DenseIndex or DynamicIndex
         """
         if not Path(path).exists():
             raise FileNotFoundError(f"No such file or directory: {path}")
@@ -95,7 +97,7 @@ class IndexBuilder(CoreIndex):
 
     def buildIndex(self) -> DynamicIndex:
         """
-        Builds index with every descriptor appended.
+        Build index with all appended descriptors.
         Raises:
             LunaSDKException: if an error occurs while building the index
         Returns:
