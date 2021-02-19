@@ -7,7 +7,7 @@ from typing import Optional, Union
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 import numpy as np
-from PIL.Image import Image as PilImage
+from PIL.Image import Image as PilImage, _fromarray_typemap as imageModeMap
 from PIL import Image as pilImage
 
 from ..errors.errors import LunaVLError
@@ -167,13 +167,21 @@ class VLImage:
             error = self.coreImage.loadFromMemory(body, len(body), imgFormat)
             if error.isError:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
+        elif isinstance(body, np.ndarray):
+            try:
+                # typekey ((shape), (array type as str))
+                typekey = (1, 1) + body.shape[2:], body.dtype.str
+                mode, _ = imageModeMap[typekey]
+            except KeyError:
+                raise TypeError(f"Bad image type: {type(body)}")
+            self.coreImage = self._coreImageFromNumpyArray(
+                ndarray=body, inputColorFormat=ColorFormat.load(mode), colorFormat=colorFormat or ColorFormat.R8G8B8
+            )
         elif isinstance(body, PilImage):
             array = np.array(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array,
-                inputColorFormat=inputColorFormat,
-                colorFormat=colorFormat or ColorFormat.R8G8B8
+                ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         else:
             raise TypeError(f"Bad image type: {type(body)}")

@@ -61,6 +61,7 @@ class TestImage(BaseTestClass):
             InitCase("byte array", bytearrayBody),
             InitCase("core", coreBody),
             InitCase("pillow img", imageWithOneFace),
+            InitCase("numpy array", np.asarray(imageWithOneFace)),
         )
         for case in cases:
             with self.subTest(initType=case.initType):

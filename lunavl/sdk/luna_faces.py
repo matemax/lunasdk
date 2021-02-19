@@ -5,6 +5,7 @@ from typing import Optional, Union, List, Dict
 from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
+from numpy import ndarray
 from .estimator_collections import FaceEstimatorsCollection
 from .estimators.face_estimators.basic_attributes import BasicAttributes
 from .estimators.face_estimators.emotions import Emotions
@@ -429,7 +430,7 @@ class VLWarpedImage(FaceWarpedImage):
 
     def __init__(
         self,
-        body: Union[bytes, PilImage, CoreImage, VLImage],
+        body: Union[bytes, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
     ):
