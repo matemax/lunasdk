@@ -8,7 +8,7 @@ from typing import Dict, Union
 from FaceEngine import SearchResult, IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch, FaceDescriptorFactory
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 
@@ -68,7 +68,7 @@ class CoreIndex:
     """
     Core index class
     """
-    __slots__ = ("_coreIndex", "descriptorFactory")
+    __slots__ = ("_coreIndex", "_descriptorFactory")
 
     def __init__(self, coreIndex: Union[IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr],
                  descriptorFactory: FaceDescriptorFactory):
@@ -79,7 +79,7 @@ class CoreIndex:
             coreIndex: core index class
         """
         self._coreIndex = coreIndex
-        self.descriptorFactory = descriptorFactory
+        self._descriptorFactory = descriptorFactory
 
     @property
     def bufSize(self) -> int:
@@ -98,8 +98,9 @@ class CoreIndex:
             descriptor
         """
         if index >= self.bufSize:
-            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
-        descriptor = self.descriptorFactory.generateDescriptor()
+            # todo remove after fix FSDK-2897 index error
+            raise IndexError(f"Descriptor index '{index}' out of range")
+        descriptor = self._descriptorFactory.generateDescriptor()
         error, descriptor = self._coreIndex.descriptorByIndex(index, descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -115,7 +116,26 @@ class CoreIndex:
             LunaSDKException: if an error occurs while remove descriptor failed
         """
         if index >= self.bufSize:
-            raise IndexError(f"Descriptor index '{index}' out of range")    # todo remove after fix FSDK index error
+            # todo remove after fix FSDK-2897 index error
+            raise IndexError(f"Descriptor index '{index}' out of range")
         error = self._coreIndex.removeDescriptor(index)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+
+    def checkDescriptorVersion(self, incomingDescriptor: Union[FaceDescriptor, FaceDescriptorBatch]) -> None:
+        """
+        Check descriptor version with version in index.
+        Args:
+            incomingDescriptor: incoming descriptor
+        Raises:
+            LunaSDKException: if descriptor versions do not match
+        """
+        descriptorVersion = incomingDescriptor.coreEstimation.getModelVersion()
+        # todo: change after FSDK-2867 get descriptor version from index
+        if self._descriptorFactory.descriptorVersion != descriptorVersion:
+            raise LunaSDKException(
+                LunaVLError.IncompatibleDescriptors.format(
+                    f"mismatch of descriptor versions: expected={self._descriptorFactory.descriptorVersion} "
+                    f"received={descriptorVersion}"
+                )
+            )

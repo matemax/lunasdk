@@ -19,6 +19,8 @@ from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor
 from tests.base import BaseTestClass
 from tests.resources import WARP_WHITE_MAN, WARP_ONE_FACE, WARP_CLEAN_FACE
 
+EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58]
+
 faceWarp = FaceWarpedImage.load(filename=WARP_WHITE_MAN)
 faceWarps = [FaceWarpedImage.load(filename=WARP_CLEAN_FACE), FaceWarpedImage.load(filename=WARP_ONE_FACE)]
 currDir = os.path.dirname(__file__)
@@ -28,6 +30,8 @@ pathToStoredIndex = os.path.join(currDir, "stored.index")
 class TestIndexFunctionality(BaseTestClass):
     """Test of indexes."""
 
+    descriptorVersion: int
+    nonDefaultDescriptorVersion: int
     defaultFaceEstimator: FaceDescriptorEstimator
     faceDescriptor: FaceDescriptor
     nonDefaultFaceDescriptor: FaceDescriptor
@@ -37,14 +41,16 @@ class TestIndexFunctionality(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.defaultFaceEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(54)
+        cls.descriptorVersion = EFDVa[0]
+        cls.nonDefaultDescriptorVersion = EFDVa[1]
+        cls.defaultFaceEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(cls.descriptorVersion)
 
-        nonDefaultEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(56)
+        nonDefaultEstimator = BaseTestClass.faceEngine.createFaceDescriptorEstimator(EFDVa[1])
         cls.nonDefaultFaceDescriptor = nonDefaultEstimator.estimate(faceWarp)
 
     def setUp(self) -> None:
         super().setUp()
-        self.indexBuilder = self.faceEngine.createFaceIndex()
+        self.indexBuilder = self.faceEngine.createIndexBuilder(self.descriptorVersion)
         self.faceDescriptor = self.defaultFaceEstimator.estimate(faceWarp)
         self.faceDescriptorBatch, _ = self.defaultFaceEstimator.estimateDescriptorsBatch(faceWarps)
 
@@ -129,14 +135,14 @@ class TestIndexFunctionality(BaseTestClass):
             descriptor = self.indexBuilder[nonexistentIndex]
         assert str(nonexistentIndex) in ex.exception.args[0]
 
-    def test_get_non_default_descriptor_from_builder(self):
-        """Test get non default descriptor from internal storage."""
-        indexBuilder = self.faceEngine.createFaceIndex(descriptorVersion=56)
-        indexBuilder.append(self.faceDescriptor)
-        assert 1 == indexBuilder.bufSize
+    def test_append_non_default_descriptor_to_builder(self):
+        """Test append non default descriptor to internal storage."""
         with pytest.raises(LunaSDKException) as ex:
-            descriptor = indexBuilder[0]
-        self.assertLunaVlError(ex, LunaVLError.InvalidInput.format("Invalid input"))
+            self.indexBuilder.append(self.nonDefaultFaceDescriptor)
+        self.assertLunaVlError(ex, LunaVLError.IncompatibleDescriptors.format(
+            f"mismatch of descriptor versions: expected={self.descriptorVersion} "
+            f"received={self.nonDefaultDescriptorVersion}"
+        ))
 
     def test_remove_descriptor_from_builder(self):
         """Test remove descriptor from internal storage."""
@@ -224,9 +230,12 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertDynamicIndex(dynamicIndex, 2, 2)
         with pytest.raises(LunaSDKException) as ex:
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidInput.format("Invalid input"))
+        self.assertLunaVlError(ex, LunaVLError.IncompatibleDescriptors.format(
+            f"mismatch of descriptor versions: expected={self.descriptorVersion} "
+            f"received={self.nonDefaultDescriptorVersion}"
+        ))
 
-    @pytest.mark.skip("FSDK-2877 internal error")
+    @pytest.mark.skip("FSDK-2897 internal error")
     def test_search_result_empty(self):
         """Test search with empty result."""
         dynamicIndex = self.indexBuilder.buildIndex()
@@ -234,6 +243,7 @@ class TestIndexFunctionality(BaseTestClass):
         result = dynamicIndex.search(self.faceDescriptor)
         assert [] == result
 
+    @pytest.mark.skip("FSDK-2897 failed search index")
     def test_search_result_invalid_input(self):
         """Test search with invalid parameter."""
         self.indexBuilder.append(self.faceDescriptor)
@@ -281,9 +291,9 @@ class TestIndexFunctionality(BaseTestClass):
                     dynamicIndex.save(path, IndexType.dynamic)
                 assert f"{path} must not be a directory" in ex.exception.args[0]
 
-    @pytest.mark.skip("FSDK RuntimeError: Failed to read index metadata")
+    @pytest.mark.skip("FSDK-2897 RuntimeError: Failed to read index metadata")
     def test_load_index_unknown_file(self):
         """Test load index unknown file."""
         with pytest.raises(LunaSDKException) as ex:
-            self.faceEngine.loadDynamicIndex(WARP_ONE_FACE)
+            self.indexBuilder.loadIndex(WARP_ONE_FACE, IndexType.dynamic)
         self.assertLunaVlError(ex, LunaVLError.InvalidInput)

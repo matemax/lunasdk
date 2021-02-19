@@ -19,16 +19,14 @@ from .stored_index import DynamicIndex, IndexType, DenseIndex
 
 class IndexBuilder(CoreIndex):
     """
-    Index builder class
+    Index builder class (only supports face descriptors)
 
     Attributes:
         _bufSize (int): storage size with descriptors
         _faceEngine (VLFaceEngine): faceEngine
     """
 
-    def __init__(
-            self, faceEngine: PyIFaceEngine, descriptorFactory: FaceDescriptorFactory
-    ):
+    def __init__(self, faceEngine: PyIFaceEngine, descriptorFactory: FaceDescriptorFactory):
         super().__init__(faceEngine.createIndexBuilder(), descriptorFactory)
         self._bufSize = 0
         self._faceEngine = faceEngine
@@ -48,12 +46,14 @@ class IndexBuilder(CoreIndex):
             LunaSDKException: if an error occurs while adding the descriptor
         """
         if isinstance(descriptor, FaceDescriptor):
-            error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
+            appendDescriptor = self._coreIndex.appendDescriptor
         elif isinstance(descriptor, FaceDescriptorBatch):
-            error = self._coreIndex.appendBatch(descriptor.coreEstimation)
+            appendDescriptor = self._coreIndex.appendBatch
         else:
             raise RuntimeError(f"Not supported descriptor class: {descriptor.__class__}")
 
+        self.checkDescriptorVersion(descriptor)
+        error = appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         self._bufSize += len(descriptor) if hasattr(descriptor, "__len__") else 1
@@ -91,7 +91,7 @@ class IndexBuilder(CoreIndex):
             raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return _cls(loadedIndex, self.descriptorFactory)
+        return _cls(loadedIndex, self._descriptorFactory)
 
     def buildIndex(self) -> DynamicIndex:
         """
@@ -104,4 +104,4 @@ class IndexBuilder(CoreIndex):
         error, index = self._coreIndex.buildIndex()
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return DynamicIndex(index, self.descriptorFactory)
+        return DynamicIndex(index, self._descriptorFactory)

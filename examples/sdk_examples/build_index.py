@@ -24,15 +24,15 @@ def buildDescriptorIndex():
         vlImage = VLImage.load(filename=image)
         faceDetection = detector.detectOne(vlImage)
         warp = warper.warp(faceDetection)
-        lastDescriptor = extractor.estimate(warp.warpedImage)
-        descriptorsBatch.append(lastDescriptor)
+        faceDescriptor = extractor.estimate(warp.warpedImage)
+        descriptorsBatch.append(faceDescriptor)
 
-    indexBuilder = faceEngine.createFaceIndex()
-    indexBuilder.appendBatch(descriptorsBatch)
+    indexBuilder = faceEngine.createIndexBuilder()
+    indexBuilder.append(descriptorsBatch)
     pprint.pprint(f"index buf size: {indexBuilder.bufSize}")
     index = indexBuilder.buildIndex()
     pprint.pprint(index[0])
-    result = index.search(lastDescriptor, 1)
+    result = index.search(faceDescriptor, 1)
     pprint.pprint(f"result: {result}")
 
 

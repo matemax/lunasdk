@@ -306,7 +306,7 @@ class VLFaceEngine:
         """
         return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
 
-    def createFaceIndex(self, descriptorVersion: int = 0) -> IndexBuilder:
+    def createIndexBuilder(self, descriptorVersion: int = 0) -> IndexBuilder:
         """
         Create an index builder for face
         Args:
@@ -314,4 +314,6 @@ class VLFaceEngine:
         Returns:
             index builder
         """
-        return IndexBuilder(self.coreFaceEngine, self.createFaceDescriptorFactory(descriptorVersion=descriptorVersion))
+        return IndexBuilder(self.coreFaceEngine, self.createFaceDescriptorFactory(
+            descriptorVersion=descriptorVersion or self.faceEngineProvider.descriptorFactorySettings.model
+        ))

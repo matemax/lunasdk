@@ -1,7 +1,8 @@
 """Module realize dynamic and dense index."""
+import os
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Union
 
 from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
@@ -38,12 +39,14 @@ class DynamicIndex(CoreIndex):
             LunaSDKException: if an error occurs while adding the descriptor
         """
         if isinstance(descriptor, FaceDescriptor):
-            error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
+            appendDescriptor = self._coreIndex.appendDescriptor
         elif isinstance(descriptor, FaceDescriptorBatch):
-            error = self._coreIndex.appendBatch(descriptor.coreEstimation)
+            appendDescriptor = self._coreIndex.appendBatch
         else:
             raise RuntimeError(f"Not supported descriptor class: {descriptor.__class__}")
 
+        self.checkDescriptorVersion(descriptor)
+        error = appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
@@ -58,22 +61,27 @@ class DynamicIndex(CoreIndex):
         Returns:
             list with index search results
         """
+        self.checkDescriptorVersion(descriptor)
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return [IndexResult(result) for result in resIndex]
 
-    def save(self, path: str, indexType: IndexType):
+    def save(self, path: str, indexType: IndexType) -> None:
         """
         Save index as 'dynamic' or 'dense' to local storage.
         Args:
             path: path to file to be created
             indexType: index type ('dynamic' or 'dense')
         Raises:
+            ValueError: if path is a directory or index type is incorrect
+            PermissionError: if write access is denied
             LunaSDKException: if an error occurs while saving the index
         """
         if Path(path).is_dir():
             raise ValueError(f"{path} must not be a directory")
+        if not os.access(Path(path).parent, os.W_OK):
+            raise PermissionError(f"Access is denied: {path}")
         if indexType == IndexType.dynamic:
             error = self._coreIndex.saveToDynamicIndex(path)
         elif indexType == IndexType.dense:
@@ -93,7 +101,7 @@ class DenseIndex(CoreIndex):
         """Remove descriptor for a dense index is not supported."""
         raise AttributeError("'DenseIndex' object has no attribute '__delitem__'")
 
-    def search(self, descriptor: FaceDescriptor, maxCount: Optional[int] = 1) -> List[IndexResult]:
+    def search(self, descriptor: FaceDescriptor, maxCount: int = 1) -> List[IndexResult]:
         """
         Search for descriptors with the shorter distance to passed descriptor.
         Args:
@@ -104,6 +112,7 @@ class DenseIndex(CoreIndex):
         Returns:
             list with index search results
         """
+        self.checkDescriptorVersion(descriptor)
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
