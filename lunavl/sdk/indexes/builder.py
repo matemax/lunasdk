@@ -36,27 +36,33 @@ class IndexBuilder(CoreIndex):
         """Get storage size with descriptors."""
         return self._bufSize
 
-    def append(self, descriptor: Union[FaceDescriptor, FaceDescriptorBatch]) -> None:
+    def append(self, descriptor: FaceDescriptor) -> None:
         """
         Appends descriptor to internal storage.
         Args:
-            descriptor: descriptor or batch of descriptors with correct length, version and data
+            descriptor: descriptor with correct length, version and data
         Raises:
-            RuntimeError: if descriptor type is not supported
             LunaSDKException: if an error occurs while adding the descriptor
         """
-        if isinstance(descriptor, FaceDescriptor):
-            appendDescriptor = self._coreIndex.appendDescriptor
-        elif isinstance(descriptor, FaceDescriptorBatch):
-            appendDescriptor = self._coreIndex.appendBatch
-        else:
-            raise RuntimeError(f"Not supported descriptor class: {descriptor.__class__}")
-
         self.checkDescriptorVersion(descriptor)
-        error = appendDescriptor(descriptor.coreEstimation)
+        error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self._bufSize += len(descriptor) if isinstance(descriptor, FaceDescriptorBatch) else 1
+        self._bufSize += 1
+
+    def appendBatch(self, descriptorsBatch: FaceDescriptorBatch) -> None:
+        """
+        Appends batch of descriptors to internal storage.
+        Args:
+            descriptorsBatch: batch of descriptors with correct length, version and data
+        Raises:
+            LunaSDKException: if an error occurs while adding the batch of descriptors
+        """
+        self.checkDescriptorVersion(descriptorsBatch)
+        error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        self._bufSize += len(descriptorsBatch)
 
     def __delitem__(self, index: int):
         """

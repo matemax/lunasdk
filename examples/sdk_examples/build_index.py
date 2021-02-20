@@ -28,7 +28,7 @@ def buildDescriptorIndex():
         descriptorsBatch.append(faceDescriptor)
 
     indexBuilder = faceEngine.createIndexBuilder()
-    indexBuilder.append(descriptorsBatch)
+    indexBuilder.appendBatch(descriptorsBatch)
     pprint.pprint(f"index buf size: {indexBuilder.bufSize}")
     index = indexBuilder.buildIndex()
     pprint.pprint(index[0])
