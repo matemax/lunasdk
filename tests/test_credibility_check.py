@@ -27,7 +27,8 @@ class TestCredibilityCheck(BaseTestClass):
         self, credibilityCheck: CredibilityCheck, expectedEstimationResults: Dict[str, str]
     ):
         """
-        Function checks if the instance belongs to the credibility check class and compares the result with what is expected.
+        Function checks if the instance belongs to the credibility check class 
+        and compares the result with what is expected.
 
         Args:
             credibilityCheck: credibility check estimation object
