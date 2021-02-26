@@ -36,10 +36,7 @@ class TestCredibilityCheck(BaseTestClass):
         assert isinstance(credibilityCheck, CredibilityCheck), f"{credibilityCheck.__class__} is not {CredibilityCheck}"
         credibilityCheckScore = credibilityCheck.asDict()["credibility_check"]
         self.assertAlmostEqual(
-            credibilityCheckScore,
-            expectedEstimationResults,
-            delta=0.001,
-            msg=f"property value is incorrect",
+            credibilityCheckScore, expectedEstimationResults, delta=0.001, msg=f"property value is incorrect"
         )
 
     def test_estimate_credibility_check_as_dict(self):
