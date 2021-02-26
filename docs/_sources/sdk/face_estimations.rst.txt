@@ -209,3 +209,6 @@ Classes and methods
 
 .. automodule:: lunavl.sdk.estimators.face_estimators.glasses
     :members:
+
+.. automodule:: lunavl.sdk.estimators.face_estimators.credibility_check
+    :members:

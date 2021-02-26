@@ -87,3 +87,10 @@ GLASSES_SCHEMA = {
     "required": ["glasses"],
     "additionalProperties": False,
 }
+
+CREDIBILITY_CHECK_SCHEMA = {
+    "type": "object",
+    "properties": {"credibility_check": TYPE_SCORE},
+    "required": ["credibility_check"],
+    "additionalProperties": False,
+}

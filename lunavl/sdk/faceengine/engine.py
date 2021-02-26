@@ -22,6 +22,7 @@ from ..estimators.face_estimators.mouth_state import MouthStateEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
+from ..estimators.face_estimators.credibility_check import CredibilityCheckEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
@@ -279,3 +280,12 @@ class VLFaceEngine:
             estimator
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
+
+    def createCredibilityCheckEstimator(self) -> CredibilityCheckEstimator:
+        """
+        Create a credibility check estimator.
+
+        Returns:
+            estimator
+        """
+        return CredibilityCheckEstimator(self._faceEngine.createCredibilityCheckEstimator())

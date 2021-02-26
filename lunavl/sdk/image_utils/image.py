@@ -278,15 +278,14 @@ class VLImage:
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
         coreImage = cls._coreImageFromNumpyArray(
-            ndarray=arr,
-            inputColorFormat=inputColorFormat,
-            colorFormat=colorFormat
+            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
         )
         return cls(coreImage, filename=filename)
 
     @property
     def format(self) -> ColorFormat:
-        """ getFormat(self: FaceEngine.Image) -> FaceEngine.FormatType
+        """
+        getFormat(self: FaceEngine.Image) -> FaceEngine.FormatType
 
         >>> image = VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg')
         >>> image.format.value
