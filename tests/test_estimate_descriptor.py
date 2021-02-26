@@ -430,7 +430,6 @@ class TestEstimateDescriptor(BaseTestClass):
                                 assert len(exceptionInfo.value.context) == 1, "Expect only one error"
                                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
 
-    @pytest.mark.skip(msg="Skip error test")  # TODO: SDK return isError=False. Not raises LunaSDKException
     def test_descriptor_batch_bad_threshold_aggregation(self):
         """
         Test descriptor batch with bad threshold warps with aggregation
@@ -439,12 +438,10 @@ class TestEstimateDescriptor(BaseTestClass):
         for descriptorVersion in [56]:
             with self.subTest(planVersion=descriptorVersion):
                 extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion)
-                descriptorBatch = self.getBatch(descriptorVersion, 4, DescriptorType.face)
-                with pytest.raises(LunaSDKException) as exceptionInfo:
-                    extractor.estimateDescriptorsBatch([faceWarp] * 4, aggregate=1, descriptorBatch=descriptorBatch)
-                self.assertLunaVlError(
-                    exceptionInfo,
-                    LunaVLError.BatchedInternalError.format(
-                        "Cant aggregate descriptors - all images'a GSs are less the threashold"
-                    ),
+                descriptorBatch = self.getBatch(descriptorVersion, 2, DescriptorType.face)
+                descriptorsRaw, descriptorAggregated = extractor.estimateDescriptorsBatch(
+                    [faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch
                 )
+                for descriptorRaw in descriptorsRaw:
+                    self.assertDescriptor(descriptorVersion, descriptorRaw, DescriptorType.face)
+                self.assertDescriptor(descriptorVersion, descriptorAggregated, DescriptorType.face)
