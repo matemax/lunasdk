@@ -13,7 +13,7 @@ from FaceEngine import (
     DT_LANDMARKS5,
     DT_LANDMARKS68,
     Image as CoreImage,
-    Rect as CoreRectI,
+    FSDKError,
 )  # pylint: disable=E0611,E0401
 
 from ..base import Landmarks
@@ -21,13 +21,12 @@ from ..detectors.base import (
     ImageForDetection,
     ImageForRedetection,
     BaseDetection,
-    assertImageForDetection,
     getArgsForCoreDetectorForImages,
     getArgsForCoreRedetect,
-    collectAndRaiseError,
+    validateBatchDetectInput,
 )
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -222,13 +221,12 @@ class FaceDetector:
         Raises:
             LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
-        assertImageForDetection(image)
 
         if detectArea is None:
             _detectArea = image.coreImage.getRect()
         else:
             _detectArea = detectArea.coreRectI
-
+        validateBatchDetectInput(self._detector, image.coreImage, _detectArea)
         error, detectRes = self._detector.detectOne(
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
@@ -256,19 +254,14 @@ class FaceDetector:
             detect68Landmarks: detect or not landmarks68
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
+        Raises:
+            LunaSDKException if an error occurs
         """
-
-        def getSingleError(image: CoreImage, detectArea: CoreRectI):
-            """Get error from one image detect"""
-            errorOne, _ = self._detector.detectOne(image, detectArea, detectionType)
-            return errorOne
-
         coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
-
-        fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
-        if fsdkErrorRes.isError:
-            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        validateBatchDetectInput(self._detector, coreImages, detectAreas)
+        error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
+        assertError(error)
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
@@ -292,12 +285,11 @@ class FaceDetector:
         Raises:
             LunaSDKException if an error occurs
         """
-        assertImageForDetection(image)
         if isinstance(bBox, Rect):
             coreBBox = Detection(bBox.coreRectF, 1.0)
         else:
             coreBBox = bBox.coreEstimation.detection
-
+        self._validateBatchReDetectInput(image.coreImage, coreBBox)
         error, detectRes = self._detector.redetectOne(
             image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
@@ -306,6 +298,31 @@ class FaceDetector:
         if detectRes.isValid():
             return FaceDetection(detectRes, image)
         return None
+
+    def _validateBatchReDetectInput(self, coreImages: List[CoreImage], detectAreas: List[List[Detection]]):
+        if isinstance(coreImages, list):
+            validationError, imagesErrors = self._detector.validate(coreImages, detectAreas)
+        else:
+            validationError, imagesErrors = self._detector.validate([coreImages], [[detectAreas]])
+        if validationError.isOk:
+            return
+        if validationError.error != FSDKError.ValidationFailed:
+            raise LunaSDKException(LunaVLError.fromSDKError(validationError), imagesErrors)
+        if not isinstance(coreImages, list):
+            raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0]))
+        errors = []
+
+        for imageErrors in imagesErrors:
+            for error in imageErrors:
+                if error.isOk:
+                    continue
+                errors.append(LunaVLError.fromSDKError(error))
+                break
+            else:
+                errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+        raise LunaSDKException(
+            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
+        )
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
@@ -321,20 +338,15 @@ class FaceDetector:
 
         Returns:
             detections
+        Raises:
+            LunaSDKException if an error occurs
         """
-
-        def getSingleError(image: CoreImage, detectArea: CoreRectI):
-            """Get error from one image redetect"""
-            errorOne, _ = self._detector.redetect([image], [detectArea], detectionType)
-            return errorOne
-
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         coreImages, detectAreas = getArgsForCoreRedetect(images)
-        fsdkErrorRes, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
-
-        if fsdkErrorRes.isError:
-            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
+        self._validateBatchReDetectInput(coreImages, detectAreas)
+        error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
+        assertError(error)
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
