@@ -16,7 +16,7 @@ from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE, BAD_IMAGE
 
 VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)
-BAD_IMAGE = VLImage.load(filename=BAD_IMAGE)
+VLIMAGE_BAD_IMAGE = VLImage.load(filename=BAD_IMAGE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
 GOOD_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width - 100, VLIMAGE_ONE_FACE.rect.height - 100)
 OUTSIDE_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)
@@ -58,7 +58,7 @@ class BaseDetectorTestClass(BaseTestClass):
 
     def assertDetection(
         self,
-        detection: Union[FaceDetection, HumanDetection, List[Union[FaceDetection, HumanDetection]]],
+        detection: Union[FaceDetection, HumanDetection, Union[List[FaceDetection], List[HumanDetection]]],
         imageVl: VLImage,
     ):
         """
@@ -71,7 +71,7 @@ class BaseDetectorTestClass(BaseTestClass):
         if isinstance(detection, list):
             detectionList = detection
         else:
-            detectionList = [detection]
+            detectionList = [detection]  # type: ignore
 
         for detection in detectionList:
             assert isinstance(detection, self.__class__.detectionClass), (
