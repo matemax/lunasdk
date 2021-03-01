@@ -440,7 +440,7 @@ class TestEstimateDescriptor(BaseTestClass):
                     extractor.estimateDescriptorsBatch([faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch)
                 self.assertLunaVlError(
                     exceptionInfo,
-                    LunaVLError.BatchedInternalError.format(
+                    LunaVLError.FiltredAggregationError.format(
                         "Cant aggregate descriptors - all images'a GSs are less the threashold"
                     ),
                 )

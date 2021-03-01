@@ -125,7 +125,7 @@ class LunaVLError:
     DetectHumanError = ErrorInfo(110021, "Detect one human body error", "")
     DetectHumansError = ErrorInfo(110022, "Detect humans bodies error", "")
     EstimationMaskError = ErrorInfo(110023, "Estimation mask error", "")
-    BadAggregationThreshold = ErrorInfo(110024, "Filtered aggregation error", "")
+    FiltredAggregationError = ErrorInfo(110024, "Filtered aggregation error", "")
     EstimationGlassesError = ErrorInfo(110025, "Estimation glasses error", "")
     EstimationOrientationModeError = ErrorInfo(110026, "Estimation orientation mode error", "")
     EstimationLivenessV1Error = ErrorInfo(110026, "Estimation livenessV1 error", "")
