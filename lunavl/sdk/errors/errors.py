@@ -128,6 +128,7 @@ class LunaVLError:
     BadAggregationThreshold = ErrorInfo(110024, "Filtered aggregation error", "")
     EstimationGlassesError = ErrorInfo(110025, "Estimation glasses error", "")
     EstimationOrientationModeError = ErrorInfo(110026, "Estimation orientation mode error", "")
+    EstimationLivenessV1Error = ErrorInfo(110026, "Estimation livenessV1 error", "")
 
     @classmethod
     def fromSDKError(cls, sdkError: FSDKErrorResult) -> "ErrorInfo":

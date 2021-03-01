@@ -17,15 +17,15 @@ from ..estimators.face_estimators.emotions import EmotionsEstimator
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from ..estimators.face_estimators.facewarper import FaceWarper
-from ..estimators.face_estimators.head_pose import HeadPoseEstimator
-from ..estimators.face_estimators.mouth_state import MouthStateEstimator
-from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
-from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
-from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
+from ..estimators.face_estimators.head_pose import HeadPoseEstimator
+from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
+from ..estimators.face_estimators.mask import MaskEstimator
+from ..estimators.face_estimators.mouth_state import MouthStateEstimator
+from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
-from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV, DEFAULT_LIVENESS_PRINCIPAL_AXES as DLPA
+from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
 
 class VLFaceEngine:
@@ -282,19 +282,15 @@ class VLFaceEngine:
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
 
-    def createLivenessV1Estimator(self, principalAxes: Optional[float] = None) -> LivenessV1Estimator:
+    def createLivenessV1Estimator(
+        self,
+    ) -> LivenessV1Estimator:
         """
         Create an one shot liveness estimator.
-
-        Args:
-            principalAxes: maximum value of Yaw, pitch and roll angles for estimation
-
         Returns:
             estimator
         """
-        if principalAxes is None:
-            principalAxes = self.faceEngineProvider.livenessV1Estimator.principalAxes or DLPA
-        return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator(), principalAxes)
+        return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator())
 
     def createOrientationModeEstimator(self) -> OrientationModeEstimator:
         """
