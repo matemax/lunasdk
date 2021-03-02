@@ -4,7 +4,7 @@ Module contains a  livenessv1 estimator.
 See `livenessv1`_.
 """
 from enum import Enum
-from typing import Optional, overload
+from typing import Optional
 
 from FaceEngine import (
     LivenessOneShotRGBEstimation,  # pylint: disable=E0611,E0401
@@ -17,7 +17,6 @@ from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.estimators.base import BaseEstimator
-from .head_pose import HeadPose
 
 
 class LivenessPrediction(Enum):
@@ -121,27 +120,6 @@ class LivenessV1Estimator(BaseEstimator):
             coreEstimator: core estimator
         """
         super().__init__(coreEstimator)
-
-    @overload  # type: ignore
-    def estimate(self, faceDetection: FaceDetection) -> LivenessV1:
-        """
-        Estimate liveness by detection
-        """
-        ...
-
-    @overload
-    def estimate(self, faceDetection: FaceDetection, headPose: HeadPose) -> LivenessV1:
-        """
-        Estimate liveness by detection with head pose validation
-        """
-        ...
-
-    @overload
-    def estimate(self, faceDetection: FaceDetection, yaw: float, pitch: float, roll) -> LivenessV1:
-        """
-        Estimate liveness by detection with angles validation
-        """
-        ...
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
