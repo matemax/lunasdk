@@ -23,9 +23,7 @@ class TestCredibilityCheck(BaseTestClass):
 
         cls.warp = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
 
-    def assertrCedibilityCheckEstimation(
-        self, credibilityCheck: CredibilityCheck, expectedEstimationResults: Dict[str, str]
-    ):
+    def assertrCedibilityCheckEstimation(self, credibilityCheck: CredibilityCheck, expectedEstimationResults: float):
         """
         Function checks if the instance belongs to the credibility check class 
         and compares the result with what is expected.
@@ -35,9 +33,11 @@ class TestCredibilityCheck(BaseTestClass):
             expectedEstimationResults: dictionary with result
         """
         assert isinstance(credibilityCheck, CredibilityCheck), f"{credibilityCheck.__class__} is not {CredibilityCheck}"
-        credibilityCheckScore = credibilityCheck.asDict()["credibility_check"]
         self.assertAlmostEqual(
-            credibilityCheckScore, expectedEstimationResults, delta=0.001, msg=f"property value is incorrect"
+            credibilityCheck.credibilityCheck,
+            expectedEstimationResults,
+            delta=0.001,
+            msg=f"property value is incorrect",
         )
 
     def test_estimate_credibility_check_as_dict(self):

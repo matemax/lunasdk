@@ -435,7 +435,7 @@ class TestEstimateDescriptor(BaseTestClass):
         Test descriptor batch with bad threshold warps with aggregation
         """
         faceWarp = FaceWarpedImage.load(filename=BAD_THRESHOLD_WARP)
-        for descriptorVersion in [56]:
+        for descriptorVersion in EFDVa:
             with self.subTest(planVersion=descriptorVersion):
                 extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion)
                 descriptorBatch = self.getBatch(descriptorVersion, 2, DescriptorType.face)

@@ -1,6 +1,8 @@
 """
 Module for estimate a credibility check from warped image.
 """
+from typing import Union, Dict, Any
+
 from FaceEngine import ICredibilityCheckEstimatorPtr
 from FaceEngine import CredibilityCheckEstimation
 
@@ -9,8 +11,6 @@ from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
-
-from typing import Union, Dict, Any
 
 
 class CredibilityCheck(BaseEstimation):
@@ -42,7 +42,7 @@ class CredibilityCheck(BaseEstimation):
         """
         return self._coreEstimation.value
 
-    def asDict(self) -> Union[Dict[Any, Any]]:
+    def asDict(self) -> Dict[str, float]:
         """
         Convert to dict.
 
@@ -58,7 +58,7 @@ class CredibilityCheckEstimator(BaseEstimator):
     Warp credibility check estimator.
     """
 
-    def __init__(sekf, credibilityCheckEstimator: ICredibilityCheckEstimatorPtr):
+    def __init__(self, credibilityCheckEstimator: ICredibilityCheckEstimatorPtr):
         """
         Init.
 
