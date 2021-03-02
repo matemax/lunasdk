@@ -1,10 +1,6 @@
 from typing import NamedTuple, List, Any, Dict, Union, Tuple
 
-from FaceEngine import (
-    Rect as CoreRectI,
-    Detection,
-    Image as CoreImage,
-)  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage  # pylint: disable=E0611,E0401
 
 from ..base import BaseEstimation, BoundingBox
 from ..errors.errors import LunaVLError
@@ -143,9 +139,7 @@ def getArgsForCoreRedetect(images: List[ImageForRedetection]) -> Tuple[List[Core
 
 
 def validateBatchDetectInput(
-    detector,
-    coreImages: Union[List[CoreImage]],
-    detectAreas: Union[CoreRectI, List[CoreRectI]],
+    detector, coreImages: Union[List[CoreImage]], detectAreas: Union[CoreRectI, List[CoreRectI]]
 ) -> None:
     """
     Collect errors from single operations and raise complex exception
