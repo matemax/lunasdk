@@ -13,6 +13,7 @@ from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
 from .estimators.face_estimators.mask import MaskEstimator
 from .estimators.face_estimators.glasses import GlassesEstimator
+from .estimators.face_estimators.credibility_check import CredibilityCheckEstimator
 from .estimators.face_estimators.facewarper import FaceWarper
 from .faceengine.engine import VLFaceEngine
 
@@ -44,6 +45,8 @@ class FaceEstimator(Enum):
     Mask = 10
     #: glasses estimator
     Glasses = 11
+    #: credibility check estimator
+    CredibilityCheck = 12
 
 
 class FaceEstimatorsCollection:
@@ -62,6 +65,7 @@ class FaceEstimatorsCollection:
         _descriptorEstimator (Optional[FaceDescriptorEstimator]): lazy load face descriptor estimator
         _maskEstimator (Optional[MaskEstimator]): lazy mask estimator
         _glassesEstimator (Optional[GlassesEstimator]): lazy glasses estimator
+        _credibilityCheckEstimator (Optional[CredibilityCheckEstimator]): lazy credibility check estimator
         warper (Optional[Warper]): warper
     """
 
@@ -79,6 +83,7 @@ class FaceEstimatorsCollection:
         "_descriptorEstimator",
         "_maskEstimator",
         "_glassesEstimator",
+        "_credibilityCheckEstimator",
     )
 
     def __init__(
@@ -107,6 +112,7 @@ class FaceEstimatorsCollection:
         self._descriptorEstimator: Union[None, FaceDescriptorEstimator] = None
         self._maskEstimator: Union[None, MaskEstimator] = None
         self._glassesEstimator: Union[None, GlassesEstimator] = None
+        self._credibilityCheckEstimator: Union[None, CredibilityCheckEstimator] = None
         self.warper: FaceWarper = self._faceEngine.createFaceWarper()
 
         if startEstimators:
@@ -183,6 +189,8 @@ class FaceEstimatorsCollection:
             self._maskEstimator = self._faceEngine.createMaskEstimator()
         elif estimator == FaceEstimator.Glasses:
             self._glassesEstimator = self._faceEngine.createGlassesEstimator()
+        elif estimator == FaceEstimator.CredibilityCheck:
+            self._credibilityCheckEstimator = self._faceEngine.createCredibilityCheckEstimator()
         else:
             raise ValueError("Bad estimator type")
 
@@ -439,6 +447,29 @@ class FaceEstimatorsCollection:
             newEstimator: new glasses estimator
         """
         self._glassesEstimator = newEstimator
+
+    @property
+    def credibilityCheckEstimator(self) -> CredibilityCheckEstimator:
+        """
+        Get credibility check estimator.
+
+        If estimator is initialized it will be returned otherwise it will be initialized and returned
+
+        Returns:
+            credibility check estimator
+        """
+        if self._credibilityCheckEstimator is None:
+            self._credibilityCheckEstimator = self._faceEngine.createCredibilityCheckEstimator()
+        return self._credibilityCheckEstimator
+
+    @credibilityCheckEstimator.setter
+    def credibilityCheckEstimator(self, newEstimator: CredibilityCheckEstimator) -> None:
+        """
+        Set warp credibility check estimator.
+        Args:
+            newEstimator: new credibility check estimator
+        """
+        self._credibilityCheckEstimator = newEstimator
 
     @property
     def faceEngine(self) -> VLFaceEngine:

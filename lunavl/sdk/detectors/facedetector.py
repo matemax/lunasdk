@@ -309,5 +309,6 @@ class FaceDetector:
 
     def setDetectionComparer(self):
         """
+        set detection comparer
         """
         pass
