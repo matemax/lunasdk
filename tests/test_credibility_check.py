@@ -33,11 +33,11 @@ class TestCredibilityCheck(BaseTestClass):
             expectedEstimationResults: dictionary with result
         """
         assert isinstance(credibilityCheck, CredibilityCheck), f"{credibilityCheck.__class__} is not {CredibilityCheck}"
+        credibilityCheckScore = credibilityCheck.credibilityCheck
+        assert isinstance(credibilityCheck.credibilityCheck, float), f"{credibilityCheckScore.__class__} is not float"
+        assert 0 <= credibilityCheckScore <= 1, f"{credibilityCheckScore} not in range [0, 1]"
         self.assertAlmostEqual(
-            credibilityCheck.credibilityCheck,
-            expectedEstimationResults,
-            delta=0.001,
-            msg=f"property value is incorrect",
+            credibilityCheckScore, expectedEstimationResults, delta=0.001, msg=f"property value is incorrect"
         )
 
     def test_estimate_credibility_check_as_dict(self):
