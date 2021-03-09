@@ -129,7 +129,6 @@ class TestsRedetectFace(FaceDetectTestClass):
                 assert redetectOne is None, "excepted None but found {}".format(redetectOne)
                 assert redetect is None, "excepted None but found {}".format(redetectOne)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_redetect_one_invalid_rectangle(self):
         """
         Test re-detection of one face with an invalid rect
@@ -140,7 +139,6 @@ class TestsRedetectFace(FaceDetectTestClass):
                     detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=INVALID_RECT)
                 self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_batch_redetect_invalid_rectangle(self):
         """
         Test batch re-detection with an invalid rect

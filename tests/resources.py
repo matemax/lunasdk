@@ -43,5 +43,5 @@ BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
 
 SPOOF = getPathToImage("spoof.jpg")
-UNKNOWN_LIVENESS = getPathToImage("disgust.jpg")
+UNKNOWN_LIVENESS = getPathToImage("face_with_mask.jpg")
 LIVENESS_FACE = getPathToImage("one_face.jpg")

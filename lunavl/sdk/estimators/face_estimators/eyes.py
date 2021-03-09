@@ -49,7 +49,7 @@ class EyeState(Enum):
 
 class IrisLandmarks(Landmarks):
     """
-     Eyelid landmarks.
+    Eyelid landmarks.
     """
 
     #  pylint: disable=W0235
@@ -65,7 +65,7 @@ class IrisLandmarks(Landmarks):
 
 class EyelidLandmarks(Landmarks):
     """
-     Eyelid landmarks.
+    Eyelid landmarks.
     """
 
     #  pylint: disable=W0235

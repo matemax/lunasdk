@@ -78,7 +78,6 @@ class TestsRedetectHuman(HumanDetectTestClass):
         assert redetectOne is None, "excepted None but found {}".format(redetectOne)
         assert redetect is None, "excepted None but found {}".format(redetectOne)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_redetect_one_invalid_rectangle(self):
         """
         Test re-detection of one human with an invalid rect
@@ -86,9 +85,8 @@ class TestsRedetectHuman(HumanDetectTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=INVALID_RECT)
         receivedError = exceptionInfo.value.error
-        self.assertReceivedAndRawExpectedErrors(receivedError, LunaVLError.InvalidRect)
+        self.assertReceivedAndRawExpectedErrors(receivedError, LunaVLError.InvalidDetection)
 
-    @pytest.mark.skip()  # TODO get resolution from n.feofanov
     def test_redetect_invalid_rectangle(self):
         """
         Test batch re-detection with an invalid rect
@@ -102,15 +100,16 @@ class TestsRedetectHuman(HumanDetectTestClass):
             )
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidDetection)
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
 
-    @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):
         """
         Test re-detection with an invalid rect
         """
-        self.detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
 
     def test_match_redetect_one_image(self):
         """

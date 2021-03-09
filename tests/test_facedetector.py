@@ -16,7 +16,7 @@ from tests.detect_test_class import (
     OUTSIDE_AREA,
     VLIMAGE_SMALL,
     FaceDetectTestClass,
-    BAD_IMAGE,
+    VLIMAGE_BAD_IMAGE,
 )
 from tests.resources import ONE_FACE, MANY_FACES, NO_FACES, WARP_CLEAN_FACE
 from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
@@ -139,7 +139,7 @@ class TestFaceDetector(FaceDetectTestClass):
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
-                    detector.detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])
+                    detector.detect(images=[VLIMAGE_ONE_FACE, VLIMAGE_BAD_IMAGE])
                 self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
                 assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
@@ -279,17 +279,29 @@ class TestFaceDetector(FaceDetectTestClass):
                     )
                 assert isinstance(exceptionInfo.value, TypeError) is True, "expected TypeError"
 
+    def test_detect_one_limit_bad_param(self):
+        """
+        Test batch detection with negative limit number
+        """
+        imageWithManyFaces = VLImage.load(filename=MANY_FACES)
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                with pytest.raises(TypeError) as exceptionInfo:
+                    detector.detectOne(
+                        image=ImageForDetection(image=imageWithManyFaces, detectArea=GOOD_AREA), limit=-1
+                    )
+                assert isinstance(exceptionInfo.value, TypeError) is True, "expected TypeError"
+
     def test_detect_one_invalid_image_format(self):
         """
         Test invalid image format detection
         """
         imageWithOneFaces = VLImage.load(filename=ONE_FACE, colorFormat=ColorFormat.B8G8R8)
-        errorDetail = "Bad image format for detection, format: B8G8R8, image: one_face.jpg"
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(image=imageWithOneFaces)
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(details=errorDetail))
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat)
 
     def test_batch_detect_invalid_image_format(self):
         """
@@ -299,12 +311,21 @@ class TestFaceDetector(FaceDetectTestClass):
         allowedColorsForDetection = {ColorFormat.R8G8B8}
         for colorFormat in set(colorToImageMap) - allowedColorsForDetection:
             colorImage = colorToImageMap[colorFormat]
-            errorDetail = f"Bad image format for detection, format: {colorFormat.value}, image: {colorImage.filename}"
             for detector in self.detectors:
                 with self.subTest(detectorType=detector.detectorType, colorFormat=colorFormat.name):
-                    with pytest.raises(LunaSDKException) as exceptionInfo:
+                    if (
+                        colorFormat in (ColorFormat.R8G8B8X8, ColorFormat.IR_X8X8X8)
+                        and detector.detectorType == DetectorType.FACE_DET_V3
+                    ):
                         detector.detect(images=[colorImage])
-                    self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(details=errorDetail))
+                    else:
+                        with pytest.raises(LunaSDKException) as exceptionInfo:
+                            detector.detect(images=[colorImage])
+                        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                        assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+                        self.assertReceivedAndRawExpectedErrors(
+                            exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat
+                        )
 
     def test_batch_detect_by_area_without_face(self):
         """

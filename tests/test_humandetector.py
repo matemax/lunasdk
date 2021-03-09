@@ -13,7 +13,7 @@ from tests.detect_test_class import (
     AREA_WITHOUT_FACE,
     OUTSIDE_AREA,
     VLIMAGE_SMALL,
-    BAD_IMAGE,
+    VLIMAGE_BAD_IMAGE,
 )
 from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
 from tests.schemas import jsonValidator, REQUIRED_HUMAN_BODY_DETECTION, LANDMARKS17
@@ -107,11 +107,12 @@ class TestHumanDetector(HumanDetectTestClass):
         Test batch detection with success and error using FACE_DET_V3 (there is not error with other detector)
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.detector.detect(images=[VLIMAGE_ONE_FACE, BAD_IMAGE])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
-        assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
-        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)
+            self.detector.detect(images=[VLIMAGE_ONE_FACE, VLIMAGE_BAD_IMAGE])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageSize)
+        # fix after FSDK-2932
+        # assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
+        # self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
+        # self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)
 
     def test_detect_one_with_image_of_several_humans(self):
         """
@@ -228,10 +229,11 @@ class TestHumanDetector(HumanDetectTestClass):
         allowedColorsForDetection = {ColorFormat.R8G8B8}
         for colorFormat in set(colorToImageMap) - allowedColorsForDetection:
             colorImage = colorToImageMap[colorFormat]
-            errorDetail = f"Bad image format for detection, format: {colorFormat.value}, image: {colorImage.filename}"
             with pytest.raises(LunaSDKException) as exceptionInfo:
                 self.detector.detect(images=[colorImage])
-            self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(details=errorDetail))
+            self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+            assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+            self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat)
 
     def test_batch_detect_by_area_without_human(self):
         """
@@ -251,7 +253,6 @@ class TestHumanDetector(HumanDetectTestClass):
         assert 1 == len(detection[0])
         self.assertHumanDetection(detection[0], VLIMAGE_ONE_FACE)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_bad_area_detection(self):
         """
         Test detection of one human in area outside image
@@ -260,7 +261,6 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_batch_detect_in_area_outside_image(self):
         """
         Test batch detection in area outside image
@@ -280,7 +280,6 @@ class TestHumanDetector(HumanDetectTestClass):
             TestHumanDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 1000)
         self.assertLunaVlError(exceptionInfo, LunaVLError.HighMemoryUsage)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_detect_one_invalid_rectangle(self):
         """
         Test detection of one human with an invalid rect
@@ -289,7 +288,6 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=Rect())
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
-    @pytest.mark.skip("FSDK-2659")
     def test_batch_detect_invalid_rectangle(self):
         """
         Test batch human detection with an invalid rect

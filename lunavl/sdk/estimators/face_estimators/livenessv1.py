@@ -4,15 +4,19 @@ Module contains a  livenessv1 estimator.
 See `livenessv1`_.
 """
 from enum import Enum
-from typing import Optional, overload
+from typing import Optional
 
-from FaceEngine import LivenessOneShotRGBEstimation, ILivenessOneShotRGBEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import (
+    LivenessOneShotRGBEstimation,  # pylint: disable=E0611,E0401
+    ILivenessOneShotRGBEstimatorPtr,
+    LivenessOneShotState,
+)
+
 from lunavl.sdk.base import BaseEstimation
+from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
-from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.estimators.base import BaseEstimator
-from .head_pose import HeadPose
 
 
 class LivenessPrediction(Enum):
@@ -23,6 +27,25 @@ class LivenessPrediction(Enum):
     Real = "real"  # real human
     Spoof = "spoof"  # spoof
     Unknown = "unknown"  # unknown
+
+    @staticmethod
+    def fromCoreEmotion(coreState: LivenessOneShotState) -> "LivenessPrediction":
+        """
+        Get enum element by core emotion.
+
+        Args:
+            coreEmotion: enum value from core
+
+        Returns:
+            corresponding emotion
+        """
+        if coreState == LivenessOneShotState.Alive:
+            return LivenessPrediction.Real
+        if coreState == LivenessOneShotState.Fake:
+            return LivenessPrediction.Spoof
+        if coreState == LivenessOneShotState.Unknown:
+            return LivenessPrediction.Unknown
+        raise RuntimeError(f"bad core mask state {coreState}")
 
 
 class LivenessV1(BaseEstimation):
@@ -84,58 +107,25 @@ class LivenessV1(BaseEstimation):
 class LivenessV1Estimator(BaseEstimator):
     """
     Liveness estimator version 1 (LivenessOneShotRGBEstimator).
-
-    Attributes:
-        principalAxes: maximum value of Yaw, pitch and roll angles for estimation
     """
 
-    __slots__ = ("principalAxes",)
-
     #  pylint: disable=W0235
-    def __init__(self, coreEstimator: ILivenessOneShotRGBEstimatorPtr, principalAxes: float):
+    def __init__(self, coreEstimator: ILivenessOneShotRGBEstimatorPtr):
         """
         Init.
 
         Args:
             coreEstimator: core estimator
-            principalAxes: maximum value of Yaw, pitch and roll angles for estimation
         """
         super().__init__(coreEstimator)
-        self.principalAxes = principalAxes
-
-    @overload  # type: ignore
-    def estimate(self, faceDetection: FaceDetection) -> LivenessV1:
-        """
-        Estimate liveness by detection
-        """
-        ...
-
-    @overload
-    def estimate(self, faceDetection: FaceDetection, headPose: HeadPose) -> LivenessV1:
-        """
-        Estimate liveness by detection with head pose validation
-        """
-        ...
-
-    @overload
-    def estimate(self, faceDetection: FaceDetection, yaw: float, pitch: float, roll) -> LivenessV1:
-        """
-        Estimate liveness by detection with angles validation
-        """
-        ...
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
+    @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
     def estimate(  # type: ignore
-        self,
-        faceDetection: FaceDetection,
-        headPose: Optional[HeadPose] = None,
-        yaw: Optional[float] = None,
-        pitch: Optional[float] = None,
-        roll: Optional[float] = None,
+        self, faceDetection: FaceDetection, qualityThreshold: Optional[float] = None
     ) -> LivenessV1:
         """
-        Estimate a gaze direction
+        Estimate a liveness
 
         .. warning::
             Current estimator version estimates correct liveness state for images from mobile and web camera only.
@@ -143,10 +133,7 @@ class LivenessV1Estimator(BaseEstimator):
 
         Args:
             faceDetection: face detection
-            headPose: head pose
-            yaw: yaw Tait–Bryan angle
-            pitch: pitch Tait–Bryan angle
-            roll: roll Tait–Bryan angle
+            qualityThreshold: quality threshold. if estimation quality is low of this threshold
         Returns:
             estimated liveness
         Raises:
@@ -158,21 +145,10 @@ class LivenessV1Estimator(BaseEstimator):
             faceDetection.image.coreImage,
             faceDetection.coreEstimation.detection,
             faceDetection.landmarks5.coreEstimation,
+            -1.0 if qualityThreshold is None else qualityThreshold,
         )
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        prediction = LivenessPrediction.Real if estimation.isReal else LivenessPrediction.Spoof
-        if headPose:
-            yaw = headPose.yaw
-            roll = headPose.roll
-            pitch = headPose.pitch
-        if any(
-            (
-                yaw is not None and self.principalAxes < abs(yaw),
-                pitch is not None and self.principalAxes < abs(pitch),
-                roll is not None and self.principalAxes < abs(roll),
-            )
-        ):
-            prediction = LivenessPrediction.Unknown
+        prediction = LivenessPrediction.fromCoreEmotion(estimation.State)
 
         return LivenessV1(estimation, prediction)

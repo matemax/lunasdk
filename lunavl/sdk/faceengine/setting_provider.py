@@ -2053,83 +2053,23 @@ class LivenessV1Estimator(BaseSettingsSection):
         self.setValue("realThreshold", value)
 
     @property
-    def useFilter(self) -> Optional[bool]:
+    def qualityThreshold(self) -> Optional[float]:
         """
-        Getter for useFilter
+        Getter for qualityThreshold
 
         Returns:
-            useFilter
+            realThreshold
         """
-        value = self.getValue("useFilter")
-        if value is None:
-            return None
-        return bool(value)
+        return self.getValue("qualityThreshold")
 
-    @useFilter.setter
-    def useFilter(self, value: bool) -> None:
+    @qualityThreshold.setter
+    def qualityThreshold(self, value: float) -> None:
         """
-        Setter for useFilter
+        Setter for qualityThreshold
         Args:
             value: new value
         """
-        self.setValue("useFilter", int(value))
-
-    @property
-    def minDetSize(self) -> Optional[int]:
-        """
-        Getter for minDetSize
-
-        Returns:
-            minDetSize
-        """
-        return self.getValue("minDetSize")
-
-    @minDetSize.setter
-    def minDetSize(self, value: int) -> None:
-        """
-        Setter for descriptorCountWarningLevel
-        Args:
-            value: new value
-        """
-        self.setValue("minDetSize", value)
-
-    @property
-    def borderDistance(self) -> Optional[int]:
-        """
-        Getter for borderDistance
-
-        Returns:
-            borderDistance
-        """
-        return self.getValue("borderDistance")
-
-    @borderDistance.setter
-    def borderDistance(self, value: int) -> None:
-        """
-        Setter for borderDistance
-        Args:
-            value: new value
-        """
-        self.setValue("borderDistance", value)
-
-    @property
-    def principalAxes(self) -> Optional[int]:
-        """
-        Getter for principalAxes
-
-        Returns:
-            principalAxes
-        """
-        return self.getValue("principalAxes")
-
-    @principalAxes.setter
-    def principalAxes(self, value: int) -> None:
-        """
-        Setter for principalAxes
-        Args:
-            value: new value
-        """
-        self.setValue("principalAxes", value)
+        self.setValue("qualityThreshold", value)
 
 
 class BaseSettingsProvider:

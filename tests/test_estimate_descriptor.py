@@ -1,7 +1,6 @@
 """
 Test estimate descriptor.
 """
-import unittest
 from enum import Enum
 from typing import Tuple, Generator, NamedTuple, Callable, List, Union, ContextManager
 
@@ -27,7 +26,7 @@ from tests.base import BaseTestClass
 from tests.detect_test_class import VLIMAGE_SMALL
 from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE, BAD_THRESHOLD_WARP
 
-EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57]
+EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58]
 
 EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [DHDV]
 
@@ -256,7 +255,7 @@ class TestEstimateDescriptor(BaseTestClass):
         else:
             assert isinstance(descriptor, HumanDescriptor)
         assert descriptor.model == expectedVersion, "descriptor has wrong version"
-        length = {54: 512, 56: 512, 57: 512, 101: 2048}[expectedVersion]
+        length = {54: 512, 56: 512, 57: 512, 58: 512, 101: 2048}[expectedVersion]
         assert length == len(descriptor.asBytes)
         assert length == len(descriptor.asVector)
         assert length + 8 == len(descriptor.rawDescriptor)
@@ -318,8 +317,6 @@ class TestEstimateDescriptor(BaseTestClass):
                 nonexistentVersions = set(range(min(case.versions) - 10, max(case.versions) + 10)) - set(case.versions)
                 for planVersion in nonexistentVersions:
                     with self.subTest(descriptor_version=planVersion):
-                        if planVersion == 57:
-                            self.skipTest("need support 57 version")
                         try:
                             case.extractorFactory(descriptorVersion=planVersion)
                         except RuntimeError:
@@ -443,7 +440,7 @@ class TestEstimateDescriptor(BaseTestClass):
                     extractor.estimateDescriptorsBatch([faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch)
                 self.assertLunaVlError(
                     exceptionInfo,
-                    LunaVLError.BatchedInternalError.format(
+                    LunaVLError.FiltredAggregationError.format(
                         "Cant aggregate descriptors - all images'a GSs are less the threashold"
                     ),
                 )
