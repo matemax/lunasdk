@@ -109,8 +109,6 @@ class LivenessV1Estimator(BaseEstimator):
     Liveness estimator version 1 (LivenessOneShotRGBEstimator).
     """
 
-    __slots__ = ("principalAxes",)
-
     #  pylint: disable=W0235
     def __init__(self, coreEstimator: ILivenessOneShotRGBEstimatorPtr):
         """

@@ -288,7 +288,7 @@ class FaceDetector:
             coreBBox = Detection(bBox.coreRectF, 1.0)
         else:
             coreBBox = bBox.coreEstimation.detection
-        self._validateBatchReDetectInput(image.coreImage, coreBBox)
+        self._validateReDetectInput(image.coreImage, coreBBox)
         error, detectRes = self._detector.redetectOne(
             image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
@@ -298,7 +298,17 @@ class FaceDetector:
             return FaceDetection(detectRes, image)
         return None
 
-    def _validateBatchReDetectInput(self, coreImages: List[CoreImage], detectAreas: List[List[Detection]]):
+    def _validateReDetectInput(self, coreImages: List[CoreImage], detectAreas: List[List[Detection]]):
+        """
+        Validate input data for face re-detect
+        Args:
+            coreImages:core images
+            detectAreas: face re-detect areas
+        Raises:
+            LunaSDKException(LunaVLError.BatchedInternalError): if validation failed and coreImages has type list
+                                                                                                  (batch redetect)
+            LunaSDKException: ifvalidation failed and coreImages has type CoreImage
+        """
         if isinstance(coreImages, list):
             validationError, imagesErrors = self._detector.validate(coreImages, detectAreas)
         else:
@@ -309,7 +319,7 @@ class FaceDetector:
         # if validationError.error != FSDKError.ValidationFailed:
         #     raise LunaSDKException(LunaVLError.fromSDKError(validationError), imagesErrors)
         if not isinstance(coreImages, list):
-            raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0]))
+            raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0][0]))
         errors = []
 
         for imageErrors in imagesErrors:
@@ -344,7 +354,7 @@ class FaceDetector:
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         coreImages, detectAreas = getArgsForCoreRedetect(images)
-        self._validateBatchReDetectInput(coreImages, detectAreas)
+        self._validateReDetectInput(coreImages, detectAreas)
         error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
         assertError(error)
 

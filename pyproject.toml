@@ -18,7 +18,7 @@ pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
 
 #[tool.poetry.dependencies.FaceEngine]
 #git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-#rev = "839aff2d"
+#tag = "v.5.1.0.0"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
