@@ -150,10 +150,11 @@ def validateBatchDetectInput(
     Raises:
         LunaSDKException: if validation are failed or data is not valid
     """
+    limit = 1
     if not isinstance(coreImages, list):
-        validationError, imageErrors = detector.validate([coreImages], [detectAreas], 1)
+        validationError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
     else:
-        validationError, imageErrors = detector.validate(coreImages, detectAreas, 1)
+        validationError, imageErrors = detector.validate(coreImages, detectAreas, limit)
     if validationError.isOk:
         return
     # uncomment after FSDK-2930
