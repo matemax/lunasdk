@@ -139,6 +139,37 @@ class ColorFormat(Enum):
         raise ValueError(f"Cannot load '{colorFormat}' color format.")
 
 
+def pilToNumpy(img: PilImage) -> np.ndarray:
+    """
+    Fast load pillow image to numpy array
+    Args:
+        img: pillow image
+
+    Returns:
+        numpy array
+    Raises:
+        RuntimeError: if encoding failed
+    """
+    img.load()
+    # unpack data
+    e = pilImage._getencoder(img.mode, "raw", img.mode)
+    e.setimage(img.im)
+
+    # NumPy buffer for the result
+    shape, typestr = pilImage._conv_type_shape(img)
+    data = np.empty(shape, dtype=np.dtype(typestr))
+    mem = data.data.cast("B", (data.data.nbytes,))
+
+    bufsize, s, offset = 65536, 0, 0
+    while not s:
+        l, s, d = e.encode(bufsize)
+        mem[offset : offset + len(d)] = d  # noqa: E203
+        offset += len(d)
+    if s < 0:
+        raise RuntimeError("encoder error %d in tobytes" % s)
+    return data
+
+
 class VLImage:
     """
     Class image.
@@ -153,7 +184,7 @@ class VLImage:
 
     def __init__(
         self,
-        body: Union[bytes, bytearray, PilImage, CoreImage],
+        body: Union[bytes, bytearray, PilImage, CoreImage, np.ndarray],
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
     ):
@@ -195,7 +226,7 @@ class VLImage:
                 ndarray=body, inputColorFormat=ColorFormat.load(mode), colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         elif isinstance(body, PilImage):
-            array = np.array(body)
+            array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
                 ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
