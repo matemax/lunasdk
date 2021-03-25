@@ -79,9 +79,17 @@ class VLFaceEngine:
         self._faceEngine = CoreFE.createFaceEngine(
             dataPath=pathToData, configPath=str(self.faceEngineProvider.pathToConfig)
         )
+        self.activate()
 
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
+
+    def activate(self):
+        """
+        Activate license
+        """
+        _license = self._faceEngine.getLicense()
+        return self._faceEngine.activateLicense(_license, f"{self.dataPath}/license.conf")
 
     def createFaceDetector(self, detectorType: DetectorType) -> FaceDetector:
         """
