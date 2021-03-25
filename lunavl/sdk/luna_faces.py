@@ -2,25 +2,26 @@
 """
 from typing import Optional, Union, List, Dict
 
-from FaceEngine import Face, OrientationType  # pylint: disable=E0611,E0401
+from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from numpy import ndarray
+
+from .detectors.base import ImageForDetection, ImageForRedetection
+from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .estimator_collections import FaceEstimatorsCollection
 from .estimators.face_estimators.basic_attributes import BasicAttributes
 from .estimators.face_estimators.emotions import Emotions
 from .estimators.face_estimators.eyes import EyesEstimation, GazeDirection
 from .estimators.face_estimators.face_descriptor import FaceDescriptor
+from .estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from .estimators.face_estimators.glasses import Glasses
 from .estimators.face_estimators.head_pose import HeadPose
+from .estimators.face_estimators.livenessv1 import LivenessV1
+from .estimators.face_estimators.mask import Mask
 from .estimators.face_estimators.mouth_state import MouthStates
 from .estimators.face_estimators.warp_quality import Quality
-from .estimators.face_estimators.mask import Mask
-from .estimators.face_estimators.glasses import Glasses
-from .estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from .estimators.face_estimators.livenessv1 import LivenessV1
 from .faceengine.engine import VLFaceEngine
-from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
-from .detectors.base import ImageForDetection, ImageForRedetection
 from .faceengine.setting_provider import DetectorType
 from .image_utils.geometry import Rect
 from .image_utils.image import VLImage, ColorFormat
@@ -256,7 +257,7 @@ class VLFaceDetection(FaceDetection):
             livenessv1
         """
         if self._liveness is None:
-            self._liveness = self.estimatorCollection.livenessV1Estimator.estimate(self, self.headPose)
+            self._liveness = self.estimatorCollection.livenessV1Estimator.estimate(self)
         return self._liveness
 
     def asDict(self) -> Dict[str, Union[str, dict, list, float, tuple]]:

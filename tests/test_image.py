@@ -4,12 +4,13 @@ from collections import namedtuple
 from pathlib import Path
 from typing import List, Union
 
+from lunavl.sdk.errors.errors import LunaVLError
 import FaceEngine as fe
 import numpy as np
 import pytest
 from PIL import Image
 
-from lunavl.sdk.errors.errors import LunaVLError
+
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
@@ -267,7 +268,7 @@ class TestImage(BaseTestClass):
                         with pytest.raises(LunaSDKException) as exceptionInfo:
                             sourceImage.convert(target)
                         self.assertLunaVlError(
-                            exceptionInfo, LunaVLError.InvalidConversion.format("Requiered conversion not implemented")
+                            exceptionInfo, LunaVLError.InvalidConversion.format("Required conversion not implemented")
                         )
                     else:
                         targetImg = sourceImage.convert(target)

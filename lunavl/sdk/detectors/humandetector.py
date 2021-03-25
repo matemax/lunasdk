@@ -4,12 +4,10 @@ Module contains function for detection human bodies on images.
 from typing import Optional, Union, List, Dict, Any
 
 from FaceEngine import (
-    HumanDetectionType,
     Human,
     HumanLandmarks17 as CoreLandmarks17,
     Detection,
-    Image as CoreImage,
-    Rect as CoreRectI,
+    HumanDetectionType,
 )  # pylint: disable=E0611,E0401
 
 from .base import (
@@ -18,7 +16,7 @@ from .base import (
     BaseDetection,
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
-    collectAndRaiseError,
+    validateBatchDetectInput,
 )
 from ..base import LandmarksWithScore
 from ..errors.errors import LunaVLError
@@ -182,31 +180,24 @@ class HumanDetector:
         Returns:
             return list of lists detection, order of detection lists is corresponding to order input images
         """
-
-        def getSingleError(image: CoreImage, detectArea: CoreRectI):
-            """Get error from one image detect"""
-            errorOne, _ = self._detector.detect([image], [detectArea], 1, detectionType)
-            return errorOne
-
         coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detectLandmarks)
-
+        validateBatchDetectInput(self._detector, coreImages, detectAreas)
         fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
         if fsdkErrorRes.isError:
-            collectAndRaiseError(fsdkErrorRes, coreImages, detectAreas, getSingleError)
-
+            raise LunaSDKException(LunaVLError.fromSDKError(fsdkErrorRes))
         res = []
         for imageIdx in range(fsdkDetectRes.getSize()):
             imagesDetections = []
             detections = fsdkDetectRes.getDetections(imageIdx)
             landmarks17Array = fsdkDetectRes.getLandmarks17(imageIdx)
 
-            for detection, landmarks17 in zip(detections, landmarks17Array):
+            for idx, detection in enumerate(detections):
                 human = Human()
                 human.img = coreImages[imageIdx]
                 human.detection = detection
-                if landmarks17:
-                    human.landmarks17_opt.set(landmarks17)
+                if detectLandmarks:
+                    human.landmarks17_opt.set(landmarks17Array[idx])
                 imagesDetections.append(human)
 
             image = images[imageIdx]
@@ -237,8 +228,7 @@ class HumanDetector:
             coreBBox = Detection(bBox.coreRectF, 1.0)
         else:
             coreBBox = bBox.coreEstimation.detection
-
-        error, detectRes = self._detector.redetectOne(image.coreImage, coreBBox)
+        error, detectRes = self._detector.redetectOne(image.coreImage, coreBBox, self._getDetectionType(True))
 
         assertError(error)
         if detectRes.isValid():

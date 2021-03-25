@@ -1,7 +1,7 @@
 language: python
 
 install:
-  - pip install poetry=='1.0.0b8'
+  - pip install poetry
   - poetry install
 
 jobs:

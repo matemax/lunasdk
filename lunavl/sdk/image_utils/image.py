@@ -3,18 +3,18 @@ Module realize VLImage - structure for storing image in special format.
 """
 from copy import copy
 from enum import Enum
-from io import BytesIO
 from pathlib import Path
 from typing import Optional, Union
+
+import numpy as np
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
-import numpy as np
-from PIL.Image import Image as PilImage, _fromarray_typemap as imageModeMap
 from PIL import Image as pilImage
+from PIL.Image import Image as PilImage, _fromarray_typemap as imageModeMap
 
+from .geometry import Rect
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
-from .geometry import Rect
 
 
 class ImageFormat(Enum):
@@ -326,7 +326,7 @@ class VLImage:
 
     @property
     def format(self) -> ColorFormat:
-        """ getFormat(self: FaceEngine.Image) -> FaceEngine.FormatType
+        """getFormat(self: FaceEngine.Image) -> FaceEngine.FormatType
 
         >>> image = VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg')
         >>> image.format.value

@@ -3,10 +3,7 @@ from typing import Optional
 
 import pytest
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.livenessv1 import LivenessPrediction, LivenessV1
-from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -29,11 +26,8 @@ class TestEstimateLivenessV1(BaseTestClass):
         cls.headPoseEstimator = cls.faceEngine.createHeadPoseEstimator()
         cls.livenessEstimator = cls.faceEngine.createLivenessV1Estimator()
         cls.detection = cls.detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=True)
-        cls.headPose = cls.headPoseEstimator.estimate(cls.detection.landmarks68)
 
-    def assert_liveness_estimation(
-        self, estimation: LivenessV1, expectedPrediction: Optional[LivenessPrediction] = None
-    ):
+    def assertLivenessEstimation(self, estimation: LivenessV1, expectedPrediction: Optional[LivenessPrediction] = None):
         """
         Assert estimation liveness.
 
@@ -56,14 +50,14 @@ class TestEstimateLivenessV1(BaseTestClass):
         """
         Test liveness estimations as dict
         """
-        glassesDict = self.livenessEstimator.estimate(self.detection).asDict()
+        livenessDict = self.livenessEstimator.estimate(self.detection).asDict()
         assert (
-            jsonValidator(schema=LIVENESSV1_SCHEMA).validate(glassesDict) is None
-        ), f"{glassesDict} does not match with schema {LIVENESSV1_SCHEMA}"
+            jsonValidator(schema=LIVENESSV1_SCHEMA).validate(livenessDict) is None
+        ), f"{livenessDict} does not match with schema {LIVENESSV1_SCHEMA}"
 
     def test_liveness_estimation(self):
         """
-        Test eye estimator with face with opened eyes
+        Test liveness estimator
         """
         Case = namedtuple("Case", ("image", "prediction"))
         cases = (
@@ -74,59 +68,23 @@ class TestEstimateLivenessV1(BaseTestClass):
         for case in cases:
             with self.subTest(prediction=case.prediction):
                 faceDetection = self.detector.detectOne(VLImage.load(filename=case.image), detect68Landmarks=True)
-                headPose = self.headPoseEstimator.estimate(faceDetection.landmarks68)
-                estimation = self.livenessEstimator.estimate(faceDetection=faceDetection, headPose=headPose)
-                self.assert_liveness_estimation(estimation, expectedPrediction=case.prediction)
+                estimation = self.livenessEstimator.estimate(faceDetection=faceDetection, qualityThreshold=0.9)
+                self.assertLivenessEstimation(estimation, expectedPrediction=case.prediction)
 
-    def test_estimate_liveness_by_small_detection(self):
+    def test_liveness_estimation_quality_threshold(self):
         """
-        Test estimate liveness by small face detection. Todo: remove after FSDK-2811
+        Test a quality threshold of liveness estimator
         """
-        faceDetection = self.detector.detectOne(VLImage.load(filename=SMALL_IMAGE))
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.livenessEstimator.estimate(faceDetection=faceDetection)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput.format(details="Invalid input"))
-
-    def test_estimate_liveness_with_head_pose_angles_info(self):
-        """
-        Test estimate liveness with head pose angles info
-        """
-        for angle in ("yaw", "roll", "pitch"):
-            for sign in (-1, 1):
-                with self.subTest(angle=angle, sign=sign):
-                    estimation = self.livenessEstimator.estimate(faceDetection=self.detection, **{angle: sign * 30})
-                    self.assert_liveness_estimation(estimation, LivenessPrediction.Unknown)
-                    estimation = self.livenessEstimator.estimate(faceDetection=self.detection, **{angle: sign * 1})
-                    self.assert_liveness_estimation(estimation, LivenessPrediction.Real)
-
-    def test_estimate_liveness_with_filtration_by_handle(self):
-        """
-        Test estimate liveness with head pose info
-        """
-        Case = namedtuple("Case", ("prediction", "principalAxes"))
-        cases = (
-            Case(LivenessPrediction.Real, 60),
-            Case(LivenessPrediction.Unknown, 1),
-            Case(LivenessPrediction.Real, None),
+        estimation = self.livenessEstimator.estimate(faceDetection=self.detection)
+        self.assertLivenessEstimation(estimation, expectedPrediction=LivenessPrediction.Real)
+        estimation = self.livenessEstimator.estimate(
+            faceDetection=self.detection, qualityThreshold=estimation.quality + 0.001
         )
-        for case in cases:
-            with self.subTest(prediction=case.prediction, principalAxes=case.principalAxes):
-                livenessEstimator = self.faceEngine.createLivenessV1Estimator(principalAxes=case.principalAxes)
-                estimation = livenessEstimator.estimate(faceDetection=self.detection, headPose=self.headPose)
-                self.assert_liveness_estimation(estimation, case.prediction)
-
-    def test_estimate_liveness_by_detection_on_image_border(self):
-        """
-        Test estimate liveness by face detection on an image border. Todo: remove after FSDK-2811
-        """
-        faceEngine = VLFaceEngine()
-        faceEngine.faceEngineProvider.livenessV1Estimator.borderDistance = 1000
-        detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
-        faceDetection = detector.detectOne(VLImage.load(filename=ONE_FACE))
-        livenessEstimator = faceEngine.createLivenessV1Estimator()
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            livenessEstimator.estimate(faceDetection=faceDetection)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput.format(details="Invalid input"))
+        self.assertLivenessEstimation(estimation, expectedPrediction=LivenessPrediction.Unknown)
+        estimation = self.livenessEstimator.estimate(
+            faceDetection=self.detection, qualityThreshold=estimation.quality - 0.001
+        )
+        self.assertLivenessEstimation(estimation, expectedPrediction=LivenessPrediction.Real)
 
     def test_estimate_liveness_by_detection_without_landmarks5(self):
         """

@@ -1,10 +1,10 @@
-from typing import NamedTuple, List, Any, Dict, Union, Tuple, Callable
+from typing import NamedTuple, List, Any, Dict, Union, Tuple
 
-from FaceEngine import Rect as CoreRectI, Detection, FSDKErrorResult, Image as CoreImage  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage  # pylint: disable=E0611,E0401
 
+from ..base import BaseEstimation, BoundingBox
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
-from ..base import BaseEstimation, BoundingBox
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage, ColorFormat
 
@@ -111,11 +111,9 @@ def getArgsForCoreDetectorForImages(
         if isinstance(image, VLImage):
             img = image
             detectAreas.append(image.coreImage.getRect())
-            assertImageForDetection(image)
         else:
             img = image.image
             detectAreas.append(image.detectArea.coreRectI)
-            assertImageForDetection(image.image)
         coreImages.append(img.coreImage)
 
     return coreImages, detectAreas
@@ -134,34 +132,44 @@ def getArgsForCoreRedetect(images: List[ImageForRedetection]) -> Tuple[List[Core
     coreImages, detectAreas = [], []
 
     for image in images:
-        assertImageForDetection(image.image)
         coreImages.append(image.image.coreImage)
         detectAreas.append([Detection(bbox.coreRect, 1.0) for bbox in image.bBoxes])
 
     return coreImages, detectAreas
 
 
-def collectAndRaiseError(
-    error: FSDKErrorResult,
-    coreImages: List[CoreImage],
-    detectAreas: Union[List[Detection], List[CoreRectI]],
-    getErrorFunction: Callable[[CoreImage, Union[Detection, CoreRectI]], FSDKErrorResult],
+def validateBatchDetectInput(
+    detector, coreImages: Union[List[CoreImage]], detectAreas: Union[CoreRectI, List[CoreRectI]]
 ) -> None:
     """
     Collect errors from single operations and raise complex exception
     Args:
-        error: fsdk error from core reply
+        detector: core face or body detector
         coreImages: list of core images
         detectAreas: list of detect areas for core images
-        getErrorFunction: function to collect error by
     Raises:
-        LunaSDKException(LunaVLError.BatchedInternalError) with collected errors in context
+        LunaSDKException: if validation are failed or data is not valid
     """
+    limit = 1
+    if not isinstance(coreImages, list):
+        validationError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
+    else:
+        validationError, imageErrors = detector.validate(coreImages, detectAreas, limit)
+    if validationError.isOk:
+        return
+    # uncomment after FSDK-2930
+    # if validationError.error != FSDKError.ValidationFailed:
+    #     raise LunaSDKException(LunaVLError.fromSDKError(validationError), errors)
+    if not isinstance(coreImages, list):
+        raise LunaSDKException(LunaVLError.fromSDKError(imageErrors[0]))
     errors = []
-    for image, detectArea in zip(coreImages, detectAreas):
-        errorOne = getErrorFunction(image, detectArea)
-        if errorOne.isOk:
-            errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-        else:
-            errors.append(LunaVLError.fromSDKError(errorOne))
-    raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors)
+    for error in imageErrors:
+        if error.isOk:
+            continue
+        errors.append(LunaVLError.fromSDKError(error))
+        break
+    else:
+        errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+    raise LunaSDKException(
+        LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
+    )
