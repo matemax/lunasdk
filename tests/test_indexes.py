@@ -148,7 +148,9 @@ class TestIndexFunctionality(BaseTestClass):
             self.indexBuilder.append(self.nonDefaultFaceDescriptor)
         self.assertLunaVlError(
             ex,
-            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}"),
+            LunaVLError.InvalidDescriptor.format(
+                f"Expected descriptor version {self.descriptorVersion}, got version {self.nonDefaultDescriptorVersion}"
+            ),
         )
 
     def test_remove_descriptor_from_builder(self):
@@ -239,7 +241,9 @@ class TestIndexFunctionality(BaseTestClass):
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
         self.assertLunaVlError(
             ex,
-            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}"),
+            LunaVLError.InvalidDescriptor.format(
+                f"Expected descriptor version {self.descriptorVersion}, got version {self.nonDefaultDescriptorVersion}"
+            ),
         )
 
     @pytest.mark.skip("FSDK-2897 internal error")
@@ -293,7 +297,8 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertLunaVlError(
             ex,
             LunaVLError.InvalidDescriptor.format(
-                f"Not expected descriptor version {nonDefaultDescriptorMap['descriptor_version']}"
+                f"Expected descriptor version {self.descriptorVersion}, "
+                f"got version {nonDefaultDescriptorMap['descriptor_version']}"
             ),
         )
 

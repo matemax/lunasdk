@@ -59,7 +59,7 @@ class IndexBuilder(CoreIndex):
         Returns:
             dynamic index
         """
-        error, loadedIndex = self._faceEngine.loadDenseIndex(path)
+        error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())

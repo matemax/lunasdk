@@ -141,5 +141,7 @@ class CoreIndex:
         """
         if receivedDescriptorVersion != self.descriptorVersion:
             raise LunaSDKException(
-                LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {receivedDescriptorVersion}")
+                LunaVLError.InvalidDescriptor.format(
+                    f"Expected descriptor version {self.descriptorVersion}, got version {receivedDescriptorVersion}"
+                )
             )
