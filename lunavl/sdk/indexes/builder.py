@@ -33,6 +33,38 @@ class IndexBuilder(CoreIndex):
         """Get storage size with descriptors."""
         return self._bufSize
 
+    def _getDenseIndex(self, path: str) -> DenseIndex:
+        """
+        Get dense index from file
+        Args:
+            path: path to saved index
+        Raises:
+            LunaSDKException: if an error occurs while loading the index
+        Returns:
+            dense index
+        """
+        error, loadedIndex = self._faceEngine.loadDenseIndex(path)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())
+        return DenseIndex(loadedIndex, self._faceEngine)
+
+    def _getDynamicIndex(self, path: str) -> DynamicIndex:
+        """
+        Get dynamic index from file
+        Args:
+            path: path to saved index
+        Raises:
+            LunaSDKException: if an error occurs while loading the index
+        Returns:
+            dynamic index
+        """
+        error, loadedIndex = self._faceEngine.loadDenseIndex(path)
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())
+        return DynamicIndex(loadedIndex, self._faceEngine)
+
     def append(self, descriptor: FaceDescriptor) -> None:
         """
         Appends descriptor to internal storage.
@@ -80,25 +112,16 @@ class IndexBuilder(CoreIndex):
             path: path to saved index
             indexType: index type ('dynamic' or 'dense')
         Raises:
-            LunaSDKException: if an error occurs while loading the index
+            FileNotFoundError: if the index file is not found
         Returns:
             class of DenseIndex or DynamicIndex
         """
         if not Path(path).exists():
             raise FileNotFoundError(f"No such file or directory: {path}")
 
-        _cls: Union[Type[DynamicIndex], Type[DenseIndex]]
         if IndexType(indexType) == IndexType.dynamic:
-            error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
-            _cls = DynamicIndex
-        else:
-            error, loadedIndex = self._faceEngine.loadDenseIndex(path)
-            _cls = DenseIndex
-
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())
-        return _cls(loadedIndex, self._faceEngine)
+            return self._getDynamicIndex(path=path)
+        return self._getDenseIndex(path=path)
 
     def buildIndex(self) -> DynamicIndex:
         """
