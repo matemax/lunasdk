@@ -70,13 +70,16 @@ class TestIndexFunctionality(BaseTestClass):
         """
         assert isinstance(dynamicIndex, DynamicIndex), f"created {dynamicIndex.__class__} is not {DynamicIndex}"
         assert isinstance(dynamicIndex.bufSize, int), f"expected int but found {dynamicIndex.bufSize.__class__}"
-        assert isinstance(dynamicIndex.descriptorsCount, int), \
-            f"expected int but found {dynamicIndex.descriptorsCount.__class__}"
+        assert isinstance(
+            dynamicIndex.descriptorsCount, int
+        ), f"expected int but found {dynamicIndex.descriptorsCount.__class__}"
         assert expectedBufSize == dynamicIndex.bufSize, "dynamic buf size is not equal to the expected"
-        assert expectedDescriptorCount == dynamicIndex.descriptorsCount, \
-            "count of descriptors is not equal to the expected"
-        assert self.getCountOfDescriptorsInStorage(dynamicIndex) == dynamicIndex.bufSize, \
-            "wrong size of internal storage"
+        assert (
+            expectedDescriptorCount == dynamicIndex.descriptorsCount
+        ), "count of descriptors is not equal to the expected"
+        assert (
+            self.getCountOfDescriptorsInStorage(dynamicIndex) == dynamicIndex.bufSize
+        ), "wrong size of internal storage"
 
     @staticmethod
     def getCountOfDescriptorsInStorage(indexObject: Union[IndexBuilder, DynamicIndex, DenseIndex]) -> int:
@@ -145,7 +148,7 @@ class TestIndexFunctionality(BaseTestClass):
             self.indexBuilder.append(self.nonDefaultFaceDescriptor)
         self.assertLunaVlError(
             ex,
-            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}")
+            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}"),
         )
 
     def test_remove_descriptor_from_builder(self):
@@ -236,7 +239,7 @@ class TestIndexFunctionality(BaseTestClass):
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
         self.assertLunaVlError(
             ex,
-            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}")
+            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}"),
         )
 
     @pytest.mark.skip("FSDK-2897 internal error")
@@ -280,8 +283,7 @@ class TestIndexFunctionality(BaseTestClass):
         assert isinstance(denseIndex, DenseIndex), f"created {denseIndex} is not {DenseIndex}"
         assert isinstance(denseIndex.bufSize, int), f"expected int but found {denseIndex.bufSize}"
         assert 1 == dynamicIndex.bufSize, "dense buf size is not equal to the expected"
-        assert self.getCountOfDescriptorsInStorage(denseIndex) == denseIndex.bufSize, \
-            "wrong size of internal storage"
+        assert self.getCountOfDescriptorsInStorage(denseIndex) == denseIndex.bufSize, "wrong size of internal storage"
 
     def test_load_index_non_default_descriptor(self):
         """Test load index from file with non default descriptor version."""
@@ -292,7 +294,7 @@ class TestIndexFunctionality(BaseTestClass):
             ex,
             LunaVLError.InvalidDescriptor.format(
                 f"Not expected descriptor version {nonDefaultDescriptorMap['descriptor_version']}"
-            )
+            ),
         )
 
     def test_load_index_incorrect_path_to_file(self):
