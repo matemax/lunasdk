@@ -15,7 +15,7 @@ def buildDescriptorIndex():
     Build index and search.
     """
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     warper = faceEngine.createFaceWarper()
     extractor = faceEngine.createFaceDescriptorEstimator()
     descriptorsBatch = faceEngine.createFaceDescriptorFactory().generateDescriptorsBatch(2)

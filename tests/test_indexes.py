@@ -24,7 +24,8 @@ EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58]
 faceWarp = FaceWarpedImage.load(filename=WARP_WHITE_MAN)
 faceWarps = [FaceWarpedImage.load(filename=WARP_CLEAN_FACE), FaceWarpedImage.load(filename=WARP_ONE_FACE)]
 currDir = os.path.dirname(__file__)
-pathToStoredIndex = os.path.join(currDir, "stored.index")
+pathToStoredIndex = os.path.join(currDir, "data", "stored.index")
+nonDefaultDynamicIndex = os.path.join(currDir, "data", "descriptor57.index")
 
 
 class TestIndexFunctionality(BaseTestClass):
@@ -50,7 +51,7 @@ class TestIndexFunctionality(BaseTestClass):
 
     def setUp(self) -> None:
         super().setUp()
-        self.indexBuilder = self.faceEngine.createIndexBuilder(self.descriptorVersion)
+        self.indexBuilder = self.faceEngine.createIndexBuilder()
         self.faceDescriptor = self.defaultFaceEstimator.estimate(faceWarp)
         self.faceDescriptorBatch, _ = self.defaultFaceEstimator.estimateDescriptorsBatch(faceWarps)
 
@@ -142,10 +143,10 @@ class TestIndexFunctionality(BaseTestClass):
         """Test append non default descriptor to internal storage."""
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.append(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.IncompatibleDescriptors.format(
-            f"mismatch of descriptor versions: expected={self.descriptorVersion} "
-            f"received={self.nonDefaultDescriptorVersion}"
-        ))
+        self.assertLunaVlError(
+            ex,
+            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}")
+        )
 
     def test_remove_descriptor_from_builder(self):
         """Test remove descriptor from internal storage."""
@@ -168,7 +169,6 @@ class TestIndexFunctionality(BaseTestClass):
             del self.indexBuilder[nonExistentIndex]
         assert str(nonExistentIndex) in ex.exception.args[0]
 
-    @pytest.mark.skip("FSDK-2877 Segmentation fault")
     def test_append_descriptor_to_empty_dynamic_index(self):
         """Test append descriptor to empty dynamic index."""
         dynamicIndex = self.indexBuilder.buildIndex()
@@ -234,10 +234,10 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=2, expectedBufSize=2)
         with pytest.raises(LunaSDKException) as ex:
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.IncompatibleDescriptors.format(
-            f"mismatch of descriptor versions: expected={self.descriptorVersion} "
-            f"received={self.nonDefaultDescriptorVersion}"
-        ))
+        self.assertLunaVlError(
+            ex,
+            LunaVLError.InvalidDescriptor.format(f"Not expected descriptor version {self.nonDefaultDescriptorVersion}")
+        )
 
     @pytest.mark.skip("FSDK-2897 internal error")
     def test_search_result_empty(self):
@@ -282,6 +282,25 @@ class TestIndexFunctionality(BaseTestClass):
         assert 1 == dynamicIndex.bufSize, "dense buf size is not equal to the expected"
         assert self.getCountOfDescriptorsInStorage(denseIndex) == denseIndex.bufSize, \
             "wrong size of internal storage"
+
+    def test_load_index_non_default_descriptor(self):
+        """Test load index from file with non default descriptor version."""
+        nonDefaultDescriptorMap = {"descriptor_version": EFDVa[2], "index": nonDefaultDynamicIndex}
+        with pytest.raises(LunaSDKException) as ex:
+            self.indexBuilder.loadIndex(nonDefaultDescriptorMap["index"], IndexType.dynamic)
+        self.assertLunaVlError(
+            ex,
+            LunaVLError.InvalidDescriptor.format(
+                f"Not expected descriptor version {nonDefaultDescriptorMap['descriptor_version']}"
+            )
+        )
+
+    def test_load_index_incorrect_path_to_file(self):
+        """Test load non existing index file."""
+        nonExistingFile = "./data/not_existing_file.index"
+        with pytest.raises(FileNotFoundError) as ex:
+            self.indexBuilder.loadIndex(nonExistingFile, IndexType.dynamic)
+        assert f"No such file or directory: {nonExistingFile}" in ex.value.args[0]
 
     def test_save_index_bad_filename(self):
         """Test save index to local storage with bad filename."""

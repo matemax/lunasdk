@@ -7,7 +7,6 @@ from typing import Union
 from FaceEngine import PyIFaceEngine
 
 from lunavl.sdk.descriptors.descriptors import (
-    FaceDescriptorFactory,
     FaceDescriptor,
     FaceDescriptorBatch,
 )
@@ -23,13 +22,11 @@ class IndexBuilder(CoreIndex):
 
     Attributes:
         _bufSize (int): storage size with descriptors
-        _faceEngine (VLFaceEngine): faceEngine
     """
 
-    def __init__(self, faceEngine: PyIFaceEngine, descriptorFactory: FaceDescriptorFactory):
-        super().__init__(faceEngine.createIndexBuilder(), descriptorFactory)
+    def __init__(self, faceEngine: PyIFaceEngine):
+        super().__init__(faceEngine.createIndexBuilder(), faceEngine)
         self._bufSize = 0
-        self._faceEngine = faceEngine
 
     @property
     def bufSize(self) -> int:
@@ -44,7 +41,7 @@ class IndexBuilder(CoreIndex):
         Raises:
             LunaSDKException: if an error occurs while adding the descriptor
         """
-        self.checkDescriptorVersion(descriptor)
+        self.checkDescriptorVersion(descriptor.coreEstimation.getModelVersion())
         error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -58,13 +55,13 @@ class IndexBuilder(CoreIndex):
         Raises:
             LunaSDKException: if an error occurs while adding the batch of descriptors
         """
-        self.checkDescriptorVersion(descriptorsBatch)
+        self.checkDescriptorVersion(descriptorsBatch.coreEstimation.getModelVersion())
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         self._bufSize += len(descriptorsBatch)
 
-    def __delitem__(self, index: int):
+    def __delitem__(self, index: int) -> None:
         """
         Removes descriptor out of internal storage.
         Args:
@@ -89,18 +86,17 @@ class IndexBuilder(CoreIndex):
         """
         if not Path(path).exists():
             raise FileNotFoundError(f"No such file or directory: {path}")
-        if indexType == IndexType.dynamic:
+        if IndexType(indexType) == IndexType.dynamic:
             error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
             _cls = DynamicIndex
-        elif indexType == IndexType.dense:
+        else:
             error, loadedIndex = self._faceEngine.loadDenseIndex(path)
             _cls = DenseIndex
-        else:
-            raise ValueError(f"{indexType} is not a valid, must be one of ['dynamic', 'dense']")
-        # todo: check descriptor version from index, after task FSDK-2867
+
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return _cls(loadedIndex, self._descriptorFactory)
+        self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())
+        return _cls(loadedIndex, self._faceEngine)
 
     def buildIndex(self) -> DynamicIndex:
         """
@@ -113,4 +109,4 @@ class IndexBuilder(CoreIndex):
         error, index = self._coreIndex.buildIndex()
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return DynamicIndex(index, self._descriptorFactory)
+        return DynamicIndex(index, self._faceEngine)
