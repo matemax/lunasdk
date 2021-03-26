@@ -1,6 +1,7 @@
 """Module realize wraps on facengine objects
 """
 import os
+from pathlib import Path
 from typing import Optional, Union
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
@@ -37,6 +38,9 @@ class VLFaceEngine:
         runtimeProvider (RuntimeSettingsProvider): runtime settings provider
         _faceEngine (PyIFaceEngine): python C++ binding on IFaceEngine, Root LUNA SDK object interface
     """
+
+    # path to a file with license info
+    license: Optional[Union[str, Path]] = None
 
     def __init__(
         self,
@@ -79,9 +83,22 @@ class VLFaceEngine:
         self._faceEngine = CoreFE.createFaceEngine(
             dataPath=pathToData, configPath=str(self.faceEngineProvider.pathToConfig)
         )
+        if self.license:
+            self.activate(self.license)
 
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
+
+    def activate(self, pathToLicense: Union[str, Path]):
+        """
+        Activate license
+        Args:
+            pathToLicense: path to the file with license info
+        """
+        _license = self._faceEngine.getLicense()
+        return self._faceEngine.activateLicense(
+            _license, pathToLicense if isinstance(pathToLicense, str) else (str(pathToLicense))
+        )
 
     def createFaceDetector(self, detectorType: DetectorType) -> FaceDetector:
         """
