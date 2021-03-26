@@ -2,7 +2,7 @@
 Module contains core index builder.
 """
 from pathlib import Path
-from typing import Union
+from typing import Union, Type
 
 from FaceEngine import PyIFaceEngine
 
@@ -70,7 +70,7 @@ class IndexBuilder(CoreIndex):
             IndexError: if index out of range
             LunaSDKException: if an error occurs while remove descriptor failed
         """
-        super().__delitem__(index=index)
+        super().__delitem__(index)
         self._bufSize -= 1
 
     def loadIndex(self, path: str, indexType: IndexType) -> Union[DynamicIndex, DenseIndex]:
@@ -86,6 +86,8 @@ class IndexBuilder(CoreIndex):
         """
         if not Path(path).exists():
             raise FileNotFoundError(f"No such file or directory: {path}")
+
+        _cls: Union[Type[DynamicIndex], Type[DenseIndex]]
         if IndexType(indexType) == IndexType.dynamic:
             error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
             _cls = DynamicIndex
