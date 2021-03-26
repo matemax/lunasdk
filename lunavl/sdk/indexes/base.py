@@ -68,6 +68,7 @@ class CoreIndex:
     """
     Core index class
     """
+
     __slots__ = ("_coreIndex", "_faceEngine")
 
     def __init__(self, coreIndex: Union[IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr], faceEngine: PyIFaceEngine):
