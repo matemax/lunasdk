@@ -26,6 +26,7 @@ from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
+from ..indexes.builder import IndexBuilder
 
 
 class VLFaceEngine:
@@ -300,3 +301,11 @@ class VLFaceEngine:
             estimator
         """
         return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
+
+    def createIndexBuilder(self) -> IndexBuilder:
+        """
+        Create an index builder for face
+        Returns:
+            index builder
+        """
+        return IndexBuilder(self._faceEngine)
