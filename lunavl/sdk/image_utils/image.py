@@ -154,8 +154,8 @@ def pilToNumpy(img: PilImage) -> np.ndarray:
     """
     img.load()
     # unpack data
-    encoder = pilImage._getencoder(img.mode, "raw", img.mode)
-    encoder.setimage(img.im)
+    e = pilImage._getencoder(img.mode, "raw", img.mode)
+    e.setimage(img.im)
 
     # NumPy buffer for the result
     shape, typestr = pilImage._conv_type_shape(img)
@@ -164,9 +164,9 @@ def pilToNumpy(img: PilImage) -> np.ndarray:
 
     bufsize, s, offset = 65536, 0, 0
     while not s:
-        _, s, data = encoder.encode(bufsize)
-        mem[offset : offset + len(data)] = data  # noqa: E203
-        offset += len(data)
+        l, s, d = e.encode(bufsize)
+        mem[offset : offset + len(d)] = d  # noqa: E203
+        offset += len(d)
     if s < 0:
         raise RuntimeError("encoder error %d in tobytes" % s)
     return data
