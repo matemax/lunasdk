@@ -149,11 +149,13 @@ def pilToNumpy(img: PilImage) -> np.ndarray:
         numpy array
     Raises:
         RuntimeError: if encoding failed
+    References:
+        https://habr.com/ru/post/545850/
     """
     img.load()
     # unpack data
-    e = pilImage._getencoder(img.mode, "raw", img.mode)
-    e.setimage(img.im)
+    encoder = pilImage._getencoder(img.mode, "raw", img.mode)
+    encoder.setimage(img.im)
 
     # NumPy buffer for the result
     shape, typestr = pilImage._conv_type_shape(img)
@@ -162,9 +164,9 @@ def pilToNumpy(img: PilImage) -> np.ndarray:
 
     bufsize, s, offset = 65536, 0, 0
     while not s:
-        l, s, d = e.encode(bufsize)
-        mem[offset : offset + len(d)] = d  # noqa: E203
-        offset += len(d)
+        _, s, data = encoder.encode(bufsize)
+        mem[offset : offset + len(data)] = data  # noqa: E203
+        offset += len(data)
     if s < 0:
         raise RuntimeError("encoder error %d in tobytes" % s)
     return data
