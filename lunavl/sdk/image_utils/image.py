@@ -10,7 +10,7 @@ import numpy as np
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL import Image as pilImage
-from PIL.Image import Image as PilImage, _fromarray_typemap as imageModeMap
+from PIL.Image import Image as PilImage, _fromarray_typemap as imageTypeMap
 
 from .geometry import Rect
 from ..errors.errors import LunaVLError
@@ -172,6 +172,30 @@ def pilToNumpy(img: PilImage) -> np.ndarray:
     return data
 
 
+def getNPImageType(arr: np.ndarray) -> str:
+    """
+    Get numpy image type
+    Args:
+        arr: numpy array
+
+    Returns:
+        image type which pillow associated with this array
+    Raises:
+        TypeError: if cannot handle  image type
+    References:
+        https://github.com/python-pillow/Pillow/blob/master/src/PIL/Image.py#L2788
+    """
+    try:
+        typekey = (1, 1) + arr.shape[2:], arr.dtype.str
+    except KeyError as e:
+        raise TypeError("Cannot handle this data type: %s" % arr.dtype.str) from e
+    try:
+        imgType, _ = imageTypeMap[typekey]
+        return imgType
+    except KeyError as e:
+        raise TypeError("Cannot handle this data type: %s, %s" % typekey) from e
+
+
 class VLImage:
     """
     Class image.
@@ -219,12 +243,7 @@ class VLImage:
             if error.isError:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, np.ndarray):
-            try:
-                # typekey ((shape), (array type as str))
-                typekey = (1, 1) + body.shape[2:], body.dtype.str
-                mode, _ = imageModeMap[typekey]
-            except KeyError:
-                raise TypeError(f"Bad image type: {type(body)}")
+            mode = getNPImageType(body)
             # copy data (alternative fromNumpyArray)
             self.coreImage = self._coreImageFromNumpyArray(
                 ndarray=body,
@@ -345,7 +364,7 @@ class VLImage:
     def fromNumpyArray(
         cls,
         arr: np.ndarray,
-        inputColorFormat: Union[str, ColorFormat],
+        inputColorFormat: Union[str, ColorFormat] = None,
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
         copy: bool = True,
@@ -365,6 +384,10 @@ class VLImage:
         """
         if isinstance(inputColorFormat, str):
             inputColorFormat = ColorFormat.load(inputColorFormat)
+
+        if inputColorFormat is None:
+            imageType = getNPImageType(arr)
+            inputColorFormat = ColorFormat.load(imageType)
 
         coreImage = cls._coreImageFromNumpyArray(
             ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat, copy=copy
