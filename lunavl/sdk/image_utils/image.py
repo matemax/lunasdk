@@ -260,7 +260,7 @@ class VLImage:
                 ndarray=array,
                 inputColorFormat=inputColorFormat,
                 colorFormat=colorFormat or ColorFormat.R8G8B8,
-                copy=True,  # fix after core
+                copy=False,
             )
 
         else:
@@ -350,7 +350,11 @@ class VLImage:
         Returns:
             core image instance
         """
+
         baseCoreImage = CoreImage()
+        # fix after core 3044
+        baseCoreImage.loadFromMemory(b"1", 1, inputColorFormat.coreFormat)
+
         baseCoreImage.setData(ndarray, inputColorFormat.coreFormat, copy=copy)
         if colorFormat is None or baseCoreImage.getFormat() == colorFormat.coreFormat:
             return baseCoreImage
