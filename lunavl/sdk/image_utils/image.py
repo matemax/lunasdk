@@ -260,7 +260,7 @@ class VLImage:
                 ndarray=array,
                 inputColorFormat=inputColorFormat,
                 colorFormat=colorFormat or ColorFormat.R8G8B8,
-                copy=False,
+                copy=True,  # fix after core
             )
 
         else:
