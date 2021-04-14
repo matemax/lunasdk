@@ -1,11 +1,20 @@
 from collections import namedtuple
 from typing import Dict
 
+from lunavl.sdk.detectors.facedetector import FaceDetector
+from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import WARP_CLEAN_FACE, FACE_WITH_MASK, OCCLUDED_FACE
+from tests.resources import (
+    WARP_CLEAN_FACE,
+    FACE_WITH_MASK,
+    OCCLUDED_FACE,
+    FULL_FACE_NO_MASK,
+    FULL_FACE_WITH_MASK,
+    FULL_OCCLUDED_FACE,
+)
 from tests.schemas import jsonValidator, MASK_SCHEMA
 
 MaskProperties = namedtuple("MaskProperties", ("missing", "medicalMask", "occluded"))
@@ -18,6 +27,7 @@ class TestMask(BaseTestClass):
 
     # warp mask estimator
     maskEstimator: MaskEstimator
+    defaultDetector: FaceDetector
 
     @classmethod
     def setup_class(cls):
@@ -27,6 +37,12 @@ class TestMask(BaseTestClass):
         cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
         cls.warpImageMissing = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
         cls.warpImageOccluded = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
+
+        cls.imageMedicalMask = VLImage.load(filename=FULL_FACE_WITH_MASK)
+        cls.imageMissing = VLImage.load(filename=FULL_FACE_NO_MASK)
+        cls.imageOccluded = VLImage.load(filename=FULL_OCCLUDED_FACE)
+
+        cls.defaultDetector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
     def assertMaskEstimation(self, mask: Mask, expectedEstimationResults: Dict[str, float]):
         """
@@ -71,7 +87,7 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations without mask on the face
         """
-        expectedResult = MaskProperties(0.896, 0.078, 0.024)
+        expectedResult = MaskProperties(0.998, 0.001, 0.000)
         mask = TestMask.maskEstimator.estimate(self.warpImageMissing)
         self.assertMaskEstimation(mask, expectedResult._asdict())
 
@@ -79,6 +95,43 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations with face is occluded by other object
         """
-        expectedResult = MaskProperties(0.326, 0.142, 0.531)
+        expectedResult = MaskProperties(0.027, 0.097, 0.875)
         mask = TestMask.maskEstimator.estimate(self.warpImageOccluded)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
+
+    def test_estimate_maskV2_as_dict(self):
+        """
+        Test maskV2 estimations as dict
+        """
+        faceDetection = self.defaultDetector.detectOne(self.imageMedicalMask)
+        maskDict = TestMask.maskEstimator.estimate(self.imageMedicalMask, faceDetection.detection).asDict()
+        assert (
+            jsonValidator(schema=MASK_SCHEMA).validate(maskDict) is None
+        ), f"{maskDict} does not match with schema {MASK_SCHEMA}"
+
+    def test_estimate_medical_mask_v2(self):
+        """
+        Test maskV2 estimations with mask exists on the face
+        """
+        faceDetection = self.defaultDetector.detectOne(self.imageMedicalMask)
+        expectedResult = MaskProperties(0.0, 0.999, 0.0)
+        mask = TestMask.maskEstimator.estimate(self.imageMedicalMask, faceDetection.detection)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
+
+    def test_estimate_missing_mask_v2(self):
+        """
+        Test mask estimations without mask on the face
+        """
+        faceDetection = self.defaultDetector.detectOne(self.imageMissing)
+        expectedResult = MaskProperties(0.997, 0.0, 0.001)
+        mask = TestMask.maskEstimator.estimate(self.imageMissing, faceDetection.detection)
+        self.assertMaskEstimation(mask, expectedResult._asdict())
+
+    def test_estimate_mask_occluded_v2(self):
+        """
+        Test mask estimations with face is occluded by other object
+        """
+        faceDetection = self.defaultDetector.detectOne(self.imageOccluded)
+        expectedResult = MaskProperties(0.0, 0.0, 0.999)
+        mask = TestMask.maskEstimator.estimate(self.imageOccluded, faceDetection.detection)
         self.assertMaskEstimation(mask, expectedResult._asdict())

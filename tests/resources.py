@@ -27,7 +27,7 @@ MIXED_EYES = getPathToImage("one_face.jpg")
 CLOSED_EYES = getPathToImage("closed_eyes.jpg")
 
 FACE_WITH_MASK = getPathToImage("face_with_mask.jpg")
-OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
+OCCLUDED_FACE = getPathToImage("occluded_warp_face.jpg")
 MASK_NOT_IN_PLACE = getPathToImage("mask_not_in_place.jpg")
 WARP_CLEAN_FACE = getPathToImage("warp_clean_face.jpg")
 
@@ -39,3 +39,7 @@ ROTATED90 = getPathToImage("rotated90.png")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
+
+FULL_FACE_WITH_MASK = getPathToImage("medical_mask_face.jpg")
+FULL_OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
+FULL_FACE_NO_MASK = getPathToImage("no_mask_face.jpg")

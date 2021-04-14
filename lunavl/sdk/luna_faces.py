@@ -189,6 +189,17 @@ class VLFaceDetection(FaceDetection):
         return self._mask
 
     @property
+    def maskV2(self) -> Mask:
+        """
+        Get mask existence estimation of full image which corresponding the detection
+        Returns:
+            mask
+        """
+        if self._mask is None:
+            self._mask = self.estimatorCollection.maskEstimator.estimate(self.image, self._coreEstimation.detection)
+        return self._mask
+
+    @property
     def glasses(self) -> Glasses:
         """
         Get glasses existence estimation of warped image which corresponding the detection

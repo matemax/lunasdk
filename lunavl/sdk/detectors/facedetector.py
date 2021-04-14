@@ -114,6 +114,11 @@ class FaceDetection(BaseDetection):
             )
         return res
 
+    @property
+    def detection(self) -> DetectionFloat:
+        """Get core detection"""
+        return self._coreEstimation.detection
+
 
 class FaceDetector:
     """
