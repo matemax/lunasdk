@@ -103,7 +103,7 @@ class VLFaceDetection(FaceDetection):
     def estimateMaskFromImage(self) -> bool:
         """
         Get current value of estimateMaskFromImage flag
-        
+
         Returns:
             (bool) current value
         """
@@ -113,7 +113,7 @@ class VLFaceDetection(FaceDetection):
     def estimateMaskFromImage(self, estimateMaskFromImage: bool) -> None:
         """
         Set new value to estimateMaskFromImage flag
-        
+
         Args:
             estimateMaskFromImage(bool): new value for flag
         """
