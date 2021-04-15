@@ -18,6 +18,7 @@ from tests.resources import (
 from tests.schemas import jsonValidator, MASK_SCHEMA
 
 MaskProperties = namedtuple("MaskProperties", ("missing", "medicalMask", "occluded"))
+TestCase = namedtuple("TestCase", ("inputImage", "isWarp", "expectedResult"))
 
 
 class TestMask(BaseTestClass):
@@ -79,59 +80,49 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations with mask exists on the face
         """
-        expectedResult = MaskProperties(0.0, 0.999, 0.000)
-        mask = TestMask.maskEstimator.estimate(self.warpImageMedicalMask)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
+        cases = [
+            TestCase(self.warpImageMedicalMask, True, MaskProperties(0.0, 0.999, 0.0)),
+            TestCase(self.imageMedicalMask, False, MaskProperties(0.0, 0.999, 0.0)),
+        ]
+        for case in cases:
+            with self.subTest():
+                if case.isWarp:
+                    mask = TestMask.maskEstimator.estimate(case.inputImage)
+                else:
+                    detection = self.defaultDetector.detectOne(case.inputImage).detection
+                    mask = TestMask.maskEstimator.estimate((case.inputImage, detection))
+                self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_missing_mask(self):
         """
         Test mask estimations without mask on the face
         """
-        expectedResult = MaskProperties(0.998, 0.001, 0.000)
-        mask = TestMask.maskEstimator.estimate(self.warpImageMissing)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
+        cases = [
+            TestCase(self.warpImageMissing, True, MaskProperties(0.998, 0.001, 0.000)),
+            TestCase(self.imageMissing, False, MaskProperties(0.997, 0.0, 0.001)),
+        ]
+        for case in cases:
+            with self.subTest():
+                if case.isWarp:
+                    mask = TestMask.maskEstimator.estimate(case.inputImage)
+                else:
+                    detection = self.defaultDetector.detectOne(case.inputImage).detection
+                    mask = TestMask.maskEstimator.estimate((case.inputImage, detection))
+                self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_mask_occluded(self):
         """
         Test mask estimations with face is occluded by other object
         """
-        expectedResult = MaskProperties(0.027, 0.097, 0.875)
-        mask = TestMask.maskEstimator.estimate(self.warpImageOccluded)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
-
-    def test_estimate_maskV2_as_dict(self):
-        """
-        Test maskV2 estimations as dict
-        """
-        faceDetection = self.defaultDetector.detectOne(self.imageMedicalMask)
-        maskDict = TestMask.maskEstimator.estimate(self.imageMedicalMask, faceDetection.detection).asDict()
-        assert (
-            jsonValidator(schema=MASK_SCHEMA).validate(maskDict) is None
-        ), f"{maskDict} does not match with schema {MASK_SCHEMA}"
-
-    def test_estimate_medical_mask_v2(self):
-        """
-        Test maskV2 estimations with mask exists on the face
-        """
-        faceDetection = self.defaultDetector.detectOne(self.imageMedicalMask)
-        expectedResult = MaskProperties(0.0, 0.999, 0.0)
-        mask = TestMask.maskEstimator.estimate(self.imageMedicalMask, faceDetection.detection)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
-
-    def test_estimate_missing_mask_v2(self):
-        """
-        Test mask estimations without mask on the face
-        """
-        faceDetection = self.defaultDetector.detectOne(self.imageMissing)
-        expectedResult = MaskProperties(0.997, 0.0, 0.001)
-        mask = TestMask.maskEstimator.estimate(self.imageMissing, faceDetection.detection)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
-
-    def test_estimate_mask_occluded_v2(self):
-        """
-        Test mask estimations with face is occluded by other object
-        """
-        faceDetection = self.defaultDetector.detectOne(self.imageOccluded)
-        expectedResult = MaskProperties(0.0, 0.0, 0.999)
-        mask = TestMask.maskEstimator.estimate(self.imageOccluded, faceDetection.detection)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
+        cases = [
+            TestCase(self.warpImageOccluded, True, MaskProperties(0.027, 0.097, 0.875)),
+            TestCase(self.imageOccluded, False, MaskProperties(0.0, 0.0, 0.999)),
+        ]
+        for case in cases:
+            with self.subTest():
+                if case.isWarp:
+                    mask = TestMask.maskEstimator.estimate(case.inputImage)
+                else:
+                    detection = self.defaultDetector.detectOne(case.inputImage).detection
+                    mask = TestMask.maskEstimator.estimate((case.inputImage, detection))
+                self.assertMaskEstimation(mask, case.expectedResult._asdict())

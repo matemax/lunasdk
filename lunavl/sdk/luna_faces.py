@@ -45,6 +45,7 @@ class VLFaceDetection(FaceDetection):
         _headPose (Optional[HeadPose]): lazy load head pose estimation
         _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
+        _estimateMaskFromImage (bool): flag if estimate mask from image or not
 
     """
 
@@ -64,9 +65,16 @@ class VLFaceDetection(FaceDetection):
         "_mask",
         "_glasses",
         "_credibilityCheck",
+        "_estimateMaskFromImage",
     )
 
-    def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
+    def __init__(
+        self,
+        coreDetection: Face,
+        image: VLImage,
+        estimatorCollection: FaceEstimatorsCollection,
+        estimateMaskFromImage: bool = False,
+    ):
         """
         Init.
 
@@ -89,6 +97,28 @@ class VLFaceDetection(FaceDetection):
         self._glasses: Optional[Glasses] = None
         self._credibilityCheck: Optional[CredibilityCheck] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
+        self._estimateMaskFromImage = estimateMaskFromImage
+
+    @property
+    def estimateMaskFromImage(self) -> bool:
+        """
+        Get current value of estimateMaskFromImage flag
+        
+        Returns:
+            (bool) current value
+        """
+        return self._estimateMaskFromImage
+
+    @estimateMaskFromImage.setter
+    def estimateMaskFromImage(self, estimateMaskFromImage: bool) -> None:
+        """
+        Set new value to estimateMaskFromImage flag
+        
+        Args:
+            estimateMaskFromImage(bool): new value for flag
+        """
+        self._mask = None
+        self._estimateMaskFromImage = estimateMaskFromImage
 
     @property
     def warp(self) -> FaceWarp:
@@ -185,18 +215,12 @@ class VLFaceDetection(FaceDetection):
             mask
         """
         if self._mask is None:
-            self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
-        return self._mask
-
-    @property
-    def maskV2(self) -> Mask:
-        """
-        Get mask existence estimation of full image which corresponding the detection
-        Returns:
-            mask
-        """
-        if self._mask is None:
-            self._mask = self.estimatorCollection.maskEstimator.estimate(self.image, self._coreEstimation.detection)
+            if self.estimateMaskFromImage:
+                self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
+            else:
+                self._mask = self.estimatorCollection.maskEstimator.estimate(
+                    (self.image, self._coreEstimation.detection)
+                )
         return self._mask
 
     @property

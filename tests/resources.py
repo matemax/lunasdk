@@ -40,6 +40,9 @@ ROTATED90 = getPathToImage("rotated90.png")
 BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
 
+# https://unsplash.com/photos/fVn26rPmO7o
 FULL_FACE_WITH_MASK = getPathToImage("medical_mask_face.jpg")
+# https://unsplash.com/photos/v6kcLmYIxjo
 FULL_OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
+# https://unsplash.com/photos/rDEOVtE7vOs
 FULL_FACE_NO_MASK = getPathToImage("no_mask_face.jpg")
