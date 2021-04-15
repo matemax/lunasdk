@@ -115,7 +115,7 @@ class TestMask(BaseTestClass):
         Test mask estimations with face is occluded by other object
         """
         cases = [
-            TestCase(self.warpImageOccluded, True, MaskProperties(0.027, 0.097, 0.875)),
+            TestCase(self.warpImageOccluded, True, MaskProperties(0.259, 0.669, 0.071)),
             TestCase(self.imageOccluded, False, MaskProperties(0.0, 0.0, 0.999)),
         ]
         for case in cases:

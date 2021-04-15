@@ -46,3 +46,5 @@ FULL_FACE_WITH_MASK = getPathToImage("medical_mask_face.jpg")
 FULL_OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
 # https://unsplash.com/photos/rDEOVtE7vOs
 FULL_FACE_NO_MASK = getPathToImage("no_mask_face.jpg")
+# https://unsplash.com/photos/IhuHLIxS_Tk
+LARGE_IMAGE = getPathToImage("large_image.jpg")
