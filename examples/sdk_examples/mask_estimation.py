@@ -7,6 +7,7 @@ from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from resources import EXAMPLE_O
+from FaceEngine import DetectionFloat, Rect
 
 
 def estimateMedicalMask():
@@ -20,7 +21,7 @@ def estimateMedicalMask():
 
     medicalMaskEstimator = faceEngine.createMaskEstimator()
     # Estimate from image
-    pprint.pprint(medicalMaskEstimator.estimate((image, faceDetection.detection)).asDict())
+    pprint.pprint(medicalMaskEstimator.estimate(image, faceDetection.coreEstimation.detection).asDict())
 
     # Estimate from wrap
     warper = faceEngine.createFaceWarper()

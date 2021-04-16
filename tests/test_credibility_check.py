@@ -1,5 +1,3 @@
-from typing import Dict
-
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.credibility_check import CredibilityCheck, CredibilityCheckEstimator
 from lunavl.sdk.image_utils.image import VLImage

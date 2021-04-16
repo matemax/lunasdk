@@ -426,7 +426,7 @@ class TestFaceDetector(FaceDetectTestClass):
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 with self.assertRaises(expected_exception=LunaSDKException):
-                    detection = detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_LARGER_IMAGE)
+                    detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_LARGER_IMAGE)
 
     def test_detect_one_by_area_outside_image(self):
         """
@@ -435,4 +435,4 @@ class TestFaceDetector(FaceDetectTestClass):
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 with self.assertRaises(expected_exception=LunaSDKException):
-                    detection = detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_OUTSIDE_IMAGE)
+                    detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_OUTSIDE_IMAGE)
