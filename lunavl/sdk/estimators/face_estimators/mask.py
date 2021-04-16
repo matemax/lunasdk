@@ -3,14 +3,13 @@
 See `warp quality`_.
 """
 from enum import Enum
-from typing import Union, Dict, overload
+from typing import Union, Dict
 
 from FaceEngine import MedicalMaskEstimation, IMedicalMaskEstimatorPtr  # pylint: disable=E0611,E0401
 from FaceEngine import MedicalMask as CoreMask  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
-from lunavl.sdk.image_utils.image import VLImage
 from lunavl.sdk.detectors.facedetector import FaceDetection
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -150,44 +149,23 @@ class MaskEstimator(BaseEstimator):
         super().__init__(maskEstimator)
 
     #  pylint: disable=W0221
-    @overload  # type: ignore
-    def estimate(self, image: FaceWarp) -> Mask:
-        """Estimate mask from a FaceWarp"""
-        pass
-
-    #  pylint: disable=W0221
-    @overload
-    def estimate(self, image: FaceWarpedImage) -> Mask:
-        """Estimate mask from a FaceWarpedImage"""
-        pass
-
-    #  pylint: disable=W0221
-    @overload
-    def estimate(self, image: VLImage, faceDetection: FaceDetection) -> Mask:
-        """Estimate mask from an VLImage with detection"""
-        pass
-
-    #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationMaskError)
-    def estimate(self, image, faceDetection=None) -> Mask:
+    def estimate(self, faceObject: Union[FaceWarpedImage, FaceWarp, FaceDetection]) -> Mask:
         """
-        Estimate mask from a warp or image.
+        Estimate mask from a warp or detection.
 
         Args:
-            warp: raw warped image, warp or image. If set an image, the detection key is required.
-            faceDetection: optional face detection. Used only if VLImage set
+            imageObject: raw warped image, warp or faceDetection.
 
         Returns:
             estimated mask
         Raises:
             LunaSDKException: if estimation failed
         """
-        if isinstance(image, (FaceWarpedImage, FaceWarp)):
-            error, mask = self._coreEstimator.estimate(image.warpedImage.coreImage)
+        if isinstance(faceObject, (FaceWarpedImage, FaceWarp)):
+            error, mask = self._coreEstimator.estimate(faceObject.warpedImage.coreImage)
         else:
-            if faceDetection is None:
-                raise LunaSDKException(LunaVLError.InvalidInput.format("face detection is not set"))
-            error, mask = self._coreEstimator.estimate(image.coreImage, faceDetection.coreEstimation.detection)
+            error, mask = self._coreEstimator.estimate(faceObject.image.coreImage, faceObject.coreEstimation.detection)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return Mask(mask)

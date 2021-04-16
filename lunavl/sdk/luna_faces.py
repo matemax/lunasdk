@@ -27,11 +27,37 @@ from .image_utils.geometry import Rect
 from .image_utils.image import VLImage, ColorFormat
 
 
+class VLFaceDetectionSettings:
+    """
+    Settings for detection
+
+    Attributes:
+        estimateMaskFromDetection: estimate mask from detection or warp
+
+    """
+
+    __slots__ = "_estimateMaskFromDetection"
+
+    def __init__(self, estimateMaskFromDetection: bool = False):
+        """
+        Init settings
+
+        Args:
+            estimateMaskFromDetection: estimate from detection or warp
+        """
+        self._estimateMaskFromDetection = estimateMaskFromDetection
+
+    @property
+    def estimateMaskFromDetection(self) -> bool:
+        """Get current settings for mask estimation"""
+        return self._estimateMaskFromDetection
+
+
 class VLFaceDetection(FaceDetection):
     """
     High level detection object.
     Attributes:
-
+        detectionSettings (VLFaceDetectionSettings): settings for detections
         estimatorCollection (FaceEstimatorsCollection): collection of estimators
         _emotions (Optional[Emotions]): lazy load emotions estimations
         _eyes (Optional[EyesEstimation]): lazy load eye estimations
@@ -49,6 +75,7 @@ class VLFaceDetection(FaceDetection):
     """
 
     __slots__ = (
+        "_detectionSettings",
         "_warp",
         "_emotions",
         "_eyes",
@@ -66,7 +93,13 @@ class VLFaceDetection(FaceDetection):
         "_credibilityCheck",
     )
 
-    def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
+    def __init__(
+        self,
+        coreDetection: Face,
+        image: VLImage,
+        estimatorCollection: FaceEstimatorsCollection,
+        detectionSettings: Optional[VLFaceDetectionSettings] = None,
+    ):
         """
         Init.
 
@@ -74,6 +107,7 @@ class VLFaceDetection(FaceDetection):
             coreDetection: core detection
         """
         super().__init__(coreDetection, image)
+        self._detectionSettings: VLFaceDetectionSettings = detectionSettings or VLFaceDetectionSettings()
         self._emotions: Optional[Emotions] = None
         self._eyes: Optional[EyesEstimation] = None
         self._warp: Optional[FaceWarp] = None
@@ -89,6 +123,26 @@ class VLFaceDetection(FaceDetection):
         self._glasses: Optional[Glasses] = None
         self._credibilityCheck: Optional[CredibilityCheck] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
+
+    @property
+    def detectionSettings(self) -> VLFaceDetectionSettings:
+        """
+        Get current detection settings
+
+        Returns:
+            (VLFaceDetectionSettings) Current detection settings
+        """
+        return self._detectionSettings
+
+    @detectionSettings.setter
+    def detectionSettings(self, detectionSettings: VLFaceDetectionSettings):
+        """
+        Set new detection settings
+        Args:
+            detectionSettings (VLFaceDetectionSettings): new detection settings
+        """
+        self._mask = None
+        self._detectionSettings = detectionSettings
 
     @property
     def warp(self) -> FaceWarp:
@@ -185,7 +239,10 @@ class VLFaceDetection(FaceDetection):
             mask
         """
         if self._mask is None:
-            self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
+            if self._detectionSettings.estimateMaskFromDetection:
+                self._mask = self.estimatorCollection.maskEstimator.estimate(self.coreEstimation.detection)
+            else:
+                self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
         return self._mask
 
     @property
@@ -315,19 +372,6 @@ class VLFaceDetection(FaceDetection):
         return res
 
 
-class VLFaceDetectionWithMaskV2(VLFaceDetection):
-    @property
-    def mask(self) -> Mask:
-        """
-        Get mask existence estimation of image which corresponding the detection
-        Returns:
-            mask
-        """
-        if self._mask is None:
-            self._mask = self.estimatorCollection.maskEstimator.estimate(self.image, self._coreEstimation.detection)
-        return self._mask
-
-
 class VLFaceDetector:
     """
     High level face detector. Return *VLFaceDetection* instead simple *FaceDetection*.
@@ -336,7 +380,6 @@ class VLFaceDetector:
           estimatorsCollection (FaceEstimatorsCollection): face estimator collections for new detections.
           _faceDetector (FaceDetector): face detector
           faceEngine (VLFaceEngine): face engine for detector and estimators, default *FACE_ENGINE*.
-          self._DetectionClass: detection class VLFaceDetection or VLFaceDetectionWithMaskV2
     """
 
     #: a global instance of FaceEngine for usual creating detectors
@@ -345,10 +388,7 @@ class VLFaceDetector:
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def __init__(
-        self,
-        detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
-        faceEngine: Optional[VLFaceEngine] = None,
-        estimateMaskFromImage: bool = False,
+        self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
     ):
         """
         Init.
@@ -356,17 +396,13 @@ class VLFaceDetector:
         Args:
             detectorType: detector type
             faceEngine: face engine for detector and estimators
-            estimateMaskFromImage (bool): estimate mask from image (V2) or warp
         """
         if faceEngine is not None:
             self.faceEngine = faceEngine
             self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
-        self._DetectionClass = VLFaceDetectionWithMaskV2 if estimateMaskFromImage else VLFaceDetection
 
-    def detectOne(
-        self, image: VLImage, detectArea: Optional[Rect] = None
-    ) -> Union[None, VLFaceDetection, VLFaceDetectionWithMaskV2]:
+    def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
         Detect just one best detection on the image.
 
@@ -379,11 +415,9 @@ class VLFaceDetector:
         detectRes = self._faceDetector.detectOne(image, detectArea, True, True)
         if detectRes is None:
             return None
-        return self._DetectionClass(detectRes.coreEstimation, detectRes.image, self.estimatorsCollection)
+        return VLFaceDetection(detectRes.coreEstimation, detectRes.image, self.estimatorsCollection)
 
-    def detect(
-        self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5
-    ) -> List[List[Union[VLFaceDetection, VLFaceDetectionWithMaskV2]]]:
+    def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5) -> List[List[VLFaceDetection]]:
         """
         Batch detect faces on images.
 
@@ -398,7 +432,7 @@ class VLFaceDetector:
         for imageNumber, image in enumerate(images):
             res.append(
                 [
-                    self._DetectionClass(
+                    VLFaceDetection(
                         detectRes.coreEstimation,
                         image if isinstance(image, VLImage) else image.image,
                         self.estimatorsCollection,
@@ -408,9 +442,7 @@ class VLFaceDetector:
             )
         return res
 
-    def redetectOne(
-        self, image: Union[VLImage, VLFaceDetection, VLFaceDetectionWithMaskV2], bBox: Rect
-    ) -> Union[VLFaceDetection, VLFaceDetectionWithMaskV2, None]:
+    def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBox: Rect) -> Union[VLFaceDetection, None]:
         """
         Redetect faces on an image. If VLFaceDetection is provided, only VLImage from that object will be used.
 
@@ -420,7 +452,7 @@ class VLFaceDetector:
         Returns:
             return detection or None if face not found
         """
-        if isinstance(image, self._DetectionClass):
+        if isinstance(image, VLFaceDetection):
             imageForRedetct = image.image
         else:
             imageForRedetct = image
@@ -428,12 +460,10 @@ class VLFaceDetector:
             imageForRedetct, bBox=bBox, detect5Landmarks=True, detect68Landmarks=True
         )
         if redetection:
-            return self._DetectionClass(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+            return VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
         return None
 
-    def redetect(
-        self, imagesAndBBoxes: List[ImageForRedetection]
-    ) -> List[List[Union[VLFaceDetection, VLFaceDetectionWithMaskV2, None]]]:
+    def redetect(self, imagesAndBBoxes: List[ImageForRedetection]) -> List[List[Union[VLFaceDetection, None]]]:
         """
         Redetect faces on images.
 
@@ -449,7 +479,7 @@ class VLFaceDetector:
         res = []
         for redetectionsOfImage in redetections:
             imageRes = [
-                self._DetectionClass(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+                VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
                 if redetection
                 else None
                 for redetection in redetectionsOfImage

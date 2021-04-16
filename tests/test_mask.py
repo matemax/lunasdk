@@ -1,13 +1,11 @@
 from collections import namedtuple
 from typing import Dict
 
-from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
+from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
-from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.image import VLImage
-from lunavl.sdk.image_utils.geometry import Rect
 from tests.base import BaseTestClass
 from tests.resources import (
     WARP_CLEAN_FACE,
@@ -94,8 +92,8 @@ class TestMask(BaseTestClass):
                 if case.isWarp:
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
-                    detectionFace = self.defaultDetector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(case.inputImage, detectionFace)
+                    faceDetection = self.defaultDetector.detectOne(case.inputImage)
+                    mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_missing_mask(self):
@@ -112,18 +110,8 @@ class TestMask(BaseTestClass):
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
                     faceDetection = self.defaultDetector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(case.inputImage, faceDetection)
+                    mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
-
-    def test_estimate_missing_mask_large_image(self):
-        """
-        Test mask estimations without mask on the face
-        """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.0, 0.999), None)
-
-        faceDetection = self.defaultDetector.detectOne(case.inputImage)
-        mask = TestMask.maskEstimator.estimate(case.inputImage, faceDetection)
-        self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_mask_occluded(self):
         """
@@ -139,22 +127,15 @@ class TestMask(BaseTestClass):
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
                     faceDetection = self.defaultDetector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(case.inputImage, faceDetection)
+                    mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
-    def test_estimate_mask_none_detection(self):
+    def test_estimate_missing_mask_large_image(self):
         """
-        Test mask estimations with none detection
+        Test mask estimations without mask on the face
         """
-        cases = [
-            TestCase("none_detection_warp", self.warpImageMedicalMask, True, MaskProperties(0.0, 0.999, 0.0), None),
-            TestCase("none_detection_image", self.imageMedicalMask, False, MaskProperties(0.0, 0.999, 0.0), None),
-        ]
-        for case in cases:
-            with self.subTest(name=case.name):
-                if case.isWarp:
-                    mask = TestMask.maskEstimator.estimate(case.inputImage, None)
-                    self.assertMaskEstimation(mask, case.expectedResult._asdict())
-                else:
-                    with self.assertRaisesRegex(LunaSDKException, "face detection is not set"):
-                        TestMask.maskEstimator.estimate(case.inputImage, None)
+        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.0, 0.999), None)
+
+        faceDetection = self.defaultDetector.detectOne(case.inputImage)
+        mask = TestMask.maskEstimator.estimate(faceDetection)
+        self.assertMaskEstimation(mask, case.expectedResult._asdict())
