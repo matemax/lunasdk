@@ -16,6 +16,11 @@ from tests.detect_test_class import (
     VLIMAGE_SMALL,
     FaceDetectTestClass,
     BAD_IMAGE,
+    VLIMAGE_LARGRE,
+    SMALL_AREA,
+    LARGE_AREA,
+    AREA_LARGER_IMAGE,
+    AREA_OUTSIDE_IMAGE,
 )
 from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
 from tests.schemas import jsonValidator, REQUIRED_FACE_DETECTION, LANDMARKS5
@@ -386,3 +391,48 @@ class TestFaceDetector(FaceDetectTestClass):
                             assert face.boundingBox.asDict() == detectOne.boundingBox.asDict()
                             assert face.landmarks5.asDict() == detectOne.landmarks5.asDict()
                             assert face.landmarks68.asDict() == detectOne.landmarks68.asDict()
+
+    def test_detect_one_large_image(self):
+        """
+        Test detection of one face from large image
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                detection = detector.detectOne(image=VLIMAGE_LARGRE)
+                self.assertFaceDetection(detection, VLIMAGE_LARGRE)
+
+    def test_detect_one_by_large_area(self):
+        """
+        Test detection of one face by large area
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                detection = detector.detectOne(image=VLIMAGE_LARGRE, detectArea=LARGE_AREA)
+                self.assertFaceDetection(detection, VLIMAGE_LARGRE)
+
+    def test_detect_one_by_small_area(self):
+        """
+        Test detection of one face by small area
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                detection = detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=SMALL_AREA)
+                self.assertIsNone(detection)
+
+    def test_detect_one_by_area_larger_image(self):
+        """
+        Test detection of one face by small area
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                with self.assertRaises(expected_exception=LunaSDKException):
+                    detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_LARGER_IMAGE)
+
+    def test_detect_one_by_area_outside_image(self):
+        """
+        Test detection of one face by small area
+        """
+        for detector in self.detectors:
+            with self.subTest(detectorType=detector.detectorType):
+                with self.assertRaises(expected_exception=LunaSDKException):
+                    detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_OUTSIDE_IMAGE)

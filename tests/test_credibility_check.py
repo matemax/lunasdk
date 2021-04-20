@@ -1,5 +1,3 @@
-from typing import Dict
-
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.credibility_check import CredibilityCheck, CredibilityCheckEstimator
 from lunavl.sdk.image_utils.image import VLImage
@@ -25,7 +23,7 @@ class TestCredibilityCheck(BaseTestClass):
 
     def assertrCedibilityCheckEstimation(self, credibilityCheck: CredibilityCheck, expectedEstimationResults: float):
         """
-        Function checks if the instance belongs to the credibility check class 
+        Function checks if the instance belongs to the credibility check class
         and compares the result with what is expected.
 
         Args:
@@ -37,7 +35,7 @@ class TestCredibilityCheck(BaseTestClass):
         assert isinstance(credibilityCheck.credibilityCheck, float), f"{credibilityCheckScore.__class__} is not float"
         assert 0 <= credibilityCheckScore <= 1, f"{credibilityCheckScore} not in range [0, 1]"
         self.assertAlmostEqual(
-            credibilityCheckScore, expectedEstimationResults, delta=0.001, msg=f"property value is incorrect"
+            credibilityCheckScore, expectedEstimationResults, delta=0.001, msg="property value is incorrect"
         )
 
     def test_estimate_credibility_check_as_dict(self):

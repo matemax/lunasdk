@@ -14,7 +14,7 @@ from .base import (
     getArgsForCoreDetectorForImages,
 )
 from ..base import LandmarksWithScore
-from ..errors.errors import LunaVLError, ErrorInfo
+from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage

@@ -1,7 +1,7 @@
 """
 Module for estimate a credibility check from warped image.
 """
-from typing import Union, Dict, Any
+from typing import Union, Dict
 
 from FaceEngine import ICredibilityCheckEstimatorPtr
 from FaceEngine import CredibilityCheckEstimation
@@ -21,6 +21,15 @@ class CredibilityCheck(BaseEstimation):
 
         - credibility_check
     """
+
+    #  pylint: disable=W0235
+    def __init__(self, credibilityCheck: CredibilityCheckEstimation):
+        """
+        Init.
+        Args:
+            credibilityCheck: estimated credibility check
+        """
+        super().__init__(credibilityCheck)
 
     @property
     def credibilityCheck(self) -> float:
@@ -47,6 +56,15 @@ class CredibilityCheckEstimator(BaseEstimator):
     """
     Warp credibility check estimator.
     """
+
+    #  pylint: disable=W0235
+    def __init__(self, credibilityCheckEstimator: ICredibilityCheckEstimatorPtr):
+        """
+        Init.
+        Args:
+            credibilityCheckEstimator: core credibility check estimator
+        """
+        super().__init__(credibilityCheckEstimator)
 
     @CoreExceptionWrap(LunaVLError.CredibilityCheckError)
     def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> CredibilityCheck:
