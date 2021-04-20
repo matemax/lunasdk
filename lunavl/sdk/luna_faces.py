@@ -38,7 +38,7 @@ class VLFaceDetectionSettings:
 
     __slots__ = "_estimateMaskFromDetection"
 
-    def __init__(self, estimateMaskFromDetection: bool = False):
+    def __init__(self, estimateMaskFromDetection: bool = True):
         """
         Init settings
 
@@ -57,7 +57,7 @@ class VLFaceDetection(FaceDetection):
     """
     High level detection object.
     Attributes:
-        detectionSettings (VLFaceDetectionSettings): settings for detections
+        _estimationSettings (VLFaceDetectionSettings): settings for detections
         estimatorCollection (FaceEstimatorsCollection): collection of estimators
         _emotions (Optional[Emotions]): lazy load emotions estimations
         _eyes (Optional[EyesEstimation]): lazy load eye estimations
