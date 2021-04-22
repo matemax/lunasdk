@@ -3,6 +3,8 @@ from typing import Optional
 
 import pytest
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.livenessv1 import LivenessPrediction, LivenessV1
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
@@ -94,3 +96,56 @@ class TestEstimateLivenessV1(BaseTestClass):
         with pytest.raises(ValueError) as exceptionInfo:
             self.livenessEstimator.estimate(faceDetection=faceDetection)
         assert "Landmarks5 is required for liveness estimation" == str(exceptionInfo.value)
+
+    def test_estimate_liveness_batch(self):
+        """
+        Test estimate liveness batch
+        """
+        detection = self.detector.detectOne(VLImage.load(filename=SPOOF), detect68Landmarks=True)
+        estimations = self.livenessEstimator.estimateBatch([self.detection, detection])
+        assert isinstance(estimations, list)
+        assert len(estimations) == 2
+        for estimation in estimations:
+            self.assertLivenessEstimation(estimation)
+
+    def test_estimate_liveness_batch_without_landmarks5(self):
+        """
+        Test estimate liveness batch without landmarks5
+        """
+        detection = self.detector.detectOne(VLImage.load(filename=SPOOF), detect5Landmarks=False)
+        with pytest.raises(ValueError) as exceptionInfo:
+            self.livenessEstimator.estimateBatch([detection])
+        assert "Landmarks5 is required for liveness estimation" == str(exceptionInfo.value)
+
+    def test_estimate_liveness_batch_without_landmarks68(self):
+        """
+        Test estimate liveness batch without landmarks 68
+        """
+        detection = self.detector.detectOne(VLImage.load(filename=SPOOF), detect68Landmarks=False)
+        estimations = self.livenessEstimator.estimateBatch([self.detection, detection])
+        assert isinstance(estimations, list)
+        assert len(estimations) == 2
+        for estimation in estimations:
+            self.assertLivenessEstimation(estimation)
+
+    def test_estimate_liveness_batch_with_threshold(self):
+        """
+        Test estimate liveness batch with threshold
+        """
+        qualityThreshold = 0.95
+        detection = self.detector.detectOne(VLImage.load(filename=SPOOF))
+        estimations = self.livenessEstimator.estimateBatch(
+            [self.detection, detection], qualityThreshold=qualityThreshold
+        )
+        assert isinstance(estimations, list)
+        assert len(estimations) == 2
+        self.assertLivenessEstimation(estimations[0], LivenessPrediction.Real)
+        self.assertLivenessEstimation(estimations[1], LivenessPrediction.Unknown)
+
+    def test_estimate_liveness_batch_invalid_input(self):
+        """
+        Test estimate liveness batch with invalid input
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.livenessEstimator.estimateBatch([])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

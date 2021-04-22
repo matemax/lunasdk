@@ -4,16 +4,17 @@ Module contains a head pose estimator.
 See `head pose`_.
 """
 from enum import Enum
-from typing import Dict
+from typing import Dict, List
 
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
+
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.base import BaseEstimation, BoundingBox
 from lunavl.sdk.detectors.facedetector import Landmarks68
 from lunavl.sdk.image_utils.image import VLImage
-
 from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
 
 
 class FrontalType(Enum):
@@ -128,7 +129,7 @@ class HeadPoseEstimator(BaseEstimator):
         """
         super().__init__(coreHeadPoseEstimator)
 
-    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
+    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
     def estimateBy68Landmarks(self, landmarks68: Landmarks68) -> HeadPose:
         """
         Estimate head pose by 68 landmarks.
@@ -173,3 +174,28 @@ class HeadPoseEstimator(BaseEstimator):
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return HeadPose(headPoseEstimation)
+
+    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
+    def estimateByBoundingBoxBatch(
+        self, detections: List[BoundingBox], imageWithDetectionList: List[VLImage]
+    ) -> List[HeadPose]:
+        """
+        Batch estimate head pose by detection.
+
+        Args:
+            detections: detection bounding box list
+            imageWithDetectionList: image with the detection list
+        Returns:
+            list of head pose estimations
+        Raises:
+            LunaSDKException: if estimation is failed
+        """
+        coreImages = [image.coreImage for image in imageWithDetectionList]
+        coreEstimations = [detection.coreEstimation for detection in detections]
+
+        validateInputForBatchEstimator(self._coreEstimator, coreImages, coreEstimations)
+        error, headPoseEstimations = self._coreEstimator.estimate(coreImages, coreEstimations)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [HeadPose(estimation) for estimation in headPoseEstimations]

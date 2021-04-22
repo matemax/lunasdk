@@ -1,6 +1,10 @@
 from collections import namedtuple
 from typing import Dict
 
+import pytest
+
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
 from lunavl.sdk.image_utils.image import VLImage
@@ -9,6 +13,7 @@ from tests.resources import WARP_CLEAN_FACE, FACE_WITH_MASK, OCCLUDED_FACE
 from tests.schemas import jsonValidator, MASK_SCHEMA
 
 MaskProperties = namedtuple("MaskProperties", ("missing", "medicalMask", "occluded"))
+WarpNExpectedProperties = namedtuple("WarpNExpectedProperties", ("warp", "expectedProperties"))
 
 
 class TestMask(BaseTestClass):
@@ -24,9 +29,15 @@ class TestMask(BaseTestClass):
         super().setup_class()
         cls.maskEstimator = cls.faceEngine.createMaskEstimator()
 
-        cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
-        cls.warpImageMissing = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
-        cls.warpImageOccluded = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
+        cls.medicalMaskWarpNProperties = WarpNExpectedProperties(
+            FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK)), MaskProperties(0.0, 0.999, 0.000)
+        )
+        cls.missingMaskWarpNProperties = WarpNExpectedProperties(
+            FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE)), MaskProperties(0.896, 0.078, 0.024)
+        )
+        cls.occludedMaskWarpNProperties = WarpNExpectedProperties(
+            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.326, 0.142, 0.531)
+        )
 
     def assertMaskEstimation(self, mask: Mask, expectedEstimationResults: Dict[str, float]):
         """
@@ -54,7 +65,7 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations as dict
         """
-        maskDict = TestMask.maskEstimator.estimate(self.warpImageMedicalMask).asDict()
+        maskDict = TestMask.maskEstimator.estimate(self.medicalMaskWarpNProperties.warp).asDict()
         assert (
             jsonValidator(schema=MASK_SCHEMA).validate(maskDict) is None
         ), f"{maskDict} does not match with schema {MASK_SCHEMA}"
@@ -63,22 +74,38 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations with mask exists on the face
         """
-        expectedResult = MaskProperties(0.0, 0.999, 0.000)
-        mask = TestMask.maskEstimator.estimate(self.warpImageMedicalMask)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
+        mask = TestMask.maskEstimator.estimate(self.medicalMaskWarpNProperties.warp)
+        self.assertMaskEstimation(mask, self.medicalMaskWarpNProperties.expectedProperties._asdict())
 
     def test_estimate_missing_mask(self):
         """
         Test mask estimations without mask on the face
         """
-        expectedResult = MaskProperties(0.896, 0.078, 0.024)
-        mask = TestMask.maskEstimator.estimate(self.warpImageMissing)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
+        mask = TestMask.maskEstimator.estimate(self.missingMaskWarpNProperties.warp)
+        self.assertMaskEstimation(mask, self.missingMaskWarpNProperties.expectedProperties._asdict())
 
     def test_estimate_mask_occluded(self):
         """
         Test mask estimations with face is occluded by other object
         """
-        expectedResult = MaskProperties(0.326, 0.142, 0.531)
-        mask = TestMask.maskEstimator.estimate(self.warpImageOccluded)
-        self.assertMaskEstimation(mask, expectedResult._asdict())
+        mask = TestMask.maskEstimator.estimate(self.occludedMaskWarpNProperties.warp)
+        self.assertMaskEstimation(mask, self.occludedMaskWarpNProperties.expectedProperties._asdict())
+
+    def test_estimate_mask_batch(self):
+        """
+        Test batch mask estimation
+        """
+        warps = [self.medicalMaskWarpNProperties, self.missingMaskWarpNProperties, self.occludedMaskWarpNProperties]
+        masks = self.maskEstimator.estimateBatch([warp.warp for warp in warps])
+        assert isinstance(masks, list)
+        assert len(masks) == len(warps)
+        for idx, mask in enumerate(masks):
+            self.assertMaskEstimation(mask, warps[idx].expectedProperties._asdict())
+
+    def test_estimate_mask_batch_invalid_input(self):
+        """
+        Test batch mask estimation with invalid input
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.maskEstimator.estimateBatch([])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

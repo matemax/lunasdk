@@ -1,6 +1,6 @@
-from FaceEngine import Detection, RectFloat
 from collections import namedtuple
 
+from FaceEngine import Detection, RectFloat
 import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
@@ -10,8 +10,6 @@ from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
 from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from lunavl.sdk.luna_faces import VLFaceDetector
-from lunavl.sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
 from tests.resources import (
     ONE_FACE,
@@ -19,8 +17,6 @@ from tests.resources import (
     GOST_HEAD_POSE_FACE,
     TURNED_HEAD_POSE_FACE,
     FRONTAL_HEAD_POSE_FACE,
-    ROTATED0,
-    ROTATED90,
 )
 
 
@@ -162,3 +158,41 @@ class TestHeadPose(BaseTestClass):
                 angles = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(detection.landmarks68)
                 self.assertHeadPose(angles)
                 assert angles.getFrontalType() == case.type
+
+    def test_head_post_batch_estimation(self):
+        """
+        Batch estimating head pose test.
+        """
+        image = VLImage.load(filename=GOST_HEAD_POSE_FACE)
+        detection = self.detector.detectOne(image, detect5Landmarks=True, detect68Landmarks=True)
+        anglesList = self.headPoseEstimator.estimateByBoundingBoxBatch(
+            [self.detection.boundingBox, detection.boundingBox], [self.image, image]
+        )
+        assert isinstance(anglesList, list)
+        assert len(anglesList) == 2
+        for angles in anglesList:
+            self.assertHeadPose(angles)
+
+    def test_head_post_batch_estimation_success_and_error(self):
+        """
+        Batch estimating head pose test with good and bad detection.
+        """
+        fakeDetection = Detection(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
+        bBox = BoundingBox(fakeDetection)
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.headPoseEstimator.estimateByBoundingBoxBatch(
+                [self.detection.boundingBox, bBox], [self.image, self.image]
+            )
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok.format("Ok"))
+        self.assertReceivedAndRawExpectedErrors(
+            exceptionInfo.value.context[1], LunaVLError.InvalidDetection.format("Invalid detection")
+        )
+
+    def test_head_post_batch_invalid_input(self):
+        """
+        Batch estimation invalid input
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.headPoseEstimator.estimateByBoundingBoxBatch([], [])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

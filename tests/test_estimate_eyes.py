@@ -1,4 +1,8 @@
-from lunavl.sdk.estimators.face_estimators.eyes import EyeState
+import pytest
+
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.estimators.face_estimators.eyes import EyeState, EyesEstimation
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -96,3 +100,33 @@ class TestEstimateEyes(BaseTestClass):
         eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
         assert eyesResult.leftEye.state == EyeState.Occluded
         assert eyesResult.rightEye.state == EyeState.Open
+
+    def test_estimate_batch(self):
+        """
+        Test eye estimator with two faces
+        """
+        for landMarks in ("L5", "L68"):
+            with self.subTest(landMarks=landMarks):
+                faceDetections = [
+                    self.detector.detectOne(img, detect68Landmarks=landMarks == "L68")
+                    for img in (OPEN_EYES_IMAGE, MIXED_EYES_IMAGE, CLOSED_EYES_IMAGE)
+                ]
+                warps = [self.warper.warp(faceDetection) for faceDetection in faceDetections]
+                landMarksTransformations = [
+                    self.warper.makeWarpTransformationWithLandmarks(faceDetection, landMarks)
+                    for faceDetection in faceDetections
+                ]
+                anglesList = self.eyeEstimator.estimateBatch(landMarksTransformations, warps)
+                assert isinstance(anglesList, list)
+                assert len(anglesList) == len(warps)
+                for angles in anglesList:
+                    assert isinstance(angles, EyesEstimation)
+                    self.assert_eyes_reply(angles.asDict())
+
+    def test_estimate_batch_invalid_input(self):
+        """
+        Test batch eye estimator with invalid input
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.eyeEstimator.estimateBatch([], [])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

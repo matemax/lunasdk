@@ -74,3 +74,40 @@ class TestEstimateGazeDirection(BaseTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.gazeEstimator.estimate(faceDetection.landmarks5, self.warp)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+
+    def test_batch_estimate_gaze(self):
+        """
+        Test gaze estimator with two warps
+        """
+        faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE))
+        warp = self.warper.warp(faceDetection=faceDetection)
+        landMarksTransformationList = [
+            self.warper.makeWarpTransformationWithLandmarks(detection, "L5")
+            for detection in (self.faceDetection, faceDetection)
+        ]
+        gazeEstimations = self.gazeEstimator.estimateBatch(landMarksTransformationList, [self.warp, warp])
+        assert isinstance(gazeEstimations, list)
+        assert len(gazeEstimations) == 2
+        for gazeEstimation in gazeEstimations:
+            self.validate_gaze_estimation(gazeEstimation.asDict())
+
+    def test_batch_estimate_gaze_with_error(self):
+        """
+        Test gaze estimator with two warps and one landmarks transformation
+        """
+        faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=True)
+        warp = self.warper.warp(faceDetection=faceDetection)
+        landMarksTransformationList = [self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")]
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.gazeEstimator.estimateBatch(landMarksTransformationList, [self.warp, warp])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok.format("Ok"))
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok.format("Ok"))
+
+    def test_batch_estimate_invalid_input(self):
+        """
+        Test gaze estimator with invalid input
+        """
+        with pytest.raises(LunaSDKException) as exceptionInfo:
+            self.gazeEstimator.estimateBatch([], [])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

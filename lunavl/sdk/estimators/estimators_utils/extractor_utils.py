@@ -42,29 +42,26 @@ def estimate(
     return descriptor
 
 
-def validateInputWarpsForBatchWarpEstimator(
-    estimatorOnWarp, warps: Union[List[Union[HumanWarp, HumanWarpedImage]], List[Union[FaceWarp, FaceWarpedImage]]]
-):
+def validateInputForBatchEstimator(estimator, *args):
     """
-    Validate input data for batch
+    Validate input data for batch estimator
 
     Args:
-        estimatorOnWarp: estimator which work on warp
-        warps: batch of warps
+        estimator: estimator
+        args: args for estimator validation
 
     Raises:
-         LunaSDKException(LunaVLError.BatchedInternalError): if warps is not valid
+         LunaSDKException(LunaVLError.BatchedInternalError): if data is not valid
          LunaSDKException: if validation is failed
     """
-    validationError, dataErrors = estimatorOnWarp.validate([warp.warpedImage.coreImage for warp in warps])
+    validationError, sdkErrors = estimator.validate(*args)
     if validationError.isOk:
         return
-    if validationError.error != FSDKError.ValidationFailed:
-        raise LunaSDKException(LunaVLError.fromSDKError(validationError), dataErrors)
-    errors = []
+    errors = [LunaVLError.fromSDKError(error) for error in sdkErrors]
 
-    for error in dataErrors:
-        errors.append(LunaVLError.fromSDKError(error))
+    if validationError.error != FSDKError.ValidationFailed:
+        raise LunaSDKException(LunaVLError.fromSDKError(validationError), errors)
+
     raise LunaSDKException(
         LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
     )
@@ -94,22 +91,19 @@ def estimateDescriptorsBatch(
 
     if descriptorBatch is None:
         descriptorBatch = descriptorFactory.generateDescriptorsBatch(len(warps))
-    validateInputWarpsForBatchWarpEstimator(coreEstimator, warps)
+    coreImages = [warp.warpedImage.coreImage for warp in warps]
+    validateInputForBatchEstimator(coreEstimator, coreImages)
     if aggregate:
         aggregatedDescriptor = descriptorFactory.generateDescriptor()
 
         error, optionalGSAggregateDescriptor, scores = coreEstimator.extractFromWarpedImageBatch(
-            [warp.warpedImage.coreImage for warp in warps],
-            descriptorBatch.coreEstimation,
-            aggregatedDescriptor.coreEstimation,
+            coreImages, descriptorBatch.coreEstimation, aggregatedDescriptor.coreEstimation
         )
         assertError(error)
         aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor
     else:
         aggregatedDescriptor = None
-        error, scores = coreEstimator.extractFromWarpedImageBatch(
-            [warp.warpedImage.coreImage for warp in warps], descriptorBatch.coreEstimation
-        )
+        error, scores = coreEstimator.extractFromWarpedImageBatch(coreImages, descriptorBatch.coreEstimation)
         assertError(error)
 
         descriptorBatch.scores = scores

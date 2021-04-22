@@ -4,12 +4,13 @@ Module contains an orientation mode estimator.
 See `orientation mode`_.
 """
 from enum import Enum
-from typing import Union
+from typing import Union, List
 
 from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
+from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputForBatchEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.image_utils.image import VLImage
@@ -84,3 +85,29 @@ class OrientationModeEstimator(BaseEstimator):
             raise LunaSDKException(LunaVLError.fromSDKError(error))
 
         return OrientationType.fromCoreOrientationType(coreOrientationType)
+
+    @CoreExceptionWrap(LunaVLError.EstimationOrientationModeError)
+    def estimateBatch(self, images: List[Union[VLImage, FaceWarp, FaceWarpedImage]]) -> List[OrientationType]:
+        """
+        Batch estimate orientation mode from warped images.
+
+        Args:
+            images: vl image or face warp list
+
+        Returns:
+            estimated orientation mode list
+        Raises:
+            LunaSDKException: if estimation is failed
+        """
+        coreImages = [img.warpedImage.coreImage if isinstance(img, FaceWarp) else img.coreImage for img in images]
+
+        validateInputForBatchEstimator(self._coreEstimator, coreImages)
+        error, coreOrientationTypeList = self._coreEstimator.estimate(coreImages)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+
+        return [
+            OrientationType.fromCoreOrientationType(coreOrientationType)
+            for coreOrientationType in coreOrientationTypeList
+        ]

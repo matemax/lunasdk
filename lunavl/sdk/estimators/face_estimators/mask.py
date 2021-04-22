@@ -3,14 +3,18 @@
 See `warp quality`_.
 """
 from enum import Enum
-from typing import Union, Dict
+from typing import Union, Dict, List
 
-from FaceEngine import MedicalMaskEstimation, IMedicalMaskEstimatorPtr  # pylint: disable=E0611,E0401
-from FaceEngine import MedicalMask as CoreMask  # pylint: disable=E0611,E0401
+from FaceEngine import (
+    MedicalMaskEstimation,
+    IMedicalMaskEstimatorPtr,
+    MedicalMask as CoreMask,
+)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
 
@@ -167,3 +171,26 @@ class MaskEstimator(BaseEstimator):
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return Mask(mask)
+
+    #  pylint: disable=W0221
+    @CoreExceptionWrap(LunaVLError.EstimationMaskError)
+    def estimateBatch(self, warps: List[Union[FaceWarp, FaceWarpedImage]]) -> List[Mask]:
+        """
+        Batch estimate mask from a warp.
+
+        Args:
+            warps: raw warped image or warp list
+
+        Returns:
+            estimated mask list
+        Raises:
+            LunaSDKException: if estimation failed
+        """
+        coreImages = [warp.warpedImage.coreImage for warp in warps]
+
+        validateInputForBatchEstimator(self._coreEstimator, coreImages)
+        error, masks = self._coreEstimator.estimate(coreImages)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [Mask(mask) for mask in masks]

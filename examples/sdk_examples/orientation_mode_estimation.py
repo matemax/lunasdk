@@ -4,8 +4,7 @@ Module realize simple examples following features:
 """
 import pprint
 
-from resources import EXAMPLE_O
-
+from resources import EXAMPLE_O, EXAMPLE_1
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.image_utils.image import VLImage
 
@@ -19,6 +18,10 @@ def estimateOrientationMode():
     orientationModeEstimator = faceEngine.createOrientationModeEstimator()
     #: estimate
     pprint.pprint(orientationModeEstimator.estimate(image))
+
+    image2 = VLImage.load(filename=EXAMPLE_1)
+    #: estimate batch
+    pprint.pprint(orientationModeEstimator.estimateBatch([image, image2]))
 
 
 if __name__ == "__main__":

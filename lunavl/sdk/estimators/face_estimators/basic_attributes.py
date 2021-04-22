@@ -5,13 +5,19 @@ See `basic attributes`_.
 from enum import Enum
 from typing import Union, Dict, Any, List, Tuple
 
-from FaceEngine import IAttributeEstimatorPtr, AttributeRequest, AttributeResult  # pylint: disable=E0611,E0401
-from FaceEngine import EthnicityEstimation, Ethnicity as CoreEthnicity  # pylint: disable=E0611,E0401
+from FaceEngine import (
+    IAttributeEstimatorPtr,
+    AttributeRequest,
+    AttributeResult,
+    EthnicityEstimation,
+    Ethnicity as CoreEthnicity,
+)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
-
 from lunavl.sdk.base import BaseEstimation
 from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
@@ -280,18 +286,10 @@ class BasicAttributesEstimator(BaseEstimator):
 
         images = [warp.warpedImage.coreImage for warp in warps]
 
+        validateInputForBatchEstimator(self._coreEstimator, images, AttributeRequest(dtAttributes))
         error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
         if error.isError:
-            errors = []
-            for image in images:
-                errorOne, baseAttributesOne = self._coreEstimator.estimate(image, AttributeRequest(dtAttributes))
-                if errorOne.isOk:
-                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-                else:
-                    errors.append(LunaVLError.fromSDKError(errorOne))
-            raise LunaSDKException(
-                LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(error).detail), errors
-            )
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
 
         attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
         if aggregate:
