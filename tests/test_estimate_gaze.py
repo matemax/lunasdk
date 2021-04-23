@@ -39,7 +39,7 @@ class TestEstimateGazeDirection(BaseTestClass):
         """
 
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")
-        warpWithLandmarks5 = WarpWithLandmarks5(self.warp.warpedImage.coreImage, landMarks5Transformation)
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, landMarks5Transformation)
         gazeEstimation = self.gazeEstimator.estimate(warpWithLandmarks5).asDict()
         self.validate_gaze_estimation(gazeEstimation)
 
@@ -50,7 +50,7 @@ class TestEstimateGazeDirection(BaseTestClass):
 
         faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=True)
         landMarks68Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L68")
-        warpWithLandmarks5 = WarpWithLandmarks5(self.warp.warpedImage.coreImage, landMarks68Transformation)
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, landMarks68Transformation)
         with pytest.raises(TypeError):
             self.gazeEstimator.estimate(warpWithLandmarks5)
 
@@ -74,7 +74,7 @@ class TestEstimateGazeDirection(BaseTestClass):
         Test gaze estimator without transformation
         """
         faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=False)
-        warpWithLandmarks5 = WarpWithLandmarks5(self.warp.warpedImage.coreImage, faceDetection.landmarks5)
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, faceDetection.landmarks5)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.gazeEstimator.estimate(warpWithLandmarks5)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
@@ -86,13 +86,8 @@ class TestEstimateGazeDirection(BaseTestClass):
         faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE))
         warp = self.warper.warp(faceDetection=faceDetection)
         warpWithLandmarks5List = [
-            WarpWithLandmarks5(
-                self.warp.warpedImage.coreImage,
-                self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5"),
-            ),
-            WarpWithLandmarks5(
-                warp.warpedImage.coreImage, self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-            ),
+            WarpWithLandmarks5(self.warp, self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")),
+            WarpWithLandmarks5(warp, self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")),
         ]
         gazeEstimations = self.gazeEstimator.estimateBatch(warpWithLandmarks5List)
         assert isinstance(gazeEstimations, list)

@@ -21,7 +21,7 @@ def estimateAGS():
 
     agsEstimator = faceEngine.createAGSEstimator()
 
-    imageWithFaceDetection = ImageWithFaceDetection(image.coreImage, faceDetection.boundingBox.coreEstimation)
+    imageWithFaceDetection = ImageWithFaceDetection(image, faceDetection.boundingBox)
     pprint.pprint(agsEstimator.estimate(imageWithFaceDetection=imageWithFaceDetection))
     pprint.pprint(agsEstimator.estimate(faceDetection))
 
@@ -29,8 +29,8 @@ def estimateAGS():
     faceDetection2 = detector.detectOne(image2)
 
     imageWithFaceDetectionList = [
-        ImageWithFaceDetection(image.coreImage, faceDetection.boundingBox.coreEstimation),
-        ImageWithFaceDetection(image2.coreImage, faceDetection2.boundingBox.coreEstimation),
+        ImageWithFaceDetection(image, faceDetection.boundingBox),
+        ImageWithFaceDetection(image2, faceDetection2.boundingBox),
     ]
     pprint.pprint(agsEstimator.estimateAgsBatchByImages(imageWithFaceDetectionList))
 

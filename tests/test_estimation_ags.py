@@ -1,5 +1,7 @@
 import pytest
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator, ImageWithFaceDetection
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
@@ -32,9 +34,7 @@ class TestBasicAttributes(BaseTestClass):
         Test estimation correctness with image.
         """
         expectedAgs = 0.96425
-        imageWithFaceDetection = ImageWithFaceDetection(
-            self.image1.coreImage, self.detection1.boundingBox.coreEstimation
-        )
+        imageWithFaceDetection = ImageWithFaceDetection(self.image1, self.detection1.boundingBox)
 
         singleValue = self.estimator.estimate(imageWithFaceDetection=imageWithFaceDetection)
         batchValue = self.estimator.estimateAgsBatchByImages([imageWithFaceDetection])[0]
@@ -60,8 +60,8 @@ class TestBasicAttributes(BaseTestClass):
         expectedAgsList = [0.96425, 1.00085]
         result = self.estimator.estimateAgsBatchByImages(
             [
-                ImageWithFaceDetection(self.image1.coreImage, self.detection1.boundingBox.coreEstimation),
-                ImageWithFaceDetection(self.image2.coreImage, self.detection2.boundingBox.coreEstimation),
+                ImageWithFaceDetection(self.image1, self.detection1.boundingBox),
+                ImageWithFaceDetection(self.image2, self.detection2.boundingBox),
             ]
         )
         assert isinstance(result, list)
@@ -84,5 +84,6 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test batch estimation with invalid input.
         """
-        with pytest.raises(TypeError):
+        with pytest.raises(LunaSDKException) as exceptionInfo:
             self.estimator.estimateAgsBatchByImages([])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

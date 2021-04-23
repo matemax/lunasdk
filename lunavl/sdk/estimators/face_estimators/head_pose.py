@@ -10,9 +10,8 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.base import BaseEstimation, BoundingBox
+from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import Landmarks68
-from lunavl.sdk.image_utils.image import VLImage
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -169,7 +168,7 @@ class HeadPoseEstimator(BaseEstimator):
             LunaSDKException: if estimation is failed
         """
         error, headPoseEstimation = self._coreEstimator.estimate(
-            imageWithFaceDetection.image, imageWithFaceDetection.bBox
+            imageWithFaceDetection.image.coreImage, imageWithFaceDetection.bBox.coreEstimation
         )
 
         if error.isError:
@@ -188,9 +187,11 @@ class HeadPoseEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation is failed
         """
-        argsMap = list(map(list, zip(*imageWithFaceDetectionList)))
-        validateInputByBatchEstimator(self._coreEstimator, *argsMap)
-        error, headPoseEstimations = self._coreEstimator.estimate(*argsMap)
+        coreImages = [row.image.coreImage for row in imageWithFaceDetectionList]
+        detections = [row.bBox.coreEstimation for row in imageWithFaceDetectionList]
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
+        error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

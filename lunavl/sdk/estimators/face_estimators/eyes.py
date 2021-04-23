@@ -17,7 +17,6 @@ from FaceEngine import (
     IrisLandmarks as CoreIrisLandmarks,
     State as CoreEyeState,
     EyesEstimation as CoreEyesEstimation,
-    Image as CoreImage,
 )  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
@@ -183,11 +182,11 @@ class WarpWithLandmarks(NamedTuple):
     """
     Structure for the transfer to detector landmarks estimation and warp.
     Attributes
-        warpCoreImage (CoreImage): warp core image
+        warp (Union[FaceWarp, FaceWarpedImage]): warp core image
         landmarks (Union[Landmarks5, Landmarks68]): landmarks estimation
     """
 
-    warpCoreImage: CoreImage
+    warp: Union[FaceWarp, FaceWarpedImage]
     landmarks: Union[Landmarks5, Landmarks68]
 
 
@@ -223,13 +222,13 @@ class EyeEstimator(BaseEstimator):
         cropper = EyeCropper()
         if isinstance(warpWithLandmarks.landmarks, Landmarks5):
             eyeRects = cropper.cropByLandmarks5(
-                warpWithLandmarks.warpCoreImage, warpWithLandmarks.landmarks.coreEstimation
+                warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
             )
         else:
             eyeRects = cropper.cropByLandmarks68(
-                warpWithLandmarks.warpCoreImage, warpWithLandmarks.landmarks.coreEstimation
+                warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
             )
-        error, eyesEstimation = self._coreEstimator.estimate(warpWithLandmarks.warpCoreImage, eyeRects)
+        error, eyesEstimation = self._coreEstimator.estimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return EyesEstimation(eyesEstimation)
@@ -255,16 +254,16 @@ class EyeEstimator(BaseEstimator):
             if isinstance(warpWithLandmarks.landmarks, Landmarks5):
                 eyeRectList.append(
                     cropper.cropByLandmarks5(
-                        warpWithLandmarks.warpCoreImage, warpWithLandmarks.landmarks.coreEstimation
+                        warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
                     )
                 )
             else:
                 eyeRectList.append(
                     cropper.cropByLandmarks68(
-                        warpWithLandmarks.warpCoreImage, warpWithLandmarks.landmarks.coreEstimation
+                        warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
                     )
                 )
-        coreImages = [row.warpCoreImage for row in warpWithLandmarksList]
+        coreImages = [row.warp.warpedImage.coreImage for row in warpWithLandmarksList]
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, eyeRectList)
         error, eyesEstimations = self._coreEstimator.estimate(coreImages, eyeRectList)
@@ -344,11 +343,11 @@ class WarpWithLandmarks5(NamedTuple):
     """
     Structure for the transfer to detector landmarks 5 estimation and warp.
     Attributes
-        warpCoreImage (CoreImage): warp core image
+        warp (Union[FaceWarp, FaceWarpedImage]): warp core image
         landmarks (Landmarks5): landmarks 5 estimation
     """
 
-    warpCoreImage: CoreImage
+    warp: Union[FaceWarp, FaceWarpedImage]
     landmarks: Landmarks5
 
 
@@ -381,7 +380,7 @@ class GazeEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         error, gaze = self._coreEstimator.estimate(
-            warpWithLandmarks5.warpCoreImage, warpWithLandmarks5.landmarks.coreEstimation
+            warpWithLandmarks5.warp.warpedImage.coreImage, warpWithLandmarks5.landmarks.coreEstimation
         )
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -400,7 +399,7 @@ class GazeEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation failed
         """
-        images = [row.warpCoreImage for row in warpWithLandmarks5List]
+        images = [row.warp.warpedImage.coreImage for row in warpWithLandmarks5List]
         landmarks = [row.landmarks.coreEstimation for row in warpWithLandmarks5List]
         validateInputByBatchEstimator(self._coreEstimator, images, landmarks)
         error, gazeList = self._coreEstimator.estimate(images, landmarks)

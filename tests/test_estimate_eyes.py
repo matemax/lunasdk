@@ -63,7 +63,7 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(OPEN_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
         eyesDict = self.eyeEstimator.estimate(warpWithLandmarks).asDict()
         self.assert_eyes_reply(eyesDict)
 
@@ -74,7 +74,7 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(OPEN_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
         eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Open
         assert eyesResult.rightEye.state == EyeState.Open
@@ -86,7 +86,7 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(CLOSED_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
         eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Closed
         assert eyesResult.rightEye.state == EyeState.Closed
@@ -98,7 +98,7 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(MIXED_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
         eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Occluded
         assert eyesResult.rightEye.state == EyeState.Open
@@ -115,7 +115,7 @@ class TestEstimateEyes(BaseTestClass):
                 ]
                 warpWithLandmarksList = [
                     WarpWithLandmarks(
-                        self.warper.warp(faceDetection).warpedImage.coreImage,
+                        self.warper.warp(faceDetection),
                         self.warper.makeWarpTransformationWithLandmarks(faceDetection, landMarks),
                     )
                     for faceDetection in faceDetections
@@ -138,11 +138,11 @@ class TestEstimateEyes(BaseTestClass):
 
         warpWithLandmarksList = [
             WarpWithLandmarks(
-                self.warper.warp(faceDetections[0]).warpedImage.coreImage,
+                self.warper.warp(faceDetections[0]),
                 self.warper.makeWarpTransformationWithLandmarks(faceDetections[0], "L5"),
             ),
             WarpWithLandmarks(
-                self.warper.warp(faceDetections[1]).warpedImage.coreImage,
+                self.warper.warp(faceDetections[1]),
                 self.warper.makeWarpTransformationWithLandmarks(faceDetections[1], "L68"),
             ),
         ]

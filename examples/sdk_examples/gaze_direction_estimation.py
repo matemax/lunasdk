@@ -25,7 +25,7 @@ def estimateGazeDirection():
 
     gazeEstimator = faceEngine.createGazeEstimator()
 
-    warpWithLandmarks5 = WarpWithLandmarks5(warp.warpedImage.coreImage, landMarks5Transformation)
+    warpWithLandmarks5 = WarpWithLandmarks5(warp, landMarks5Transformation)
     pprint.pprint(gazeEstimator.estimate(warpWithLandmarks5).asDict())
 
     faceDetection2 = detector.detectOne(VLImage.load(filename=EXAMPLE_1), detect68Landmarks=True)
@@ -33,8 +33,8 @@ def estimateGazeDirection():
     landMarks5Transformation2 = warper.makeWarpTransformationWithLandmarks(faceDetection2, "L5")
 
     warpWithLandmarks5List = [
-        WarpWithLandmarks5(warp.warpedImage.coreImage, landMarks5Transformation),
-        WarpWithLandmarks5(warp2.warpedImage.coreImage, landMarks5Transformation2),
+        WarpWithLandmarks5(warp, landMarks5Transformation),
+        WarpWithLandmarks5(warp2, landMarks5Transformation2),
     ]
     estimations = gazeEstimator.estimateBatch(warpWithLandmarks5List)
     pprint.pprint([estimation.asDict() for estimation in estimations])

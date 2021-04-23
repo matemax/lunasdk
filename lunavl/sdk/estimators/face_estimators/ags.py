@@ -49,7 +49,9 @@ class AGSEstimator(BaseEstimator):
         if detection is None:
             if imageWithFaceDetection is None:
                 raise ValueError("image and boundingBox or detection must be not None")
-            error, ags = self._coreEstimator.estimate(imageWithFaceDetection.image, imageWithFaceDetection.bBox)
+            error, ags = self._coreEstimator.estimate(
+                imageWithFaceDetection.image.coreImage, imageWithFaceDetection.bBox.coreEstimation
+            )
         else:
             error, ags = self._coreEstimator.estimate(detection.image.coreImage, detection.boundingBox.coreEstimation)
 
@@ -95,9 +97,11 @@ class AGSEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
             ValueError: if empty image list and empty detection list or images count not match bounding boxes count
         """
-        argsMap = list(map(list, zip(*imageWithFaceDetectionList)))
-        validateInputByBatchEstimator(self._coreEstimator, *argsMap)
-        error, agsList = self._coreEstimator.estimate(*argsMap)
+        coreImages = [row.image.coreImage for row in imageWithFaceDetectionList]
+        boundingBoxEstimations = [row.bBox.coreEstimation for row in imageWithFaceDetectionList]
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
+        error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

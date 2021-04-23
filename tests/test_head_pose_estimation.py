@@ -95,7 +95,7 @@ class TestHeadPose(BaseTestClass):
         Estimating head pose by bounding box test.
         """
         angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
-            ImageWithFaceDetection(self.image.coreImage, self.detection.boundingBox.coreEstimation)
+            ImageWithFaceDetection(self.image, self.detection.boundingBox)
         )
         self.assertHeadPose(angles)
 
@@ -105,7 +105,7 @@ class TestHeadPose(BaseTestClass):
         """
         image = VLImage.load(filename=NO_FACES)
         angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
-            ImageWithFaceDetection(self.image.coreImage, self.detection.boundingBox.coreEstimation)
+            ImageWithFaceDetection(self.image, self.detection.boundingBox)
         )
         self.assertHeadPose(angles)
 
@@ -116,9 +116,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = Detection(RectFloat(3000.0, 3000.0, 100.0, 100.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(
-                ImageWithFaceDetection(self.image.coreImage, bBox.coreEstimation)
-            )
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
@@ -128,9 +126,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = Detection(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(
-                ImageWithFaceDetection(self.image.coreImage, bBox.coreEstimation)
-            )
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection)
 
     def test_default_estimation(self):
@@ -175,8 +171,8 @@ class TestHeadPose(BaseTestClass):
         image = VLImage.load(filename=GOST_HEAD_POSE_FACE)
         detection = self.detector.detectOne(image, detect5Landmarks=True, detect68Landmarks=True)
         imageWithFaceDetectionList = [
-            ImageWithFaceDetection(self.image.coreImage, self.detection.boundingBox.coreEstimation),
-            ImageWithFaceDetection(image.coreImage, detection.boundingBox.coreEstimation),
+            ImageWithFaceDetection(self.image, self.detection.boundingBox),
+            ImageWithFaceDetection(image, detection.boundingBox),
         ]
         anglesList = self.headPoseEstimator.estimateByBoundingBoxBatch(imageWithFaceDetectionList)
         assert isinstance(anglesList, list)

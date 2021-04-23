@@ -24,7 +24,7 @@ def estimateEyes():
 
     eyesEstimator = faceEngine.createEyeEstimator()
 
-    warpWithLandmarks = WarpWithLandmarks(landMarks5Transformation, warp.warpedImage.coreImage)
+    warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
     pprint.pprint(eyesEstimator.estimate(warpWithLandmarks).asDict())
 
     image2 = VLImage.load(filename=EXAMPLE_1)
@@ -33,8 +33,8 @@ def estimateEyes():
     landMarks5Transformation2 = warper.makeWarpTransformationWithLandmarks(faceDetection2, "L5")
 
     warpWithLandmarksList = [
-        WarpWithLandmarks(landMarks5Transformation, warp.warpedImage.coreImage),
-        WarpWithLandmarks(landMarks5Transformation2, warp2.warpedImage.coreImage),
+        WarpWithLandmarks(warp, landMarks5Transformation),
+        WarpWithLandmarks(warp2, landMarks5Transformation2),
     ]
 
     estimations = eyesEstimator.estimateBatch(warpWithLandmarksList)
