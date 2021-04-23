@@ -93,7 +93,7 @@ class TestMask(BaseTestClass):
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
                     faceDetection = self.defaultDetector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(faceDetection.coreEstimation)
+                    mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_missing_mask(self):
@@ -110,7 +110,7 @@ class TestMask(BaseTestClass):
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
                     faceDetection = self.defaultDetector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(faceDetection.coreEstimation)
+                    mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_mask_occluded(self):
@@ -127,7 +127,7 @@ class TestMask(BaseTestClass):
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
                     faceDetection = self.defaultDetector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(faceDetection.coreEstimation)
+                    mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
     def test_estimate_missing_mask_large_image(self):
@@ -137,5 +137,5 @@ class TestMask(BaseTestClass):
         case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.0, 0.999), None)
 
         faceDetection = self.defaultDetector.detectOne(case.inputImage)
-        mask = TestMask.maskEstimator.estimate(faceDetection.coreEstimation)
+        mask = TestMask.maskEstimator.estimate(faceDetection)
         self.assertMaskEstimation(mask, case.expectedResult._asdict())

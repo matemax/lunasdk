@@ -7,10 +7,10 @@ from typing import Union, Dict
 
 from FaceEngine import MedicalMaskEstimation, IMedicalMaskEstimatorPtr  # pylint: disable=E0611,E0401
 from FaceEngine import MedicalMask as CoreMask  # pylint: disable=E0611,E0401
-from FaceEngine import Face
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
+from lunavl.sdk.detectors.facedetector import FaceDetection
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
@@ -150,12 +150,12 @@ class MaskEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationMaskError)
-    def estimate(self, faceObject: Union[FaceWarpedImage, FaceWarp, Face]) -> Mask:
+    def estimate(self, faceObject: Union[FaceWarpedImage, FaceWarp, FaceDetection]) -> Mask:
         """
         Estimate mask from a warp or detection.
 
         Args:
-            imageObject: raw warped image, warp or face object.
+            imageObject: raw warped image, warp or faceDetection.
 
         Returns:
             estimated mask
@@ -165,7 +165,7 @@ class MaskEstimator(BaseEstimator):
         if isinstance(faceObject, (FaceWarpedImage, FaceWarp)):
             error, mask = self._coreEstimator.estimate(faceObject.warpedImage.coreImage)
         else:
-            error, mask = self._coreEstimator.estimate(faceObject.img, faceObject.detection)
+            error, mask = self._coreEstimator.estimate(faceObject.image.coreImage, faceObject.coreEstimation.detection)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return Mask(mask)
