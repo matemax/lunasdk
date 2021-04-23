@@ -2,7 +2,11 @@
 Module with base classes of estimators and estimations
 """
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, NamedTuple
+
+from FaceEngine import Rect
+
+from lunavl.sdk.image_utils.image import VLImage
 
 
 class BaseEstimator(ABC):
@@ -34,3 +38,15 @@ class BaseEstimator(ABC):
             estimated attributes
         """
         pass
+
+
+class ImageWithFaceDetection(NamedTuple):
+    """
+    Structure for the transfer to detector an image and detect an area.
+    Attributes
+        image (VLImage): image for detection
+        bBox(Rect[float]): face bounding box
+    """
+
+    image: VLImage
+    bBox: Rect

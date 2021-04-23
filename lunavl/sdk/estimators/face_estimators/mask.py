@@ -14,7 +14,7 @@ from FaceEngine import (
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from ..base import BaseEstimator
-from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
 
@@ -188,7 +188,7 @@ class MaskEstimator(BaseEstimator):
         """
         coreImages = [warp.warpedImage.coreImage for warp in warps]
 
-        validateInputForBatchEstimator(self._coreEstimator, coreImages)
+        validateInputByBatchEstimator(self._coreEstimator, coreImages)
         error, masks = self._coreEstimator.estimate(coreImages)
 
         if error.isError:

@@ -17,7 +17,7 @@ from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.base import BaseEstimation
 from ..base import BaseEstimator
-from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
@@ -286,7 +286,7 @@ class BasicAttributesEstimator(BaseEstimator):
 
         images = [warp.warpedImage.coreImage for warp in warps]
 
-        validateInputForBatchEstimator(self._coreEstimator, images, AttributeRequest(dtAttributes))
+        validateInputByBatchEstimator(self._coreEstimator, images, AttributeRequest(dtAttributes))
         error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

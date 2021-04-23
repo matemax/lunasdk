@@ -3,6 +3,7 @@ An approximate garbage score estimation example
 """
 import pprint
 
+from lunavl.sdk.estimators.base import ImageWithFaceDetection
 from resources import EXAMPLE_O, EXAMPLE_1
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
@@ -20,16 +21,20 @@ def estimateAGS():
 
     agsEstimator = faceEngine.createAGSEstimator()
 
-    pprint.pprint(agsEstimator.estimate(image=image, boundingBox=faceDetection.boundingBox))
+    imageWithFaceDetection = ImageWithFaceDetection(image.coreImage, faceDetection.boundingBox.coreEstimation)
+    pprint.pprint(agsEstimator.estimate(imageWithFaceDetection=imageWithFaceDetection))
     pprint.pprint(agsEstimator.estimate(faceDetection))
 
     image2 = VLImage.load(filename=EXAMPLE_1)
-    faceDetections = [detections[0] for detections in detector.detect([image, image2])]
-    boundingBoxes = [detection.boundingBox for detection in faceDetections]
+    faceDetection2 = detector.detectOne(image2)
 
-    pprint.pprint(agsEstimator.estimateAgsBatchByImages(images=[image, image2], boundingBoxes=boundingBoxes))
+    imageWithFaceDetectionList = [
+        ImageWithFaceDetection(image.coreImage, faceDetection.boundingBox.coreEstimation),
+        ImageWithFaceDetection(image2.coreImage, faceDetection2.boundingBox.coreEstimation),
+    ]
+    pprint.pprint(agsEstimator.estimateAgsBatchByImages(imageWithFaceDetectionList))
 
-    pprint.pprint(agsEstimator.estimateAgsBatchByDetections(detections=faceDetections))
+    pprint.pprint(agsEstimator.estimateAgsBatchByDetections(detections=[faceDetection, faceDetection2]))
 
 
 if __name__ == "__main__":

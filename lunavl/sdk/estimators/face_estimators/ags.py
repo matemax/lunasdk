@@ -9,10 +9,8 @@ from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.detectors.facedetector import FaceDetection
-from lunavl.sdk.image_utils.image import VLImage
-from ..base import BaseEstimator
-from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
-from ...base import BoundingBox
+from ..base import BaseEstimator, ImageWithFaceDetection
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
 
 class AGSEstimator(BaseEstimator):
@@ -33,18 +31,14 @@ class AGSEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationAGSError)
     def estimate(
-        self,
-        detection: Optional[FaceDetection] = None,
-        image: Optional[VLImage] = None,
-        boundingBox: Optional[BoundingBox] = None,
+        self, detection: Optional[FaceDetection] = None, imageWithFaceDetection: Optional[ImageWithFaceDetection] = None
     ) -> float:
         """
         Estimate ags for single image/detection.
 
         Args:
-            image: image in R8G8B8 format
-            boundingBox: face bounding box of corresponding the image
             detection: face detection
+            imageWithFaceDetection: image with face detection
 
         Returns:
             estimated ags, float in range[0,1]
@@ -53,11 +47,12 @@ class AGSEstimator(BaseEstimator):
             ValueError: if image and detection are None
         """
         if detection is None:
-            if image is None or boundingBox is None:
+            if imageWithFaceDetection is None:
                 raise ValueError("image and boundingBox or detection must be not None")
-            error, ags = self._coreEstimator.estimate(image.coreImage, boundingBox.coreEstimation)
+            error, ags = self._coreEstimator.estimate(imageWithFaceDetection.image, imageWithFaceDetection.bBox)
         else:
             error, ags = self._coreEstimator.estimate(detection.image.coreImage, detection.boundingBox.coreEstimation)
+
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return ags
@@ -79,7 +74,7 @@ class AGSEstimator(BaseEstimator):
         coreImages = [detection.image.coreImage for detection in detections]
         boundingBoxEstimations = [detection.boundingBox.coreEstimation for detection in detections]
 
-        validateInputForBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
         error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)
 
         if error.isError:
@@ -87,13 +82,12 @@ class AGSEstimator(BaseEstimator):
         return agsList
 
     @CoreExceptionWrap(LunaVLError.EstimationAGSError)
-    def estimateAgsBatchByImages(self, images: List[VLImage], boundingBoxes: List[BoundingBox]) -> List[float]:
+    def estimateAgsBatchByImages(self, imageWithFaceDetectionList: List[ImageWithFaceDetection]) -> List[float]:
         """
         Estimate ags for list of images with bounding boxes.
 
         Args:
-            images: list of image in R8G8B8 format
-            boundingBoxes: list of face bounding box of corresponding the images
+            imageWithFaceDetectionList: list of image with face detection
 
         Returns:
             list of estimated ags, float in range[0,1]
@@ -101,11 +95,9 @@ class AGSEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
             ValueError: if empty image list and empty detection list or images count not match bounding boxes count
         """
-        coreImages = [image.coreImage for image in images]
-        boundingBoxEstimations = [bbox.coreEstimation for bbox in boundingBoxes]
-
-        validateInputForBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
-        error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)
+        argsMap = list(map(list, zip(*imageWithFaceDetectionList)))
+        validateInputByBatchEstimator(self._coreEstimator, *argsMap)
+        error, agsList = self._coreEstimator.estimate(*argsMap)
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

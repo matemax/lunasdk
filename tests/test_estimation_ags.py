@@ -1,9 +1,6 @@
 import pytest
 
-from lunavl.sdk.detectors.facedetector import FaceDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator
+from lunavl.sdk.estimators.face_estimators.ags import AGSEstimator, ImageWithFaceDetection
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
@@ -18,21 +15,14 @@ class TestBasicAttributes(BaseTestClass):
 
     # estimator to call
     estimator: AGSEstimator = BaseTestClass.faceEngine.createAGSEstimator()
-
     # first image
-    image1: VLImage
-    # first detection
-    detection1: FaceDetection
+    image1: VLImage = VLImage.load(filename=ONE_FACE)
     # second image
-    image2: VLImage
-    # second detection
-    detection2: FaceDetection
+    image2: VLImage = VLImage.load(filename=CLEAN_ONE_FACE)
 
     @classmethod
     def setUpClass(cls) -> None:
         """ Load warps. """
-        cls.image1 = VLImage.load(filename=ONE_FACE)
-        cls.image2 = VLImage.load(filename=CLEAN_ONE_FACE)
         detector = VLFaceEngine().createFaceDetector(DetectorType.FACE_DET_V1)
         cls.detection1 = detector.detectOne(cls.image1)
         cls.detection2 = detector.detectOne(cls.image2)
@@ -42,10 +32,12 @@ class TestBasicAttributes(BaseTestClass):
         Test estimation correctness with image.
         """
         expectedAgs = 0.96425
-        singleValue = self.estimator.estimate(image=self.image1, boundingBox=self.detection1.boundingBox)
-        batchValue = self.estimator.estimateAgsBatchByImages(
-            images=[self.image1], boundingBoxes=[self.detection1.boundingBox]
-        )[0]
+        imageWithFaceDetection = ImageWithFaceDetection(
+            self.image1.coreImage, self.detection1.boundingBox.coreEstimation
+        )
+
+        singleValue = self.estimator.estimate(imageWithFaceDetection=imageWithFaceDetection)
+        batchValue = self.estimator.estimateAgsBatchByImages([imageWithFaceDetection])[0]
         assert type(singleValue) == type(batchValue)
         assert isinstance(singleValue, float)
         assert abs(expectedAgs - singleValue) < EXPECTED_PRECISION
@@ -67,8 +59,10 @@ class TestBasicAttributes(BaseTestClass):
         """
         expectedAgsList = [0.96425, 1.00085]
         result = self.estimator.estimateAgsBatchByImages(
-            images=[self.image1, self.image2],
-            boundingBoxes=[self.detection1.boundingBox, self.detection2.boundingBox],
+            [
+                ImageWithFaceDetection(self.image1.coreImage, self.detection1.boundingBox.coreEstimation),
+                ImageWithFaceDetection(self.image2.coreImage, self.detection2.boundingBox.coreEstimation),
+            ]
         )
         assert isinstance(result, list)
         for idx, row in enumerate(result):
@@ -90,8 +84,5 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test batch estimation with invalid input.
         """
-        with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.estimator.estimateAgsBatchByImages(
-                images=[self.image1, self.image2], boundingBoxes=[self.detection1.boundingBox]
-            )
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+        with pytest.raises(TypeError):
+            self.estimator.estimateAgsBatchByImages([])

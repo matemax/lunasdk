@@ -13,8 +13,8 @@ from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.base import BaseEstimation, BoundingBox
 from lunavl.sdk.detectors.facedetector import Landmarks68
 from lunavl.sdk.image_utils.image import VLImage
-from ..base import BaseEstimator
-from ..estimators_utils.extractor_utils import validateInputForBatchEstimator
+from ..base import BaseEstimator, ImageWithFaceDetection
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
 
 class FrontalType(Enum):
@@ -157,44 +157,40 @@ class HeadPoseEstimator(BaseEstimator):
         return self.estimateBy68Landmarks(landmarks68)
 
     @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateByBoundingBox(self, detection: BoundingBox, imageWithDetection: VLImage) -> HeadPose:
+    def estimateByBoundingBox(self, imageWithFaceDetection: ImageWithFaceDetection) -> HeadPose:
         """
         Estimate head pose by detection.
 
         Args:
-            detection: detection bounding box
-            imageWithDetection: image with the detection.
+            imageWithFaceDetection: image with face detection
         Returns:
             estimate head pose
         Raises:
             LunaSDKException: if estimation is failed
         """
-        error, headPoseEstimation = self._coreEstimator.estimate(imageWithDetection.coreImage, detection.coreEstimation)
+        error, headPoseEstimation = self._coreEstimator.estimate(
+            imageWithFaceDetection.image, imageWithFaceDetection.bBox
+        )
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return HeadPose(headPoseEstimation)
 
     @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateByBoundingBoxBatch(
-        self, detections: List[BoundingBox], imageWithDetectionList: List[VLImage]
-    ) -> List[HeadPose]:
+    def estimateByBoundingBoxBatch(self, imageWithFaceDetectionList: List[ImageWithFaceDetection]) -> List[HeadPose]:
         """
         Batch estimate head pose by detection.
 
         Args:
-            detections: detection bounding box list
-            imageWithDetectionList: image with the detection list
+            imageWithFaceDetectionList: list of image with face detection
         Returns:
             list of head pose estimations
         Raises:
             LunaSDKException: if estimation is failed
         """
-        coreImages = [image.coreImage for image in imageWithDetectionList]
-        coreEstimations = [detection.coreEstimation for detection in detections]
-
-        validateInputForBatchEstimator(self._coreEstimator, coreImages, coreEstimations)
-        error, headPoseEstimations = self._coreEstimator.estimate(coreImages, coreEstimations)
+        argsMap = list(map(list, zip(*imageWithFaceDetectionList)))
+        validateInputByBatchEstimator(self._coreEstimator, *argsMap)
+        error, headPoseEstimations = self._coreEstimator.estimate(*argsMap)
 
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

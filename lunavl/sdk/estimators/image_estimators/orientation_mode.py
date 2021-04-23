@@ -10,7 +10,7 @@ from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientat
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
-from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputForBatchEstimator
+from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.image_utils.image import VLImage
@@ -101,7 +101,7 @@ class OrientationModeEstimator(BaseEstimator):
         """
         coreImages = [img.warpedImage.coreImage if isinstance(img, FaceWarp) else img.coreImage for img in images]
 
-        validateInputForBatchEstimator(self._coreEstimator, coreImages)
+        validateInputByBatchEstimator(self._coreEstimator, coreImages)
         error, coreOrientationTypeList = self._coreEstimator.estimate(coreImages)
 
         if error.isError:

@@ -17,7 +17,7 @@ from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.estimators.base import BaseEstimator
-from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputForBatchEstimator
+from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 
 
 class LivenessPrediction(Enum):
@@ -181,7 +181,7 @@ class LivenessV1Estimator(BaseEstimator):
         except AttributeError:
             raise ValueError("Landmarks5 is required for liveness estimation")
 
-        validateInputForBatchEstimator(self._coreEstimator, coreImages, detections, coreEstimations)
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, detections, coreEstimations)
         error, estimations = self._coreEstimator.estimate(
             coreImages,
             detections,

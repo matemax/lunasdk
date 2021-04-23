@@ -1,8 +1,6 @@
 import pytest
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.face_estimators.eyes import EyeState, EyesEstimation
+from lunavl.sdk.estimators.face_estimators.eyes import EyeState, EyesEstimation, WarpWithLandmarks
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -65,7 +63,8 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(OPEN_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesDict = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage).asDict()
+        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        eyesDict = self.eyeEstimator.estimate(warpWithLandmarks).asDict()
         self.assert_eyes_reply(eyesDict)
 
     def test_estimate_open_eyes(self):
@@ -75,7 +74,8 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(OPEN_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
+        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Open
         assert eyesResult.rightEye.state == EyeState.Open
 
@@ -86,7 +86,8 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(CLOSED_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
+        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Closed
         assert eyesResult.rightEye.state == EyeState.Closed
 
@@ -97,7 +98,8 @@ class TestEstimateEyes(BaseTestClass):
         faceDetection = self.detector.detectOne(MIXED_EYES_IMAGE)
         warp = self.warper.warp(faceDetection)
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
-        eyesResult = self.eyeEstimator.estimate(landMarks5Transformation, warp.warpedImage)
+        warpWithLandmarks = WarpWithLandmarks(warp.warpedImage.coreImage, landMarks5Transformation)
+        eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Occluded
         assert eyesResult.rightEye.state == EyeState.Open
 
@@ -111,22 +113,49 @@ class TestEstimateEyes(BaseTestClass):
                     self.detector.detectOne(img, detect68Landmarks=landMarks == "L68")
                     for img in (OPEN_EYES_IMAGE, MIXED_EYES_IMAGE, CLOSED_EYES_IMAGE)
                 ]
-                warps = [self.warper.warp(faceDetection) for faceDetection in faceDetections]
-                landMarksTransformations = [
-                    self.warper.makeWarpTransformationWithLandmarks(faceDetection, landMarks)
+                warpWithLandmarksList = [
+                    WarpWithLandmarks(
+                        self.warper.warp(faceDetection).warpedImage.coreImage,
+                        self.warper.makeWarpTransformationWithLandmarks(faceDetection, landMarks),
+                    )
                     for faceDetection in faceDetections
                 ]
-                anglesList = self.eyeEstimator.estimateBatch(landMarksTransformations, warps)
+                anglesList = self.eyeEstimator.estimateBatch(warpWithLandmarksList)
                 assert isinstance(anglesList, list)
-                assert len(anglesList) == len(warps)
+                assert len(anglesList) == len(faceDetections)
                 for angles in anglesList:
                     assert isinstance(angles, EyesEstimation)
                     self.assert_eyes_reply(angles.asDict())
+
+    def test_estimate_batch_mixed_landmarks(self):
+        """
+        Test eye estimator with two faces - 1st with 5 landmarks, 2nd with 68 landmarks
+        """
+        faceDetections = [
+            self.detector.detectOne(OPEN_EYES_IMAGE, detect68Landmarks=False),
+            self.detector.detectOne(OPEN_EYES_IMAGE, detect68Landmarks=True),
+        ]
+
+        warpWithLandmarksList = [
+            WarpWithLandmarks(
+                self.warper.warp(faceDetections[0]).warpedImage.coreImage,
+                self.warper.makeWarpTransformationWithLandmarks(faceDetections[0], "L5"),
+            ),
+            WarpWithLandmarks(
+                self.warper.warp(faceDetections[1]).warpedImage.coreImage,
+                self.warper.makeWarpTransformationWithLandmarks(faceDetections[1], "L68"),
+            ),
+        ]
+        anglesList = self.eyeEstimator.estimateBatch(warpWithLandmarksList)
+        assert isinstance(anglesList, list)
+        assert len(anglesList) == len(faceDetections)
+        for angles in anglesList:
+            assert isinstance(angles, EyesEstimation)
+            self.assert_eyes_reply(angles.asDict())
 
     def test_estimate_batch_invalid_input(self):
         """
         Test batch eye estimator with invalid input
         """
-        with pytest.raises(LunaSDKException) as exceptionInfo:
+        with pytest.raises(TypeError):
             self.eyeEstimator.estimateBatch([], [])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)

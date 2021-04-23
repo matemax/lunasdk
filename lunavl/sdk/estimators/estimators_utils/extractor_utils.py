@@ -92,7 +92,7 @@ def estimateDescriptorsBatch(
     if descriptorBatch is None:
         descriptorBatch = descriptorFactory.generateDescriptorsBatch(len(warps))
     coreImages = [warp.warpedImage.coreImage for warp in warps]
-    validateInputForBatchEstimator(coreEstimator, coreImages)
+    validateInputByBatchEstimator(coreEstimator, coreImages)
     if aggregate:
         aggregatedDescriptor = descriptorFactory.generateDescriptor()
 
