@@ -184,7 +184,7 @@ class WarpWithLandmarks(NamedTuple):
     Structure for the transfer to detector landmarks estimation and warp.
     Attributes
         warpCoreImage (CoreImage): warp core image
-        landmarksEstimation (Union[Landmarks5, Landmarks68]): landmarks estimation
+        landmarks (Union[Landmarks5, Landmarks68]): landmarks estimation
     """
 
     warpCoreImage: CoreImage
@@ -345,11 +345,11 @@ class WarpWithLandmarks5(NamedTuple):
     Structure for the transfer to detector landmarks 5 estimation and warp.
     Attributes
         warpCoreImage (CoreImage): warp core image
-        landmarksEstimation (Landmarks5): landmarks 5 estimation
+        landmarks (Landmarks5): landmarks 5 estimation
     """
 
     warpCoreImage: CoreImage
-    landmarksEstimation: Landmarks5
+    landmarks: Landmarks5
 
 
 class GazeEstimator(BaseEstimator):
@@ -381,7 +381,7 @@ class GazeEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         error, gaze = self._coreEstimator.estimate(
-            warpWithLandmarks5.warpCoreImage, warpWithLandmarks5.landmarksEstimation.coreEstimation
+            warpWithLandmarks5.warpCoreImage, warpWithLandmarks5.landmarks.coreEstimation
         )
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -401,7 +401,7 @@ class GazeEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         images = [row.warpCoreImage for row in warpWithLandmarks5List]
-        landmarks = [row.landmarksEstimation.coreEstimation for row in warpWithLandmarks5List]
+        landmarks = [row.landmarks.coreEstimation for row in warpWithLandmarks5List]
         validateInputByBatchEstimator(self._coreEstimator, images, landmarks)
         error, gazeList = self._coreEstimator.estimate(images, landmarks)
 
