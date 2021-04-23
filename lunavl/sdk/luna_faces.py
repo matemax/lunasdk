@@ -230,7 +230,7 @@ class VLFaceDetection(FaceDetection):
         """
         if self._mask is None:
             if self._estimationSettings.estimateMaskFromDetection:
-                self._mask = self.estimatorCollection.maskEstimator.estimate(self.coreEstimation.detection)
+                self._mask = self.estimatorCollection.maskEstimator.estimate(self)
             else:
                 self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
         return self._mask
