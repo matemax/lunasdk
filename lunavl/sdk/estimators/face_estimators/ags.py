@@ -68,7 +68,7 @@ class AGSEstimator(BaseEstimator):
         Estimate ags for list of detections.
 
         Args:
-            detections: list of face detection
+            detections: face detection list
 
         Returns:
             list of estimated ags, float in range[0,1]
