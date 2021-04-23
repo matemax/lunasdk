@@ -179,7 +179,7 @@ class MaskEstimator(BaseEstimator):
         Batch estimate mask from a warp.
 
         Args:
-            warps: raw warped image or warp list
+            warps: warp list
 
         Returns:
             estimated mask list

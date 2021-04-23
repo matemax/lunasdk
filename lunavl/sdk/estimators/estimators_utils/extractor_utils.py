@@ -42,13 +42,13 @@ def estimate(
     return descriptor
 
 
-def validateInputForBatchEstimator(estimator, *args):
+def validateInputByBatchEstimator(estimator, *args):
     """
-    Validate input data for batch estimator
+    Validate input data using batch estimator
 
     Args:
         estimator: estimator
-        args: args for estimator validation
+        args: args to validate by estimator
 
     Raises:
          LunaSDKException(LunaVLError.BatchedInternalError): if data is not valid

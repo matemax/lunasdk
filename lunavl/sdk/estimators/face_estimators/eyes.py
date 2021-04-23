@@ -17,7 +17,7 @@ from FaceEngine import (
     IrisLandmarks as CoreIrisLandmarks,
     State as CoreEyeState,
     EyesEstimation as CoreEyesEstimation,
-)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+)  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException

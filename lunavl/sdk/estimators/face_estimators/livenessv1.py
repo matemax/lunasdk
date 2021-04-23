@@ -164,7 +164,7 @@ class LivenessV1Estimator(BaseEstimator):
 
         .. warning::
             Current estimator version estimates correct liveness state for images from mobile and web camera only.
-            A correctness of a liveness prediction are not guarantee for other images source.
+            A correctness of the liveness prediction is not guaranteed for other image sources.
 
         Args:
             faceDetections: face detection list

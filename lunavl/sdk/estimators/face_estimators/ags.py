@@ -50,7 +50,7 @@ class AGSEstimator(BaseEstimator):
             estimated ags, float in range[0,1]
         Raises:
             LunaSDKException: if estimation failed
-            ValueError: if image and detection is None
+            ValueError: if image and detection are None
         """
         if detection is None:
             if image is None or boundingBox is None:
