@@ -20,7 +20,7 @@ def estimateMedicalMask():
 
     medicalMaskEstimator = faceEngine.createMaskEstimator()
     # Estimate from detection
-    pprint.pprint(medicalMaskEstimator.estimate(faceDetection).asDict())
+    pprint.pprint(medicalMaskEstimator.estimate(faceDetection.coreEstimation).asDict())
 
     # Estimate from wrap
     warper = faceEngine.createFaceWarper()
