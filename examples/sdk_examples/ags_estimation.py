@@ -24,10 +24,12 @@ def estimateAGS():
     pprint.pprint(agsEstimator.estimate(faceDetection))
 
     image2 = VLImage.load(filename=EXAMPLE_1)
-    faceDetections = detector.detect([image, image2])
-    boundingBoxes = [detection[0].boundingBox for detection in faceDetections]
+    faceDetections = [detections[0] for detections in detector.detect([image, image2])]
+    boundingBoxes = [detection.boundingBox for detection in faceDetections]
 
-    pprint.pprint(agsEstimator.estimateAgsBatch(images=[image, image2], boundingBoxes=boundingBoxes))
+    pprint.pprint(agsEstimator.estimateAgsBatchByImages(images=[image, image2], boundingBoxes=boundingBoxes))
+
+    pprint.pprint(agsEstimator.estimateAgsBatchByDetections(detections=faceDetections))
 
 
 if __name__ == "__main__":

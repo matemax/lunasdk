@@ -43,9 +43,9 @@ class TestBasicAttributes(BaseTestClass):
         """
         expectedAgs = 0.96425
         singleValue = self.estimator.estimate(image=self.image1, boundingBox=self.detection1.boundingBox)
-        batchValue = self.estimator.estimateAgsBatch(images=[self.image1], boundingBoxes=[self.detection1.boundingBox])[
-            0
-        ]
+        batchValue = self.estimator.estimateAgsBatchByImages(
+            images=[self.image1], boundingBoxes=[self.detection1.boundingBox]
+        )[0]
         assert type(singleValue) == type(batchValue)
         assert isinstance(singleValue, float)
         assert abs(expectedAgs - singleValue) < EXPECTED_PRECISION
@@ -56,7 +56,7 @@ class TestBasicAttributes(BaseTestClass):
         """
         expectedAgs = 0.96425
         singleValue = self.estimator.estimate(detection=self.detection1)
-        batchValue = self.estimator.estimateAgsBatch(detections=[self.detection1])[0]
+        batchValue = self.estimator.estimateAgsBatchByDetections(detections=[self.detection1])[0]
         assert type(singleValue) == type(batchValue)
         assert isinstance(singleValue, float)
         assert abs(expectedAgs - singleValue) < EXPECTED_PRECISION
@@ -66,7 +66,7 @@ class TestBasicAttributes(BaseTestClass):
         Test batch estimation correctness with images.
         """
         expectedAgsList = [0.96425, 1.00085]
-        result = self.estimator.estimateAgsBatch(
+        result = self.estimator.estimateAgsBatchByImages(
             images=[self.image1, self.image2],
             boundingBoxes=[self.detection1.boundingBox, self.detection2.boundingBox],
         )
@@ -80,7 +80,7 @@ class TestBasicAttributes(BaseTestClass):
         Test batch estimation correctness with detections.
         """
         expectedAgsList = [0.96425, 1.00085]
-        result = self.estimator.estimateAgsBatch(detections=[self.detection1, self.detection2])
+        result = self.estimator.estimateAgsBatchByDetections(detections=[self.detection1, self.detection2])
         assert isinstance(result, list)
         for idx, row in enumerate(result):
             assert isinstance(row, float)
@@ -91,7 +91,7 @@ class TestBasicAttributes(BaseTestClass):
         Test batch estimation with invalid input.
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.estimator.estimateAgsBatch(
+            self.estimator.estimateAgsBatchByImages(
                 images=[self.image1, self.image2], boundingBoxes=[self.detection1.boundingBox]
             )
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
