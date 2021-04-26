@@ -38,7 +38,7 @@ class VLFaceDetectionSettings:
 
     __slots__ = "_estimateMaskFromDetection"
 
-    def __init__(self, estimateMaskFromDetection: bool = True):
+    def __init__(self, estimateMaskFromDetection: bool = False):
         """
         Init settings
 
