@@ -32,9 +32,9 @@ def estimateAGS():
         ImageWithFaceDetection(image, faceDetection.boundingBox),
         ImageWithFaceDetection(image2, faceDetection2.boundingBox),
     ]
-    pprint.pprint(agsEstimator.estimateAgsBatchByImages(imageWithFaceDetectionList))
+    pprint.pprint(agsEstimator.estimateBatch(imageWithFaceDetectionList))
 
-    pprint.pprint(agsEstimator.estimateAgsBatchByDetections(detections=[faceDetection, faceDetection2]))
+    pprint.pprint(agsEstimator.estimateBatch(detections=[faceDetection, faceDetection2]))
 
 
 if __name__ == "__main__":

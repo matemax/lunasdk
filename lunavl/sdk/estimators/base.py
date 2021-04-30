@@ -41,11 +41,11 @@ class BaseEstimator(ABC):
 
 class ImageWithFaceDetection(NamedTuple):
     """
-    Structure for the transfer to detector an image and detect an area.
+    Structure for transferring an image and its detection.
     Attributes
         image (VLImage): image for detection
-        bBox(BoundingBox): face bounding box
+        boundingBox (BoundingBox): face bounding box
     """
 
     image: VLImage
-    bBox: BoundingBox
+    boundingBox: BoundingBox

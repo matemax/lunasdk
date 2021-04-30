@@ -2,7 +2,7 @@
 
 See ags_.
 """
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 
@@ -50,7 +50,7 @@ class AGSEstimator(BaseEstimator):
             if imageWithFaceDetection is None:
                 raise ValueError("image and boundingBox or detection must be not None")
             error, ags = self._coreEstimator.estimate(
-                imageWithFaceDetection.image.coreImage, imageWithFaceDetection.bBox.coreEstimation
+                imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
             )
         else:
             error, ags = self._coreEstimator.estimate(detection.image.coreImage, detection.boundingBox.coreEstimation)
@@ -60,12 +60,12 @@ class AGSEstimator(BaseEstimator):
         return ags
 
     @CoreExceptionWrap(LunaVLError.EstimationAGSError)
-    def estimateAgsBatchByDetections(self, detections: List[FaceDetection]) -> List[float]:
+    def estimateBatch(self, detections: Union[List[FaceDetection], List[ImageWithFaceDetection]]) -> List[float]:
         """
         Estimate ags for list of detections.
 
         Args:
-            detections: face detection list
+            detections: face detection list or list of image with its face detection
 
         Returns:
             list of estimated ags, float in range[0,1]
@@ -75,30 +75,6 @@ class AGSEstimator(BaseEstimator):
         """
         coreImages = [detection.image.coreImage for detection in detections]
         boundingBoxEstimations = [detection.boundingBox.coreEstimation for detection in detections]
-
-        validateInputByBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
-        error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)
-
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return agsList
-
-    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
-    def estimateAgsBatchByImages(self, imageWithFaceDetectionList: List[ImageWithFaceDetection]) -> List[float]:
-        """
-        Estimate ags for list of images with bounding boxes.
-
-        Args:
-            imageWithFaceDetectionList: list of image with face detection
-
-        Returns:
-            list of estimated ags, float in range[0,1]
-        Raises:
-            LunaSDKException: if estimation failed
-            ValueError: if empty image list and empty detection list or images count not match bounding boxes count
-        """
-        coreImages = [row.image.coreImage for row in imageWithFaceDetectionList]
-        boundingBoxEstimations = [row.bBox.coreEstimation for row in imageWithFaceDetectionList]
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
         error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)

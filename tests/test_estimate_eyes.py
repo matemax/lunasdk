@@ -129,7 +129,7 @@ class TestEstimateEyes(BaseTestClass):
 
     def test_estimate_batch_mixed_landmarks(self):
         """
-        Test eye estimator with two faces - 1st with 5 landmarks, 2nd with 68 landmarks
+        Test eye estimator with two faces: first with landmarks5, second with landmarks68
         """
         faceDetections = [
             self.detector.detectOne(OPEN_EYES_IMAGE, detect68Landmarks=False),

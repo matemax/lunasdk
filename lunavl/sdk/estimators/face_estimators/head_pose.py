@@ -168,7 +168,7 @@ class HeadPoseEstimator(BaseEstimator):
             LunaSDKException: if estimation is failed
         """
         error, headPoseEstimation = self._coreEstimator.estimate(
-            imageWithFaceDetection.image.coreImage, imageWithFaceDetection.bBox.coreEstimation
+            imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
         )
 
         if error.isError:
@@ -188,7 +188,7 @@ class HeadPoseEstimator(BaseEstimator):
             LunaSDKException: if estimation is failed
         """
         coreImages = [row.image.coreImage for row in imageWithFaceDetectionList]
-        detections = [row.bBox.coreEstimation for row in imageWithFaceDetectionList]
+        detections = [row.boundingBox.coreEstimation for row in imageWithFaceDetectionList]
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
         error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)

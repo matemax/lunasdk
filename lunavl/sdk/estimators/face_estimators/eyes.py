@@ -180,7 +180,7 @@ class EyesEstimation(BaseEstimation):
 
 class WarpWithLandmarks(NamedTuple):
     """
-    Structure for the transfer to detector landmarks estimation and warp.
+    Structure for transferring a detector landmarks estimation and its warp.
     Attributes
         warp (Union[FaceWarp, FaceWarpedImage]): warp core image
         landmarks (Union[Landmarks5, Landmarks68]): landmarks estimation
@@ -211,7 +211,7 @@ class EyeEstimator(BaseEstimator):
         """
         Estimate mouth state on warp.
 
-        Args:
+        Args:WarpWithLandmarks
             warpWithLandmarks: core warp with transformed landmarks
 
         Returns:
@@ -341,7 +341,7 @@ class GazeDirection(BaseEstimation):
 
 class WarpWithLandmarks5(NamedTuple):
     """
-    Structure for the transfer to detector landmarks 5 estimation and warp.
+    Structure for transferring a detector landmarks 5 estimation and its warp.
     Attributes
         warp (Union[FaceWarp, FaceWarpedImage]): warp core image
         landmarks (Landmarks5): landmarks 5 estimation
