@@ -183,7 +183,7 @@ class HeadPoseEstimator(BaseEstimator):
         Batch estimate head pose by detection.
 
         Args:
-            imageWithFaceDetectionList: list of image with face detection
+            imageWithFaceDetectionList: list of image with face detection or face detections
         Returns:
             list of head pose estimations
         Raises:
