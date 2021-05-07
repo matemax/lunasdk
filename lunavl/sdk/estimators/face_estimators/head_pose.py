@@ -177,20 +177,20 @@ class HeadPoseEstimator(BaseEstimator):
 
     @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
     def estimateBatch(
-        self, imageWithFaceDetectionList: Union[List[ImageWithFaceDetection], List[FaceDetection]]
+        self, faceDetectionOrImageWithFaceDetectionList: Union[List[ImageWithFaceDetection], List[FaceDetection]]
     ) -> List[HeadPose]:
         """
         Batch estimate head pose by detection.
 
         Args:
-            imageWithFaceDetectionList: list of image with face detection or face detections
+            faceDetectionOrImageWithFaceDetectionList: list of image with face detection or face detections
         Returns:
             list of head pose estimations
         Raises:
             LunaSDKException: if estimation is failed
         """
-        coreImages = [row.image.coreImage for row in imageWithFaceDetectionList]
-        detections = [row.boundingBox.coreEstimation for row in imageWithFaceDetectionList]
+        coreImages = [row.image.coreImage for row in faceDetectionOrImageWithFaceDetectionList]
+        detections = [row.boundingBox.coreEstimation for row in faceDetectionOrImageWithFaceDetectionList]
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
         error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
