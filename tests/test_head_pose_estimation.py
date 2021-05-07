@@ -174,7 +174,7 @@ class TestHeadPose(BaseTestClass):
             ImageWithFaceDetection(self.image, self.detection.boundingBox),
             ImageWithFaceDetection(image, detection.boundingBox),
         ]
-        anglesList = self.headPoseEstimator.estimateByBoundingBoxBatch(imageWithFaceDetectionList)
+        anglesList = self.headPoseEstimator.estimateBatch(imageWithFaceDetectionList)
         assert isinstance(anglesList, list)
         assert len(anglesList) == 2
         for angles in anglesList:
@@ -185,4 +185,4 @@ class TestHeadPose(BaseTestClass):
         Batch estimation invalid input
         """
         with pytest.raises(TypeError):
-            self.headPoseEstimator.estimateByBoundingBoxBatch([], [])
+            self.headPoseEstimator.estimateBatch([], [])

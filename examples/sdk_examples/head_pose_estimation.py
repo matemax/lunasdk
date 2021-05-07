@@ -43,7 +43,7 @@ def estimateHeadPose():
         ImageWithFaceDetection(image, faceDetection.boundingBox),
         ImageWithFaceDetection(image2, faceDetection2.boundingBox),
     ]
-    anglesList = headPoseEstimator.estimateByBoundingBoxBatch(imageWithFaceDetectionList)
+    anglesList = headPoseEstimator.estimateBatch(imageWithFaceDetectionList)
     pprint.pprint(anglesList)
 
 

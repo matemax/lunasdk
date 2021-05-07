@@ -176,7 +176,7 @@ class HeadPoseEstimator(BaseEstimator):
         return HeadPose(headPoseEstimation)
 
     @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateByBoundingBoxBatch(
+    def estimateBatch(
         self, imageWithFaceDetectionList: Union[List[ImageWithFaceDetection], List[FaceDetection]]
     ) -> List[HeadPose]:
         """
