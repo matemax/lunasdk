@@ -4,14 +4,14 @@ Module contains a head pose estimator.
 See `head pose`_.
 """
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.detectors.facedetector import Landmarks68
+from lunavl.sdk.detectors.facedetector import Landmarks68, FaceDetection
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -176,7 +176,9 @@ class HeadPoseEstimator(BaseEstimator):
         return HeadPose(headPoseEstimation)
 
     @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateByBoundingBoxBatch(self, imageWithFaceDetectionList: List[ImageWithFaceDetection]) -> List[HeadPose]:
+    def estimateByBoundingBoxBatch(
+        self, imageWithFaceDetectionList: Union[List[ImageWithFaceDetection], List[FaceDetection]]
+    ) -> List[HeadPose]:
         """
         Batch estimate head pose by detection.
 
