@@ -1,17 +1,16 @@
-from FaceEngine import Detection, RectFloat
 from collections import namedtuple
 
+from FaceEngine import Detection, RectFloat
 import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.estimators.base import ImageWithFaceDetection
 from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator, HeadPose, FrontalType
 from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
 from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from lunavl.sdk.luna_faces import VLFaceDetector
-from lunavl.sdk.faceengine.engine import VLFaceEngine
 from tests.base import BaseTestClass
 from tests.resources import (
     ONE_FACE,
@@ -19,8 +18,6 @@ from tests.resources import (
     GOST_HEAD_POSE_FACE,
     TURNED_HEAD_POSE_FACE,
     FRONTAL_HEAD_POSE_FACE,
-    ROTATED0,
-    ROTATED90,
 )
 
 
@@ -97,7 +94,9 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose by bounding box test.
         """
-        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(self.detection.boundingBox, self.image)
+        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
+            ImageWithFaceDetection(self.image, self.detection.boundingBox)
+        )
         self.assertHeadPose(angles)
 
     def test_estimate_head_pose_by_bounding_box_from_other_image(self):
@@ -105,7 +104,9 @@ class TestHeadPose(BaseTestClass):
         Estimating head pose on image without faces by bounding box from other image.
         """
         image = VLImage.load(filename=NO_FACES)
-        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(self.detection.boundingBox, image)
+        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
+            ImageWithFaceDetection(self.image, self.detection.boundingBox)
+        )
         self.assertHeadPose(angles)
 
     def test_estimate_head_pose_by_image_and_bounding_box_without_intersection(self):
@@ -115,7 +116,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = Detection(RectFloat(3000.0, 3000.0, 100.0, 100.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
 
     def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
@@ -125,7 +126,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = Detection(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(bBox, self.image)
+            TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection)
 
     def test_default_estimation(self):
@@ -162,3 +163,26 @@ class TestHeadPose(BaseTestClass):
                 angles = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(detection.landmarks68)
                 self.assertHeadPose(angles)
                 assert angles.getFrontalType() == case.type
+
+    def test_head_pose_batch_estimation(self):
+        """
+        Batch estimating head pose test.
+        """
+        image = VLImage.load(filename=GOST_HEAD_POSE_FACE)
+        detection = self.detector.detectOne(image, detect5Landmarks=True, detect68Landmarks=True)
+        imageWithFaceDetectionList = [
+            ImageWithFaceDetection(self.image, self.detection.boundingBox),
+            ImageWithFaceDetection(image, detection.boundingBox),
+        ]
+        anglesList = self.headPoseEstimator.estimateBatch(imageWithFaceDetectionList)
+        assert isinstance(anglesList, list)
+        assert len(anglesList) == 2
+        for angles in anglesList:
+            self.assertHeadPose(angles)
+
+    def test_head_pose_batch_invalid_input(self):
+        """
+        Batch estimation invalid input
+        """
+        with pytest.raises(TypeError):
+            self.headPoseEstimator.estimateBatch([], [])

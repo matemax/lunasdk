@@ -2,17 +2,15 @@
 
 See ags_.
 """
-from typing import Optional
+from typing import Optional, List, Union
 
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.detectors.facedetector import FaceDetection
-from lunavl.sdk.image_utils.image import VLImage
-
-from ..base import BaseEstimator
-from ...base import BoundingBox
+from ..base import BaseEstimator, ImageWithFaceDetection
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
 
 class AGSEstimator(BaseEstimator):
@@ -33,31 +31,54 @@ class AGSEstimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationAGSError)
     def estimate(
-        self,
-        detection: Optional[FaceDetection] = None,
-        image: Optional[VLImage] = None,
-        boundingBox: Optional[BoundingBox] = None,
+        self, detection: Optional[FaceDetection] = None, imageWithFaceDetection: Optional[ImageWithFaceDetection] = None
     ) -> float:
         """
-        Estimate emotion on warp.
+        Estimate ags for single image/detection.
 
         Args:
-            image: image in R8G8B8 format
-            boundingBox: face bounding box of corresponding the image
             detection: face detection
+            imageWithFaceDetection: image with face detection
 
         Returns:
             estimated ags, float in range[0,1]
         Raises:
             LunaSDKException: if estimation failed
-            ValueError: if image and detection is Noee
+            ValueError: if image and detection are None
         """
         if detection is None:
-            if image is None or boundingBox is None:
-                raise ValueError("image and boundingBox or detection bust be not None")
-            error, ags = self._coreEstimator.estimate(image.coreImage, boundingBox.coreEstimation)
+            if imageWithFaceDetection is None:
+                raise ValueError("image and boundingBox or detection must be not None")
+            error, ags = self._coreEstimator.estimate(
+                imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
+            )
         else:
             error, ags = self._coreEstimator.estimate(detection.image.coreImage, detection.boundingBox.coreEstimation)
+
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return ags
+
+    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
+    def estimateBatch(self, detections: Union[List[FaceDetection], List[ImageWithFaceDetection]]) -> List[float]:
+        """
+        Estimate ags for list of detections.
+
+        Args:
+            detections: face detection list or list of image with its face detection
+
+        Returns:
+            list of estimated ags, float in range[0,1]
+        Raises:
+            LunaSDKException: if estimation failed
+            ValueError: if empty image list and empty detection list or images count not match bounding boxes count
+        """
+        coreImages = [detection.image.coreImage for detection in detections]
+        boundingBoxEstimations = [detection.boundingBox.coreEstimation for detection in detections]
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
+        error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return agsList

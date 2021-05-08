@@ -4,7 +4,7 @@ Module contains a  livenessv1 estimator.
 See `livenessv1`_.
 """
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from FaceEngine import (
     LivenessOneShotRGBEstimation,  # pylint: disable=E0611,E0401
@@ -17,6 +17,7 @@ from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.estimators.base import BaseEstimator
+from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 
 
 class LivenessPrediction(Enum):
@@ -152,3 +153,44 @@ class LivenessV1Estimator(BaseEstimator):
         prediction = LivenessPrediction.fromCoreEmotion(estimation.State)
 
         return LivenessV1(estimation, prediction)
+
+    #  pylint: disable=W0221
+    @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
+    def estimateBatch(  # type: ignore
+        self, faceDetections: List[FaceDetection], qualityThreshold: Optional[float] = None
+    ) -> List[LivenessV1]:
+        """
+        Batch estimate liveness
+
+        .. warning::
+            Current estimator version estimates correct liveness state for images from mobile and web camera only.
+            A correctness of the liveness prediction is not guaranteed for other image sources.
+
+        Args:
+            faceDetections: face detection list
+            qualityThreshold: quality threshold. if estimation quality is low of this threshold
+        Returns:
+            estimated liveness
+        Raises:
+            LunaSDKException: if estimation failed
+        """
+        coreImages = [detection.image.coreImage for detection in faceDetections]
+        detections = [detection.coreEstimation.detection for detection in faceDetections]
+        try:
+            coreEstimations = [detection.landmarks5.coreEstimation for detection in faceDetections]  # type: ignore
+        except AttributeError:
+            raise ValueError("Landmarks5 is required for liveness estimation")
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, detections, coreEstimations)
+        error, estimations = self._coreEstimator.estimate(
+            coreImages,
+            detections,
+            coreEstimations,
+            -1.0 if qualityThreshold is None else qualityThreshold,
+        )
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [
+            LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State)) for estimation in estimations
+        ]

@@ -5,19 +5,26 @@ See `eyes`_ and `gaze direction`_.
 
 """
 from enum import Enum
-from typing import Union
+from typing import Union, List, NamedTuple
 
-from FaceEngine import IEyeEstimatorPtr, EyeCropper, IGazeEstimatorPtr, GazeEstimation  # pylint: disable=E0611,E0401
-from FaceEngine import EyelidLandmarks as CoreEyelidLandmarks, EyeAttributes  # pylint: disable=E0611,E0401
-from FaceEngine import IrisLandmarks as CoreIrisLandmarks  # pylint: disable=E0611,E0401
-from FaceEngine import State as CoreEyeState, EyesEstimation as CoreEyesEstimation  # pylint: disable=E0611,E0401
+from FaceEngine import (
+    IEyeEstimatorPtr,
+    EyeCropper,
+    IGazeEstimatorPtr,
+    GazeEstimation,
+    EyelidLandmarks as CoreEyelidLandmarks,
+    EyeAttributes,
+    IrisLandmarks as CoreIrisLandmarks,
+    State as CoreEyeState,
+    EyesEstimation as CoreEyesEstimation,
+)  # pylint: disable=E0611,E0401
+
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
-
 from lunavl.sdk.base import BaseEstimation, Landmarks
 from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
-
 from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
@@ -171,6 +178,18 @@ class EyesEstimation(BaseEstimation):
         return {"left_eye": self.leftEye.asDict(), "right_eye": self.rightEye.asDict()}
 
 
+class WarpWithLandmarks(NamedTuple):
+    """
+    Structure for transferring a detector landmarks estimation and its warp.
+    Attributes
+        warp (Union[FaceWarp, FaceWarpedImage]): warp core image
+        landmarks (Union[Landmarks5, Landmarks68]): landmarks estimation
+    """
+
+    warp: Union[FaceWarp, FaceWarpedImage]
+    landmarks: Union[Landmarks5, Landmarks68]
+
+
 class EyeEstimator(BaseEstimator):
     """
     Eye estimator.
@@ -188,15 +207,12 @@ class EyeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(
-        self, transformedLandmarks: Union[Landmarks5, Landmarks68], warp: Union[FaceWarp, FaceWarpedImage]
-    ) -> EyesEstimation:
+    def estimate(self, warpWithLandmarks: WarpWithLandmarks) -> EyesEstimation:
         """
         Estimate mouth state on warp.
 
-        Args:
-            warp: warped image
-            transformedLandmarks: transformed landmarks
+        Args:WarpWithLandmarks
+            warpWithLandmarks: core warp with transformed landmarks
 
         Returns:
             estimated states
@@ -204,14 +220,57 @@ class EyeEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         cropper = EyeCropper()
-        if isinstance(transformedLandmarks, Landmarks5):
-            eyeRects = cropper.cropByLandmarks5(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
+        if isinstance(warpWithLandmarks.landmarks, Landmarks5):
+            eyeRects = cropper.cropByLandmarks5(
+                warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
+            )
         else:
-            eyeRects = cropper.cropByLandmarks68(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
-        error, eyesEstimation = self._coreEstimator.estimate(warp.warpedImage.coreImage, eyeRects)
+            eyeRects = cropper.cropByLandmarks68(
+                warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
+            )
+        error, eyesEstimation = self._coreEstimator.estimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return EyesEstimation(eyesEstimation)
+
+    #  pylint: disable=W0221
+    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
+    def estimateBatch(self, warpWithLandmarksList: List[WarpWithLandmarks]) -> List[EyesEstimation]:
+        """
+        Batch estimate mouth state on warps.
+
+        Args:
+            warpWithLandmarksList: list of core warp with transformed landmarks
+
+        Returns:
+            list of estimated states
+        Raises:
+            LunaSDKException: if estimation failed
+            ValueError: if warps count not equals landmarks count
+        """
+        cropper = EyeCropper()
+        eyeRectList = []
+        for warpWithLandmarks in warpWithLandmarksList:
+            if isinstance(warpWithLandmarks.landmarks, Landmarks5):
+                eyeRectList.append(
+                    cropper.cropByLandmarks5(
+                        warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
+                    )
+                )
+            else:
+                eyeRectList.append(
+                    cropper.cropByLandmarks68(
+                        warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
+                    )
+                )
+        coreImages = [row.warp.warpedImage.coreImage for row in warpWithLandmarksList]
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages, eyeRectList)
+        error, eyesEstimations = self._coreEstimator.estimate(coreImages, eyeRectList)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [EyesEstimation(eyesEstimation) for eyesEstimation in eyesEstimations]
 
 
 def _isNotNan(value: float) -> bool:
@@ -280,6 +339,18 @@ class GazeDirection(BaseEstimation):
         }
 
 
+class WarpWithLandmarks5(NamedTuple):
+    """
+    Structure for transferring a detector landmarks 5 estimation and its warp.
+    Attributes
+        warp (Union[FaceWarp, FaceWarpedImage]): warp core image
+        landmarks (Landmarks5): landmarks 5 estimation
+    """
+
+    warp: Union[FaceWarp, FaceWarpedImage]
+    landmarks: Landmarks5
+
+
 class GazeEstimator(BaseEstimator):
     """
     Gaze direction estimator.
@@ -297,19 +368,42 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(self, transformedLandmarks: Landmarks5, warp: Union[FaceWarp, FaceWarpedImage]) -> GazeDirection:
+    def estimate(self, warpWithLandmarks5: WarpWithLandmarks5) -> GazeDirection:
         """
         Estimate a gaze direction
 
         Args:
-            warp: warped image
-            transformedLandmarks: transformed landmarks
+            warpWithLandmarks5: warp with transformed 5 landmarks
         Returns:
             estimated states
         Raises:
             LunaSDKException: if estimation failed
         """
-        error, gaze = self._coreEstimator.estimate(warp.warpedImage.coreImage, transformedLandmarks.coreEstimation)
+        error, gaze = self._coreEstimator.estimate(
+            warpWithLandmarks5.warp.warpedImage.coreImage, warpWithLandmarks5.landmarks.coreEstimation
+        )
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
         return GazeDirection(gaze)
+
+    #  pylint: disable=W0221
+    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
+    def estimateBatch(self, warpWithLandmarks5List: List[WarpWithLandmarks5]) -> List[GazeDirection]:
+        """
+        Batch estimate a gaze direction
+
+        Args:
+            warpWithLandmarks5List: warp with transformed 5 landmarks list
+        Returns:
+            list of estimated states
+        Raises:
+            LunaSDKException: if estimation failed
+        """
+        images = [row.warp.warpedImage.coreImage for row in warpWithLandmarks5List]
+        landmarks = [row.landmarks.coreEstimation for row in warpWithLandmarks5List]
+        validateInputByBatchEstimator(self._coreEstimator, images, landmarks)
+        error, gazeList = self._coreEstimator.estimate(images, landmarks)
+
+        if error.isError:
+            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        return [GazeDirection(gaze) for gaze in gazeList]

@@ -6,6 +6,7 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
+from lunavl.sdk.estimators.face_estimators.eyes import WarpWithLandmarks5
 
 
 class TestEstimateGazeDirection(BaseTestClass):
@@ -38,7 +39,8 @@ class TestEstimateGazeDirection(BaseTestClass):
         """
 
         landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")
-        gazeEstimation = self.gazeEstimator.estimate(landMarks5Transformation, self.warp).asDict()
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, landMarks5Transformation)
+        gazeEstimation = self.gazeEstimator.estimate(warpWithLandmarks5).asDict()
         self.validate_gaze_estimation(gazeEstimation)
 
     def test_estimate_gaze_landmarks68(self):
@@ -48,8 +50,9 @@ class TestEstimateGazeDirection(BaseTestClass):
 
         faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=True)
         landMarks68Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L68")
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, landMarks68Transformation)
         with pytest.raises(TypeError):
-            self.gazeEstimator.estimate(landMarks68Transformation, self.warp)
+            self.gazeEstimator.estimate(warpWithLandmarks5)
 
     def test_estimate_gaze_landmarks68_without_landmarks68_detection(self):
         """
@@ -71,6 +74,30 @@ class TestEstimateGazeDirection(BaseTestClass):
         Test gaze estimator without transformation
         """
         faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE), detect68Landmarks=False)
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, faceDetection.landmarks5)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.gazeEstimator.estimate(faceDetection.landmarks5, self.warp)
+            self.gazeEstimator.estimate(warpWithLandmarks5)
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+
+    def test_batch_estimate_gaze(self):
+        """
+        Test gaze estimator with two warps
+        """
+        faceDetection = self.detector.detectOne(VLImage.load(filename=ONE_FACE))
+        warp = self.warper.warp(faceDetection=faceDetection)
+        warpWithLandmarks5List = [
+            WarpWithLandmarks5(self.warp, self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")),
+            WarpWithLandmarks5(warp, self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")),
+        ]
+        gazeEstimations = self.gazeEstimator.estimateBatch(warpWithLandmarks5List)
+        assert isinstance(gazeEstimations, list)
+        assert len(gazeEstimations) == 2
+        for gazeEstimation in gazeEstimations:
+            self.validate_gaze_estimation(gazeEstimation.asDict())
+
+    def test_batch_estimate_invalid_input(self):
+        """
+        Test gaze estimator with invalid input
+        """
+        with pytest.raises(TypeError):
+            self.gazeEstimator.estimateBatch([], [])

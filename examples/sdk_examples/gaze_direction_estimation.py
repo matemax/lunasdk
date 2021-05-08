@@ -6,7 +6,8 @@ import pprint
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from resources import EXAMPLE_O
+from resources import EXAMPLE_O, EXAMPLE_1
+from lunavl.sdk.estimators.face_estimators.eyes import WarpWithLandmarks5
 
 
 def estimateGazeDirection():
@@ -24,7 +25,19 @@ def estimateGazeDirection():
 
     gazeEstimator = faceEngine.createGazeEstimator()
 
-    pprint.pprint(gazeEstimator.estimate(landMarks5Transformation, warp).asDict())
+    warpWithLandmarks5 = WarpWithLandmarks5(warp, landMarks5Transformation)
+    pprint.pprint(gazeEstimator.estimate(warpWithLandmarks5).asDict())
+
+    faceDetection2 = detector.detectOne(VLImage.load(filename=EXAMPLE_1), detect68Landmarks=True)
+    warp2 = warper.warp(faceDetection2)
+    landMarks5Transformation2 = warper.makeWarpTransformationWithLandmarks(faceDetection2, "L5")
+
+    warpWithLandmarks5List = [
+        WarpWithLandmarks5(warp, landMarks5Transformation),
+        WarpWithLandmarks5(warp2, landMarks5Transformation2),
+    ]
+    estimations = gazeEstimator.estimateBatch(warpWithLandmarks5List)
+    pprint.pprint([estimation.asDict() for estimation in estimations])
 
 
 if __name__ == "__main__":
