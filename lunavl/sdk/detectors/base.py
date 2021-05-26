@@ -1,6 +1,6 @@
 from typing import NamedTuple, List, Any, Dict, Union, Tuple
 
-from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage, FSDKError  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage  # pylint: disable=E0611,E0401
 
 from ..base import BaseEstimation, BoundingBox
 from ..errors.errors import LunaVLError
@@ -157,8 +157,9 @@ def validateBatchDetectInput(
         validationError, imageErrors = detector.validate(coreImages, detectAreas, limit)
     if validationError.isOk:
         return
-    if validationError.error != FSDKError.ValidationFailed:
-        raise LunaSDKException(LunaVLError.fromSDKError(validationError), imageErrors)
+    # uncomment after FSDK-2930
+    # if validationError.error != FSDKError.ValidationFailed:
+    #     raise LunaSDKException(LunaVLError.fromSDKError(validationError), errors)
     if not isinstance(coreImages, list):
         raise LunaSDKException(LunaVLError.fromSDKError(imageErrors[0]))
     errors = []

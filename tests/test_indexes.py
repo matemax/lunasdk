@@ -2,10 +2,9 @@
 Test build an index with descriptors.
 """
 from typing import Union
-import os
 
 import pytest
-
+import os
 from lunavl.sdk.descriptors.descriptors import (
     FaceDescriptor,
     FaceDescriptorBatch,
@@ -76,10 +75,10 @@ class TestIndexFunctionality(BaseTestClass):
         ), f"expected int but found {dynamicIndex.descriptorsCount.__class__}"
         assert expectedBufSize == dynamicIndex.bufSize, "dynamic buf size is not equal to the expected"
         assert (
-                expectedDescriptorCount == dynamicIndex.descriptorsCount
+            expectedDescriptorCount == dynamicIndex.descriptorsCount
         ), "count of descriptors is not equal to the expected"
         assert (
-                self.getCountOfDescriptorsInStorage(dynamicIndex) == dynamicIndex.bufSize
+            self.getCountOfDescriptorsInStorage(dynamicIndex) == dynamicIndex.bufSize
         ), "wrong size of internal storage"
 
     @staticmethod
@@ -95,10 +94,9 @@ class TestIndexFunctionality(BaseTestClass):
         while True:
             try:
                 indexObject[count]
-            except LunaSDKException as ex:
-                if ex.error.errorCode == LunaVLError.InvalidDescriptorId.errorCode:
-                    break
-                raise
+            # todo: remove after fix FSDK-2897
+            except IndexError:
+                break
             else:
                 count += 1
         return count
@@ -139,15 +137,21 @@ class TestIndexFunctionality(BaseTestClass):
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
         assert len(self.faceDescriptorBatch) == self.indexBuilder.bufSize
         nonExistentIndex = 2
-        with pytest.raises(LunaSDKException) as ex:
+        # todo: change test after FSDK-2897
+        with self.assertRaises(IndexError) as ex:
             descriptor = self.indexBuilder[nonExistentIndex]
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId)
+        assert str(nonExistentIndex) in ex.exception.args[0]
 
     def test_append_non_default_descriptor_to_builder(self):
         """Test append non default descriptor to internal storage."""
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.append(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptor)
+        self.assertLunaVlError(
+            ex,
+            LunaVLError.InvalidDescriptor.format(
+                f"Expected descriptor version {self.descriptorVersion}, got version {self.nonDefaultDescriptorVersion}"
+            ),
+        )
 
     def test_remove_descriptor_from_builder(self):
         """Test remove descriptor from internal storage."""
@@ -165,9 +169,10 @@ class TestIndexFunctionality(BaseTestClass):
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
         assert expectedDescriptorsCount == self.indexBuilder.bufSize
         nonExistentIndex = 2
-        with pytest.raises(LunaSDKException) as ex:
+        # todo: change test after FSDK-2897
+        with self.assertRaises(IndexError) as ex:
             del self.indexBuilder[nonExistentIndex]
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId)
+        assert str(nonExistentIndex) in ex.exception.args[0]
 
     def test_append_descriptor_to_empty_dynamic_index(self):
         """Test append descriptor to empty dynamic index."""
@@ -234,9 +239,14 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=2, expectedBufSize=2)
         with pytest.raises(LunaSDKException) as ex:
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidInput)
+        self.assertLunaVlError(
+            ex,
+            LunaVLError.InvalidDescriptor.format(
+                f"Expected descriptor version {self.descriptorVersion}, got version {self.nonDefaultDescriptorVersion}"
+            ),
+        )
 
-    @pytest.mark.skip("FSDK-3174")
+    @pytest.mark.skip("FSDK-2897 internal error")
     def test_search_result_empty(self):
         """Test search with empty result."""
         dynamicIndex = self.indexBuilder.buildIndex()
@@ -244,6 +254,7 @@ class TestIndexFunctionality(BaseTestClass):
         result = dynamicIndex.search(self.faceDescriptor)
         assert [] == result
 
+    @pytest.mark.skip("FSDK-2897 failed search index")
     def test_search_result_invalid_input(self):
         """Test search with invalid parameter."""
         self.indexBuilder.append(self.faceDescriptor)
@@ -278,7 +289,6 @@ class TestIndexFunctionality(BaseTestClass):
         assert 1 == dynamicIndex.bufSize, "dense buf size is not equal to the expected"
         assert self.getCountOfDescriptorsInStorage(denseIndex) == denseIndex.bufSize, "wrong size of internal storage"
 
-    @pytest.mark.skip(msg="FSDK-3176")
     def test_load_index_non_default_descriptor(self):
         """Test load index from file with non default descriptor version."""
         nonDefaultDescriptorMap = {"descriptor_version": EFDVa[2], "index": nonDefaultDynamicIndex}
@@ -321,8 +331,9 @@ class TestIndexFunctionality(BaseTestClass):
             dynamicIndex.save(pathToStoredIndex, "someType")
         assert ex.value.args[0] == "'someType' is not a valid IndexType"
 
+    @pytest.mark.skip("FSDK-2897 RuntimeError: Failed to read index metadata")
     def test_load_index_unknown_file(self):
         """Test load index unknown file."""
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.loadIndex(WARP_ONE_FACE, IndexType.dynamic)
-        self.assertLunaVlError(ex, LunaVLError.InvalidSerializedObject)
+        self.assertLunaVlError(ex, LunaVLError.InvalidInput)

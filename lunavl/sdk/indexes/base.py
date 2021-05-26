@@ -103,6 +103,10 @@ class CoreIndex:
         Returns:
             descriptor
         """
+        if index >= self.bufSize:
+            # todo remove after fix FSDK-2897 index error
+            raise IndexError(f"Descriptor index '{index}' out of range")
+
         _coreDescriptor = self._faceEngine.createDescriptor(self._coreIndex.getDescriptorVersion())
         error, descriptor = self._coreIndex.descriptorByIndex(index, _coreDescriptor)
         if error.isError:
@@ -118,6 +122,26 @@ class CoreIndex:
             IndexError: if index out of range
             LunaSDKException: if an error occurs while remove descriptor failed
         """
+        if index >= self.bufSize:
+            # todo remove after fix FSDK-2897 index error
+            raise IndexError(f"Descriptor index '{index}' out of range")
+
         error = self._coreIndex.removeDescriptor(index)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+
+    def checkDescriptorVersion(self, receivedDescriptorVersion: int) -> None:
+        """
+        Check descriptor version with version in index.
+        todo: remove this function after normalizing errors (FSDK-2897)
+        Args:
+            receivedDescriptorVersion: received descriptor version
+        Raises:
+            LunaSDKException(InvalidDescriptor): if descriptor versions do not match
+        """
+        if receivedDescriptorVersion != self.descriptorVersion:
+            raise LunaSDKException(
+                LunaVLError.InvalidDescriptor.format(
+                    f"Expected descriptor version {self.descriptorVersion}, got version {receivedDescriptorVersion}"
+                )
+            )

@@ -75,10 +75,6 @@ class LunaVLError:
     InvalidImage = ErrorInfo(100010, "Invalid image", "")
     InvalidImageFormat = ErrorInfo(100011, "Invalid image format", "")
     InvalidImageSize = ErrorInfo(100012, "Invalid image size", "")
-    InvalidSpanSize = ErrorInfo(100013, "Invalid span size", "")
-    InvalidDescriptorId = ErrorInfo(100014, "Invalid descriptor id", "")
-    InvalidSerializedObject = ErrorInfo(100015, "Invalid serialized object", "")
-    ValidationFailed = ErrorInfo(100016, "Failed validation", "")
 
     InvalidInput = ErrorInfo(100013, "Invalid input", "")
     InvalidLandmarks5 = ErrorInfo(100014, "Invalid landmarks 5", "")

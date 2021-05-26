@@ -37,6 +37,7 @@ class DynamicIndex(CoreIndex):
         Raises:
             LunaSDKException: if an error occurs while adding the descriptor
         """
+        self.checkDescriptorVersion(descriptor.coreEstimation.getModelVersion())
         error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -49,6 +50,7 @@ class DynamicIndex(CoreIndex):
         Raises:
             LunaSDKException: if an error occurs while adding the batch of descriptors
         """
+        self.checkDescriptorVersion(descriptorsBatch.coreEstimation.getModelVersion())
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -64,6 +66,7 @@ class DynamicIndex(CoreIndex):
         Returns:
             list with index search results
         """
+        self.checkDescriptorVersion(descriptor.coreEstimation.getModelVersion())
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -114,6 +117,7 @@ class DenseIndex(CoreIndex):
         Returns:
             list with index search results
         """
+        self.checkDescriptorVersion(descriptor.coreEstimation.getModelVersion())
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))

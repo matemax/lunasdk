@@ -46,6 +46,7 @@ class IndexBuilder(CoreIndex):
         error, loadedIndex = self._faceEngine.loadDenseIndex(path)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+        self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())
         return DenseIndex(loadedIndex, self._faceEngine)
 
     def _getDynamicIndex(self, path: str) -> DynamicIndex:
@@ -61,6 +62,7 @@ class IndexBuilder(CoreIndex):
         error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
+        self.checkDescriptorVersion(loadedIndex.getDescriptorVersion())
         return DynamicIndex(loadedIndex, self._faceEngine)
 
     def append(self, descriptor: FaceDescriptor) -> None:
@@ -71,6 +73,7 @@ class IndexBuilder(CoreIndex):
         Raises:
             LunaSDKException: if an error occurs while adding the descriptor
         """
+        self.checkDescriptorVersion(descriptor.coreEstimation.getModelVersion())
         error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
@@ -84,6 +87,7 @@ class IndexBuilder(CoreIndex):
         Raises:
             LunaSDKException: if an error occurs while adding the batch of descriptors
         """
+        self.checkDescriptorVersion(descriptorsBatch.coreEstimation.getModelVersion())
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
