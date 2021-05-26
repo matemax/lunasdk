@@ -108,11 +108,9 @@ class TestHumanDetector(HumanDetectTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.detect(images=[VLIMAGE_ONE_FACE, VLIMAGE_BAD_IMAGE])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageSize)
-        # fix after FSDK-2932
-        # assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-        # self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
-        # self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
+        assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidImageSize)
 
     def test_detect_one_with_image_of_several_humans(self):
         """
@@ -259,7 +257,7 @@ class TestHumanDetector(HumanDetectTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.ValidationFailed)
 
     def test_batch_detect_in_area_outside_image(self):
         """
@@ -286,7 +284,7 @@ class TestHumanDetector(HumanDetectTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=Rect())
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.ValidationFailed)
 
     def test_batch_detect_invalid_rectangle(self):
         """

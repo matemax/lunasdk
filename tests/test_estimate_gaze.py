@@ -77,7 +77,7 @@ class TestEstimateGazeDirection(BaseTestClass):
         warpWithLandmarks5 = WarpWithLandmarks5(self.warp, faceDetection.landmarks5)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.gazeEstimator.estimate(warpWithLandmarks5)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidLandmarks5)
 
     def test_batch_estimate_gaze(self):
         """

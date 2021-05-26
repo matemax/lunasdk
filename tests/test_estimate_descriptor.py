@@ -26,9 +26,9 @@ from tests.base import BaseTestClass
 from tests.detect_test_class import VLIMAGE_SMALL
 from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE, BAD_THRESHOLD_WARP
 
-EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58]
+EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58, 59]
 
-EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [DHDV]
+EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [DHDV, 102, 103]
 
 
 class DescriptorType(Enum):
@@ -255,7 +255,7 @@ class TestEstimateDescriptor(BaseTestClass):
         else:
             assert isinstance(descriptor, HumanDescriptor)
         assert descriptor.model == expectedVersion, "descriptor has wrong version"
-        length = {54: 512, 56: 512, 57: 512, 58: 512, 101: 2048}[expectedVersion]
+        length = {54: 512, 56: 512, 57: 512, 58: 512, 59: 512, 102: 2048, 103: 2048, 104: 2048}[expectedVersion]
         assert length == len(descriptor.asBytes)
         assert length == len(descriptor.asVector)
         assert length + 8 == len(descriptor.rawDescriptor)
@@ -427,20 +427,16 @@ class TestEstimateDescriptor(BaseTestClass):
                                 assert len(exceptionInfo.value.context) == 1, "Expect only one error"
                                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
 
-    def test_descriptor_batch_bad_threshold_aggregation(self):
+    def test_descriptor_batch_low_threshold_aggregation(self):
         """
-        Test descriptor batch with bad threshold warps with aggregation
+        Test descriptor batch with low threshold warps with aggregation
         """
         faceWarp = FaceWarpedImage.load(filename=BAD_THRESHOLD_WARP)
         for descriptorVersion in [56]:
             with self.subTest(planVersion=descriptorVersion):
                 extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion)
                 descriptorBatch = self.getBatch(descriptorVersion, 2, DescriptorType.face)
-                with pytest.raises(LunaSDKException) as exceptionInfo:
-                    extractor.estimateDescriptorsBatch([faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch)
-                self.assertLunaVlError(
-                    exceptionInfo,
-                    LunaVLError.FiltredAggregationError.format(
-                        "Cant aggregate descriptors - all images'a GSs are less the threashold"
-                    ),
+                _, descriptor = extractor.estimateDescriptorsBatch(
+                    [faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch
                 )
+                assert descriptor.garbageScore < 0.5, "Expected low gs"

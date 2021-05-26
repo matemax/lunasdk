@@ -13,6 +13,7 @@ from FaceEngine import (
     DT_LANDMARKS5,
     DT_LANDMARKS68,
     Image as CoreImage,
+    FSDKError,
 )  # pylint: disable=E0611,E0401
 
 from ..base import Landmarks
@@ -315,9 +316,8 @@ class FaceDetector:
             validationError, imagesErrors = self._detector.validate([coreImages], [[detectAreas]])
         if validationError.isOk:
             return
-        # wait FSDK-2930
-        # if validationError.error != FSDKError.ValidationFailed:
-        #     raise LunaSDKException(LunaVLError.fromSDKError(validationError), imagesErrors)
+        if validationError.error != FSDKError.ValidationFailed:
+            raise LunaSDKException(LunaVLError.fromSDKError(validationError), imagesErrors)
         if not isinstance(coreImages, list):
             raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0][0]))
         errors = []
