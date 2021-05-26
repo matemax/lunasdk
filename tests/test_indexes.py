@@ -278,19 +278,14 @@ class TestIndexFunctionality(BaseTestClass):
         assert 1 == dynamicIndex.bufSize, "dense buf size is not equal to the expected"
         assert self.getCountOfDescriptorsInStorage(denseIndex) == denseIndex.bufSize, "wrong size of internal storage"
 
-    @pytest.mark.skip(msg="FSDK-3176")
-    def test_load_index_non_default_descriptor(self):
-        """Test load index from file with non default descriptor version."""
-        nonDefaultDescriptorMap = {"descriptor_version": EFDVa[2], "index": nonDefaultDynamicIndex}
+    def test_append_another_version_descriptor_to_dynamic_index(self):
+        """Test append another version descriptor to dynamic index."""
+        self.indexBuilder.append(self.faceDescriptor)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=1, expectedBufSize=1)
         with pytest.raises(LunaSDKException) as ex:
-            self.indexBuilder.loadIndex(nonDefaultDescriptorMap["index"], IndexType.dynamic)
-        self.assertLunaVlError(
-            ex,
-            LunaVLError.InvalidDescriptor.format(
-                f"Expected descriptor version {self.descriptorVersion}, "
-                f"got version {nonDefaultDescriptorMap['descriptor_version']}"
-            ),
-        )
+            self.indexBuilder.append(self.nonDefaultFaceDescriptor)
+        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptor)
 
     def test_load_index_incorrect_path_to_file(self):
         """Test load non existing index file."""
