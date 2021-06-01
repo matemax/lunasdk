@@ -152,14 +152,14 @@ def validateBatchDetectInput(
     """
     limit = 1
     if not isinstance(coreImages, list):
-        validationError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
+        mainError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
     else:
-        validationError, imageErrors = detector.validate(coreImages, detectAreas, limit)
-    if validationError.isOk:
+        mainError, imageErrors = detector.validate(coreImages, detectAreas, limit)
+    if mainError.isOk:
         return
-    if validationError.error != FSDKError.ValidationFailed:
+    if mainError.error != FSDKError.ValidationFailed:
         raise LunaSDKException(
-            LunaVLError.fromSDKError(validationError),
+            LunaVLError.ValidationFailed.format(mainError.what),
             [LunaVLError.fromSDKError(errors[0]) for errors in imageErrors],
         )
     if not isinstance(coreImages, list):
@@ -173,5 +173,5 @@ def validateBatchDetectInput(
     else:
         errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
     raise LunaSDKException(
-        LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
+        LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
     )

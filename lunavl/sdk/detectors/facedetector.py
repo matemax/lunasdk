@@ -311,14 +311,14 @@ class FaceDetector:
             LunaSDKException: if validation failed and coreImages has type CoreImage
         """
         if isinstance(coreImages, list):
-            validationError, imagesErrors = self._detector.validate(coreImages, detectAreas)
+            mainError, imagesErrors = self._detector.validate(coreImages, detectAreas)
         else:
-            validationError, imagesErrors = self._detector.validate([coreImages], [[detectAreas]])
-        if validationError.isOk:
+            mainError, imagesErrors = self._detector.validate([coreImages], [[detectAreas]])
+        if mainError.isOk:
             return
-        if validationError.error != FSDKError.ValidationFailed:
+        if mainError.error != FSDKError.ValidationFailed:
             raise LunaSDKException(
-                LunaVLError.fromSDKError(validationError),
+                LunaVLError.ValidationFailed.format(mainError.what),
                 [LunaVLError.fromSDKError(errors[0]) for errors in imagesErrors],
             )
         if not isinstance(coreImages, list):
@@ -334,7 +334,7 @@ class FaceDetector:
             else:
                 errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
         raise LunaSDKException(
-            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
+            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
         )
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
