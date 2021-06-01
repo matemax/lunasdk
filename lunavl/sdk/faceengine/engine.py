@@ -300,7 +300,9 @@ class VLFaceEngine:
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
 
-    def createLivenessV1Estimator(self,) -> LivenessV1Estimator:
+    def createLivenessV1Estimator(
+        self,
+    ) -> LivenessV1Estimator:
         """
         Create an one shot liveness estimator.
         Returns:
