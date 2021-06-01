@@ -206,7 +206,7 @@ class TestIndexFunctionality(BaseTestClass):
         self.indexBuilder.appendBatch(self.faceDescriptorBatch)
         dynamicIndex = self.indexBuilder.buildIndex()
         self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=2, expectedBufSize=2)
-        for index, expectedDescriptorCount in ((0, 1), (0, 0)):
+        for index, expectedDescriptorCount in ((1, 1), (0, 0)):
             with self.subTest(case=f"remove descriptor with index: {index}"):
                 del dynamicIndex[index]
                 self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount, len(self.faceDescriptorBatch))

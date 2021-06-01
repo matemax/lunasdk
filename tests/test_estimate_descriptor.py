@@ -20,7 +20,6 @@ from lunavl.sdk.estimators.body_estimators.human_descriptor import HumanDescript
 from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarpedImage
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
-from lunavl.sdk.globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.detect_test_class import VLIMAGE_SMALL
@@ -28,7 +27,7 @@ from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE, BAD_THR
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58, 59]
 
-EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [DHDV, 102, 103]
+EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [102, 103, 104]
 
 
 class DescriptorType(Enum):

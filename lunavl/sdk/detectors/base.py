@@ -159,7 +159,7 @@ def validateBatchDetectInput(
         return
     if validationError.error != FSDKError.ValidationFailed:
         raise LunaSDKException(
-            LunaVLError.ValidationFailed.format("Failed validation"),
+            LunaVLError.fromSDKError(validationError),
             [LunaVLError.fromSDKError(errors[0]) for errors in imageErrors],
         )
     if not isinstance(coreImages, list):

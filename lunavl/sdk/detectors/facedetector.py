@@ -318,7 +318,7 @@ class FaceDetector:
             return
         if validationError.error != FSDKError.ValidationFailed:
             raise LunaSDKException(
-                LunaVLError.ValidationFailed.format("Failed validation"),
+                LunaVLError.fromSDKError(validationError),
                 [LunaVLError.fromSDKError(errors[0]) for errors in imagesErrors],
             )
         if not isinstance(coreImages, list):
