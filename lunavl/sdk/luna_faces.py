@@ -10,9 +10,10 @@ from numpy import ndarray
 from .detectors.base import ImageForDetection, ImageForRedetection
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .estimator_collections import FaceEstimatorsCollection
+from .estimators.base import ImageWithFaceDetection
 from .estimators.face_estimators.basic_attributes import BasicAttributes
 from .estimators.face_estimators.emotions import Emotions
-from .estimators.face_estimators.eyes import EyesEstimation, GazeDirection
+from .estimators.face_estimators.eyes import EyesEstimation, GazeDirection, WarpWithLandmarks, WarpWithLandmarks5
 from .estimators.face_estimators.face_descriptor import FaceDescriptor
 from .estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from .estimators.face_estimators.glasses import Glasses
@@ -110,9 +111,8 @@ class VLFaceDetection(FaceDetection):
             head pose
         """
         if self._headPose is None:
-            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(
-                self.boundingBox, self.image
-            )
+            imageWithFaceDetection = ImageWithFaceDetection(self.image, self.boundingBox)
+            self._headPose = self.estimatorCollection.headPoseEstimator.estimateByBoundingBox(imageWithFaceDetection)
         return self._headPose
 
     @property
@@ -231,7 +231,8 @@ class VLFaceDetection(FaceDetection):
             eyes estimation
         """
         if self._eyes is None:
-            self._eyes = self.estimatorCollection.eyeEstimator.estimate(self._getTransformedLandmarks5(), self.warp)
+            warpWithLandmarks = WarpWithLandmarks(self.warp, self._getTransformedLandmarks5())
+            self._eyes = self.estimatorCollection.eyeEstimator.estimate(warpWithLandmarks)
         return self._eyes
 
     @property
@@ -243,9 +244,8 @@ class VLFaceDetection(FaceDetection):
             gaze direction
         """
         if self._gaze is None:
-            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(
-                self._getTransformedLandmarks5(), self.warp
-            )
+            warpWithLandmarks5 = WarpWithLandmarks5(self.warp, self._getTransformedLandmarks5())
+            self._gaze = self.estimatorCollection.gazeDirectionEstimator.estimate(warpWithLandmarks5)
         return self._gaze
 
     @property

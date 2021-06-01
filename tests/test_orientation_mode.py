@@ -77,4 +77,4 @@ class TestOrientationMode(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.orientationModeEstimator.estimateBatch([])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)

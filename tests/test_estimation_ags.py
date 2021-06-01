@@ -86,4 +86,4 @@ class TestBasicAttributes(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.estimator.estimateBatch([])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidInput)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)

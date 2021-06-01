@@ -1,6 +1,6 @@
 from typing import NamedTuple, List, Any, Dict, Union, Tuple
 
-from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage  # pylint: disable=E0611,E0401
+from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage, FSDKError  # pylint: disable=E0611,E0401
 
 from ..base import BaseEstimation, BoundingBox
 from ..errors.errors import LunaVLError
@@ -152,14 +152,16 @@ def validateBatchDetectInput(
     """
     limit = 1
     if not isinstance(coreImages, list):
-        validationError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
+        mainError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
     else:
-        validationError, imageErrors = detector.validate(coreImages, detectAreas, limit)
-    if validationError.isOk:
+        mainError, imageErrors = detector.validate(coreImages, detectAreas, limit)
+    if mainError.isOk:
         return
-    # uncomment after FSDK-2930
-    # if validationError.error != FSDKError.ValidationFailed:
-    #     raise LunaSDKException(LunaVLError.fromSDKError(validationError), errors)
+    if mainError.error != FSDKError.ValidationFailed:
+        raise LunaSDKException(
+            LunaVLError.ValidationFailed.format(mainError.what),
+            [LunaVLError.fromSDKError(errors[0]) for errors in imageErrors],
+        )
     if not isinstance(coreImages, list):
         raise LunaSDKException(LunaVLError.fromSDKError(imageErrors[0]))
     errors = []
@@ -170,6 +172,4 @@ def validateBatchDetectInput(
         break
     else:
         errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-    raise LunaSDKException(
-        LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
-    )
+    raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors)

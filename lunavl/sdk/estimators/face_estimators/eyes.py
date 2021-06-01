@@ -211,7 +211,7 @@ class EyeEstimator(BaseEstimator):
         """
         Estimate mouth state on warp.
 
-        Args:WarpWithLandmarks
+        Args:
             warpWithLandmarks: core warp with transformed landmarks
 
         Returns:

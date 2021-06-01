@@ -13,6 +13,7 @@ from FaceEngine import (
     DT_LANDMARKS5,
     DT_LANDMARKS68,
     Image as CoreImage,
+    FSDKError,
 )  # pylint: disable=E0611,E0401
 
 from ..base import Landmarks
@@ -307,17 +308,19 @@ class FaceDetector:
         Raises:
             LunaSDKException(LunaVLError.BatchedInternalError): if validation failed and coreImages has type list
                                                                                                   (batch redetect)
-            LunaSDKException: ifvalidation failed and coreImages has type CoreImage
+            LunaSDKException: if validation failed and coreImages has type CoreImage
         """
         if isinstance(coreImages, list):
-            validationError, imagesErrors = self._detector.validate(coreImages, detectAreas)
+            mainError, imagesErrors = self._detector.validate(coreImages, detectAreas)
         else:
-            validationError, imagesErrors = self._detector.validate([coreImages], [[detectAreas]])
-        if validationError.isOk:
+            mainError, imagesErrors = self._detector.validate([coreImages], [[detectAreas]])
+        if mainError.isOk:
             return
-        # wait FSDK-2930
-        # if validationError.error != FSDKError.ValidationFailed:
-        #     raise LunaSDKException(LunaVLError.fromSDKError(validationError), imagesErrors)
+        if mainError.error != FSDKError.ValidationFailed:
+            raise LunaSDKException(
+                LunaVLError.ValidationFailed.format(mainError.what),
+                [LunaVLError.fromSDKError(errors[0]) for errors in imagesErrors],
+            )
         if not isinstance(coreImages, list):
             raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0][0]))
         errors = []
@@ -331,7 +334,7 @@ class FaceDetector:
             else:
                 errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
         raise LunaSDKException(
-            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(validationError).detail), errors
+            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
         )
 
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
