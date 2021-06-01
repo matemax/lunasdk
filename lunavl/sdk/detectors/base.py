@@ -172,6 +172,4 @@ def validateBatchDetectInput(
         break
     else:
         errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-    raise LunaSDKException(
-        LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
-    )
+    raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors)

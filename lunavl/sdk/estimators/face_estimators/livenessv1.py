@@ -183,10 +183,7 @@ class LivenessV1Estimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections, coreEstimations)
         error, estimations = self._coreEstimator.estimate(
-            coreImages,
-            detections,
-            coreEstimations,
-            -1.0 if qualityThreshold is None else qualityThreshold,
+            coreImages, detections, coreEstimations, -1.0 if qualityThreshold is None else qualityThreshold,
         )
 
         if error.isError:
