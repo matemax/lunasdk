@@ -48,7 +48,7 @@ class TestMask(BaseTestClass):
             FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE)), MaskProperties(0.896, 0.078, 0.024)
         )
         cls.occludedMaskWarpNProperties = WarpNExpectedProperties(
-            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.326, 0.142, 0.531)
+            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.000, 0.001, 0.998)
         )
         cls.imageMedicalMask = VLImage.load(filename=FULL_FACE_WITH_MASK)
         cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
@@ -72,16 +72,15 @@ class TestMask(BaseTestClass):
         assert isinstance(mask, Mask), f"{mask.__class__} is not {Mask}"
 
         for propertyName in expectedEstimationResults:
-            with self.subTest(propertyName=propertyName):
-                actualPropertyResult = getattr(mask, propertyName)
-                assert isinstance(actualPropertyResult, float), f"{propertyName} is not float"
-                assert 0 <= actualPropertyResult < 1, f"{propertyName} is out of range [0,1]"
-                self.assertAlmostEqual(
-                    actualPropertyResult,
-                    expectedEstimationResults[propertyName],
-                    delta=0.005,
-                    msg=f"property value '{propertyName}' is incorrect",
-                )
+            actualPropertyResult = getattr(mask, propertyName)
+            assert isinstance(actualPropertyResult, float), f"{propertyName} is not float"
+            assert 0 <= actualPropertyResult < 1, f"{propertyName} is out of range [0,1]"
+            self.assertAlmostEqual(
+                actualPropertyResult,
+                expectedEstimationResults[propertyName],
+                delta=0.005,
+                msg=f"property value '{propertyName}' is incorrect",
+            )
 
     def test_estimate_mask_as_dict(self):
         """
@@ -114,8 +113,8 @@ class TestMask(BaseTestClass):
         Test mask estimations without mask on the face
         """
         cases = [
-            TestCase("no_mask_warp", self.warpImageMissing, True, MaskProperties(0.998, 0.001, 0.000), None),
-            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.997, 0.0, 0.001), None),
+            TestCase("no_mask_warp", self.warpImageMissing, True, MaskProperties(0.896, 0.078, 0.024), None),
+            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.051, 0.002, 0.945), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -131,7 +130,7 @@ class TestMask(BaseTestClass):
         Test mask estimations with face is occluded by other object
         """
         cases = [
-            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.259, 0.669, 0.071), None),
+            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.000, 0.000, 0.998), None),
             TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.0, 0.0, 0.999), None),
         ]
         for case in cases:
@@ -166,7 +165,7 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations without mask on the face
         """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.0, 0.999), None)
+        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.003, 0.035, 0.961), None)
 
         faceDetection = self.defaultDetector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
