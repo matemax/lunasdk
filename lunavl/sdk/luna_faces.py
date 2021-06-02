@@ -1,4 +1,5 @@
-"""Module realize hight level api for estimate face attributes
+"""
+Module realize hight level api for estimate face attributes
 """
 from typing import Optional, Union, List, Dict
 
@@ -12,6 +13,7 @@ from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .estimator_collections import FaceEstimatorsCollection
 from .estimators.base import ImageWithFaceDetection
 from .estimators.face_estimators.basic_attributes import BasicAttributes
+from .estimators.face_estimators.credibility_check import CredibilityCheck
 from .estimators.face_estimators.emotions import Emotions
 from .estimators.face_estimators.eyes import EyesEstimation, GazeDirection, WarpWithLandmarks, WarpWithLandmarks5
 from .estimators.face_estimators.face_descriptor import FaceDescriptor
@@ -28,11 +30,37 @@ from .image_utils.geometry import Rect
 from .image_utils.image import VLImage, ColorFormat
 
 
+class VLFaceDetectionSettings:
+    """
+    Settings for detection
+
+    Attributes:
+        estimateMaskFromDetection: estimate mask from detection or warp
+
+    """
+
+    __slots__ = "_estimateMaskFromDetection"
+
+    def __init__(self, estimateMaskFromDetection: bool = False):
+        """
+        Init settings
+
+        Args:
+            estimateMaskFromDetection: estimate from detection or warp
+        """
+        self._estimateMaskFromDetection = estimateMaskFromDetection
+
+    @property
+    def estimateMaskFromDetection(self) -> bool:
+        """Get current settings for mask estimation"""
+        return self._estimateMaskFromDetection
+
+
 class VLFaceDetection(FaceDetection):
     """
     High level detection object.
     Attributes:
-
+        _estimationSettings (VLFaceDetectionSettings): settings for detections
         estimatorCollection (FaceEstimatorsCollection): collection of estimators
         _emotions (Optional[Emotions]): lazy load emotions estimations
         _eyes (Optional[EyesEstimation]): lazy load eye estimations
@@ -42,6 +70,7 @@ class VLFaceDetection(FaceDetection):
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
         _mask (Optional[Mask]): lazy load mask estimation
         _glasses (Optional[Glasses]): lazy load glasses estimation
+        _credibilityCheck (Optional[CredibilityCheck]): lazy load credibility check estimation
         _headPose (Optional[HeadPose]): lazy load head pose estimation
         _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
@@ -49,6 +78,7 @@ class VLFaceDetection(FaceDetection):
     """
 
     __slots__ = (
+        "_estimationSettings",
         "_warp",
         "_emotions",
         "_eyes",
@@ -64,9 +94,16 @@ class VLFaceDetection(FaceDetection):
         "_mask",
         "_glasses",
         "_liveness",
+        "_credibilityCheck",
     )
 
-    def __init__(self, coreDetection: Face, image: VLImage, estimatorCollection: FaceEstimatorsCollection):
+    def __init__(
+        self,
+        coreDetection: Face,
+        image: VLImage,
+        estimatorCollection: FaceEstimatorsCollection,
+        estimationSettings: Optional[VLFaceDetectionSettings] = None,
+    ):
         """
         Init.
 
@@ -74,6 +111,7 @@ class VLFaceDetection(FaceDetection):
             coreDetection: core detection
         """
         super().__init__(coreDetection, image)
+        self._estimationSettings: VLFaceDetectionSettings = estimationSettings or VLFaceDetectionSettings()
         self._emotions: Optional[Emotions] = None
         self._eyes: Optional[EyesEstimation] = None
         self._warp: Optional[FaceWarp] = None
@@ -87,8 +125,19 @@ class VLFaceDetection(FaceDetection):
         self._descriptor: Optional[FaceDescriptor] = None
         self._mask: Optional[Mask] = None
         self._glasses: Optional[Glasses] = None
+        self._credibilityCheck: Optional[CredibilityCheck] = None
         self._liveness: Optional[LivenessV1] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
+
+    @property
+    def estimationSettings(self) -> VLFaceDetectionSettings:
+        """
+        Get current detection settings
+
+        Returns:
+            (VLFaceDetectionSettings) Current detection settings
+        """
+        return self._estimationSettings
 
     @property
     def warp(self) -> FaceWarp:
@@ -184,7 +233,10 @@ class VLFaceDetection(FaceDetection):
             mask
         """
         if self._mask is None:
-            self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
+            if self._estimationSettings.estimateMaskFromDetection:
+                self._mask = self.estimatorCollection.maskEstimator.estimate(self)
+            else:
+                self._mask = self.estimatorCollection.maskEstimator.estimate(self.warp)
         return self._mask
 
     @property
@@ -197,6 +249,17 @@ class VLFaceDetection(FaceDetection):
         if self._glasses is None:
             self._glasses = self.estimatorCollection.glassesEstimator.estimate(self.warp)
         return self._glasses
+
+    @property
+    def credibilityCheck(self) -> CredibilityCheck:
+        """
+        Get credibility check existence estimation of warped image which corresponding the detection
+        Returns:
+            credibilityCheck
+        """
+        if self._credibilityCheck is None:
+            self._credibilityCheck = self.estimatorCollection.credibilityCheckEstimator.estimate(self.warp)
+        return self._credibilityCheck
 
     @property
     def descriptor(self) -> FaceDescriptor:
@@ -310,6 +373,8 @@ class VLFaceDetection(FaceDetection):
 
         if self._liveness is not None:
             attributes["liveness"] = self._liveness.asDict()
+        if self._credibilityCheck is not None:
+            attributes["credibility_check"] = self._credibilityCheck.asDict()
 
         res["attributes"] = attributes
         return res
@@ -331,7 +396,10 @@ class VLFaceDetector:
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def __init__(
-        self, detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT, faceEngine: Optional[VLFaceEngine] = None
+        self,
+        detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
+        faceEngine: Optional[VLFaceEngine] = None,
+        estimationSettings: Optional[VLFaceDetectionSettings] = None,
     ):
         """
         Init.
@@ -344,6 +412,7 @@ class VLFaceDetector:
             self.faceEngine = faceEngine
             self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
+        self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
@@ -358,7 +427,9 @@ class VLFaceDetector:
         detectRes = self._faceDetector.detectOne(image, detectArea, True, True)
         if detectRes is None:
             return None
-        return VLFaceDetection(detectRes.coreEstimation, detectRes.image, self.estimatorsCollection)
+        return VLFaceDetection(
+            detectRes.coreEstimation, detectRes.image, self.estimatorsCollection, self._estimationSettings
+        )
 
     def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5) -> List[List[VLFaceDetection]]:
         """
@@ -379,6 +450,7 @@ class VLFaceDetector:
                         detectRes.coreEstimation,
                         image if isinstance(image, VLImage) else image.image,
                         self.estimatorsCollection,
+                        self._estimationSettings,
                     )
                     for detectRes in detectRes[imageNumber]
                 ]
@@ -403,7 +475,9 @@ class VLFaceDetector:
             imageForRedetct, bBox=bBox, detect5Landmarks=True, detect68Landmarks=True
         )
         if redetection:
-            return VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+            return VLFaceDetection(
+                redetection.coreEstimation, redetection.image, self.estimatorsCollection, self._estimationSettings
+            )
         return None
 
     def redetect(self, imagesAndBBoxes: List[ImageForRedetection]) -> List[List[Union[VLFaceDetection, None]]]:
@@ -422,7 +496,9 @@ class VLFaceDetector:
         res = []
         for redetectionsOfImage in redetections:
             imageRes = [
-                VLFaceDetection(redetection.coreEstimation, redetection.image, self.estimatorsCollection)
+                VLFaceDetection(
+                    redetection.coreEstimation, redetection.image, self.estimatorsCollection, self._estimationSettings
+                )
                 if redetection
                 else None
                 for redetection in redetectionsOfImage
@@ -443,9 +519,19 @@ class VLWarpedImage(FaceWarpedImage):
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
         _mask (Optional[Mask]): lazy load mask estimation
         _glasses (Optional[Glasses]): lazy load glasses estimation
+        _credibilityCheck (Optional[CredibilityCheck]): lazy load credibility check estimation
     """
 
-    __slots__ = ("_emotions", "_mouthState", "_basicAttributes", "_warpQuality", "_descriptor", "_mask", "_glasses")
+    __slots__ = (
+        "_emotions",
+        "_mouthState",
+        "_basicAttributes",
+        "_warpQuality",
+        "_descriptor",
+        "_mask",
+        "_glasses",
+        "_credibilityCheck",
+    )
 
     def __init__(
         self,
@@ -462,6 +548,7 @@ class VLWarpedImage(FaceWarpedImage):
         self._descriptor: Optional[FaceDescriptor] = None
         self._mask: Optional[Mask] = None
         self._glasses: Optional[Glasses] = None
+        self._credibilityCheck: Optional[CredibilityCheck] = None
 
     #: estimators collection of class for usual creating detectors
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=VLFaceEngine())
@@ -550,6 +637,17 @@ class VLWarpedImage(FaceWarpedImage):
             self._glasses = VLWarpedImage.estimatorsCollection.glassesEstimator.estimate(self)
         return self._glasses
 
+    @property
+    def credibilityCheck(self) -> CredibilityCheck:
+        """
+        Get credibility check of warped image which corresponding the detection
+        Returns:
+            credibilityCheck
+        """
+        if self._credibilityCheck is None:
+            self._credibilityCheck = VLWarpedImage.estimatorsCollection.credibilityCheckEstimator.estimate(self)
+        return self._credibilityCheck
+
     def asDict(self) -> Dict[str, Dict[str, float]]:
         """
         Convert to dict.
@@ -580,6 +678,9 @@ class VLWarpedImage(FaceWarpedImage):
 
         if self._glasses is not None:
             attributes["glasses"] = self._glasses.asDict()
+
+        if self._credibilityCheck is not None:
+            attributes["credibility_check"] = self._credibilityCheck.asDict()
 
         res["attributes"] = attributes
         return res

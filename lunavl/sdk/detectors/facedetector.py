@@ -365,5 +365,7 @@ class FaceDetector:
         return res
 
     def setDetectionComparer(self):
-        """"""
+        """
+        set detection comparer
+        """
         pass
