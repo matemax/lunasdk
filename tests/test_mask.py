@@ -50,10 +50,12 @@ class TestMask(BaseTestClass):
         cls.occludedMaskWarpNProperties = WarpNExpectedProperties(
             FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.326, 0.142, 0.531)
         )
-
         cls.imageMedicalMask = VLImage.load(filename=FULL_FACE_WITH_MASK)
+        cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
         cls.imageMissing = VLImage.load(filename=FULL_FACE_NO_MASK)
+        cls.warpImageMissing = FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE))
         cls.imageOccluded = VLImage.load(filename=FULL_OCCLUDED_FACE)
+        cls.warpImageOccluded = FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE))
 
         cls.largeImage = VLImage.load(filename=LARGE_IMAGE)
 
@@ -77,7 +79,7 @@ class TestMask(BaseTestClass):
                 self.assertAlmostEqual(
                     actualPropertyResult,
                     expectedEstimationResults[propertyName],
-                    delta=0.001,
+                    delta=0.005,
                     msg=f"property value '{propertyName}' is incorrect",
                 )
 
