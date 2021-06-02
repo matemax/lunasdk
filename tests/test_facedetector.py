@@ -318,9 +318,11 @@ class TestFaceDetector(FaceDetectTestClass):
             colorImage = colorToImageMap[colorFormat]
             for detector in self.detectors:
                 with self.subTest(detectorType=detector.detectorType, colorFormat=colorFormat.name):
-                    if (
-                        colorFormat in (ColorFormat.R8G8B8X8, ColorFormat.IR_X8X8X8)
-                        and detector.detectorType == DetectorType.FACE_DET_V3
+                    if all(
+                        (
+                            colorFormat in (ColorFormat.R8G8B8X8, ColorFormat.IR_X8X8X8),
+                            detector.detectorType == DetectorType.FACE_DET_V3,
+                        )
                     ):
                         detector.detect(images=[colorImage])
                     else:
