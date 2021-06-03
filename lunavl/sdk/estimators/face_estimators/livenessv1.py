@@ -32,13 +32,13 @@ class LivenessPrediction(Enum):
     @staticmethod
     def fromCoreEmotion(coreState: LivenessOneShotState) -> "LivenessPrediction":
         """
-        Get enum element by core emotion.
+        Get enum element by core liveness.
 
         Args:
-            coreEmotion: enum value from core
+            coreState: enum value from core
 
         Returns:
-            corresponding emotion
+            corresponding prediction
         """
         if coreState == LivenessOneShotState.Alive:
             return LivenessPrediction.Real
@@ -46,7 +46,7 @@ class LivenessPrediction(Enum):
             return LivenessPrediction.Spoof
         if coreState == LivenessOneShotState.Unknown:
             return LivenessPrediction.Unknown
-        raise RuntimeError(f"bad core mask state {coreState}")
+        raise RuntimeError(f"bad core liveness state {coreState}")
 
 
 class LivenessV1(BaseEstimation):

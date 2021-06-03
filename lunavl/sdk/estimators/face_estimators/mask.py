@@ -35,13 +35,13 @@ class MaskState(Enum):
     @staticmethod
     def fromCoreEmotion(coreMask: CoreMask) -> "MaskState":
         """
-        Get enum element by core emotion.
+        Get enum element by core mask.
 
         Args:
-            coreEmotion: enum value from core
+            coreMask: enum value from core
 
         Returns:
-            corresponding emotion
+            corresponding mask prediction
         """
         if coreMask == CoreMask.NoMask:
             return MaskState.Missing
