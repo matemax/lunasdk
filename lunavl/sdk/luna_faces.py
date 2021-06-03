@@ -13,7 +13,7 @@ from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .estimator_collections import FaceEstimatorsCollection
 from .estimators.base import ImageWithFaceDetection
 from .estimators.face_estimators.basic_attributes import BasicAttributes
-from .estimators.face_estimators.credibility_check import CredibilityCheck
+from .estimators.face_estimators.trustworthiness import Trustworthiness
 from .estimators.face_estimators.emotions import Emotions
 from .estimators.face_estimators.eyes import EyesEstimation, GazeDirection, WarpWithLandmarks, WarpWithLandmarks5
 from .estimators.face_estimators.face_descriptor import FaceDescriptor
@@ -70,7 +70,7 @@ class VLFaceDetection(FaceDetection):
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
         _mask (Optional[Mask]): lazy load mask estimation
         _glasses (Optional[Glasses]): lazy load glasses estimation
-        _credibilityCheck (Optional[CredibilityCheck]): lazy load credibility check estimation
+        _trustworthiness (Optional[Trustworthiness]): lazy load trustworthiness estimation
         _headPose (Optional[HeadPose]): lazy load head pose estimation
         _ags (Optional[float]): lazy load ags estimation
         _transformedLandmarks5 (Optional[Landmarks68]): lazy load transformed landmarks68
@@ -94,7 +94,7 @@ class VLFaceDetection(FaceDetection):
         "_mask",
         "_glasses",
         "_liveness",
-        "_credibilityCheck",
+        "_trustworthiness",
     )
 
     def __init__(
@@ -125,7 +125,7 @@ class VLFaceDetection(FaceDetection):
         self._descriptor: Optional[FaceDescriptor] = None
         self._mask: Optional[Mask] = None
         self._glasses: Optional[Glasses] = None
-        self._credibilityCheck: Optional[CredibilityCheck] = None
+        self._trustworthiness: Optional[Trustworthiness] = None
         self._liveness: Optional[LivenessV1] = None
         self.estimatorCollection: FaceEstimatorsCollection = estimatorCollection
 
@@ -251,15 +251,15 @@ class VLFaceDetection(FaceDetection):
         return self._glasses
 
     @property
-    def credibilityCheck(self) -> CredibilityCheck:
+    def trustworthiness(self) -> Trustworthiness:
         """
-        Get credibility check existence estimation of warped image which corresponding the detection
+        Get trustworthiness existence estimation of warped image which corresponding the detection
         Returns:
-            credibilityCheck
+            trustworthiness
         """
-        if self._credibilityCheck is None:
-            self._credibilityCheck = self.estimatorCollection.credibilityCheckEstimator.estimate(self.warp)
-        return self._credibilityCheck
+        if self._trustworthiness is None:
+            self._trustworthiness = self.estimatorCollection.trustworthinessEstimator.estimate(self.warp)
+        return self._trustworthiness
 
     @property
     def descriptor(self) -> FaceDescriptor:
@@ -373,8 +373,8 @@ class VLFaceDetection(FaceDetection):
 
         if self._liveness is not None:
             attributes["liveness"] = self._liveness.asDict()
-        if self._credibilityCheck is not None:
-            attributes["credibility_check"] = self._credibilityCheck.asDict()
+        if self._trustworthiness is not None:
+            attributes["trustworthiness"] = self._trustworthiness.asDict()
 
         res["attributes"] = attributes
         return res
@@ -519,7 +519,7 @@ class VLWarpedImage(FaceWarpedImage):
         _warpQuality (Optional[Quality]): lazy load warp quality estimation
         _mask (Optional[Mask]): lazy load mask estimation
         _glasses (Optional[Glasses]): lazy load glasses estimation
-        _credibilityCheck (Optional[CredibilityCheck]): lazy load credibility check estimation
+        _trustworthiness (Optional[Trustworthiness]): lazy load trustworthiness estimation
     """
 
     __slots__ = (
@@ -530,7 +530,7 @@ class VLWarpedImage(FaceWarpedImage):
         "_descriptor",
         "_mask",
         "_glasses",
-        "_credibilityCheck",
+        "_trustworthiness",
     )
 
     def __init__(
@@ -548,7 +548,7 @@ class VLWarpedImage(FaceWarpedImage):
         self._descriptor: Optional[FaceDescriptor] = None
         self._mask: Optional[Mask] = None
         self._glasses: Optional[Glasses] = None
-        self._credibilityCheck: Optional[CredibilityCheck] = None
+        self._trustworthiness: Optional[Trustworthiness] = None
 
     #: estimators collection of class for usual creating detectors
     estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=VLFaceEngine())
@@ -638,15 +638,15 @@ class VLWarpedImage(FaceWarpedImage):
         return self._glasses
 
     @property
-    def credibilityCheck(self) -> CredibilityCheck:
+    def trustworthiness(self) -> Trustworthiness:
         """
-        Get credibility check of warped image which corresponding the detection
+        Get ctrustworthiness of warped image which corresponding the detection
         Returns:
-            credibilityCheck
+            trustworthiness
         """
-        if self._credibilityCheck is None:
-            self._credibilityCheck = VLWarpedImage.estimatorsCollection.credibilityCheckEstimator.estimate(self)
-        return self._credibilityCheck
+        if self._trustworthiness is None:
+            self._trustworthiness = VLWarpedImage.estimatorsCollection.trustworthinessEstimator.estimate(self)
+        return self._trustworthiness
 
     def asDict(self) -> Dict[str, Dict[str, float]]:
         """
@@ -679,8 +679,8 @@ class VLWarpedImage(FaceWarpedImage):
         if self._glasses is not None:
             attributes["glasses"] = self._glasses.asDict()
 
-        if self._credibilityCheck is not None:
-            attributes["credibility_check"] = self._credibilityCheck.asDict()
+        if self._trustworthiness is not None:
+            attributes["trustworthiness"] = self._trustworthiness.asDict()
 
         res["attributes"] = attributes
         return res

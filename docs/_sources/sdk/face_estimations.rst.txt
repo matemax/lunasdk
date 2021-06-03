@@ -242,5 +242,5 @@ Classes and methods
 .. automodule:: lunavl.sdk.estimators.image_estimators.orientation_mode
     :members:
 
-.. automodule:: lunavl.sdk.estimators.face_estimators.credibility_check
+.. automodule:: lunavl.sdk.estimators.face_estimators.trustworthiness
     :members:

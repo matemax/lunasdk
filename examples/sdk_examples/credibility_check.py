@@ -1,5 +1,5 @@
 """
-Credibility check estimation example
+Trustworthiness estimation example
 """
 import pprint
 
@@ -9,9 +9,9 @@ from lunavl.sdk.image_utils.image import VLImage
 from resources import EXAMPLE_1
 
 
-def estimateCredibilityCheck():
+def estimateTrustworthiness():
     """
-    Create warp to detection.
+    Estimate trustworthiness of a person
     """
     image = VLImage.load(filename=EXAMPLE_1)
     faceEngine = VLFaceEngine()
@@ -20,9 +20,9 @@ def estimateCredibilityCheck():
     warper = faceEngine.createFaceWarper()
     warp = warper.warp(faceDetection)
 
-    credibilityCheckEstimator = faceEngine.createCredibilityCheckEstimator()
-    pprint.pprint(credibilityCheckEstimator.estimate(warp.warpedImage).asDict())
+    trustworthinessCheckEstimator = faceEngine.createTrustworthinessEstimator()
+    pprint.pprint(trustworthinessCheckEstimator.estimate(warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":
-    estimateCredibilityCheck()
+    estimateTrustworthiness()

@@ -103,9 +103,9 @@ LIVENESSV1_SCHEMA = {
     "additionalProperties": False,
 }
 
-CREDIBILITY_CHECK_SCHEMA = {
+TRUSTWORTHINESS_SCHEMA = {
     "type": "object",
-    "properties": {"credibility_check": TYPE_SCORE},
-    "required": ["credibility_check"],
+    "properties": {"trustworthiness": TYPE_SCORE},
+    "required": ["trustworthiness"],
     "additionalProperties": False,
 }

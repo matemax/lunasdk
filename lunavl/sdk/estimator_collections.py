@@ -13,7 +13,7 @@ from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
 from .estimators.face_estimators.mask import MaskEstimator
 from .estimators.face_estimators.glasses import GlassesEstimator
-from .estimators.face_estimators.credibility_check import CredibilityCheckEstimator
+from .estimators.face_estimators.trustworthiness import TrustworthinessEstimator
 from .estimators.face_estimators.facewarper import FaceWarper
 from .estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from .estimators.image_estimators.orientation_mode import OrientationModeEstimator
@@ -51,8 +51,8 @@ class FaceEstimator(Enum):
     LivenessV1 = 12
     #: orientation mode estimator
     OrientationMode = 13
-    #: credibility check estimator
-    CredibilityCheck = 14
+    #: trustworthiness estimator
+    Trustworthiness = 14
 
 
 class FaceEstimatorsCollection:
@@ -73,7 +73,7 @@ class FaceEstimatorsCollection:
         _glassesEstimator (Optional[GlassesEstimator]): lazy glasses estimator
         _livenessV1Estimator (Optional[LivenessV1Estimator]): lazy livenessv1 estimator
         _orientationModeEstimator (Optional[OrientationModeEstimator]): lazy orientation mode estimator
-        _credibilityCheckEstimator (Optional[CredibilityCheckEstimator]): lazy credibility check estimator
+        _trustworthinessEstimator (Optional[TrustworthinessEstimator]): lazy trustworthiness estimator
         warper (Optional[Warper]): warper
     """
 
@@ -93,7 +93,7 @@ class FaceEstimatorsCollection:
         "_glassesEstimator",
         "_livenessV1Estimator",
         "_orientationModeEstimator",
-        "_credibilityCheckEstimator",
+        "_trustworthinessEstimator",
     )
 
     def __init__(
@@ -124,7 +124,7 @@ class FaceEstimatorsCollection:
         self._glassesEstimator: Union[None, GlassesEstimator] = None
         self._livenessV1Estimator: Union[None, LivenessV1Estimator] = None
         self._orientationModeEstimator: Union[None, OrientationModeEstimator] = None
-        self._credibilityCheckEstimator: Union[None, CredibilityCheckEstimator] = None
+        self._trustworthinessEstimator: Union[None, TrustworthinessEstimator] = None
         self.warper: FaceWarper = self._faceEngine.createFaceWarper()
 
         if startEstimators:
@@ -205,8 +205,8 @@ class FaceEstimatorsCollection:
             self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator()
         elif estimator == FaceEstimator.OrientationMode:
             self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
-        elif estimator == FaceEstimator.CredibilityCheck:
-            self._credibilityCheckEstimator = self._faceEngine.createCredibilityCheckEstimator()
+        elif estimator == FaceEstimator.Trustworthiness:
+            self._trustworthinessEstimator = self._faceEngine.createTrustworthinessEstimator()
         else:
             raise ValueError("Bad estimator type")
 
@@ -512,24 +512,24 @@ class FaceEstimatorsCollection:
         self._orientationModeEstimator = newEstimator
 
     @property
-    def credibilityCheckEstimator(self) -> CredibilityCheckEstimator:
+    def trustworthinessEstimator(self) -> TrustworthinessEstimator:
         """
-        Get credibility check estimator.
+        Get trustworthiness estimator.
         Returns:
-            credibility check estimator
+            trustworthiness estimator
         """
-        if self._credibilityCheckEstimator is None:
-            self._credibilityCheckEstimator = self._faceEngine.createCredibilityCheckEstimator()
-        return self._credibilityCheckEstimator
+        if self._trustworthinessEstimator is None:
+            self._trustworthinessEstimator = self._faceEngine.createTrustworthinessEstimator()
+        return self._trustworthinessEstimator
 
-    @credibilityCheckEstimator.setter
-    def credibilityCheckEstimator(self, newEstimator: CredibilityCheckEstimator) -> None:
+    @trustworthinessEstimator.setter
+    def trustworthinessEstimator(self, newEstimator: TrustworthinessEstimator) -> None:
         """
-        Set warp credibility check estimator.
+        Set warp trustworthiness estimator.
         Args:
-            newEstimator: new credibility check estimator
+            newEstimator: new trustworthiness estimator
         """
-        self._credibilityCheckEstimator = newEstimator
+        self._trustworthinessEstimator = newEstimator
 
     @property
     def faceEngine(self) -> VLFaceEngine:

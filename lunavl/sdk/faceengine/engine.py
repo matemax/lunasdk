@@ -14,7 +14,7 @@ from ..estimators.body_estimators.human_descriptor import HumanDescriptorEstimat
 from ..estimators.body_estimators.humanwarper import HumanWarper
 from ..estimators.face_estimators.ags import AGSEstimator
 from ..estimators.face_estimators.basic_attributes import BasicAttributesEstimator
-from ..estimators.face_estimators.credibility_check import CredibilityCheckEstimator
+from ..estimators.face_estimators.trustworthiness import TrustworthinessEstimator
 from ..estimators.face_estimators.emotions import EmotionsEstimator
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
@@ -326,10 +326,10 @@ class VLFaceEngine:
         """
         return IndexBuilder(self._faceEngine)
 
-    def createCredibilityCheckEstimator(self) -> CredibilityCheckEstimator:
+    def createTrustworthinessEstimator(self) -> TrustworthinessEstimator:
         """
-        Create a credibility check estimator.
+        Create a trustworthiness estimator.
         Returns:
             estimator
         """
-        return CredibilityCheckEstimator(self._faceEngine.createCredibilityCheckEstimator())
+        return TrustworthinessEstimator(self._faceEngine.createCredibilityCheckEstimator())
