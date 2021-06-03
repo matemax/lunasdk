@@ -13,12 +13,12 @@ repository = "https://github.com/matemax/lunasdk"
 python = ">=3.6"
 numpy = "*"
 requests = "^2.22"
-Pillow = "*"
+Pillow = {version = "*", markers = "sys_platform == 'win32'"}
 pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
 
 #[tool.poetry.dependencies.FaceEngine]
 #git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-#tag = "v.5.1.0.0"
+#tag = "v.5.2.0.0"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
