@@ -17,11 +17,14 @@ def estimateMedicalMask():
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
     faceDetection = detector.detectOne(image)
-    warper = faceEngine.createFaceWarper()
-    warp = warper.warp(faceDetection)
 
     medicalMaskEstimator = faceEngine.createMaskEstimator()
+    # Estimate from detection
+    pprint.pprint(medicalMaskEstimator.estimate(faceDetection).asDict())
 
+    # Estimate from wrap
+    warper = faceEngine.createFaceWarper()
+    warp = warper.warp(faceDetection)
     pprint.pprint(medicalMaskEstimator.estimate(warp.warpedImage).asDict())
 
     warp2 = warper.warp(detector.detectOne(VLImage.load(filename=EXAMPLE_1)))

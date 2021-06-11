@@ -363,7 +363,3 @@ class FaceDetector:
 
         res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
         return res
-
-    def setDetectionComparer(self):
-        """"""
-        pass

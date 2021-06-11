@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 [tool]
 [tool.poetry]
 name = "lunavl"
-version = "0.1.6"
+version = "0.1.7"
 description = "Python interface for VisionLabs Luna platform"
 authors = ["VisionLabs <m.limonov@visionlabs.ru>"]
 repository = "https://github.com/matemax/lunasdk"
@@ -13,12 +13,13 @@ repository = "https://github.com/matemax/lunasdk"
 python = ">=3.6"
 numpy = "*"
 requests = "^2.22"
-Pillow = {version = "7.0.0", markers = "sys_platform == 'win32'"}
+Pillow = {version = "*", markers = "sys_platform == 'win32'"}
 pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
+dataclasses = {version="*", markers="python_version == '3.6'"}
 
 #[tool.poetry.dependencies.FaceEngine]
 #git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-#tag = "v.5.1.0.0"
+#tag = "v.5.2.0.0"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"

@@ -102,3 +102,18 @@ LIVENESSV1_SCHEMA = {
     "required": ["prediction", "estimations"],
     "additionalProperties": False,
 }
+
+CREDIBILITY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "estimations": {
+            "type": "object",
+            "properties": {"score": TYPE_SCORE},
+            "required": ["score"],
+            "additionalProperties": False,
+        },
+        "prediction": {"type": "string", "enum": ["reliable", "non_reliable"]},
+    },
+    "required": ["estimations", "prediction"],
+    "additionalProperties": False,
+}

@@ -400,7 +400,7 @@ class TestEstimateDescriptor(BaseTestClass):
                                 exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
                             )
 
-    @pytest.mark.skip(msg="Skip error test")  # TODO: Сheck why the test failed
+    @pytest.mark.skip(msg="Skip error test")  # TODO: SDK return isError=False. Not raises LunaSDKException
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):
         """
         Test correctly estimate descriptor batch.
@@ -431,7 +431,7 @@ class TestEstimateDescriptor(BaseTestClass):
         Test descriptor batch with low threshold warps with aggregation
         """
         faceWarp = FaceWarpedImage.load(filename=BAD_THRESHOLD_WARP)
-        for descriptorVersion in [56]:
+        for descriptorVersion in EFDVa:
             with self.subTest(planVersion=descriptorVersion):
                 extractor = self.faceEngine.createFaceDescriptorEstimator(descriptorVersion)
                 descriptorBatch = self.getBatch(descriptorVersion, 2, DescriptorType.face)

@@ -12,14 +12,24 @@ from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE, BAD_IMAGE
+from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE, BAD_IMAGE, LARGE_IMAGE
 
 VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)
 VLIMAGE_BAD_IMAGE = VLImage.load(filename=BAD_IMAGE)
 VLIMAGE_SEVERAL_FACE = VLImage.load(filename=SEVERAL_FACES)
+VLIMAGE_LARGE_IMAGE = VLImage.load(filename=LARGE_IMAGE)
 GOOD_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width - 100, VLIMAGE_ONE_FACE.rect.height - 100)
 OUTSIDE_AREA = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width, VLIMAGE_ONE_FACE.rect.height)
+SMALL_AREA = Rect(50, 50, 52, 52)
+LARGE_AREA = Rect(1, 1, VLIMAGE_LARGE_IMAGE.rect.width - 1, VLIMAGE_LARGE_IMAGE.rect.height - 1)
+AREA_LARGER_IMAGE = Rect(100, 100, VLIMAGE_ONE_FACE.rect.width + 100, VLIMAGE_ONE_FACE.rect.height + 100)
+AREA_OUTSIDE_IMAGE = Rect(
+    VLIMAGE_ONE_FACE.rect.width,
+    VLIMAGE_ONE_FACE.rect.height,
+    VLIMAGE_ONE_FACE.rect.width + 100,
+    VLIMAGE_ONE_FACE.rect.height + 100,
+)
 AREA_WITHOUT_FACE = Rect(50, 50, 100, 100)
 INVALID_RECT = Rect(0, 0, 0, 0)
 ERROR_CORE_RECT = Rect(0.1, 0.1, 0.1, 0.1)  # anything out of range (0.1, 1)

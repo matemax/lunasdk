@@ -326,7 +326,8 @@ class VLImage:
 
     @property
     def format(self) -> ColorFormat:
-        """getFormat(self: FaceEngine.Image) -> FaceEngine.FormatType
+        """
+        Get image format.
 
         >>> image = VLImage.load(url='https://st.kp.yandex.net/im/kadr/3/1/4/kinopoisk.ru-Keira-Knightley-3142930.jpg')
         >>> image.format.value

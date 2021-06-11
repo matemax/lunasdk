@@ -13,6 +13,7 @@ from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
 from .estimators.face_estimators.mask import MaskEstimator
 from .estimators.face_estimators.glasses import GlassesEstimator
+from .estimators.face_estimators.credibility import CredibilityEstimator
 from .estimators.face_estimators.facewarper import FaceWarper
 from .estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from .estimators.image_estimators.orientation_mode import OrientationModeEstimator
@@ -50,6 +51,8 @@ class FaceEstimator(Enum):
     LivenessV1 = 12
     #: orientation mode estimator
     OrientationMode = 13
+    #: credibility estimator
+    Credibility = 14
 
 
 class FaceEstimatorsCollection:
@@ -70,6 +73,7 @@ class FaceEstimatorsCollection:
         _glassesEstimator (Optional[GlassesEstimator]): lazy glasses estimator
         _livenessV1Estimator (Optional[LivenessV1Estimator]): lazy livenessv1 estimator
         _orientationModeEstimator (Optional[OrientationModeEstimator]): lazy orientation mode estimator
+        _credibilityEstimator (Optional[CredibilityEstimator]): lazy credibility estimator
         warper (Optional[Warper]): warper
     """
 
@@ -89,6 +93,7 @@ class FaceEstimatorsCollection:
         "_glassesEstimator",
         "_livenessV1Estimator",
         "_orientationModeEstimator",
+        "_credibilityEstimator",
     )
 
     def __init__(
@@ -119,6 +124,7 @@ class FaceEstimatorsCollection:
         self._glassesEstimator: Union[None, GlassesEstimator] = None
         self._livenessV1Estimator: Union[None, LivenessV1Estimator] = None
         self._orientationModeEstimator: Union[None, OrientationModeEstimator] = None
+        self._credibilityEstimator: Union[None, CredibilityEstimator] = None
         self.warper: FaceWarper = self._faceEngine.createFaceWarper()
 
         if startEstimators:
@@ -199,6 +205,8 @@ class FaceEstimatorsCollection:
             self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator()
         elif estimator == FaceEstimator.OrientationMode:
             self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
+        elif estimator == FaceEstimator.Credibility:
+            self._credibilityEstimator = self._faceEngine.createCredibilityEstimator()
         else:
             raise ValueError("Bad estimator type")
 
@@ -502,6 +510,26 @@ class FaceEstimatorsCollection:
             newEstimator: new estimator
         """
         self._orientationModeEstimator = newEstimator
+
+    @property
+    def credibilityEstimator(self) -> CredibilityEstimator:
+        """
+        Get credibility estimator.
+        Returns:
+            credibility estimator
+        """
+        if self._credibilityEstimator is None:
+            self._credibilityEstimator = self._faceEngine.createCredibilityEstimator()
+        return self._credibilityEstimator
+
+    @credibilityEstimator.setter
+    def credibilityEstimator(self, newEstimator: CredibilityEstimator) -> None:
+        """
+        Set warp credibility estimator.
+        Args:
+            newEstimator: new credibility estimator
+        """
+        self._credibilityEstimator = newEstimator
 
     @property
     def faceEngine(self) -> VLFaceEngine:

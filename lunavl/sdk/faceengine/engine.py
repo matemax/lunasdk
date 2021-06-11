@@ -14,6 +14,7 @@ from ..estimators.body_estimators.human_descriptor import HumanDescriptorEstimat
 from ..estimators.body_estimators.humanwarper import HumanWarper
 from ..estimators.face_estimators.ags import AGSEstimator
 from ..estimators.face_estimators.basic_attributes import BasicAttributesEstimator
+from ..estimators.face_estimators.credibility import CredibilityEstimator
 from ..estimators.face_estimators.emotions import EmotionsEstimator
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
@@ -300,9 +301,7 @@ class VLFaceEngine:
         """
         return GlassesEstimator(self._faceEngine.createGlassesEstimator())
 
-    def createLivenessV1Estimator(
-        self,
-    ) -> LivenessV1Estimator:
+    def createLivenessV1Estimator(self) -> LivenessV1Estimator:
         """
         Create an one shot liveness estimator.
         Returns:
@@ -326,3 +325,11 @@ class VLFaceEngine:
             index builder
         """
         return IndexBuilder(self._faceEngine)
+
+    def createCredibilityEstimator(self) -> CredibilityEstimator:
+        """
+        Create a credibility estimator.
+        Returns:
+            estimator
+        """
+        return CredibilityEstimator(self._faceEngine.createCredibilityCheckEstimator())
