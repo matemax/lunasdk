@@ -1,5 +1,5 @@
 """
-Module realize hight level api for estimate face attributes
+High-level api for estimating face attributes
 """
 from typing import Optional, Union, List, Dict
 
@@ -28,32 +28,18 @@ from .faceengine.engine import VLFaceEngine
 from .faceengine.setting_provider import DetectorType
 from .image_utils.geometry import Rect
 from .image_utils.image import VLImage, ColorFormat
+from dataclasses import dataclass
 
 
+@dataclass(frozen=True)
 class VLFaceDetectionSettings:
     """
     Settings for detection
-
-    Attributes:
-        estimateMaskFromDetection: estimate mask from detection or warp
-
     """
 
-    __slots__ = "_estimateMaskFromDetection"
-
-    def __init__(self, estimateMaskFromDetection: bool = False):
-        """
-        Init settings
-
-        Args:
-            estimateMaskFromDetection: estimate from detection or warp
-        """
-        self._estimateMaskFromDetection = estimateMaskFromDetection
-
-    @property
-    def estimateMaskFromDetection(self) -> bool:
-        """Get current settings for mask estimation"""
-        return self._estimateMaskFromDetection
+    __slots__ = ("estimateMaskFromDetection",)
+    # estimate mask from detection or warp
+    estimateMaskFromDetection: bool = False
 
 
 class VLFaceDetection(FaceDetection):

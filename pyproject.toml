@@ -15,6 +15,7 @@ numpy = "*"
 requests = "^2.22"
 Pillow = {version = "*", markers = "sys_platform == 'win32'"}
 pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
+dataclasses = {version="*", markers="python_version == '3.6'"}
 
 #[tool.poetry.dependencies.FaceEngine]
 #git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
