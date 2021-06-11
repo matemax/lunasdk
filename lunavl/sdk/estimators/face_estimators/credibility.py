@@ -52,11 +52,6 @@ class Credibility(BaseEstimation):
 
     #  pylint: disable=W0235
     def __init__(self, credibility: CredibilityCheckEstimation):
-        """
-        Init.
-        Args:
-            credibility: estimated credibility
-        """
         super().__init__(credibility)
 
     @property
