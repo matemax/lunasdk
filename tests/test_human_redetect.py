@@ -64,7 +64,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         assert 2 == len(redetect)
         self.assertHumanDetection(redetect[0], VLIMAGE_SEVERAL_FACE)
         self.assertHumanDetection(redetect[1], VLIMAGE_ONE_FACE)
-        assert 5 == len(redetect[0])
+        assert 2 == len(redetect[0])
         assert 1 == len(redetect[1])
 
     def test_redetect_by_area_without_human(self):

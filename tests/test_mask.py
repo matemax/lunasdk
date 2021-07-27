@@ -165,7 +165,7 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations without mask on the face
         """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.003, 0.035, 0.961), None)
+        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.003, 0.006, 0.991), None)
 
         faceDetection = self.defaultDetector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)

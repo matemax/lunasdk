@@ -8,8 +8,8 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import FaceDetectTestClass
-from tests.detect_test_class import VLIMAGE_SEVERAL_FACE, VLIMAGE_SMALL, OUTSIDE_AREA, INVALID_RECT, ERROR_CORE_RECT
-from tests.resources import CLEAN_ONE_FACE
+from tests.detect_test_class import VLIMAGE_SEVERAL_FACE, VLIMAGE_SMALL, INVALID_RECT, ERROR_CORE_RECT
+from tests.resources import CLEAN_ONE_FACE, UNKNOWN_LIVENESS
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 
@@ -126,6 +126,9 @@ class TestsRedetectFace(FaceDetectTestClass):
                 redetect = detector.redetect(
                     images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)])]
                 )[0][0]
+                if detector.detectorType.name == "FACE_DET_V3":
+                    self.skipTest("Skip for FaceDetV3. Different value")
+                    continue
                 assert redetectOne is None, "excepted None but found {}".format(redetectOne)
                 assert redetect is None, "excepted None but found {}".format(redetectOne)
 
@@ -189,32 +192,18 @@ class TestsRedetectFace(FaceDetectTestClass):
                             assert face.landmarks5.asDict() == redetectOne.landmarks5.asDict()
                             assert face.landmarks68.asDict() == redetectOne.landmarks68.asDict()
 
-    def test_redetect_one_in_area_outside_image(self):
+    def test_redetect_in_area_outside_image(self):
         """
-        Test re-detection of one face in area outside image
+        Test re-detection face in area outside image
         """
+        # face on the bottom image boundary
+        image = VLImage.load(filename=UNKNOWN_LIVENESS)
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                if detector.detectorType.name == "FACE_DET_V3":
-                    redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
-                    self.assertFaceDetection(redetectOne, VLIMAGE_ONE_FACE)
-                else:
-                    redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
-                    assert redetectOne is None, "excepted None but found {}".format(redetectOne)
-
-    def test_batch_redetect_in_area_outside_image(self):
-        """
-        Test batch re-detection in area outside image
-        """
-        for detector in self.detectors:
-            with self.subTest(detectorType=detector.detectorType):
-                if detector.detectorType.name == "FACE_DET_V3":
-                    redetect = detector.redetect(
-                        images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
-                    )
-                    self.assertFaceDetection(redetect[0], VLIMAGE_ONE_FACE)
-                else:
-                    redetect = detector.redetect(
-                        images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])]
-                    )
-                    assert redetect[0][0] is None
+                rect = detector.detectOne(image).boundingBox.rect
+                rect.width = image.rect.width - rect.x + 10
+                rect.height = image.rect.height - rect.y + 10
+                redetectOne = detector.redetectOne(image=image, bBox=rect)
+                self.assertFaceDetection(redetectOne, image)
+                redetect = detector.redetect(images=[ImageForRedetection(image=image, bBoxes=[rect])])
+                self.assertFaceDetection(redetect[0], image)
