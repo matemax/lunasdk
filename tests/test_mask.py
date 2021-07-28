@@ -97,7 +97,7 @@ class TestMask(BaseTestClass):
         """
         cases = [
             TestCase("medical_mask_warp", self.warpImageMedicalMask, True, MaskProperties(0.0, 0.999, 0.0), None),
-            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.0, 0.999, 0.0), None),
+            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.0, 0.994, 0.005), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
