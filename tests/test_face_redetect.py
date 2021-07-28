@@ -122,12 +122,11 @@ class TestsRedetectFace(FaceDetectTestClass):
         """
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=Rect(0, 0, 100, 100))
-                redetect = detector.redetect(
-                    images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)])]
-                )[0][0]
+                bBox = Rect(0, 0, 200, 200)
+                redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=bBox)
+                redetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[bBox])])[0][0]
                 if detector.detectorType.name == "FACE_DET_V3":
-                    self.skipTest("Skip for FaceDetV3. Different value")
+                    self.skipTest("Skip for FaceDetV3. FSDK-3314")
                     continue
                 assert redetectOne is None, "excepted None but found {}".format(redetectOne)
                 assert redetect is None, "excepted None but found {}".format(redetectOne)
