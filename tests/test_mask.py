@@ -97,7 +97,7 @@ class TestMask(BaseTestClass):
         """
         cases = [
             TestCase("medical_mask_warp", self.warpImageMedicalMask, True, MaskProperties(0.0, 0.999, 0.0), None),
-            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.0, 0.999, 0.0), None),
+            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.0, 0.994, 0.005), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -114,7 +114,7 @@ class TestMask(BaseTestClass):
         """
         cases = [
             TestCase("no_mask_warp", self.warpImageMissing, True, MaskProperties(0.896, 0.078, 0.024), None),
-            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.051, 0.002, 0.945), None),
+            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.120, 0.005, 0.876), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -165,7 +165,7 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations without mask on the face
         """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.003, 0.035, 0.961), None)
+        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.003, 0.006, 0.991), None)
 
         faceDetection = self.defaultDetector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)

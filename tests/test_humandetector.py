@@ -158,7 +158,7 @@ class TestHumanDetector(HumanDetectTestClass):
         detection = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE])
         self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
         assert 1 == len(detection)
-        assert 5 == len(detection[0]), f"Excepted 5 bodies, got {len(detection[0])}"
+        assert 2 == len(detection[0]), f"Expected 2 faces, got {len(detection[0])}"
 
     def test_batch_detect_of_multiple_images(self):
         """
@@ -168,7 +168,7 @@ class TestHumanDetector(HumanDetectTestClass):
         self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
         self.assertHumanDetection(detection[1], VLIMAGE_ONE_FACE)
         assert 2 == len(detection)
-        assert 5 == len(detection[0])
+        assert 2 == len(detection[0])
         assert 1 == len(detection[1])
 
     def test_get_landmarks_for_detect_one(self):
@@ -199,7 +199,7 @@ class TestHumanDetector(HumanDetectTestClass):
         assert 6 == len(detection)
 
         detection = self.detector.detect(images=[imageWithManyFaces], limit=20)[0]
-        assert 18 == len(detection)
+        assert 17 == len(detection)
 
     @pytest.mark.skip("core bug: Fatal error")
     def test_detect_limit_bad_param(self):
