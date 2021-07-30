@@ -37,7 +37,6 @@ class VLFaceDetectionSettings:
     Settings for detection
     """
 
-    __slots__ = ("estimateMaskFromDetection",)
     # estimate mask from detection or warp
     estimateMaskFromDetection: bool = False
 
