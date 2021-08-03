@@ -10,9 +10,10 @@ import numpy as np
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL import Image as pilImage
-from PIL.Image import Image as PilImage, _fromarray_typemap as imageModeMap
+from PIL.Image import Image as PilImage
 
 from .geometry import Rect
+from .pil.np import getNPImageType, pilToNumpy
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
 
@@ -185,17 +186,12 @@ class VLImage:
             if error.isError:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, np.ndarray):
-            try:
-                # typekey ((shape), (array type as str))
-                typekey = (1, 1) + body.shape[2:], body.dtype.str
-                mode, _ = imageModeMap[typekey]
-            except KeyError:
-                raise TypeError(f"Bad image type: {type(body)}")
+            mode = getNPImageType(body)
             self.coreImage = self._coreImageFromNumpyArray(
                 ndarray=body, inputColorFormat=ColorFormat.load(mode), colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         elif isinstance(body, PilImage):
-            array = np.array(body)
+            array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
                 ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
@@ -300,7 +296,7 @@ class VLImage:
     def fromNumpyArray(
         cls,
         arr: np.ndarray,
-        inputColorFormat: Union[str, ColorFormat],
+        inputColorFormat: Optional[Union[str, ColorFormat]] = None,
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
     ) -> "VLImage":
@@ -319,10 +315,16 @@ class VLImage:
         if isinstance(inputColorFormat, str):
             inputColorFormat = ColorFormat.load(inputColorFormat)
 
+        if inputColorFormat is None:
+            imageType = getNPImageType(arr)
+            inputColorFormat = ColorFormat.load(imageType)
+
         coreImage = cls._coreImageFromNumpyArray(
             ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
         )
-        return cls(coreImage, filename=filename)
+        img = cls(coreImage, filename=filename)
+        img.source = arr
+        return img
 
     @property
     def format(self) -> ColorFormat:
