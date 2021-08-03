@@ -7,3 +7,4 @@ lunavl.egg*
 .mypy_*
 build/*
 dist/*
+/GitExtensions.settings

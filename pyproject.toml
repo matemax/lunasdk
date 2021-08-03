@@ -12,9 +12,9 @@ repository = "https://github.com/matemax/lunasdk"
 [tool.poetry.dependencies]
 python = ">=3.6"
 numpy = "*"
-requests = "^2.22"
+requests = "*"
 Pillow = {version = "*", markers = "sys_platform == 'win32'"}
-pillow-simd = {version = "^v6.0.0.post0", markers = "sys_platform != 'win32'"}
+pillow-simd = {version = "*", markers = "sys_platform != 'win32'"}
 dataclasses = {version="*", markers="python_version == '3.6'"}
 
 #[tool.poetry.dependencies.FaceEngine]
