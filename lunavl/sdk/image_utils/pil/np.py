@@ -1,4 +1,5 @@
 import numpy as np
+import PIL.Image
 from PIL.Image import Image, _fromarray_typemap as imageTypeMap
 
 
@@ -39,11 +40,11 @@ def pilToNumpy(img: Image) -> np.ndarray:
     """
     img.load()
     # unpack data
-    e = Image._getencoder(img.mode, "raw", img.mode)
+    e = PIL.Image._getencoder(img.mode, "raw", img.mode)
     e.setimage(img.im)
 
     # NumPy buffer for the result
-    shape, typestr = Image._conv_type_shape(img)
+    shape, typestr = PIL.Image._conv_type_shape(img)
     data = np.empty(shape, dtype=np.dtype(typestr))
     mem = data.data.cast("B", (data.data.nbytes,))
 
