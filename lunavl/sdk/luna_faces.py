@@ -523,8 +523,9 @@ class VLWarpedImage(FaceWarpedImage):
         body: Union[bytes, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
+        copy: bool = True,
     ):
-        super().__init__(body=body, filename=filename, colorFormat=colorFormat)
+        super().__init__(body=body, filename=filename, colorFormat=colorFormat, copy=copy)
         self._emotions: Optional[Emotions] = None
         self._eyes: Optional[EyesEstimation] = None
         self._mouthState: Optional[MouthStates] = None
