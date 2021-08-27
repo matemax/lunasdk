@@ -4,7 +4,7 @@ Module realize VLImage - structure for storing image in special format.
 from copy import copy
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 import numpy as np
 import requests
@@ -148,15 +148,23 @@ class VLImage:
         coreImage (CoreFE.Image): core image object
         source (Union[bytes, bytearray, PilImage, CoreImage]): body of image
         filename (str): filename of the file which is source of image
+        _npbuf (Optional[np.ndarray]): image as numpy array. this field is intended for  reduce copy from python to
+                                       to c++ image memory. We can use np array memory direct in several cases.
+                                       But user reference on array may be removed before reference on corresponding
+                                       VLImage therefore we save reference inside image.
+    Warnings:
+         np array is mutable therefore if array is not copied any array changes in python code
+         will entail undefined behavior of sdk functions.
     """
 
-    __slots__ = ("coreImage", "source", "filename")
+    __slots__ = ("coreImage", "source", "filename", "_npbuf")
 
     def __init__(
         self,
-        body: Union[bytes, bytearray, PilImage, CoreImage],
+        body: Union[bytes, bytearray, PilImage, CoreImage, np.ndarray],
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
+        copy: bool = True,
     ):
         """
         Init.
@@ -165,10 +173,15 @@ class VLImage:
             body: body of image - bytes numpy array or core image
             colorFormat: img format to cast into
             filename: user mark a source of image
+            copy: copy image to c++ or not (if possible). actual for numpy
+        Warnings:
+                 np array is mutable therefore if array is not copied any array changes in python code
+                 will entail undefined behavior of sdk functions.
         Raises:
             TypeError: if body has incorrect type
             LunaSDKException: if failed to load image to sdk Image
         """
+        self._npbuf = None
         if isinstance(body, bytearray):
             body = bytes(body)
 
@@ -187,15 +200,27 @@ class VLImage:
                 raise LunaSDKException(LunaVLError.fromSDKError(error))
         elif isinstance(body, np.ndarray):
             mode = getNPImageType(body)
-            self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=body, inputColorFormat=ColorFormat.load(mode), colorFormat=colorFormat or ColorFormat.R8G8B8
+            self.coreImage, copied = self._coreImageFromNumpyArray(
+                ndarray=body,
+                inputColorFormat=ColorFormat.load(mode),
+                colorFormat=colorFormat or ColorFormat.R8G8B8,
+                copy=copy,
             )
+            if not copied:
+                # save reference, protect from deletion and free memory of python gb
+                self._npbuf = body
         elif isinstance(body, PilImage):
             array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
-            self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
+            self.coreImage, copied = self._coreImageFromNumpyArray(
+                ndarray=array,
+                inputColorFormat=inputColorFormat,
+                colorFormat=colorFormat or ColorFormat.R8G8B8,
+                copy=False,
             )
+            if not copied:
+                # save reference, protect from deletion and free memory of python gb
+                self._npbuf = array
         else:
             raise TypeError(f"Bad image type: {type(body)}")
 
@@ -269,8 +294,8 @@ class VLImage:
 
     @staticmethod
     def _coreImageFromNumpyArray(
-        ndarray: np.ndarray, inputColorFormat: ColorFormat, colorFormat: Optional[ColorFormat] = None
-    ) -> CoreImage:
+        ndarray: np.ndarray, inputColorFormat: ColorFormat, colorFormat: Optional[ColorFormat] = None, copy: bool = True
+    ) -> Tuple[CoreImage, bool]:
         """
         Load VLImage from numpy array into `self`.
 
@@ -283,14 +308,18 @@ class VLImage:
             core image instance
         """
         baseCoreImage = CoreImage()
-        baseCoreImage.setData(ndarray, inputColorFormat.coreFormat)
-        if colorFormat is None or baseCoreImage.getFormat() == colorFormat.coreFormat:
-            return baseCoreImage
+        if colorFormat is None or inputColorFormat.coreFormat == colorFormat.coreFormat:
+            # only  create core image without converting
+            baseCoreImage.setData(ndarray, inputColorFormat.coreFormat, copy=copy)
+            return baseCoreImage, copy
+        else:
+            # need convert, not copy image because `convert` allocates new memory
+            baseCoreImage.setData(ndarray, inputColorFormat.coreFormat, copy=False)
 
         error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
         if error.isError:
             raise LunaSDKException(LunaVLError.fromSDKError(error))
-        return convertedCoreImage
+        return convertedCoreImage, True
 
     @classmethod
     def fromNumpyArray(
@@ -299,6 +328,7 @@ class VLImage:
         inputColorFormat: Optional[Union[str, ColorFormat]] = None,
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
+        copy: bool = True,
     ) -> "VLImage":
         """
         Load VLImage from numpy array.
@@ -308,6 +338,9 @@ class VLImage:
             inputColorFormat: input numpy pixel array format
             colorFormat: pixel format to cast into
             filename: optional filename
+            copy: copy arr content to C++ or not. If `copy` is false function will try not copy  memory
+        Warnings: np array is mutable therefore if array is not copied any array changes in python code
+                  will entail undefined behavior of sdk functions.
 
         Returns:
             vl image
@@ -319,11 +352,14 @@ class VLImage:
             imageType = getNPImageType(arr)
             inputColorFormat = ColorFormat.load(imageType)
 
-        coreImage = cls._coreImageFromNumpyArray(
-            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
+        coreImage, copied = cls._coreImageFromNumpyArray(
+            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat, copy=copy
         )
         img = cls(coreImage, filename=filename)
         img.source = arr
+        if not copied:
+            # save reference, protect from deletion and free memory of python gb
+            img._npbuf = arr
         return img
 
     @property
@@ -434,6 +470,8 @@ class VLImage:
             numpy array
         todo: doctest
         """
+        if self._npbuf is not None:
+            return self._npbuf
         if self.format == ColorFormat.R16:
             return self.coreImage.getDataR16()
         return self.coreImage.getData()
