@@ -29,6 +29,7 @@ class FaceWarpedImage(VLImage):
         body: Union[bytes, bytearray, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
+        copy: bool = True,
     ):
         """
         Init.
@@ -37,13 +38,16 @@ class FaceWarpedImage(VLImage):
             body: body of image - bytes/bytearray or core image or pil image or vlImage
             filename: user mark a source of image
             colorFormat: output image color format
+            copy: copy image to c++ or not (if possible). actual for numpy
+
         """
         if isinstance(body, VLImage):
             self.source = body.source
             self.filename = body.filename
             self.coreImage = body.coreImage
+            self._npbuf = body._npbuf
         else:
-            super().__init__(body, filename=filename, colorFormat=colorFormat)
+            super().__init__(body, filename=filename, colorFormat=colorFormat, copy=copy)
         self.assertWarp()
 
     def assertWarp(self):
