@@ -236,6 +236,43 @@ class FaceDetector:
             return None
         return FaceDetection(detectRes, image)
 
+    async def aDetectOne(
+        self,
+        image: VLImage,
+        detectArea: Optional[Rect] = None,
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
+    ) -> Union[None, FaceDetection]:
+        """
+        Detect just one best detection on the image.
+
+        Args:
+            image: image. Format must be R8G8B8
+            detectArea: rectangle area which contains face to detect. If not set will be set image.rect
+            detect5Landmarks: detect or not landmarks5
+            detect68Landmarks: detect or not landmarks68
+        Returns:
+            face detection if face is found otherwise None
+        Raises:
+            LunaSDKException: if detectOne is failed or image format has wrong  the format
+        """
+
+        if detectArea is None:
+            _detectArea = image.coreImage.getRect()
+        else:
+            _detectArea = detectArea.coreRectI
+        validateBatchDetectInput(self._detector, image.coreImage, _detectArea)
+        task = self._detector.aDetectOne(
+            image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+        )
+        await task
+        error, detectRes = task.result()
+        assertError(error)
+
+        if detectRes.isValid() is False:
+            return None
+        return FaceDetection(detectRes, image)
+
     @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
         self,
