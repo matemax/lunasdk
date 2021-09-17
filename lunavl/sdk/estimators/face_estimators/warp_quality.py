@@ -5,10 +5,10 @@ See `warp quality`_.
 from typing import Dict, Union
 
 from FaceEngine import SubjectiveQuality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
 from lunavl.sdk.base import BaseEstimation
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
@@ -133,6 +133,6 @@ class WarpQualityEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         error, coreQuality = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
+
         return Quality(coreQuality)

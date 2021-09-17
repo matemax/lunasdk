@@ -9,8 +9,7 @@ from FaceEngine import SearchResult, IIndexBuilderPtr, IDenseIndexPtr, IDynamicI
 
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.descriptors.descriptors import FaceDescriptor
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.errors.exceptions import assertError
 
 
 class IndexResult(BaseEstimation):
@@ -105,8 +104,8 @@ class CoreIndex:
         """
         _coreDescriptor = self._faceEngine.createDescriptor(self._coreIndex.getDescriptorVersion())
         error, descriptor = self._coreIndex.descriptorByIndex(index, _coreDescriptor)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
+
         return FaceDescriptor(descriptor)
 
     def __delitem__(self, index: int) -> None:
@@ -119,5 +118,4 @@ class CoreIndex:
             LunaSDKException: if an error occurs while remove descriptor failed
         """
         error = self._coreIndex.removeDescriptor(index)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
