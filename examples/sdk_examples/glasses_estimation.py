@@ -26,6 +26,10 @@ def estimateGlasses():
 
 
 async def estimateGlassesAsync():
+    """
+    Example of an async glasses estimation.
+
+    """
     image = VLImage.load(filename=EXAMPLE_3)
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)

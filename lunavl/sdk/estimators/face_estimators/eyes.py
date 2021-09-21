@@ -26,6 +26,7 @@ from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask
 
 
 class EyeState(Enum):
@@ -349,6 +350,17 @@ class WarpWithLandmarks5(NamedTuple):
     landmarks: Landmarks5
 
 
+def postProcessingBatch(error, gazeList):
+    assertError(error)
+
+    return [GazeDirection(gaze) for gaze in gazeList]
+
+
+def postProcessing(error, gaze):
+    assertError(error)
+    return GazeDirection(gaze)
+
+
 class GazeEstimator(BaseEstimator):
     """
     Gaze direction estimator.
@@ -366,40 +378,47 @@ class GazeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(self, warpWithLandmarks5: WarpWithLandmarks5) -> GazeDirection:
+    def estimate(
+        self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: bool = False
+    ) -> Union[GazeDirection, AsyncTask[GazeDirection]]:
         """
         Estimate a gaze direction
 
         Args:
             warpWithLandmarks5: warp with transformed 5 landmarks
         Returns:
-            estimated states
+            estimated states if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
-        error, gaze = self._coreEstimator.estimate(
-            warpWithLandmarks5.warp.warpedImage.coreImage, warpWithLandmarks5.landmarks.coreEstimation
-        )
-        assertError(error)
-        return GazeDirection(gaze)
+        image = warpWithLandmarks5.warp.warpedImage.coreImage
+        landmarks = warpWithLandmarks5.landmarks.coreEstimation
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(image, landmarks)
+            return AsyncTask(task, postProcessing)
+        error, gaze = self._coreEstimator.estimate(image, landmarks)
+        return postProcessing(error, gaze)
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimateBatch(self, warpWithLandmarks5List: List[WarpWithLandmarks5]) -> List[GazeDirection]:
+    def estimateBatch(
+        self, warpWithLandmarks5List: List[WarpWithLandmarks5], asyncEstimate: bool = False
+    ) -> Union[List[GazeDirection], AsyncTask[List[GazeDirection]]]:
         """
         Batch estimate a gaze direction
 
         Args:
             warpWithLandmarks5List: warp with transformed 5 landmarks list
         Returns:
-            list of estimated states
+            list of estimated states if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
         images = [row.warp.warpedImage.coreImage for row in warpWithLandmarks5List]
         landmarks = [row.landmarks.coreEstimation for row in warpWithLandmarks5List]
         validateInputByBatchEstimator(self._coreEstimator, images, landmarks)
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(images, landmarks)
+            return AsyncTask(task, postProcessingBatch)
         error, gazeList = self._coreEstimator.estimate(images, landmarks)
-        assertError(error)
-
-        return [GazeDirection(gaze) for gaze in gazeList]
+        return postProcessingBatch(error, gazeList)

@@ -110,14 +110,15 @@ class GlassesEstimator(BaseEstimator):
 
         Args:
             warp: raw warped image or warp
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
             estimated glasses
         Raises:
-            LunaSDKException: if estimation failed
+            LunaSDKException: if estimation failed if asyncEstimate is false otherwise async task
         """
         if asyncEstimate:
-            task = self._coreEstimator.estimateAsync(warp.warpedImage.coreImage)
+            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
             return AsyncTask(task, postProcessing)
         error, glasses = self._coreEstimator.estimate(warp.warpedImage.coreImage)
         return postProcessing(error, glasses)
