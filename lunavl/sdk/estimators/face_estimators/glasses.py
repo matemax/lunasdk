@@ -11,6 +11,7 @@ from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask
 from ...base import BaseEstimation
 
 
@@ -81,6 +82,11 @@ class Glasses(BaseEstimation):
         return {"glasses": str(self.glasses)}
 
 
+def postProcessing(error, glasses) -> Glasses:
+    assertError(error)
+    return Glasses(glasses)
+
+
 class GlassesEstimator(BaseEstimator):
     """
     Warp glasses estimator.
@@ -96,7 +102,9 @@ class GlassesEstimator(BaseEstimator):
         super().__init__(glassesEstimator)
 
     @CoreExceptionWrap(LunaVLError.EstimationGlassesError)
-    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> Glasses:
+    def estimate(
+        self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
+    ) -> Union[Glasses, AsyncTask[Glasses]]:
         """
         Estimate glasses from a warp.
 
@@ -108,6 +116,8 @@ class GlassesEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation failed
         """
+        if asyncEstimate:
+            task = self._coreEstimator.estimateAsync(warp.warpedImage.coreImage)
+            return AsyncTask(task, postProcessing)
         error, glasses = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        assertError(error)
-        return Glasses(glasses)
+        return postProcessing(error, glasses)

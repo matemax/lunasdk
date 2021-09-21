@@ -58,10 +58,7 @@ async def asyncEstimateHeadPose():
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     headPoseEstimator = faceEngine.createHeadPoseEstimator()
     faceDetection = detector.detectOne(image, detect5Landmarks=True, detect68Landmarks=True)
-    angles = headPoseEstimator.estimate(faceDetection.landmarks68, asyncEstimate=True)
-    angles.asDict()
-    #: estimate by 68 landmarks
-    # async
+    # async estimation
     angles = await headPoseEstimator.estimate(faceDetection.landmarks68, asyncEstimate=True)
     pprint.pprint(angles.asDict())
     # run tasks and get results
