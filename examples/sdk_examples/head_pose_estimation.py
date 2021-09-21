@@ -4,6 +4,7 @@ Module realize simple examples following features:
     * batch images face detection
     * detect landmarks68 and landmarks5
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.estimators.base import ImageWithFaceDetection
@@ -20,7 +21,7 @@ def estimateHeadPose():
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     headPoseEstimator = faceEngine.createHeadPoseEstimator()
     faceDetection = detector.detectOne(image, detect5Landmarks=False, detect68Landmarks=True)
     #: estimate by 68 landmarks
@@ -47,5 +48,29 @@ def estimateHeadPose():
     pprint.pprint(anglesList)
 
 
+async def asyncEstimateHeadPose():
+    """
+    Example of an async head pose estimation.
+
+    """
+    image = VLImage.load(filename=EXAMPLE_O)
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+    headPoseEstimator = faceEngine.createHeadPoseEstimator()
+    faceDetection = detector.detectOne(image, detect5Landmarks=True, detect68Landmarks=True)
+    angles = headPoseEstimator.estimate(faceDetection.landmarks68, asyncEstimate=True)
+    angles.asDict()
+    #: estimate by 68 landmarks
+    # async
+    angles = await headPoseEstimator.estimate(faceDetection.landmarks68, asyncEstimate=True)
+    pprint.pprint(angles.asDict())
+    # run tasks and get results
+    task1 = headPoseEstimator.estimate(faceDetection.landmarks68, asyncEstimate=True)
+    task2 = headPoseEstimator.estimate(faceDetection.landmarks68, asyncEstimate=True)
+    for task in (task1, task2):
+        pprint.pprint(task.get().asDict())
+
+
 if __name__ == "__main__":
     estimateHeadPose()
+    asyncio.run(asyncEstimateHeadPose())
