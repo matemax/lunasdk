@@ -1,4 +1,5 @@
 """Common descriptor extractor utils"""
+from functools import partial
 from typing import Optional, Union, List, Tuple, Type
 
 from FaceEngine import IDescriptorExtractorPtr, FSDKError  # pylint: disable=E0611,E0401
@@ -6,8 +7,28 @@ from FaceEngine import IDescriptorExtractorPtr, FSDKError  # pylint: disable=E06
 from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory, BaseDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, assertError
+from lunavl.sdk.async_task import AsyncTask
 from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+
+
+def postProcessing(error, gs, descriptor):
+    assertError(error)
+    descriptor.garbageScore = gs
+    return descriptor
+
+
+def postProcessingBatch(error, gScores, descriptorBatch):
+    assertError(error)
+    descriptorBatch.scores = gScores
+    return descriptorBatch, None
+
+
+def postProcessingBatchWithAggregation(error, aggregetionGs, gScores, descriptorBatch, aggregatedDescriptor):
+    assertError(error)
+    aggregatedDescriptor.garbageScore = aggregetionGs
+    descriptorBatch.scores = gScores
+    return descriptorBatch, aggregatedDescriptor
 
 
 def estimate(
@@ -15,7 +36,8 @@ def estimate(
     descriptorFactory: BaseDescriptorFactory,
     coreEstimator: IDescriptorExtractorPtr,
     descriptor: Optional[BaseDescriptor] = None,
-) -> BaseDescriptor:
+    asyncEstimate: bool = False,
+) -> Union[BaseDescriptor, AsyncTask[BaseDescriptor]]:
     """
     Estimate a face descriptor or a human descriptor from the warped image.
 
@@ -24,8 +46,9 @@ def estimate(
         descriptor: descriptor for saving extract result
         descriptorFactory: descriptor factory
         coreEstimator: descriptor extractor
+        asyncEstimate: estimate or run estimation in background
     Returns:
-        estimated descriptor
+        estimated descriptor if asyncEstimate is false otherwise async task
     Raises:
         LunaSDKException: if estimation failed
     """
@@ -34,11 +57,11 @@ def estimate(
         coreDescriptor = descriptor.coreEstimation
     else:
         coreDescriptor = descriptor.coreEstimation
-
+    if asyncEstimate:
+        task = coreEstimator.asyncExtractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
+        return AsyncTask(task, partial(postProcessing, descriptor=descriptor))
     error, optionalGS = coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
-    assertError(error)
-    descriptor.garbageScore = optionalGS
-    return descriptor
+    return postProcessing(error, optionalGS, descriptor)
 
 
 def validateInputByBatchEstimator(estimator, *args):
@@ -72,7 +95,11 @@ def estimateDescriptorsBatch(
     coreEstimator: IDescriptorExtractorPtr,
     aggregate: bool = False,
     descriptorBatch: Optional[BaseDescriptorBatch] = None,
-) -> Tuple[BaseDescriptorBatch, Union[BaseDescriptor, None]]:
+    asyncEstimate: bool = False,
+) -> Union[
+    Tuple[BaseDescriptorBatch, Union[BaseDescriptor, None]],
+    AsyncTask[Tuple[BaseDescriptorBatch, Union[BaseDescriptor, None]]],
+]:
     """
     Estimate a batch of descriptors from warped images.
 
@@ -82,8 +109,9 @@ def estimateDescriptorsBatch(
         descriptorBatch: optional batch for saving descriptors
         descriptorFactory: descriptor factory
         coreEstimator: descriptor extractor
+        asyncEstimate: estimate or run estimation in background
     Returns:
-        tuple of batch and the aggregate descriptors (or None)
+        tuple of batch and the aggregate descriptors (or None) if asyncEstimate is false otherwise async task
     Raises:
         LunaSDKException: if estimation failed
     """
@@ -94,16 +122,30 @@ def estimateDescriptorsBatch(
     validateInputByBatchEstimator(coreEstimator, coreImages)
     if aggregate:
         aggregatedDescriptor = descriptorFactory.generateDescriptor()
-
+        if asyncEstimate:
+            task = coreEstimator.asyncExtractFromWarpedImageBatch(
+                coreImages, descriptorBatch.coreEstimation, aggregatedDescriptor.coreEstimation
+            )
+            return AsyncTask(
+                task,
+                postProcessing=partial(
+                    postProcessingBatchWithAggregation,
+                    descriptorBatch=descriptorBatch,
+                    aggregatedDescriptor=aggregatedDescriptor,
+                ),
+            )
         error, optionalGSAggregateDescriptor, scores = coreEstimator.extractFromWarpedImageBatch(
             coreImages, descriptorBatch.coreEstimation, aggregatedDescriptor.coreEstimation
         )
-        assertError(error)
-        aggregatedDescriptor.garbageScore = optionalGSAggregateDescriptor
-    else:
-        aggregatedDescriptor = None
-        error, scores = coreEstimator.extractFromWarpedImageBatch(coreImages, descriptorBatch.coreEstimation)
-        assertError(error)
-
-        descriptorBatch.scores = scores
-    return descriptorBatch, aggregatedDescriptor
+        return postProcessingBatchWithAggregation(
+            error,
+            optionalGSAggregateDescriptor,
+            scores,
+            descriptorBatch=descriptorBatch,
+            aggregatedDescriptor=aggregatedDescriptor,
+        )
+    if asyncEstimate:
+        task = coreEstimator.asyncExtractFromWarpedImageBatch(coreImages, descriptorBatch.coreEstimation)
+        return AsyncTask(task, postProcessing=partial(postProcessingBatch, descriptorBatch=descriptorBatch))
+    error, scores = coreEstimator.extractFromWarpedImageBatch(coreImages, descriptorBatch.coreEstimation)
+    return postProcessingBatch(error, scores, descriptorBatch=descriptorBatch)
