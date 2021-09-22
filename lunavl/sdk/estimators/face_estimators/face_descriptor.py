@@ -70,7 +70,7 @@ class FaceDescriptorEstimator(BaseEstimator):
         aggregate: bool = False,
         descriptorBatch: Optional[FaceDescriptorBatch] = None,
         asyncEstimate: bool = False,
-    ) -> Union[Tuple[FaceDescriptorBatchEstimation, AsyncTask[FaceDescriptorBatchEstimation]]]:
+    ) -> Union[FaceDescriptorBatchEstimation, AsyncTask[FaceDescriptorBatchEstimation]]:
         """
         Estimate a batch of descriptors from warped images.
 
@@ -80,7 +80,7 @@ class FaceDescriptorEstimator(BaseEstimator):
             descriptorBatch: optional batch for saving descriptors
             asyncEstimate: estimate or run estimation in background
         Returns:
-            tuple of batch and the aggregate descriptors (or None)
+            tuple of batch and the aggregate descriptors (or None) if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
 

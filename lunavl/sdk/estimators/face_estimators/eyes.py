@@ -191,6 +191,16 @@ class WarpWithLandmarks(NamedTuple):
     landmarks: Union[Landmarks5, Landmarks68]
 
 
+def postProcessingEyes(error, eyesEstimation):
+    assertError(error)
+    return EyesEstimation(eyesEstimation)
+
+
+def postProcessingEyesBatch(error, eyesEstimations):
+    assertError(error)
+    return [EyesEstimation(eyesEstimation) for eyesEstimation in eyesEstimations]
+
+
 class EyeEstimator(BaseEstimator):
     """
     Eye estimator.
@@ -208,15 +218,20 @@ class EyeEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimate(self, warpWithLandmarks: WarpWithLandmarks) -> EyesEstimation:
+    def estimate(
+        self,
+        warpWithLandmarks: WarpWithLandmarks,
+        asyncEstimate: bool = False,
+    ) -> Union[EyesEstimation, AsyncTask[EyesEstimation]]:
         """
         Estimate mouth state on warp.
 
         Args:
             warpWithLandmarks: core warp with transformed landmarks
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated states
+            estimated states if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
@@ -229,21 +244,26 @@ class EyeEstimator(BaseEstimator):
             eyeRects = cropper.cropByLandmarks68(
                 warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
             )
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
+            return AsyncTask(task, postProcessingEyes)
         error, eyesEstimation = self._coreEstimator.estimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
-        assertError(error)
-        return EyesEstimation(eyesEstimation)
+        return postProcessingEyes(error, eyesEstimation)
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
-    def estimateBatch(self, warpWithLandmarksList: List[WarpWithLandmarks]) -> List[EyesEstimation]:
+    def estimateBatch(
+        self, warpWithLandmarksList: List[WarpWithLandmarks], asyncEstimate: bool = False
+    ) -> Union[List[EyesEstimation], AsyncTask[List[EyesEstimation]]]:
         """
         Batch estimate mouth state on warps.
 
         Args:
             warpWithLandmarksList: list of core warp with transformed landmarks
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            list of estimated states
+            list of estimated states if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
             ValueError: if warps count not equals landmarks count
@@ -264,12 +284,12 @@ class EyeEstimator(BaseEstimator):
                     )
                 )
         coreImages = [row.warp.warpedImage.coreImage for row in warpWithLandmarksList]
-
         validateInputByBatchEstimator(self._coreEstimator, coreImages, eyeRectList)
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(coreImages, eyeRectList)
+            return AsyncTask(task, postProcessingEyesBatch)
         error, eyesEstimations = self._coreEstimator.estimate(coreImages, eyeRectList)
-        assertError(error)
-
-        return [EyesEstimation(eyesEstimation) for eyesEstimation in eyesEstimations]
+        return postProcessingEyesBatch(error, eyesEstimations)
 
 
 def _isNotNan(value: float) -> bool:
