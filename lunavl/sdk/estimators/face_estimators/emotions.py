@@ -12,6 +12,7 @@ from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask
 
 
 class Emotion(Enum):
@@ -178,6 +179,11 @@ class Emotions(BaseEstimation):
         return Emotion.fromCoreEmotion(self._coreEstimation.getPredominantEmotion())
 
 
+def postProcessing(error, emotions):
+    assertError(error)
+    return Emotions(emotions)
+
+
 class EmotionsEstimator(BaseEstimator):
     """
     Emotions estimator.
@@ -195,18 +201,23 @@ class EmotionsEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationEmotionsError)
-    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> Emotions:
+    def estimate(
+        self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
+    ) -> Union[Emotions, AsyncTask[Emotions]]:
         """
         Estimate emotion on warp.
 
         Args:
             warp: warped image
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated emotions
+            estimated emotions if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
+            return AsyncTask(task, postProcessing)
         error, emotions = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        assertError(error)
-        return Emotions(emotions)
+        return postProcessing(error, emotions)

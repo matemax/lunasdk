@@ -406,6 +406,7 @@ class GazeEstimator(BaseEstimator):
 
         Args:
             warpWithLandmarks5: warp with transformed 5 landmarks
+            asyncEstimate: estimate or run estimation in background
         Returns:
             estimated states if asyncEstimate is false otherwise async task
         Raises:
@@ -429,6 +430,7 @@ class GazeEstimator(BaseEstimator):
 
         Args:
             warpWithLandmarks5List: warp with transformed 5 landmarks list
+            asyncEstimate: estimate or run estimation in background
         Returns:
             list of estimated states if asyncEstimate is false otherwise async task
         Raises:
