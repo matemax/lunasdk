@@ -12,6 +12,7 @@ from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask
 from ...base import BaseEstimation
 
 
@@ -84,6 +85,11 @@ class Credibility(BaseEstimation):
         return {"estimations": {"score": self.score}, "prediction": self.prediction.value}
 
 
+def postProcessing(error, credibility):
+    assertError(error)
+    return Credibility(credibility)
+
+
 class CredibilityEstimator(BaseEstimator):
     """
     Warp credibility estimator.
@@ -99,18 +105,23 @@ class CredibilityEstimator(BaseEstimator):
         super().__init__(credibilityEstimator)
 
     @CoreExceptionWrap(LunaVLError.CredibilityError)
-    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> Credibility:
+    def estimate(
+        self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
+    ) -> Union[Credibility, AsyncTask[Credibility]]:
         """
         Estimate credibility from a warp.
 
         Args:
             warp: raw warped image or warp
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated credibility
+            estimated credibility if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
+            return AsyncTask(task, postProcessing)
         error, credibility = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        assertError(error)
-        return Credibility(credibility)
+        return postProcessing(error, credibility)
