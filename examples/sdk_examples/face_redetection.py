@@ -3,6 +3,7 @@ Module realize simple examples following features:
     * redetect one face detection
     * redetect several faces
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.detectors.base import ImageForRedetection
@@ -40,5 +41,39 @@ def detectFaces():
     )
 
 
+async def asyncRedetectFaces():
+    """
+    Async redetect faces on images.
+    """
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+
+    imageWithSeveralFaces = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
+    severalFaces = detector.detect([imageWithSeveralFaces], detect5Landmarks=False, detect68Landmarks=False)
+
+    detections = await detector.redetect(
+        images=[
+            ImageForRedetection(imageWithSeveralFaces, [face.boundingBox.rect for face in severalFaces[0]]),
+        ],
+        asyncEstimate=True,
+    )
+    pprint.pprint(detections)
+    task1 = detector.redetect(
+        images=[
+            ImageForRedetection(imageWithSeveralFaces, [severalFaces[0][0].boundingBox.rect]),
+        ],
+        asyncEstimate=True,
+    )
+    task2 = detector.redetect(
+        images=[
+            ImageForRedetection(imageWithSeveralFaces, [severalFaces[0][1].boundingBox.rect]),
+        ],
+        asyncEstimate=True,
+    )
+    for task in (task1, task2):
+        pprint.pprint(task.get())
+
+
 if __name__ == "__main__":
     detectFaces()
+    asyncio.run(asyncRedetectFaces())

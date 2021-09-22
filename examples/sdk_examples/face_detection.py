@@ -4,47 +4,70 @@ Module realize simple examples following features:
     * batch images face detection
     * detect landmarks68 and landmarks5
 """
-
 import asyncio
-import os
 import pprint
-import sys
-from time import time
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
-from lunavl.sdk.faceengine.engine import VLFaceEngine  # noqa: E402
-from lunavl.sdk.faceengine.setting_provider import DetectorType  # noqa: E402
-from lunavl.sdk.image_utils.image import VLImage  # noqa: E402
-from resources import EXAMPLE_O  # noqa: E402
+from lunavl.sdk.faceengine.engine import VLFaceEngine
+from lunavl.sdk.detectors.base import ImageForDetection
+from lunavl.sdk.faceengine.setting_provider import DetectorType
+from lunavl.sdk.image_utils.geometry import Rect
+from lunavl.sdk.image_utils.image import VLImage
+from resources import EXAMPLE_WITHOUT_FACES, EXAMPLE_SEVERAL_FACES, EXAMPLE_O
 
 
-async def detectFaces():
+def detectFaces():
     """
     Detect one face on an image.
     """
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
 
     imageWithOneFace = VLImage.load(filename=EXAMPLE_O)
-    pprint.pprint((detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False)).asDict())
+    pprint.pprint(detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False).asDict())
+    imageWithSeveralFaces = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
+    pprint.pprint(detector.detectOne(imageWithSeveralFaces, detect5Landmarks=False, detect68Landmarks=False).asDict())
 
-    count = 1000
-    conc = 2
+    severalFaces = detector.detect([imageWithSeveralFaces], detect5Landmarks=False, detect68Landmarks=False)
+    pprint.pprint([face.asDict() for face in severalFaces[0]])
 
-    async def worker(iterator):
-        for _ in iterator:
-            await detector.aDetectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False)
+    imageWithoutFace = VLImage.load(filename=EXAMPLE_WITHOUT_FACES)
+    pprint.pprint(detector.detectOne(imageWithoutFace, detect5Landmarks=False, detect68Landmarks=False) is None)
 
-    it = iter((i for i in range(count)))
-    start = time()
-    await asyncio.gather(*[worker(it) for _ in range(conc)])
-    print(time() - start)
+    severalFaces = detector.detect(
+        [ImageForDetection(imageWithSeveralFaces, Rect(1, 1, 300, 300))],
+        detect5Landmarks=False,
+        detect68Landmarks=False,
+    )
+    pprint.pprint(severalFaces)
 
-    start = time()
-    for _ in range(count):
-        detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False)
-    print(time() - start)
+
+async def asyncDetectFaces():
+    """
+    Async detect faces on images.
+    """
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+
+    image1 = VLImage.load(filename=EXAMPLE_O)
+    image2 = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
+    detections = await detector.detect([image1], asyncEstimate=True)
+    pprint.pprint(detections)
+    detections = await detector.detect(images=[image1], asyncEstimate=True)
+    pprint.pprint(detections)
+    task1 = detector.detect(
+        images=[image1],
+        asyncEstimate=True,
+    )
+    task2 = detector.detect(
+        images=[
+            image2,
+        ],
+        asyncEstimate=True,
+    )
+    for task in (task1, task2):
+        pprint.pprint(task.get())
 
 
 if __name__ == "__main__":
-    asyncio.run(detectFaces())
+    detectFaces()
+    asyncio.run(asyncDetectFaces())
