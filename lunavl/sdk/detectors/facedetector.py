@@ -24,6 +24,7 @@ from ..detectors.base import (
     getArgsForCoreDetectorForImages,
     getArgsForCoreRedetect,
     validateBatchDetectInput,
+    validateReDetectInput,
 )
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
@@ -357,7 +358,7 @@ class FaceDetector:
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         coreImages, detectAreas = getArgsForCoreRedetect(images)
-        self._validateReDetectInput(coreImages, detectAreas)
+        validateReDetectInput(self._detector, coreImages, detectAreas)
         error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
         assertError(error)
 

@@ -8,6 +8,7 @@ from FaceEngine import (
     HumanLandmarks17 as CoreLandmarks17,
     Detection,
     HumanDetectionType,
+    Image as CoreImage,
 )  # pylint: disable=E0611,E0401
 
 from .base import (
@@ -17,10 +18,12 @@ from .base import (
     assertImageForDetection,
     getArgsForCoreDetectorForImages,
     validateBatchDetectInput,
+    getArgsForCoreRedetect,
+    validateReDetectInput,
 )
 from ..base import LandmarksWithScore
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
+from ..errors.exceptions import CoreExceptionWrap, assertError
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -234,6 +237,45 @@ class HumanDetector:
             return HumanDetection(detectRes, image)
         return None
 
+    @staticmethod
+    def collectDetectionsResult(
+        fsdkDetectRes,
+        coreImages: List[CoreImage],
+        images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
+        detectLandmarks: bool = True,
+    ):
+        """
+        Collect detection results from core reply and prepare human detections
+        Args:
+            fsdkDetectRes: fsdk (re)detect results
+            coreImages: core images
+            images: incoming images
+        Returns:
+            return list of lists detection, order of detection lists is corresponding to order input images
+        """
+        res = []
+        for imageIdx in range(fsdkDetectRes.getSize()):
+            imagesDetections = []
+            detections = fsdkDetectRes.getDetections(imageIdx)
+            image = images[imageIdx]
+
+            for detectionIdx, detection in enumerate(detections):
+                human = Human()
+                human.img = coreImages[imageIdx]
+                human.detection = detection
+                if detectLandmarks:
+                    human.landmarks17_opt.set(fsdkDetectRes.getLandmarks17(imageIdx)[detectionIdx])
+                imagesDetections.append(human)
+
+            vlImage = image if isinstance(image, VLImage) else image.image
+            res.append(
+                [
+                    HumanDetection(coreDetection, vlImage) if coreDetection.isValid() else None
+                    for coreDetection in imagesDetections
+                ]
+            )
+        return res
+
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetect(self, images: List[ImageForRedetection]) -> List[List[Union[HumanDetection, None]]]:
         """
@@ -247,21 +289,8 @@ class HumanDetector:
         Raises:
             LunaSDKException if an error occurs, context contains all errors
         """
-        res = []
-        errors = []
-        errorDuringProgress = False
-        for image in images:
-            imageRes = []
-            for bBox in image.bBoxes:
-                try:
-                    detection = self.redetectOne(image.image, bBox=bBox)
-                    imageRes.append(detection)
-                    errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
-                except LunaSDKException as exc:
-                    errors.append(exc.error)
-                    errorDuringProgress = True
-                    break
-            res.append(imageRes)
-        if errorDuringProgress:
-            raise LunaSDKException(LunaVLError.BatchedInternalError, errors)
-        return res
+        coreImages, detectAreas = getArgsForCoreRedetect(images)
+        validateReDetectInput(self._detector, coreImages, detectAreas)
+        error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, self._getDetectionType(True))
+        assertError(error)
+        return self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
