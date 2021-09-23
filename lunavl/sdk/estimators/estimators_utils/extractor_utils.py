@@ -36,8 +36,7 @@ def estimate(
         coreDescriptor = descriptor.coreEstimation
 
     error, optionalGS = coreEstimator.extractFromWarpedImage(warp.warpedImage.coreImage, coreDescriptor)
-    if error.isError:
-        raise LunaSDKException(LunaVLError.fromSDKError(error))
+    assertError(error)
     descriptor.garbageScore = optionalGS
     return descriptor
 

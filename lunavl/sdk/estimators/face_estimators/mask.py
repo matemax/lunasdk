@@ -11,9 +11,9 @@ from FaceEngine import (
     MedicalMask as CoreMask,
 )  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.detectors.facedetector import FaceDetection
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -170,8 +170,7 @@ class MaskEstimator(BaseEstimator):
             error, mask = self._coreEstimator.estimate(faceObject.warpedImage.coreImage)
         else:
             error, mask = self._coreEstimator.estimate(faceObject.image.coreImage, faceObject.coreEstimation.detection)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return Mask(mask)
 
     #  pylint: disable=W0221
@@ -192,7 +191,6 @@ class MaskEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         error, masks = self._coreEstimator.estimate(coreImages)
+        assertError(error)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return [Mask(mask) for mask in masks]

@@ -2,7 +2,7 @@
 Module contains core index builder.
 """
 from pathlib import Path
-from typing import Union, Type
+from typing import Union
 
 from FaceEngine import PyIFaceEngine
 
@@ -10,8 +10,7 @@ from lunavl.sdk.descriptors.descriptors import (
     FaceDescriptor,
     FaceDescriptorBatch,
 )
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.errors.exceptions import assertError
 from .base import CoreIndex
 from .stored_index import DynamicIndex, IndexType, DenseIndex
 
@@ -44,8 +43,7 @@ class IndexBuilder(CoreIndex):
             dense index
         """
         error, loadedIndex = self._faceEngine.loadDenseIndex(path)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return DenseIndex(loadedIndex, self._faceEngine)
 
     def _getDynamicIndex(self, path: str) -> DynamicIndex:
@@ -59,8 +57,7 @@ class IndexBuilder(CoreIndex):
             dynamic index
         """
         error, loadedIndex = self._faceEngine.loadDynamicIndex(path)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return DynamicIndex(loadedIndex, self._faceEngine)
 
     def append(self, descriptor: FaceDescriptor) -> None:
@@ -72,8 +69,7 @@ class IndexBuilder(CoreIndex):
             LunaSDKException: if an error occurs while adding the descriptor
         """
         error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         self._bufSize += 1
 
     def appendBatch(self, descriptorsBatch: FaceDescriptorBatch) -> None:
@@ -85,8 +81,7 @@ class IndexBuilder(CoreIndex):
             LunaSDKException: if an error occurs while adding the batch of descriptors
         """
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         self._bufSize += len(descriptorsBatch)
 
     def __delitem__(self, index: int) -> None:
@@ -128,6 +123,5 @@ class IndexBuilder(CoreIndex):
             DynamicIndex
         """
         error, index = self._coreIndex.buildIndex()
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return DynamicIndex(index, self._faceEngine)

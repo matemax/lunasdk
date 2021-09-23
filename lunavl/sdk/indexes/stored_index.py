@@ -5,8 +5,7 @@ from pathlib import Path
 from typing import List
 
 from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.errors.exceptions import assertError
 from .base import CoreIndex, IndexResult
 
 
@@ -38,8 +37,7 @@ class DynamicIndex(CoreIndex):
             LunaSDKException: if an error occurs while adding the descriptor
         """
         error = self._coreIndex.appendDescriptor(descriptor.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
     def appendBatch(self, descriptorsBatch: FaceDescriptorBatch) -> None:
         """
@@ -50,8 +48,7 @@ class DynamicIndex(CoreIndex):
             LunaSDKException: if an error occurs while adding the batch of descriptors
         """
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
     def search(self, descriptor: FaceDescriptor, maxCount: int = 1) -> List[IndexResult]:
         """
@@ -65,8 +62,7 @@ class DynamicIndex(CoreIndex):
             list with index search results
         """
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return [IndexResult(result) for result in resIndex]
 
     def save(self, path: str, indexType: IndexType) -> None:
@@ -90,8 +86,7 @@ class DynamicIndex(CoreIndex):
         else:
             error = self._coreIndex.saveToDenseIndex(path)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
 
 class DenseIndex(CoreIndex):
@@ -115,6 +110,5 @@ class DenseIndex(CoreIndex):
             list with index search results
         """
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return [IndexResult(result) for result in resIndex]

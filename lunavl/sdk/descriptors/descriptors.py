@@ -11,7 +11,7 @@ from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr, DescriptorBatchResul
 
 from ..base import BaseEstimation
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import LunaSDKException, CoreExceptionWrap
+from ..errors.exceptions import CoreExceptionWrap, assertError
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
 
@@ -45,8 +45,7 @@ class BaseDescriptor(BaseEstimation):
             bytes with metadata
         """
         error, descBytes = self.coreEstimation.save()
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return descBytes
 
     @property
@@ -88,9 +87,8 @@ class BaseDescriptor(BaseEstimation):
         Raises:
             LunaSDKException(LunaVLError.fromSDKError(res)) if cannot create descriptor instance
         """
-        res = self.coreEstimation.load(descriptor, len(descriptor))
-        if res.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(res))
+        error = self.coreEstimation.load(descriptor, len(descriptor))
+        assertError(error)
         self.garbageScore = garbageScore
 
 
@@ -152,8 +150,7 @@ class BaseDescriptorBatch(BaseEstimation):
         if i >= len(self):
             raise IndexError(f"Descriptor index '{i}' out of range")  # todo remove after
         error, descriptor = self._coreEstimation.getDescriptorFast(i)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         descriptor = self.__class__._descriptorFactory(descriptor, self.scores[i])
         return descriptor
 
@@ -166,8 +163,7 @@ class BaseDescriptorBatch(BaseEstimation):
         """
         for index in range(len(self)):
             error, descriptor = self._coreEstimation.getDescriptorFast(index)
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            assertError(error)
             yield self._descriptorFactory(descriptor, self.scores[index])
 
     def append(self, descriptor: BaseDescriptor) -> None:
@@ -178,8 +174,7 @@ class BaseDescriptorBatch(BaseEstimation):
             descriptor: descriptor
         """
         error: DescriptorBatchResult = self.coreEstimation.add(descriptor.coreEstimation)
-        if not error.isOk:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         self.scores.append(descriptor.garbageScore)
 
     def __repr__(self) -> str:

@@ -8,10 +8,10 @@ from typing import Dict, List, Union
 
 from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import Landmarks68, FaceDetection
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -142,9 +142,7 @@ class HeadPoseEstimator(BaseEstimator):
             LunaSDKException: if estimation is failed
         """
         error, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
-
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
         return HeadPose(headPoseEstimation)
 
@@ -171,8 +169,7 @@ class HeadPoseEstimator(BaseEstimator):
             imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
         )
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return HeadPose(headPoseEstimation)
 
     @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
@@ -192,7 +189,6 @@ class HeadPoseEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
         error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
+        assertError(error)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return [HeadPose(estimation) for estimation in headPoseEstimations]

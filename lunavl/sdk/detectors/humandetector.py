@@ -183,9 +183,8 @@ class HumanDetector:
         coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detectLandmarks)
         validateBatchDetectInput(self._detector, coreImages, detectAreas)
-        fsdkErrorRes, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
-        if fsdkErrorRes.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(fsdkErrorRes))
+        error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
+        assertError(error)
         res = []
         for imageIdx in range(fsdkDetectRes.getSize()):
             imagesDetections = []
