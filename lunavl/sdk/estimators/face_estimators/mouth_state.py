@@ -11,6 +11,7 @@ from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask
 
 
 class MouthStates(BaseEstimation):
@@ -68,6 +69,11 @@ class MouthStates(BaseEstimation):
         return {"opened": self.opened, "occluded": self.occlusion, "smile": self.smile}
 
 
+def postProcessing(error, mouthState):
+    assertError(error)
+    return MouthStates(mouthState)
+
+
 class MouthStateEstimator(BaseEstimator):
     """
     Mouth state estimator.
@@ -85,18 +91,25 @@ class MouthStateEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationMouthStateError)
-    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> MouthStates:
+    def estimate(
+        self,
+        warp: Union[FaceWarp, FaceWarpedImage],
+        asyncEstimate: bool = False,
+    ) -> Union[MouthStates, AsyncTask[MouthStates]]:
         """
         Estimate mouth state on warp.
 
         Args:
             warp: warped image
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated states
+            estimated states if asyncEstimate is False otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
+            return AsyncTask(task, postProcessing)
         error, mouthState = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        assertError(error)
-        return MouthStates(mouthState)
+        return postProcessing(error, mouthState)
