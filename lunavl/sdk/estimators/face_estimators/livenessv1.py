@@ -4,7 +4,7 @@ Module contains a  livenessv1 estimator.
 See `livenessv1`_.
 """
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from FaceEngine import (
     LivenessOneShotRGBEstimation,  # pylint: disable=E0611,E0401
@@ -12,6 +12,7 @@ from FaceEngine import (
     LivenessOneShotState,
 )
 
+from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
@@ -105,6 +106,17 @@ class LivenessV1(BaseEstimation):
         return self._coreEstimation.qualityScore
 
 
+def postProcessing(error, estimation):
+    assertError(error)
+    return LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State))
+
+
+def postProcessingBatch(error, estimations):
+    assertError(error)
+
+    return [LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State)) for estimation in estimations]
+
+
 class LivenessV1Estimator(BaseEstimator):
     """
     Liveness estimator version 1 (LivenessOneShotRGBEstimator).
@@ -123,8 +135,11 @@ class LivenessV1Estimator(BaseEstimator):
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
     def estimate(  # type: ignore
-        self, faceDetection: FaceDetection, qualityThreshold: Optional[float] = None
-    ) -> LivenessV1:
+        self,
+        faceDetection: FaceDetection,
+        qualityThreshold: Optional[float] = None,
+        asyncEstimate: bool = False,
+    ) -> Union[LivenessV1, AsyncTask[LivenessV1]]:
         """
         Estimate a liveness
 
@@ -135,30 +150,38 @@ class LivenessV1Estimator(BaseEstimator):
         Args:
             faceDetection: face detection
             qualityThreshold: quality threshold. if estimation quality is low of this threshold
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            estimated liveness
+            estimated liveness if asyncEstimate is False otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
         if faceDetection.landmarks5 is None:
             raise ValueError("Landmarks5 is required for liveness estimation")
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(
+                faceDetection.image.coreImage,
+                faceDetection.coreEstimation.detection,
+                faceDetection.landmarks5.coreEstimation,
+                -1.0 if qualityThreshold is None else qualityThreshold,
+            )
+            return AsyncTask(task, postProcessing)
         error, estimation = self._coreEstimator.estimate(
             faceDetection.image.coreImage,
             faceDetection.coreEstimation.detection,
             faceDetection.landmarks5.coreEstimation,
             -1.0 if qualityThreshold is None else qualityThreshold,
         )
-        assertError(error)
-
-        prediction = LivenessPrediction.fromCoreEmotion(estimation.State)
-
-        return LivenessV1(estimation, prediction)
+        return postProcessing(error, estimation)
 
     #  pylint: disable=W0221
     @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
     def estimateBatch(  # type: ignore
-        self, faceDetections: List[FaceDetection], qualityThreshold: Optional[float] = None
-    ) -> List[LivenessV1]:
+        self,
+        faceDetections: List[FaceDetection],
+        qualityThreshold: Optional[float] = None,
+        asyncEstimate: bool = False,
+    ) -> Union[List[LivenessV1], AsyncTask[List[LivenessV1]]]:
         """
         Batch estimate liveness
 
@@ -169,8 +192,9 @@ class LivenessV1Estimator(BaseEstimator):
         Args:
             faceDetections: face detection list
             qualityThreshold: quality threshold. if estimation quality is low of this threshold
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            estimated liveness
+            estimated liveness if asyncEstimate is False otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
@@ -182,14 +206,18 @@ class LivenessV1Estimator(BaseEstimator):
             raise ValueError("Landmarks5 is required for liveness estimation")
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections, coreEstimations)
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(
+                coreImages,
+                detections,
+                coreEstimations,
+                -1.0 if qualityThreshold is None else qualityThreshold,
+            )
+            return AsyncTask(task, postProcessingBatch)
         error, estimations = self._coreEstimator.estimate(
             coreImages,
             detections,
             coreEstimations,
             -1.0 if qualityThreshold is None else qualityThreshold,
         )
-        assertError(error)
-
-        return [
-            LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State)) for estimation in estimations
-        ]
+        return postProcessingBatch(error, estimations)
