@@ -5,10 +5,10 @@ see `mouth state`_
 from typing import Union, Dict
 
 from FaceEngine import MouthEstimation, IMouthEstimatorPtr  # pylint: disable=E0611,E0401
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 
 from lunavl.sdk.base import BaseEstimation
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
@@ -98,6 +98,5 @@ class MouthStateEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         error, mouthState = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return MouthStates(mouthState)

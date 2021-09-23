@@ -2,13 +2,13 @@
 
 See `warp quality`_.
 """
-from typing import Union, Dict
 from enum import Enum
+from typing import Union, Dict
 
 from FaceEngine import GlassesEstimation, IGlassesEstimatorPtr
 
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
@@ -109,6 +109,5 @@ class GlassesEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         error, glasses = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return Glasses(glasses)

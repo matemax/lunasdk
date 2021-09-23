@@ -14,8 +14,7 @@ from PIL.Image import Image as PilImage
 
 from .geometry import Rect
 from .pil.np import getNPImageType, pilToNumpy
-from ..errors.errors import LunaVLError
-from ..errors.exceptions import LunaSDKException
+from ..errors.exceptions import assertError
 
 
 class ImageFormat(Enum):
@@ -177,14 +176,14 @@ class VLImage:
                 self.coreImage = body
             else:
                 error, self.coreImage = body.convert(colorFormat.coreFormat)
-                if error.isError:
-                    raise LunaSDKException(LunaVLError.fromSDKError(error))
+                assertError(error)
+
         elif isinstance(body, bytes):
             self.coreImage = CoreImage()
             imgFormat = (colorFormat or ColorFormat.R8G8B8).coreFormat
             error = self.coreImage.loadFromMemory(body, len(body), imgFormat)
-            if error.isError:
-                raise LunaSDKException(LunaVLError.fromSDKError(error))
+            assertError(error)
+
         elif isinstance(body, np.ndarray):
             mode = getNPImageType(body)
             self.coreImage = self._coreImageFromNumpyArray(
@@ -288,8 +287,8 @@ class VLImage:
             return baseCoreImage
 
         error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
+
         return convertedCoreImage
 
     @classmethod
@@ -486,11 +485,10 @@ class VLImage:
             LunaSDKException: if failed to save image to sdk Image
         """
         if colorFormat is None:
-            saveRes = self.coreImage.save(filename)
+            error = self.coreImage.save(filename)
         else:
-            saveRes = self.coreImage.save(filename, colorFormat.coreFormat)
-        if saveRes.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(saveRes))
+            error = self.coreImage.save(filename, colorFormat.coreFormat)
+        assertError(error)
 
     def convertToBinaryImg(self, imageFormat: ImageFormat = ImageFormat.PPM) -> bytes:
         """
@@ -525,6 +523,6 @@ class VLImage:
             LunaSDKException: if failed to convert image
         """
         error, coreImage = self.coreImage.convert(colorFormat.coreFormat)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
+
         return self.__class__(body=coreImage, filename=self.filename)

@@ -9,10 +9,10 @@ from typing import Union, List
 from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType
 
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.image_utils.image import VLImage
 
 
@@ -80,9 +80,7 @@ class OrientationModeEstimator(BaseEstimator):
             coreImage = image.coreImage
 
         error, coreOrientationType = self._coreEstimator.estimate(coreImage)
-
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
         return OrientationType.fromCoreOrientationType(coreOrientationType)
 
@@ -103,9 +101,7 @@ class OrientationModeEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         error, coreOrientationTypeList = self._coreEstimator.estimate(coreImages)
-
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
         return [
             OrientationType.fromCoreOrientationType(coreOrientationType)

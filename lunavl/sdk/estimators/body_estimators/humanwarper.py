@@ -9,7 +9,7 @@ from numpy import ndarray
 
 from lunavl.sdk.detectors.humandetector import HumanDetection
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
@@ -141,8 +141,7 @@ class HumanWarper:
             LunaSDKException: if creation failed
         """
         error, warp = self._coreWarper.warp(humanDetection.image.coreImage, humanDetection.coreEstimation.detection)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
         warpedImage = HumanWarpedImage(body=warp, filename=humanDetection.image.filename)
 

@@ -13,9 +13,9 @@ from FaceEngine import (
     Ethnicity as CoreEthnicity,
 )  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.base import BaseEstimation
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -247,8 +247,7 @@ class BasicAttributesEstimator(BaseEstimator):
             dtAttributes |= AttributeRequest.estimateEthnicity
 
         error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage, AttributeRequest(dtAttributes))
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return BasicAttributes(baseAttributes)
 
     @CoreExceptionWrap(LunaVLError.BatchEstimationBasicAttributeError)
@@ -288,8 +287,7 @@ class BasicAttributesEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, images, AttributeRequest(dtAttributes))
         error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
         attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
         if aggregate:

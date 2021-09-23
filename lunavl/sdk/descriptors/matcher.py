@@ -6,10 +6,10 @@ see `face descriptors matching`_.
 from typing import List, Union
 
 from FaceEngine import IDescriptorMatcherPtr  # pylint: disable=E0611,E0401
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
+
 from lunavl.sdk.descriptors.descriptors import FaceDescriptorFactory
+from lunavl.sdk.errors.exceptions import assertError
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
 
 
 class MatchingResult:
@@ -92,6 +92,5 @@ class FaceMatcher:
                 batch.append(candidate)
             error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation, batch.coreEstimation)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return matchResults

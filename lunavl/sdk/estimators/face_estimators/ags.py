@@ -6,9 +6,9 @@ from typing import Optional, List, Union
 
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.detectors.facedetector import FaceDetection
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -55,8 +55,7 @@ class AGSEstimator(BaseEstimator):
         else:
             error, ags = self._coreEstimator.estimate(detection.image.coreImage, detection.boundingBox.coreEstimation)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return ags
 
     @CoreExceptionWrap(LunaVLError.EstimationAGSError)
@@ -79,6 +78,5 @@ class AGSEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages, boundingBoxEstimations)
         error, agsList = self._coreEstimator.estimate(coreImages, boundingBoxEstimations)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return agsList

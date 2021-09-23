@@ -15,7 +15,7 @@ from FaceEngine import (
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -148,8 +148,8 @@ class LivenessV1Estimator(BaseEstimator):
             faceDetection.landmarks5.coreEstimation,
             -1.0 if qualityThreshold is None else qualityThreshold,
         )
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
+
         prediction = LivenessPrediction.fromCoreEmotion(estimation.State)
 
         return LivenessV1(estimation, prediction)
@@ -188,9 +188,8 @@ class LivenessV1Estimator(BaseEstimator):
             coreEstimations,
             -1.0 if qualityThreshold is None else qualityThreshold,
         )
+        assertError(error)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return [
             LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State)) for estimation in estimations
         ]

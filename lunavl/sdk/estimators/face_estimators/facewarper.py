@@ -6,9 +6,10 @@ from FaceEngine import IWarperPtr, Transformation  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from numpy import ndarray
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import LunaSDKException, CoreExceptionWrap
+
 from lunavl.sdk.detectors.facedetector import FaceDetection, Landmarks68, Landmarks5
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
@@ -164,8 +165,7 @@ class FaceWarper:
         """
         transformation = self._createWarpTransformation(faceDetection)
         error, warp = self._coreWarper.warp(faceDetection.coreEstimation.img, transformation)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
 
         warpedImage = FaceWarpedImage(body=warp, filename=faceDetection.image.filename)
 
@@ -198,8 +198,7 @@ class FaceWarper:
             error, warp = self._coreWarper.warp(faceDetection.landmarks5.coreEstimation, transformation)
         else:
             raise ValueError("Invalid value of typeLandmarks, must be 'L68' or 'L5'")
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         if typeLandmarks == "L68":
             return Landmarks68(warp)
         return Landmarks5(warp)

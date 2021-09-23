@@ -9,7 +9,7 @@ from FaceEngine import CredibilityStatus
 from FaceEngine import ICredibilityCheckEstimatorPtr
 
 from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...base import BaseEstimation
@@ -112,6 +112,5 @@ class CredibilityEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         error, credibility = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return Credibility(credibility)

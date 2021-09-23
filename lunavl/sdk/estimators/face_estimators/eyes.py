@@ -19,10 +19,10 @@ from FaceEngine import (
     EyesEstimation as CoreEyesEstimation,
 )  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, LunaSDKException
 from lunavl.sdk.base import BaseEstimation, Landmarks
 from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -229,8 +229,7 @@ class EyeEstimator(BaseEstimator):
                 warpWithLandmarks.warp.warpedImage.coreImage, warpWithLandmarks.landmarks.coreEstimation
             )
         error, eyesEstimation = self._coreEstimator.estimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return EyesEstimation(eyesEstimation)
 
     #  pylint: disable=W0221
@@ -267,9 +266,8 @@ class EyeEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, eyeRectList)
         error, eyesEstimations = self._coreEstimator.estimate(coreImages, eyeRectList)
+        assertError(error)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return [EyesEstimation(eyesEstimation) for eyesEstimation in eyesEstimations]
 
 
@@ -382,8 +380,7 @@ class GazeEstimator(BaseEstimator):
         error, gaze = self._coreEstimator.estimate(
             warpWithLandmarks5.warp.warpedImage.coreImage, warpWithLandmarks5.landmarks.coreEstimation
         )
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
+        assertError(error)
         return GazeDirection(gaze)
 
     #  pylint: disable=W0221
@@ -403,7 +400,6 @@ class GazeEstimator(BaseEstimator):
         landmarks = [row.landmarks.coreEstimation for row in warpWithLandmarks5List]
         validateInputByBatchEstimator(self._coreEstimator, images, landmarks)
         error, gazeList = self._coreEstimator.estimate(images, landmarks)
+        assertError(error)
 
-        if error.isError:
-            raise LunaSDKException(LunaVLError.fromSDKError(error))
         return [GazeDirection(gaze) for gaze in gazeList]
