@@ -26,6 +26,7 @@ from ..detectors.base import (
     getArgsForCoreDetectorForImages,
     getArgsForCoreRedetect,
     validateBatchDetectInput,
+    validateReDetectInput,
 )
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
@@ -398,7 +399,7 @@ class FaceDetector:
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         coreImages, detectAreas = getArgsForCoreRedetect(images)
-        self._validateReDetectInput(coreImages, detectAreas)
+        validateReDetectInput(self._detector, coreImages, detectAreas)
         if asyncEstimate:
             task = self._detector.asyncRedetect(coreImages, detectAreas, detectionType)
             return AsyncTask(task, postProcessing=partial(postProcessingRedetect, coreImages=coreImages, images=images))

@@ -32,7 +32,7 @@ def detectHumans():
             images=[
                 ImageForRedetection(imageWithSeveralHumans, [human.boundingBox.rect for human in severalHumans[0]]),
                 ImageForRedetection(imageWithOneHuman, [detection.boundingBox.rect]),
-                ImageForRedetection(imageWithOneHuman, [Rect(0, 0, 1, 1)]),
+                ImageForRedetection(imageWithOneHuman, [Rect(0, 0, 100, 100)]),
             ]
         )
     )
