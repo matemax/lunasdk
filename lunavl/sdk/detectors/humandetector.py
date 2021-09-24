@@ -97,7 +97,7 @@ class HumanDetection(BaseDetection):
 
 
 def collectDetectionsResult(
-        fsdkDetectRes,
+    fsdkDetectRes,
     coreImages: List[CoreImage],
     images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
     detectLandmarks: bool = True,
@@ -136,6 +136,12 @@ def collectDetectionsResult(
         )
     return res
 
+
+def postProcessingBatch(error, fsdkDetectRes, coreImages, images):
+    assertError(error)
+    return collectDetectionsResult(fsdkDetectRes, coreImages, images)
+
+
 class HumanDetector:
     """
     Human body detector.
@@ -167,7 +173,12 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumanError)
     def detectOne(
-        self, image: VLImage, detectArea: Optional[Rect] = None, limit: int = 5, detectLandmarks: bool = True
+        self,
+        image: VLImage,
+        detectArea: Optional[Rect] = None,
+        limit: int = 5,
+        detectLandmarks: bool = True,
+        asyncEstimate=False,
     ) -> Union[None, HumanDetection]:
         """
         Detect just one best detection on the image.
@@ -177,6 +188,7 @@ class HumanDetector:
             detectArea: rectangle area which contains human to detect. If not set will be set image.rect
             limit: max number of detections for input image
             detectLandmarks: detect or not landmarks
+            asyncEstimate: estimate or run estimation in background
         Returns:
             human detection if human is found otherwise None
         Raises:
@@ -211,7 +223,11 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def detect(
-        self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, detectLandmarks: bool = True
+        self,
+        images: List[Union[VLImage, ImageForDetection]],
+        limit: int = 5,
+        detectLandmarks: bool = True,
+        asyncEstimate=False,
     ) -> List[List[HumanDetection]]:
         """
         Batch detect human bodies on images.
@@ -220,8 +236,11 @@ class HumanDetector:
             images: input images list. Format must be R8G8B8
             limit: max number of detections per input image
             detectLandmarks: detect or not landmarks
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            return list of lists detection, order of detection lists is corresponding to order input images
+            asyncEstimate is False: return list of lists detection, order of detection lists is corresponding
+                                    to order input images
+            asyncEstimate isTrue:  async task
         """
         coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detectLandmarks)
@@ -232,7 +251,10 @@ class HumanDetector:
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetectOne(  # noqa: F811
-        self, image: VLImage, bBox: Union[Rect, HumanDetection]
+        self,
+        image: VLImage,
+        bBox: Union[Rect, HumanDetection],
+        asyncEstimate=False,
     ) -> Union[None, HumanDetection]:
         """
         Redetect human body on an image in area, restricted with image.bBox, bBox or detection.
@@ -243,7 +265,7 @@ class HumanDetector:
             bBox: detection bounding box
 
         Returns:
-            detection if human body found otherwise None
+            detection if human body found otherwise None if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException if an error occurs
         """
@@ -260,15 +282,20 @@ class HumanDetector:
         return None
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
-    def redetect(self, images: List[ImageForRedetection]) -> List[List[Union[HumanDetection, None]]]:
+    def redetect(
+        self,
+        images: List[ImageForRedetection],
+        asyncEstimate=False,
+    ) -> List[List[Union[HumanDetection, None]]]:
         """
         Redetect human on each image.image in area, restricted with image.bBox.
 
         Args:
-            images: images with a bounding boxes
+            images: images with a bounding boxes,
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            detections
+            detections if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException if an error occurs, context contains all errors
         """
