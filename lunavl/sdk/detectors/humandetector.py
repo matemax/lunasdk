@@ -96,6 +96,46 @@ class HumanDetection(BaseDetection):
         return res
 
 
+def collectDetectionsResult(
+        fsdkDetectRes,
+    coreImages: List[CoreImage],
+    images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
+    detectLandmarks: bool = True,
+):
+    """
+    Collect detection results from core reply and prepare human detections
+    Args:
+        fsdkDetectRes: fsdk (re)detect results
+        coreImages: core images
+        images: incoming images
+        detectLandmarks: detect body landmarks or not
+    Returns:
+        return list of lists detection, order of detection lists is corresponding to order input images
+    """
+    res = []
+    for imageIdx in range(fsdkDetectRes.getSize()):
+        imagesDetections = []
+        detections = fsdkDetectRes.getDetections(imageIdx)
+        landmarks17Array = fsdkDetectRes.getLandmarks17(imageIdx)
+
+        for detectionIdx, detection in enumerate(detections):
+            human = Human()
+            human.img = coreImages[imageIdx]
+            human.detection = detection
+            if detectLandmarks:
+                human.landmarks17_opt.set(landmarks17Array[detectionIdx])
+            imagesDetections.append(human)
+
+        image = images[imageIdx]
+        vlImage = image if isinstance(image, VLImage) else image.image
+        res.append(
+            [
+                HumanDetection(coreDetection, vlImage) if coreDetection.isValid() else None
+                for coreDetection in imagesDetections
+            ]
+        )
+    return res
+
 class HumanDetector:
     """
     Human body detector.
@@ -188,25 +228,7 @@ class HumanDetector:
         validateBatchDetectInput(self._detector, coreImages, detectAreas)
         error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
         assertError(error)
-        res = []
-        for imageIdx in range(fsdkDetectRes.getSize()):
-            imagesDetections = []
-            detections = fsdkDetectRes.getDetections(imageIdx)
-            landmarks17Array = fsdkDetectRes.getLandmarks17(imageIdx)
-
-            for idx, detection in enumerate(detections):
-                human = Human()
-                human.img = coreImages[imageIdx]
-                human.detection = detection
-                if detectLandmarks:
-                    human.landmarks17_opt.set(landmarks17Array[idx])
-                imagesDetections.append(human)
-
-            image = images[imageIdx]
-            vlImage = image if isinstance(image, VLImage) else image.image
-            res.append([HumanDetection(human, vlImage) for human in imagesDetections])
-
-        return res
+        return collectDetectionsResult(fsdkDetectRes, coreImages, images, detectLandmarks)
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetectOne(  # noqa: F811
@@ -237,45 +259,6 @@ class HumanDetector:
             return HumanDetection(detectRes, image)
         return None
 
-    @staticmethod
-    def collectDetectionsResult(
-        fsdkDetectRes,
-        coreImages: List[CoreImage],
-        images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
-        detectLandmarks: bool = True,
-    ):
-        """
-        Collect detection results from core reply and prepare human detections
-        Args:
-            fsdkDetectRes: fsdk (re)detect results
-            coreImages: core images
-            images: incoming images
-        Returns:
-            return list of lists detection, order of detection lists is corresponding to order input images
-        """
-        res = []
-        for imageIdx in range(fsdkDetectRes.getSize()):
-            imagesDetections = []
-            detections = fsdkDetectRes.getDetections(imageIdx)
-            image = images[imageIdx]
-
-            for detectionIdx, detection in enumerate(detections):
-                human = Human()
-                human.img = coreImages[imageIdx]
-                human.detection = detection
-                if detectLandmarks:
-                    human.landmarks17_opt.set(fsdkDetectRes.getLandmarks17(imageIdx)[detectionIdx])
-                imagesDetections.append(human)
-
-            vlImage = image if isinstance(image, VLImage) else image.image
-            res.append(
-                [
-                    HumanDetection(coreDetection, vlImage) if coreDetection.isValid() else None
-                    for coreDetection in imagesDetections
-                ]
-            )
-        return res
-
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetect(self, images: List[ImageForRedetection]) -> List[List[Union[HumanDetection, None]]]:
         """
@@ -293,4 +276,4 @@ class HumanDetector:
         validateReDetectInput(self._detector, coreImages, detectAreas)
         error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, self._getDetectionType(True))
         assertError(error)
-        return self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
+        return collectDetectionsResult(fsdkDetectRes, coreImages, images)
