@@ -4,6 +4,7 @@ Module realize simple examples following features:
     * batch images human detection
     * detect landmarks17
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
@@ -35,5 +36,25 @@ def detectHumanBody():
     pprint.pprint(severalHumans)
 
 
+async def asyncDetectHumanBody():
+    """
+    Async detect one human body on an image.
+    """
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createHumanDetector()
+
+    imageWithOneHuman = VLImage.load(filename=EXAMPLE_O)
+    pprint.pprint(detector.detectOne(imageWithOneHuman, detectLandmarks=False).asDict())
+    imageWithSeveralHumans = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
+    human = await detector.detectOne(imageWithSeveralHumans, detectLandmarks=False, asyncEstimate=True)
+    pprint.pprint(human.asDict())
+
+    task1 = detector.detect([imageWithSeveralHumans], detectLandmarks=True, asyncEstimate=True)
+    task2 = detector.detect([imageWithSeveralHumans], detectLandmarks=True, asyncEstimate=True)
+    for task in (task1, task2):
+        pprint.pprint(task.get())
+
+
 if __name__ == "__main__":
     detectHumanBody()
+    asyncio.run(asyncDetectHumanBody())

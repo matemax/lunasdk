@@ -18,5 +18,5 @@ class AsyncTask(Generic[TaskResult]):
 
     def __await__(self) -> Generator[None, None, TaskResult]:
         yield from self._coreTask.__await__()
-        res = self._coreTask.result
+        res = self._coreTask.getResult()
         return self._postProcessing(*res)

@@ -264,7 +264,7 @@ class HumanDetector:
         detectionType = self._getDetectionType(detectLandmarks)
         validateBatchDetectInput(self._detector, coreImages, detectAreas)
         if asyncEstimate:
-            task = self._detector.detect(coreImages, detectAreas, limit, detectionType)
+            task = self._detector.asyncDetect(coreImages, detectAreas, limit, detectionType)
             return AsyncTask(task, partial(postProcessingBatch, images=images, detectLandmarks=detectLandmarks))
         error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
         return postProcessingBatch(error, fsdkDetectRes, images, detectLandmarks)
@@ -323,9 +323,7 @@ class HumanDetector:
         detectLandmarks = True
         if asyncEstimate:
             task = self._detector.asyncRedetect(coreImages, detectAreas, self._getDetectionType(detectLandmarks))
-            pProcessing = partial(
-                postProcessingBatch, coreImages=coreImages, images=images, detectLandmarks=detectLandmarks
-            )
+            pProcessing = partial(postProcessingBatch, images=images, detectLandmarks=detectLandmarks)
             return AsyncTask(task, pProcessing)
         error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, self._getDetectionType(detectLandmarks))
         return postProcessingBatch(error, fsdkDetectRes, images=images, detectLandmarks=detectLandmarks)
