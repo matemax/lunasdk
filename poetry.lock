@@ -194,7 +194,7 @@ develop = false
 [package.source]
 type = "git"
 url = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-reference = "async"
+reference = "2e2461"
 resolved_reference = "2e2461e0a2ae27b3896745c9aa3fa575844e25fc"
 
 [[package]]
@@ -826,7 +826,7 @@ testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", 
 
 [[package]]
 name = "zipp"
-version = "3.5.0"
+version = "3.5.1"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "dev"
 optional = false
@@ -839,7 +839,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6"
-content-hash = "1426fe2c6da0d8a57646f09e1bb1b8aa862cbf6dcb17a8e9a133209a586f271e"
+content-hash = "a0bb1ee6857a2a0d323842807a2d5aab592f426c8c9ee41f67455f4e6432d801"
 
 [metadata.files]
 alabaster = [
@@ -1362,6 +1362,6 @@ virtualenv = [
     {file = "virtualenv-20.8.1.tar.gz", hash = "sha256:bcc17f0b3a29670dd777d6f0755a4c04f28815395bca279cdcb213b97199a6b8"},
 ]
 zipp = [
-    {file = "zipp-3.5.0-py3-none-any.whl", hash = "sha256:957cfda87797e389580cb8b9e3870841ca991e2125350677b2ca83a0e99390a3"},
-    {file = "zipp-3.5.0.tar.gz", hash = "sha256:f5812b1e007e48cff63449a5e9f4e7ebea716b4111f9c4f9a645f91d579bf0c4"},
+    {file = "zipp-3.5.1-py3-none-any.whl", hash = "sha256:8dc6c4d5a809d659067cc713f76bcf42fae8ae641db12fddfa93694a15abc96b"},
+    {file = "zipp-3.5.1.tar.gz", hash = "sha256:1fc9641b26f3bd81069b7738b039f2819cab6e3fc3399a953e19d92cc81eff4d"},
 ]

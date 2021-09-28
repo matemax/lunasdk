@@ -19,7 +19,7 @@ dataclasses = {version="*", markers="python_version == '3.6'"}
 
 [tool.poetry.dependencies.FaceEngine]
 git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-branch = "async"
+rev = "2e2461"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
