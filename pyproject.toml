@@ -16,10 +16,10 @@ requests = "*"
 Pillow = {version = "*", markers = "sys_platform == 'win32'"}
 pillow-simd = {version = "*", markers = "sys_platform != 'win32'"}
 dataclasses = {version="*", markers="python_version == '3.6'"}
-
-[tool.poetry.dependencies.FaceEngine]
-git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-tag = "t_async"
+#
+#[tool.poetry.dependencies.FaceEngine]
+#git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
+#tag = "t_async"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
