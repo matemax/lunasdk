@@ -456,10 +456,11 @@ class VLFaceDetector:
         Returns:
             return list of lists detection, order of detection lists is corresponding to order of input images
         """
-        detectRes = self._faceDetector.detect(images, limit, True, True, asyncEstimate=asyncEstimate)
+
         if asyncEstimate:
-            task: AsyncTask = detectRes
+            task: AsyncTask = self._faceDetector.detect(images, limit, True, True, asyncEstimate=asyncEstimate)
             return wrap(task, self.postProcessingBatch)
+        detectRes = self._faceDetector.detect(images, limit, True, True, asyncEstimate=asyncEstimate)
         return self.postProcessingBatch(detectRes)
 
     def redetectOne(

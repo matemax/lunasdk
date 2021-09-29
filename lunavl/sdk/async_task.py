@@ -26,4 +26,4 @@ class AsyncTask(Generic[TaskResult]):
 
 def wrap(task: AsyncTask[TaskResult], pp: Callable[[TaskResult], TaskResult1]) -> AsyncTask[TaskResult1]:
     oldPP = task.postProcessing
-    return AsyncTask(task.coreTask, postProcessing=lambda coreRes: pp(oldPP(*coreRes)))
+    return AsyncTask(task.coreTask, postProcessing=lambda *coreRes: pp(oldPP(*coreRes)))
