@@ -8,6 +8,7 @@ from typing import Union, List
 
 from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType
 
+from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from lunavl.sdk.estimators.base import BaseEstimator
@@ -46,6 +47,18 @@ class OrientationType(Enum):
         return self.value
 
 
+def postProcessingBatch(error, oientations):
+    assertError(error)
+
+    return [OrientationType.fromCoreOrientationType(coreOrientationType) for coreOrientationType in oientations]
+
+
+def postProcessing(error, orientationType):
+    assertError(error)
+
+    return OrientationType.fromCoreOrientationType(orientationType)
+
+
 class OrientationModeEstimator(BaseEstimator):
     """
     OrientationModeEstimator.
@@ -62,12 +75,15 @@ class OrientationModeEstimator(BaseEstimator):
         super().__init__(coreOrientationModeEstimator)
 
     @CoreExceptionWrap(LunaVLError.EstimationOrientationModeError)
-    def estimate(self, image: Union[VLImage, FaceWarp, FaceWarpedImage]) -> OrientationType:
+    def estimate(
+        self, image: Union[VLImage, FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
+    ) -> Union[OrientationType, AsyncTask[OrientationType]]:
         """
         Estimate orientation mode from warped image.
 
         Args:
             image: vl image or face warp
+             asyncEstimate: estimate or run estimation in background
 
         Returns:
             estimated orientation mode
@@ -78,32 +94,33 @@ class OrientationModeEstimator(BaseEstimator):
             coreImage = image.warpedImage.coreImage
         else:
             coreImage = image.coreImage
-
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(coreImage)
+            return AsyncTask(task, postProcessing)
         error, coreOrientationType = self._coreEstimator.estimate(coreImage)
-        assertError(error)
-
-        return OrientationType.fromCoreOrientationType(coreOrientationType)
+        return postProcessing(error, coreOrientationType)
 
     @CoreExceptionWrap(LunaVLError.EstimationOrientationModeError)
-    def estimateBatch(self, images: List[Union[VLImage, FaceWarp, FaceWarpedImage]]) -> List[OrientationType]:
+    def estimateBatch(
+        self, images: List[Union[VLImage, FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
+    ) -> Union[List[OrientationType], AsyncTask[List[OrientationType]]]:
         """
         Batch estimate orientation mode from warped images.
 
         Args:
             images: vl image or face warp list
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated orientation mode list
+            estimated orientation mode list if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation is failed
         """
         coreImages = [img.warpedImage.coreImage if isinstance(img, FaceWarp) else img.coreImage for img in images]
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(coreImages)
+            return AsyncTask(task, postProcessingBatch)
         error, coreOrientationTypeList = self._coreEstimator.estimate(coreImages)
-        assertError(error)
-
-        return [
-            OrientationType.fromCoreOrientationType(coreOrientationType)
-            for coreOrientationType in coreOrientationTypeList
-        ]
+        return postProcessingBatch(error, coreOrientationTypeList)
