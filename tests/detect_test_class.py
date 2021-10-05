@@ -12,6 +12,7 @@ from lunavl.sdk.image_utils.geometry import Point
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
+from tests.config import USE_FACE_DET_V1, USE_FACE_DET_V2
 from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE, BAD_IMAGE, LARGE_IMAGE
 
 VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
@@ -161,10 +162,12 @@ class FaceDetectTestClass(BaseDetectorTestClass):
         """
         super().setup_class()
         cls.detectors = [
-            cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1),
-            cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2),
             cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3),
         ]
+        if USE_FACE_DET_V2:
+            cls.detectors.append(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V2))
+        if USE_FACE_DET_V1:
+            cls.detectors.append(cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V1))
         CaseLandmarks = namedtuple("CaseLandmarks", ("detect5Landmarks", "detect68Landmarks"))
         cls.landmarksCases = [
             CaseLandmarks(landmarks5, landmarks68)

@@ -125,9 +125,6 @@ class TestsRedetectFace(FaceDetectTestClass):
                 bBox = Rect(0, 0, 200, 200)
                 redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=bBox)
                 redetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[bBox])])[0][0]
-                if detector.detectorType.name == "FACE_DET_V3":
-                    self.skipTest("Skip for FaceDetV3. FSDK-3314")
-                    continue
                 assert redetectOne is None, "excepted None but found {}".format(redetectOne)
                 assert redetect is None, "excepted None but found {}".format(redetectOne)
 
@@ -161,14 +158,16 @@ class TestsRedetectFace(FaceDetectTestClass):
                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
 
-    @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):
         """
         Test re-detection with an invalid rect
         """
         for detector in self.detectors:
-            with self.subTest(detectorType=detector.detectorType):
-                detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+            with pytest.raises(LunaSDKException) as exceptionInfo:
+                with self.subTest(detectorType=detector.detectorType):
+                    detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+            assert len(exceptionInfo.value.context) == 1, "Expect two error in exception context"
+            self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
 
     def test_match_redetect_one_image(self):
         """
@@ -177,9 +176,6 @@ class TestsRedetectFace(FaceDetectTestClass):
         for image in (VLIMAGE_ONE_FACE, VLIMAGE_SMALL):
             for detector in self.detectors:
                 with self.subTest(detectorType=detector.detectorType):
-                    if detector.detectorType.name == "FACE_DET_V3":
-                        self.skipTest("Skip for FaceDetV3. Different value")
-                        continue
                     bBoxRect = detector.detectOne(image=image).boundingBox.rect
                     redetectOne = detector.redetectOne(image=image, bBox=bBoxRect, detect68Landmarks=True)
                     batchRedetect = detector.redetect(

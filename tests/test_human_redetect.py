@@ -85,7 +85,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=INVALID_RECT)
         receivedError = exceptionInfo.value.error
-        self.assertReceivedAndRawExpectedErrors(receivedError, LunaVLError.InvalidDetection)
+        self.assertReceivedAndRawExpectedErrors(receivedError, LunaVLError.InvalidRect)
 
     def test_redetect_invalid_rectangle(self):
         """
@@ -100,7 +100,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
             )
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
-        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidDetection)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
 
     def test_rect_float(self):
