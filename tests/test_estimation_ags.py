@@ -7,16 +7,16 @@ from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.config import USE_AGS
 from tests.resources import CLEAN_ONE_FACE, ONE_FACE
 
 EXPECTED_PRECISION = 10 ** -5
 
 
-@pytest.mark.skipif(not USE_AGS, reason="AGS estimation disabled")
 class TestBasicAttributes(BaseTestClass):
     """ Test basic attributes. """
 
+    # estimator to call
+    estimator: AGSEstimator = BaseTestClass.faceEngine.createAGSEstimator()
     # first image
     image1: VLImage = VLImage.load(filename=ONE_FACE)
     # second image
@@ -25,7 +25,6 @@ class TestBasicAttributes(BaseTestClass):
     @classmethod
     def setUpClass(cls) -> None:
         """ Load warps. """
-        cls.estimator: AGSEstimator = BaseTestClass.faceEngine.createAGSEstimator()
         detector = VLFaceEngine().createFaceDetector(DetectorType.FACE_DET_V1)
         cls.detection1 = detector.detectOne(cls.image1)
         cls.detection2 = detector.detectOne(cls.image2)

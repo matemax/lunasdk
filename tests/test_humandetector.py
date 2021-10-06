@@ -189,7 +189,6 @@ class TestHumanDetector(HumanDetectTestClass):
                 detection = self.detector.detect(images=[VLIMAGE_ONE_FACE], detectLandmarks=case.detectLandmarks)[0][0]
                 self.assertDetectionLandmarks(detection=detection, landmarksIsExpected=case.detectLandmarks)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_batch_detect_limit(self):
         """
         Test checking detection limit for an image
@@ -202,7 +201,7 @@ class TestHumanDetector(HumanDetectTestClass):
         detection = self.detector.detect(images=[imageWithManyFaces], limit=20)[0]
         assert 17 == len(detection)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
+    @pytest.mark.skip("core bug: Fatal error")
     def test_detect_limit_bad_param(self):
         """
         Test batch detection with negative limit number

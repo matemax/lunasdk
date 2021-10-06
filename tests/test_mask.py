@@ -48,7 +48,7 @@ class TestMask(BaseTestClass):
             FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE)), MaskProperties(0.998, 0.002, 0.000)
         )
         cls.occludedMaskWarpNProperties = WarpNExpectedProperties(
-            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.260, 0.669, 0.071)  # TODO: that is not medical mask at all
+            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.260, 0.669, 0.071)  # TODO: bug
         )
         cls.imageMedicalMask = VLImage.load(filename=FULL_FACE_WITH_MASK)
         cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
@@ -130,7 +130,7 @@ class TestMask(BaseTestClass):
         Test mask estimations with face is occluded by other object
         """
         cases = [
-            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.260, 0.669, 0.071), None),  #TODO: that is not medical mask at all
+            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.260, 0.669, 0.071), None),  # TODO: bug
             TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.000, 0.000, 1.000), None),
         ]
         for case in cases:
@@ -161,12 +161,11 @@ class TestMask(BaseTestClass):
             self.maskEstimator.estimateBatch([])
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_estimate_missing_mask_large_image(self):
         """
         Test mask estimations without mask on the face
         """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.003, 0.006, 0.991), None)
+        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.000, 1.000), None)
 
         faceDetection = self.defaultDetector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)

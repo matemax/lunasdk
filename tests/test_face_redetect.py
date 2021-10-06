@@ -163,11 +163,12 @@ class TestsRedetectFace(FaceDetectTestClass):
         Test re-detection with an invalid rect
         """
         for detector in self.detectors:
-            with pytest.raises(LunaSDKException) as exceptionInfo:
-                with self.subTest(detectorType=detector.detectorType):
+            with self.subTest(detectorType=detector.detectorType):
+                with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
-            assert len(exceptionInfo.value.context) == 1, "Expect two error in exception context"
-            self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
+                self.assertLunaVlError(
+                    exceptionInfo, LunaVLError.ValidationFailed.format(LunaVLError.InvalidRect.description)
+                )
 
     def test_match_redetect_one_image(self):
         """

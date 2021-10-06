@@ -290,7 +290,6 @@ class TestEstimateDescriptor(BaseTestClass):
         else:
             return self.faceEngine.createHumanDescriptorFactory(planVersion).generateDescriptorsBatch(size)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_create_estimators_positive(self):
         """
         Test create estimators of different existent plan versions.
@@ -324,7 +323,6 @@ class TestEstimateDescriptor(BaseTestClass):
                         else:
                             raise AssertionError(f"Descriptor version {planVersion} is supported. But should not.")
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_extract_descriptors_positive(self):
         """
         Test correctly estimate descriptor.
@@ -339,7 +337,6 @@ class TestEstimateDescriptor(BaseTestClass):
                             descriptor = extractor.estimate(case.warps[0], **kw)
                             self.assertDescriptor(planVersion, descriptor, case.type)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_extract_descriptors_incorrect_source_descriptors(self):
         """
         Test estimate descriptor using incorrect source descriptor.
@@ -357,7 +354,6 @@ class TestEstimateDescriptor(BaseTestClass):
                             assert exceptionInfo.value.error.errorCode == LunaVLError.UnknownError.errorCode
                             assert exceptionInfo.value.error.detail == "Incompatible model versions"
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_extract_descriptors_batch_positive(self):
         """
         Test correctly estimate descriptor batch.
@@ -382,7 +378,6 @@ class TestEstimateDescriptor(BaseTestClass):
                                 else:
                                     assert descriptorAggregated is None
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_extract_descriptors_batch_positive_and_negative(self):
         """
         Test estimate descriptor batch with one good warp and one bad (expected error).
@@ -405,7 +400,7 @@ class TestEstimateDescriptor(BaseTestClass):
                                 exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
                             )
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
+    @pytest.mark.skip(msg="Skip error test")  # TODO: SDK return isError=False. Not raises LunaSDKException
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):
         """
         Test correctly estimate descriptor batch.
@@ -431,7 +426,6 @@ class TestEstimateDescriptor(BaseTestClass):
                                 assert len(exceptionInfo.value.context) == 1, "Expect only one error"
                                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_descriptor_batch_low_threshold_aggregation(self):
         """
         Test descriptor batch with low threshold warps with aggregation

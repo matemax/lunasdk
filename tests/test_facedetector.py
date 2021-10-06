@@ -255,7 +255,6 @@ class TestFaceDetector(FaceDetectTestClass):
                             detection=detection, landmarks5=case.detect5Landmarks, landmarks68=case.detect68Landmarks
                         )
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_batch_detect_limit(self):
         """
         Test checking detection limit for an image
@@ -272,7 +271,6 @@ class TestFaceDetector(FaceDetectTestClass):
                 else:
                     assert 19 == len(detection)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_detect_limit_bad_param(self):
         """
         Test batch detection with negative limit number
@@ -286,7 +284,6 @@ class TestFaceDetector(FaceDetectTestClass):
                     )
                 assert isinstance(exceptionInfo.value, TypeError) is True, "expected TypeError"
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_detect_one_limit_bad_param(self):
         """
         Test batch detection with negative limit number
@@ -427,7 +424,6 @@ class TestFaceDetector(FaceDetectTestClass):
                             assert face.landmarks5.asDict() == detectOne.landmarks5.asDict()
                             assert face.landmarks68.asDict() == detectOne.landmarks68.asDict()
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_detect_one_large_image(self):
         """
         Test detection of one face from large image
@@ -437,7 +433,6 @@ class TestFaceDetector(FaceDetectTestClass):
                 detection = detector.detectOne(image=VLIMAGE_LARGE_IMAGE)
                 self.assertFaceDetection(detection, VLIMAGE_LARGE_IMAGE)
 
-    @pytest.mark.skip(msg="core bug: Memory issue?")
     def test_detect_one_by_large_area(self):
         """
         Test detection of one face by large area
