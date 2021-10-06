@@ -19,13 +19,6 @@ class TestsRedetectFace(FaceDetectTestClass):
     Face redetection tests.
     """
 
-    detector: FaceDetector
-
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
-
     def test_get_landmarks_for_redetect_one(self):
         """
         Test get and check landmark instances for re-detection of one face

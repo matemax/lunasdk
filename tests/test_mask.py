@@ -34,7 +34,7 @@ class TestMask(BaseTestClass):
 
     # warp mask estimator
     maskEstimator: MaskEstimator
-    defaultDetector: FaceDetector
+    detector: FaceDetector
 
     @classmethod
     def setup_class(cls):
@@ -59,7 +59,7 @@ class TestMask(BaseTestClass):
 
         cls.largeImage = VLImage.load(filename=LARGE_IMAGE)
 
-        cls.defaultDetector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
 
     def assertMaskEstimation(self, mask: Mask, expectedEstimationResults: Dict[str, float]):
         """
@@ -104,7 +104,7 @@ class TestMask(BaseTestClass):
                 if case.isWarp:
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
-                    faceDetection = self.defaultDetector.detectOne(case.inputImage)
+                    faceDetection = self.detector.detectOne(case.inputImage)
                     mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
@@ -121,7 +121,7 @@ class TestMask(BaseTestClass):
                 if case.isWarp:
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
-                    faceDetection = self.defaultDetector.detectOne(case.inputImage)
+                    faceDetection = self.detector.detectOne(case.inputImage)
                     mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
@@ -138,7 +138,7 @@ class TestMask(BaseTestClass):
                 if case.isWarp:
                     mask = TestMask.maskEstimator.estimate(case.inputImage)
                 else:
-                    faceDetection = self.defaultDetector.detectOne(case.inputImage)
+                    faceDetection = self.detector.detectOne(case.inputImage)
                     mask = TestMask.maskEstimator.estimate(faceDetection)
                 self.assertMaskEstimation(mask, case.expectedResult._asdict())
 
@@ -167,6 +167,6 @@ class TestMask(BaseTestClass):
         """
         case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.000, 1.000), None)
 
-        faceDetection = self.defaultDetector.detectOne(case.inputImage)
+        faceDetection = self.detector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
         self.assertMaskEstimation(mask, case.expectedResult._asdict())
