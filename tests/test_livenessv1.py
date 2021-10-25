@@ -65,15 +65,14 @@ class TestEstimateLivenessV1(BaseTestClass):
         cases = (
             Case(LIVENESS_FACE, LivenessPrediction.Real),
             Case(SPOOF, LivenessPrediction.Spoof),
-            # Case(UNKNOWN_LIVENESS, LivenessPrediction.Unknown),  # quality=1.0, waiting for SDK update
+            Case(UNKNOWN_LIVENESS, LivenessPrediction.Unknown),
         )
         for case in cases:
             with self.subTest(prediction=case.prediction):
                 faceDetection = self.detector.detectOne(VLImage.load(filename=case.image), detect68Landmarks=True)
-                estimation = self.livenessEstimator.estimate(faceDetection=faceDetection, qualityThreshold=0.9)
+                estimation = self.livenessEstimator.estimate(faceDetection=faceDetection, qualityThreshold=0.75)
                 self.assertLivenessEstimation(estimation, expectedPrediction=case.prediction)
 
-    @pytest.mark.skip("quality=1.0, waiting for SDK update")
     def test_liveness_estimation_quality_threshold(self):
         """
         Test a quality threshold of liveness estimator
@@ -120,7 +119,6 @@ class TestEstimateLivenessV1(BaseTestClass):
         for estimation in estimations:
             self.assertLivenessEstimation(estimation)
 
-    @pytest.mark.skip("quality=1.0, waiting for SDK update")
     def test_estimate_liveness_batch_with_threshold(self):
         """
         Test estimate liveness batch with threshold

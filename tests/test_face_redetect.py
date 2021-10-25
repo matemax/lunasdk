@@ -1,15 +1,13 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForRedetection
-from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import FaceDetectTestClass
 from tests.detect_test_class import VLIMAGE_SEVERAL_FACE, VLIMAGE_SMALL, INVALID_RECT, ERROR_CORE_RECT
-from tests.resources import CLEAN_ONE_FACE, UNKNOWN_LIVENESS
+from tests.resources import CLEAN_ONE_FACE, FACE_WITH_MASK
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 
@@ -186,12 +184,12 @@ class TestsRedetectFace(FaceDetectTestClass):
         Test re-detection face in area outside image
         """
         # face on the bottom image boundary
-        image = VLImage.load(filename=UNKNOWN_LIVENESS)
+        image = VLImage.load(filename=FACE_WITH_MASK)
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 rect = detector.detectOne(image).boundingBox.rect
-                rect.width = image.rect.width - rect.x + 10
-                rect.height = image.rect.height - rect.y + 10
+                rect.width = image.rect.width - rect.x + 100
+                rect.height = image.rect.height - rect.y + 100
                 redetectOne = detector.redetectOne(image=image, bBox=rect)
                 self.assertFaceDetection(redetectOne, image)
                 redetect = detector.redetect(images=[ImageForRedetection(image=image, bBoxes=[rect])])
