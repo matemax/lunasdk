@@ -393,9 +393,6 @@ class VLFaceDetector:
             detectorType: detector type
             faceEngine: face engine for detector and estimators
         """
-        import os
-        print(f"PID={os.getpid()}")
-
         if faceEngine is not None:
             self.faceEngine = faceEngine
             self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
