@@ -110,7 +110,7 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detect(images=[VLIMAGE_ONE_FACE, VLIMAGE_BAD_IMAGE])
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
         assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidImageSize)
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)  # todo: ?
 
     def test_detect_one_with_image_of_several_humans(self):
         """

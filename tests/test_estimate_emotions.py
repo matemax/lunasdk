@@ -17,7 +17,7 @@ class TestEstimateEmotions(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
         cls.warper = cls.faceEngine.createFaceWarper()
         cls.emotionEstimator = cls.faceEngine.createEmotionEstimator()
 

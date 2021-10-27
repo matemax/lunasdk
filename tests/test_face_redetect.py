@@ -1,15 +1,13 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForRedetection
-from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import FaceDetectTestClass
 from tests.detect_test_class import VLIMAGE_SEVERAL_FACE, VLIMAGE_SMALL, INVALID_RECT, ERROR_CORE_RECT
-from tests.resources import CLEAN_ONE_FACE, UNKNOWN_LIVENESS
+from tests.resources import CLEAN_ONE_FACE, FACE_WITH_MASK
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)
 
@@ -18,13 +16,6 @@ class TestsRedetectFace(FaceDetectTestClass):
     """
     Face redetection tests.
     """
-
-    detector: FaceDetector
-
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
 
     def test_get_landmarks_for_redetect_one(self):
         """
@@ -125,9 +116,6 @@ class TestsRedetectFace(FaceDetectTestClass):
                 bBox = Rect(0, 0, 200, 200)
                 redetectOne = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=bBox)
                 redetect = detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[bBox])])[0][0]
-                if detector.detectorType.name == "FACE_DET_V3":
-                    self.skipTest("Skip for FaceDetV3. FSDK-3314")
-                    continue
                 assert redetectOne is None, "excepted None but found {}".format(redetectOne)
                 assert redetect is None, "excepted None but found {}".format(redetectOne)
 
@@ -161,14 +149,17 @@ class TestsRedetectFace(FaceDetectTestClass):
                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
                 self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
 
-    @pytest.mark.skip("core bug: Fatal error")
     def test_rect_float(self):
         """
         Test re-detection with an invalid rect
         """
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
-                detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+                with pytest.raises(LunaSDKException) as exceptionInfo:
+                    detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
+                self.assertLunaVlError(
+                    exceptionInfo, LunaVLError.ValidationFailed.format(LunaVLError.InvalidRect.description)
+                )
 
     def test_match_redetect_one_image(self):
         """
@@ -177,9 +168,6 @@ class TestsRedetectFace(FaceDetectTestClass):
         for image in (VLIMAGE_ONE_FACE, VLIMAGE_SMALL):
             for detector in self.detectors:
                 with self.subTest(detectorType=detector.detectorType):
-                    if detector.detectorType.name == "FACE_DET_V3":
-                        self.skipTest("Skip for FaceDetV3. Different value")
-                        continue
                     bBoxRect = detector.detectOne(image=image).boundingBox.rect
                     redetectOne = detector.redetectOne(image=image, bBox=bBoxRect, detect68Landmarks=True)
                     batchRedetect = detector.redetect(
@@ -196,12 +184,12 @@ class TestsRedetectFace(FaceDetectTestClass):
         Test re-detection face in area outside image
         """
         # face on the bottom image boundary
-        image = VLImage.load(filename=UNKNOWN_LIVENESS)
+        image = VLImage.load(filename=FACE_WITH_MASK)
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 rect = detector.detectOne(image).boundingBox.rect
-                rect.width = image.rect.width - rect.x + 10
-                rect.height = image.rect.height - rect.y + 10
+                rect.width = image.rect.width - rect.x + 100
+                rect.height = image.rect.height - rect.y + 100
                 redetectOne = detector.redetectOne(image=image, bBox=rect)
                 self.assertFaceDetection(redetectOne, image)
                 redetect = detector.redetect(images=[ImageForRedetection(image=image, bBoxes=[rect])])
