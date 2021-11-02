@@ -236,7 +236,6 @@ class TestIndexFunctionality(BaseTestClass):
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
         self.assertLunaVlError(ex, LunaVLError.InvalidInput)
 
-    @pytest.mark.skip("FSDK-3174")
     def test_search_result_empty(self):
         """Test search with empty result."""
         dynamicIndex = self.indexBuilder.buildIndex()

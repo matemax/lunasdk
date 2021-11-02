@@ -42,7 +42,7 @@ class TestHeadPose(BaseTestClass):
         Create detection for estimations.
         """
         super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
         cls.headPoseEstimator = cls.faceEngine.createHeadPoseEstimator()
         cls.image = VLImage.load(filename=ONE_FACE)
         cls.detection = TestHeadPose.detector.detectOne(cls.image, detect5Landmarks=True, detect68Landmarks=True)

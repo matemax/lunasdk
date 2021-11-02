@@ -24,7 +24,7 @@ class TestEstimateLivenessV1(BaseTestClass):
         Create test data and estimators
         """
         super().setup_class()
-        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_DEFAULT)
+        cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
         cls.headPoseEstimator = cls.faceEngine.createHeadPoseEstimator()
         cls.livenessEstimator = cls.faceEngine.createLivenessV1Estimator()
         cls.detection = cls.detector.detectOne(VLImage.load(filename=CLEAN_ONE_FACE), detect68Landmarks=True)
@@ -70,7 +70,7 @@ class TestEstimateLivenessV1(BaseTestClass):
         for case in cases:
             with self.subTest(prediction=case.prediction):
                 faceDetection = self.detector.detectOne(VLImage.load(filename=case.image), detect68Landmarks=True)
-                estimation = self.livenessEstimator.estimate(faceDetection=faceDetection, qualityThreshold=0.9)
+                estimation = self.livenessEstimator.estimate(faceDetection=faceDetection, qualityThreshold=0.75)
                 self.assertLivenessEstimation(estimation, expectedPrediction=case.prediction)
 
     def test_liveness_estimation_quality_threshold(self):
