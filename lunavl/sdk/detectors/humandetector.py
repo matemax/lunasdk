@@ -274,6 +274,7 @@ class HumanDetector:
         self,
         image: VLImage,
         bBox: Union[Rect, HumanDetection],
+        detectLandmarks: bool = True,
         asyncEstimate=False,
     ) -> Union[RedetectResult, AsyncTask[RedetectResult]]:
         """
@@ -283,6 +284,7 @@ class HumanDetector:
             image: image with a bounding box, or just VLImage. If VLImage provided, one of bBox or detection
                 should be defined.
             bBox: detection bounding box
+            detectLandmarks: detect or not landmarks
 
         Returns:
             detection if human body found otherwise None if asyncEstimate is false otherwise async task
@@ -295,15 +297,18 @@ class HumanDetector:
         else:
             coreBBox = bBox.coreEstimation.detection
         if asyncEstimate:
-            task = self._detector.asyncRedetectOne(image.coreImage, coreBBox, self._getDetectionType(True))
+            task = self._detector.asyncRedetectOne(image.coreImage, coreBBox, self._getDetectionType(detectLandmarks))
             return AsyncTask(task, partial(postProcessingRedetect, image=image))
-        error, detectRes = self._detector.redetectOne(image.coreImage, coreBBox, self._getDetectionType(True))
+        error, detectRes = self._detector.redetectOne(
+            image.coreImage, coreBBox, self._getDetectionType(detectLandmarks)
+        )
         return postProcessingRedetect(error, detectRes, image)
 
     @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetect(
         self,
         images: List[ImageForRedetection],
+        detectLandmarks: bool = True,
         asyncEstimate=False,
     ) -> Union[RedetectBatchResult, AsyncTask[RedetectBatchResult]]:
         """
@@ -312,6 +317,7 @@ class HumanDetector:
         Args:
             images: images with a bounding boxes,
             asyncEstimate: estimate or run estimation in background
+            detectLandmarks: detect or not landmarks
 
         Returns:
             detections if asyncEstimate is false otherwise async task
@@ -320,7 +326,6 @@ class HumanDetector:
         """
         coreImages, detectAreas = getArgsForCoreRedetect(images)
         validateReDetectInput(self._detector, coreImages, detectAreas)
-        detectLandmarks = True
         if asyncEstimate:
             task = self._detector.asyncRedetect(coreImages, detectAreas, self._getDetectionType(detectLandmarks))
             pProcessing = partial(postProcessingBatch, images=images, detectLandmarks=detectLandmarks)
