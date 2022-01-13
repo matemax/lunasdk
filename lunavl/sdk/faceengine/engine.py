@@ -88,6 +88,8 @@ class VLFaceEngine:
         )
         if self.license:
             self.activate(self.license)
+        elif os.path.isfile(licenseDataPath := os.path.join(pathToData, "license.conf")):
+            self.activate(licenseDataPath)
 
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
