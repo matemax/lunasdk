@@ -24,6 +24,8 @@ def _patchLoadLib():
         else:
             # 3.8 or higher
             os.add_dll_directory(pathToBinary)
+            # sdk 5.5.0 fix
+            os.environ["PATH"] = f"{os.getenv('PATH')};{pathToBinary}"
     else:
         os.environ["LD_LIBRARY_PATH"] = f"{os.getenv('LD_LIBRARY_PATH')}:{pathToBinary}"
 
