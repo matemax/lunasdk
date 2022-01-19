@@ -55,8 +55,22 @@ class ErrorInfo:
         """
         return "error code: {}, desc: {}, detail: {}".format(self.errorCode, self.description, self.detail)
 
-    def format(self, details: str) -> "ErrorInfo":
-        return ErrorInfo(self.errorCode, self.description, details)
+    def format(self, *formatArgs) -> "ErrorInfo":
+        """
+        The time has come.
+
+        Args:
+            formatArgs: args to format the current
+
+        Returns:
+            error with formatted detail
+
+        >>> error = ErrorInfo(777, '777', 'some {} data {}')
+        >>> error = error.format('useful', '4 u')
+        >>> error.detail
+        'some useful data 4 u'
+        """
+        return ErrorInfo(self.errorCode, self.description, self.detail.format(*formatArgs))
 
 
 class LunaVLError:
