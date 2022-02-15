@@ -23,8 +23,8 @@ class IndexBuilder(CoreIndex):
         _bufSize (int): storage size with descriptors
     """
 
-    def __init__(self, faceEngine: PyIFaceEngine):
-        super().__init__(faceEngine.createIndexBuilder(), faceEngine)
+    def __init__(self, faceEngine: PyIFaceEngine, descriptorVersion: int = 0):
+        super().__init__(faceEngine.createIndexBuilder(version=descriptorVersion), faceEngine)
         self._bufSize = 0
 
     @property

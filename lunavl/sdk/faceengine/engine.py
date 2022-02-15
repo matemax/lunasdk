@@ -318,13 +318,15 @@ class VLFaceEngine:
         """
         return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
 
-    def createIndexBuilder(self) -> IndexBuilder:
+    def createIndexBuilder(self, descriptorVersion: int = 0) -> IndexBuilder:
         """
         Create an index builder for face
+        Args:
+            descriptorVersion: descriptor version, or zero if default should be used
         Returns:
             index builder
         """
-        return IndexBuilder(self._faceEngine)
+        return IndexBuilder(self._faceEngine, descriptorVersion=descriptorVersion)
 
     def createCredibilityEstimator(self) -> CredibilityEstimator:
         """
