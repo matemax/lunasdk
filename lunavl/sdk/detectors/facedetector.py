@@ -130,7 +130,7 @@ class FaceDetector:
 
     Attributes:
         _detector (IDetectorPtr): core detector
-        detectorType (DetectionType): detector type
+        detectorType (DetectorType): detector type
 
     """
 
