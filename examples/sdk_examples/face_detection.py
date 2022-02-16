@@ -19,7 +19,7 @@ def detectFaces():
     Detect one face on an image.
     """
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
 
     imageWithOneFace = VLImage.load(filename=EXAMPLE_O)
     pprint.pprint(detector.detectOne(imageWithOneFace, detect5Landmarks=False, detect68Landmarks=False).asDict())
@@ -33,7 +33,7 @@ def detectFaces():
     pprint.pprint(detector.detectOne(imageWithoutFace, detect5Landmarks=False, detect68Landmarks=False) is None)
 
     severalFaces = detector.detect(
-        [ImageForDetection(imageWithSeveralFaces, Rect(1, 1, 300.0, 300.0))],
+        [ImageForDetection(imageWithSeveralFaces, Rect(1, 1, 300, 300))],
         detect5Landmarks=False,
         detect68Landmarks=False,
     )

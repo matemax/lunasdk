@@ -15,7 +15,7 @@ def estimateMouthState():
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     faceDetection = detector.detectOne(image)
     warper = faceEngine.createFaceWarper()
     warp = warper.warp(faceDetection)

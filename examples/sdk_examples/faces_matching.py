@@ -15,7 +15,7 @@ def matchFacesFromImages():
     """
 
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     extractor = faceEngine.createFaceDescriptorEstimator()
     warper = faceEngine.createFaceWarper()
     matcher = faceEngine.createFaceMatcher()
