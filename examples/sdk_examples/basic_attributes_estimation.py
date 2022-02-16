@@ -15,7 +15,7 @@ def estimateBasicAttributes():
     """
     image = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     faceDetections = detector.detect([image])[0]
     warper = faceEngine.createFaceWarper()
     warps = [warper.warp(faceDetection) for faceDetection in faceDetections]
