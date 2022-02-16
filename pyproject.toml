@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 [tool]
 [tool.poetry]
 name = "lunavl"
-version = "0.1.13"
+version = "0.1.14"
 description = "Python interface for VisionLabs Luna platform"
 authors = ["VisionLabs <m.limonov@visionlabs.ru>"]
 repository = "https://github.com/matemax/lunasdk"
