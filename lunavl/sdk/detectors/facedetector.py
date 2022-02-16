@@ -27,6 +27,7 @@ from ..detectors.base import (
 )
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
+from ..faceengine.setting_provider import DetectorType
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -135,7 +136,7 @@ class FaceDetector:
 
     __slots__ = ("_detector", "detectorType")
 
-    def __init__(self, detectorPtr, detectorType: DetectionType):
+    def __init__(self, detectorPtr, detectorType: DetectorType):
         self._detector = detectorPtr
         self.detectorType = detectorType
 

@@ -20,7 +20,7 @@ def estimateHeadPose():
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V1)
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     headPoseEstimator = faceEngine.createHeadPoseEstimator()
     faceDetection = detector.detectOne(image, detect5Landmarks=False, detect68Landmarks=True)
     #: estimate by 68 landmarks
