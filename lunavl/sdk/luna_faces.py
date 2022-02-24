@@ -255,7 +255,7 @@ class VLFaceDetection(FaceDetection):
             mouth state
         """
         if self._descriptor is None:
-            self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(self.warp)
+            self._descriptor = self.estimatorCollection.descriptorEstimator.estimate(self.warp)
         return self._descriptor
 
     def _getTransformedLandmarks5(self) -> Landmarks5:
@@ -376,9 +376,9 @@ class VLFaceDetector:
     """
 
     #: a global instance of FaceEngine for usual creating detectors
-    faceEngine: VLFaceEngine = VLFaceEngine()
+    faceEngine: VLFaceEngine
     #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
+    estimatorsCollection: FaceEstimatorsCollection
 
     def __init__(
         self,
@@ -395,7 +395,9 @@ class VLFaceDetector:
         """
         if faceEngine is not None:
             self.faceEngine = faceEngine
-            self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
+        else:
+            self.faceEngine = VLFaceEngine()
+        self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
         self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
 
@@ -536,7 +538,7 @@ class VLWarpedImage(FaceWarpedImage):
         self._credibility: Optional[Credibility] = None
 
     #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=VLFaceEngine())
+    estimatorsCollection: FaceEstimatorsCollection
 
     @property
     def mouthState(self) -> MouthStates:
