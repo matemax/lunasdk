@@ -16,8 +16,10 @@ a face estimator collection as a class attribute for a detections attributes est
 Example
 ~~~~~~~
 
+>>> from lunavl.sdk.faceengine.engine import VLFaceEngine
 >>> from lunavl.sdk.luna_faces import VLFaceDetector
 >>> from lunavl.sdk.luna_faces import VLImage
+>>> VLFaceDetector.initialize(VLFaceEngine())
 >>> detector = VLFaceDetector()
 >>> image = VLImage.load(
 ...         url='https://cdn1.savepice.ru/uploads/2019/4/15/aa970957128d9892f297cdfa5b3fda88-full.jpg')

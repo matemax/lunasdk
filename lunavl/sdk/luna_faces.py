@@ -383,7 +383,6 @@ class VLFaceDetector:
     def __init__(
         self,
         detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
-        faceEngine: Optional[VLFaceEngine] = None,
         estimationSettings: Optional[VLFaceDetectionSettings] = None,
     ):
         """
@@ -391,15 +390,21 @@ class VLFaceDetector:
 
         Args:
             detectorType: detector type
-            faceEngine: face engine for detector and estimators
+            estimationSettings: settings for detection
         """
-        if faceEngine is not None:
-            self.faceEngine = faceEngine
-        else:
-            self.faceEngine = VLFaceEngine()
-        self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
         self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
+
+    @classmethod
+    def initialize(cls, faceEngine: VLFaceEngine) -> None:
+        """
+        Initialize class attributes.
+
+        Args:
+            faceEngine: face engine for detector and estimators
+        """
+        cls.faceEngine = faceEngine
+        cls.estimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
@@ -509,6 +514,9 @@ class VLWarpedImage(FaceWarpedImage):
         _credibility (Optional[Credibility]): lazy load credibility estimation
     """
 
+    #: estimators collection of class for usual creating detectors
+    estimatorsCollection: FaceEstimatorsCollection
+
     __slots__ = (
         "_emotions",
         "_mouthState",
@@ -537,8 +545,15 @@ class VLWarpedImage(FaceWarpedImage):
         self._glasses: Optional[Glasses] = None
         self._credibility: Optional[Credibility] = None
 
-    #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection
+    @classmethod
+    def initialize(cls, estimatorsCollection: FaceEstimatorsCollection) -> None:
+        """
+        Initialize class attributes.
+
+        Args:
+            estimatorsCollection: face estimators collection
+        """
+        cls.estimatorsCollection = estimatorsCollection
 
     @property
     def mouthState(self) -> MouthStates:
