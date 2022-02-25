@@ -399,6 +399,7 @@ class VLFaceDetector:
                 raise RuntimeError(f"Initialize the '{self.__class__.__name__}' first or pass faceEngine")
         else:
             self.faceEngine = faceEngine
+            self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
         self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
 
