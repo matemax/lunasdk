@@ -4,7 +4,6 @@ Example of using VLFaceDetector
 import pprint
 from lunavl.sdk.image_utils.image import VLImage
 from lunavl.sdk.luna_faces import VLFaceDetector
-from lunavl.sdk.faceengine.engine import VLFaceEngine
 from resources import EXAMPLE_O
 
 
@@ -12,7 +11,7 @@ def estimateAll():
     """
     Estimate all attributes
     """
-    # VLFaceDetector.initialize(VLFaceEngine())
+    VLFaceDetector.initialize()
     detector = VLFaceDetector()
     image = VLImage.load(filename=EXAMPLE_O)
     detection = detector.detectOne(image)
