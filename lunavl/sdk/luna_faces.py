@@ -383,6 +383,7 @@ class VLFaceDetector:
     def __init__(
         self,
         detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
+        faceEngine: Optional[VLFaceEngine] = None,
         estimationSettings: Optional[VLFaceDetectionSettings] = None,
     ):
         """
@@ -390,21 +391,27 @@ class VLFaceDetector:
 
         Args:
             detectorType: detector type
+            faceEngine: face engine for detector and estimators
             estimationSettings: settings for detection
         """
+        if faceEngine is None:
+            if not hasattr(self, "faceEngine"):
+                raise RuntimeError(f"Initialize the '{self.__class__.__name__}' first or pass faceEngine")
+        else:
+            self.faceEngine = faceEngine
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
         self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
 
     @classmethod
-    def initialize(cls, faceEngine: VLFaceEngine) -> None:
+    def initialize(cls, faceEngine: Optional[VLFaceEngine] = None) -> None:
         """
         Initialize class attributes.
 
         Args:
             faceEngine: face engine for detector and estimators
         """
-        cls.faceEngine = faceEngine
-        cls.estimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
+        cls.faceEngine = faceEngine or VLFaceEngine()
+        cls.estimatorsCollection = FaceEstimatorsCollection(faceEngine=cls.faceEngine)
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
@@ -546,14 +553,14 @@ class VLWarpedImage(FaceWarpedImage):
         self._credibility: Optional[Credibility] = None
 
     @classmethod
-    def initialize(cls, estimatorsCollection: FaceEstimatorsCollection) -> None:
+    def initialize(cls, estimatorsCollection: Optional[FaceEstimatorsCollection] = None) -> None:
         """
         Initialize class attributes.
 
         Args:
             estimatorsCollection: face estimators collection
         """
-        cls.estimatorsCollection = estimatorsCollection
+        cls.estimatorsCollection = estimatorsCollection or FaceEstimatorsCollection()
 
     @property
     def mouthState(self) -> MouthStates:

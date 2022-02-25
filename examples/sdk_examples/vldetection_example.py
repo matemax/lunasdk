@@ -12,7 +12,7 @@ def estimateAll():
     """
     Estimate all attributes
     """
-    VLFaceDetector.initialize(VLFaceEngine())
+    # VLFaceDetector.initialize(VLFaceEngine())
     detector = VLFaceDetector()
     image = VLImage.load(filename=EXAMPLE_O)
     detection = detector.detectOne(image)
