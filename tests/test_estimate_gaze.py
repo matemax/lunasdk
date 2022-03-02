@@ -77,7 +77,7 @@ class TestEstimateGazeDirection(BaseTestClass):
         warpWithLandmarks5 = WarpWithLandmarks5(self.warp, faceDetection.landmarks5)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.gazeEstimator.estimate(warpWithLandmarks5)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidLandmarks5)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidLandmarks5.format("Invalid landmarks 5"))
 
     def test_batch_estimate_gaze(self):
         """
@@ -99,5 +99,6 @@ class TestEstimateGazeDirection(BaseTestClass):
         """
         Test gaze estimator with invalid input
         """
-        with pytest.raises(TypeError):
+        with pytest.raises(LunaSDKException) as e:
             self.gazeEstimator.estimateBatch([], [])
+        assert e.value.error.errorCode == LunaVLError.InvalidSpanSize.errorCode

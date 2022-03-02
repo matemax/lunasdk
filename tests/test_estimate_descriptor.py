@@ -400,7 +400,7 @@ class TestEstimateDescriptor(BaseTestClass):
                                 exceptionInfo.value.context[1], LunaVLError.InvalidImageSize
                             )
 
-    @pytest.mark.skip(msg="Skip error test")  # TODO: SDK return isError=False. Not raises LunaSDKException
+    @pytest.mark.skip(reason="Skip error test")  # TODO: SDK return isError=False. Not raises LunaSDKException
     def test_extract_descriptors_batch_incorrect_source_descriptors(self):
         """
         Test correctly estimate descriptor batch.

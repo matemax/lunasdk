@@ -98,7 +98,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
                     ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)]),
                 ]
             )
-        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
@@ -109,7 +109,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[ERROR_CORE_RECT])])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.ValidationFailed.format("Invalid rectangle"))
 
     def test_match_redetect_one_image(self):
         """

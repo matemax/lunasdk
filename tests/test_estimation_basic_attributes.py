@@ -232,7 +232,7 @@ class TestBasicAttributes(BaseTestClass):
                 estimateEthnicity=True,
                 aggregate=False,
             )
-        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)
