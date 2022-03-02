@@ -141,13 +141,13 @@ class TestIndexFunctionality(BaseTestClass):
         nonExistentIndex = 2
         with pytest.raises(LunaSDKException) as ex:
             descriptor = self.indexBuilder[nonExistentIndex]
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId)
+        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId.format("Invalid descriptor id."))
 
     def test_append_non_default_descriptor_to_builder(self):
         """Test append non default descriptor to internal storage."""
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.append(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptor)
+        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptor.format("Invalid descriptor"))
 
     def test_remove_descriptor_from_builder(self):
         """Test remove descriptor from internal storage."""
@@ -167,7 +167,7 @@ class TestIndexFunctionality(BaseTestClass):
         nonExistentIndex = 2
         with pytest.raises(LunaSDKException) as ex:
             del self.indexBuilder[nonExistentIndex]
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId)
+        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId.format("Invalid descriptor id."))
 
     def test_append_descriptor_to_empty_dynamic_index(self):
         """Test append descriptor to empty dynamic index."""
@@ -234,7 +234,7 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=2, expectedBufSize=2)
         with pytest.raises(LunaSDKException) as ex:
             dynamicIndex.search(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidInput)
+        self.assertLunaVlError(ex, LunaVLError.InvalidInput.format("Invalid input"))
 
     def test_search_result_empty(self):
         """Test search with empty result."""
@@ -284,7 +284,7 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=1, expectedBufSize=1)
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.append(self.nonDefaultFaceDescriptor)
-        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptor)
+        self.assertLunaVlError(ex, LunaVLError.InvalidDescriptor.format("Invalid descriptor"))
 
     def test_load_index_incorrect_path_to_file(self):
         """Test load non existing index file."""
@@ -319,7 +319,7 @@ class TestIndexFunctionality(BaseTestClass):
         """Test load index unknown file."""
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.loadIndex(WARP_ONE_FACE, IndexType.dynamic)
-        self.assertLunaVlError(ex, LunaVLError.InvalidSerializedObject)
+        self.assertLunaVlError(ex, LunaVLError.InvalidSerializedObject.format("Invalid serialized object."))
 
     def test_nondefault_descriptor_index(self):
         """Test build nondefault version index, and then append & search descriptor."""

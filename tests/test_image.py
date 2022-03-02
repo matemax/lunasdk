@@ -116,7 +116,7 @@ class TestImage(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage(body=b"some text", filename="bytes")
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidType)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidType.format("Unsupported type"))
 
     def test_check_ndarray_type(self):
         """
@@ -145,7 +145,7 @@ class TestImage(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             VLImage.load(filename=ONE_FACE, colorFormat=ColorFormat("Unknown"))
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidFormat)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidFormat.format("Unsupported format"))
 
     def test_save_image(self):
         """

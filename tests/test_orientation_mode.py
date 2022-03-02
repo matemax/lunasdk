@@ -77,4 +77,4 @@ class TestOrientationMode(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.orientationModeEstimator.estimateBatch([])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))

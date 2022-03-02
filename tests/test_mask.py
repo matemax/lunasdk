@@ -161,7 +161,7 @@ class TestMask(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.maskEstimator.estimateBatch([])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))
 
     def test_estimate_missing_mask_large_image(self):
         """
