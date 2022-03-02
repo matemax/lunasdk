@@ -379,9 +379,9 @@ class VLFaceDetector:
     """
 
     #: a global instance of FaceEngine for usual creating detectors
-    faceEngine: VLFaceEngine = VLFaceEngine()
+    faceEngine: VLFaceEngine
     #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=faceEngine)
+    estimatorsCollection: FaceEstimatorsCollection
 
     def __init__(
         self,
@@ -395,12 +395,27 @@ class VLFaceDetector:
         Args:
             detectorType: detector type
             faceEngine: face engine for detector and estimators
+            estimationSettings: settings for detection
         """
-        if faceEngine is not None:
+        if faceEngine is None:
+            if not hasattr(self, "faceEngine"):
+                raise RuntimeError(f"Initialize the '{self.__class__.__name__}' first or pass faceEngine")
+        else:
             self.faceEngine = faceEngine
             self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
         self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
         self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
+
+    @classmethod
+    def initialize(cls, faceEngine: Optional[VLFaceEngine] = None) -> None:
+        """
+        Initialize class attributes.
+
+        Args:
+            faceEngine: face engine for detector and estimators
+        """
+        cls.faceEngine = faceEngine or VLFaceEngine()
+        cls.estimatorsCollection = FaceEstimatorsCollection(faceEngine=cls.faceEngine)
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
@@ -523,6 +538,9 @@ class VLWarpedImage(FaceWarpedImage):
         _credibility (Optional[Credibility]): lazy load credibility estimation
     """
 
+    #: estimators collection of class for usual creating detectors
+    estimatorsCollection: FaceEstimatorsCollection
+
     __slots__ = (
         "_emotions",
         "_mouthState",
@@ -551,8 +569,15 @@ class VLWarpedImage(FaceWarpedImage):
         self._glasses: Optional[Glasses] = None
         self._credibility: Optional[Credibility] = None
 
-    #: estimators collection of class for usual creating detectors
-    estimatorsCollection: FaceEstimatorsCollection = FaceEstimatorsCollection(faceEngine=VLFaceEngine())
+    @classmethod
+    def initialize(cls, estimatorsCollection: Optional[FaceEstimatorsCollection] = None) -> None:
+        """
+        Initialize class attributes.
+
+        Args:
+            estimatorsCollection: face estimators collection
+        """
+        cls.estimatorsCollection = estimatorsCollection or FaceEstimatorsCollection()
 
     @property
     def mouthState(self) -> MouthStates:

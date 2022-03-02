@@ -320,3 +320,12 @@ class TestIndexFunctionality(BaseTestClass):
         with pytest.raises(LunaSDKException) as ex:
             self.indexBuilder.loadIndex(WARP_ONE_FACE, IndexType.dynamic)
         self.assertLunaVlError(ex, LunaVLError.InvalidSerializedObject)
+
+    def test_nondefault_descriptor_index(self):
+        """Test build nondefault version index, and then append & search descriptor."""
+        indexBuilder = self.faceEngine.createIndexBuilder(descriptorVersion=self.nonDefaultDescriptorVersion)
+        indexBuilder.append(self.nonDefaultFaceDescriptor)
+        dynamicIndex = indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=1, expectedBufSize=1)
+        result = dynamicIndex.search(self.nonDefaultFaceDescriptor)
+        assert 1 == len(result), result
