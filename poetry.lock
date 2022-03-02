@@ -167,21 +167,6 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
-name = "FaceEngine"
-version = "5.5.1.0"
-description = "Python bindings of FaceEngine using pybind11 and CMake"
-category = "main"
-optional = false
-python-versions = "*"
-develop = false
-
-[package.source]
-type = "git"
-url = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-reference = "ec6eff03"
-resolved_reference = "ec6eff038619c76c81436d33eb1236f441dac39a"
-
-[[package]]
 name = "filelock"
 version = "3.4.1"
 description = "A platform independent file lock."
@@ -834,7 +819,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6"
-content-hash = "2bedd72ce3f3a07cd89c84a02fa7f6440028b064f3b6ee5dcb28bad1a718d8db"
+content-hash = "e4469ad092fe6931a401571b4f33534ab6623703d4c8cc1eada938a90d33e842"
 
 [metadata.files]
 alabaster = [
@@ -900,7 +885,6 @@ docutils = [
     {file = "docutils-0.17.1-py2.py3-none-any.whl", hash = "sha256:cf316c8370a737a022b72b56874f6602acf974a37a9fba42ec2876387549fc61"},
     {file = "docutils-0.17.1.tar.gz", hash = "sha256:686577d2e4c32380bb50cbb22f575ed742d58168cee37e99117a854bcd88f125"},
 ]
-FaceEngine = []
 filelock = [
     {file = "filelock-3.4.1-py3-none-any.whl", hash = "sha256:a4bc51381e01502a30e9f06dd4fa19a1712eab852b6fb0f84fd7cce0793d8ca3"},
     {file = "filelock-3.4.1.tar.gz", hash = "sha256:0f12f552b42b5bf60dba233710bf71337d35494fc8bdd4fd6d9f6d082ad45e06"},
