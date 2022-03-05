@@ -216,7 +216,7 @@ class HeadPoseEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
         if not asyncEstimate:
-            error, headPoseEstimations = self._coreEstimator.async_estimate_subjective_quality(coreImages, detections)
+            error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
             return postProcessingBatch(error, headPoseEstimations)
-        task = self._coreEstimator.asyncEstimate(coreImages, detections)
+        task = self._coreEstimator.async_estimate_subjective_quality(coreImages, detections)
         return AsyncTask(task, postProcessingBatch)
