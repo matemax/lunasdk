@@ -2,7 +2,7 @@
 
 see `mouth state`_
 """
-from typing import Union, Dict
+from typing import Union, Dict, List
 
 from FaceEngine import MouthEstimation, IMouthEstimatorPtr  # pylint: disable=E0611,E0401
 
@@ -10,6 +10,7 @@ from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...async_task import AsyncTask
 
@@ -74,6 +75,12 @@ def postProcessing(error, mouthState):
     return MouthStates(mouthState)
 
 
+def postProcessingBatch(error, mouthStates):
+    assertError(error)
+
+    return [MouthStates(mouthState) for mouthState in mouthStates]
+
+
 class MouthStateEstimator(BaseEstimator):
     """
     Mouth state estimator.
@@ -113,3 +120,28 @@ class MouthStateEstimator(BaseEstimator):
             return AsyncTask(task, postProcessing)
         error, mouthState = self._coreEstimator.estimate(warp.warpedImage.coreImage)
         return postProcessing(error, mouthState)
+
+    #  pylint: disable=W0221
+    @CoreExceptionWrap(LunaVLError.EstimationMouthStateError)
+    def estimateBatch(
+        self, warps: List[Union[FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
+    ) -> Union[List[MouthStates], AsyncTask[List[MouthStates]]]:
+        """
+        Batch estimate mouth states
+
+        Args:
+            warps: warped images
+            asyncEstimate: estimate or run estimation in background
+        Returns:
+            list of estimated mouth states if asyncEstimate is false otherwise async task
+        Raises:
+            LunaSDKException: if estimation failed
+        """
+        coreImages = [warp.warpedImage.coreImage for warp in warps]
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages)
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(coreImages)
+            return AsyncTask(task, postProcessingBatch)
+        error, masks = self._coreEstimator.estimate(coreImages)
+        return postProcessingBatch(error, masks)
