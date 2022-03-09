@@ -49,6 +49,6 @@ class TestCredibility(BaseTestClass):
         """
         Test credibility check estimations
         """
-        expectedResult = 0.926
+        expectedResult = 0.923
         credibility = TestCredibility.credibilityEstimator.estimate(self.warp)
         self.assertCredibilityEstimation(credibility, expectedResult)
