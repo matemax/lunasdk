@@ -15,8 +15,7 @@ from FaceEngine import (
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import FaceDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.errors.exceptions import assertError
 from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -133,7 +132,6 @@ class LivenessV1Estimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
     def estimate(  # type: ignore
         self,
         faceDetection: FaceDetection,
@@ -175,7 +173,6 @@ class LivenessV1Estimator(BaseEstimator):
         return postProcessing(error, estimation)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationLivenessV1Error)
     def estimateBatch(  # type: ignore
         self,
         faceDetections: List[FaceDetection],

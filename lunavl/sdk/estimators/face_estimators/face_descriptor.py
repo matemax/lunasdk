@@ -10,8 +10,6 @@ from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.descriptors.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -63,7 +61,6 @@ class FaceDescriptorEstimator(BaseEstimator):
             asyncEstimate=asyncEstimate,
         )
 
-    @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
         self,
         warps: List[Union[FaceWarp, FaceWarpedImage]],

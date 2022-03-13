@@ -8,8 +8,7 @@ from FaceEngine import CredibilityCheckEstimation
 from FaceEngine import CredibilityStatus
 from FaceEngine import ICredibilityCheckEstimatorPtr
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.errors.exceptions import assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...async_task import AsyncTask
@@ -104,7 +103,6 @@ class CredibilityEstimator(BaseEstimator):
         """
         super().__init__(credibilityEstimator)
 
-    @CoreExceptionWrap(LunaVLError.CredibilityError)
     def estimate(
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Credibility, AsyncTask[Credibility]]:

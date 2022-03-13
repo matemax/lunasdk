@@ -4,10 +4,10 @@ from typing import Optional, Union, List, Tuple, Type
 
 from FaceEngine import IDescriptorExtractorPtr, FSDKError  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory, BaseDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, assertError
-from lunavl.sdk.async_task import AsyncTask
 from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 

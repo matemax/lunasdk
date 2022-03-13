@@ -23,8 +23,7 @@ from .base import (
 )
 from ..async_task import AsyncTask
 from ..base import LandmarksWithScore
-from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.exceptions import assertError
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
 
@@ -202,7 +201,6 @@ class HumanDetector:
             toDetect = HumanDetectionType.HDT_ALL
         return toDetect
 
-    @CoreExceptionWrap(LunaVLError.DetectHumanError)
     def detectOne(
         self,
         image: VLImage,
@@ -239,7 +237,6 @@ class HumanDetector:
         error, detectRes = self._detector.detect(imgs, detectAreas, limit, detectionType)
         return postProcessing(error, detectRes, image)
 
-    @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def detect(
         self,
         images: List[Union[VLImage, ImageForDetection]],
@@ -269,7 +266,6 @@ class HumanDetector:
         error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
         return postProcessingBatch(error, fsdkDetectRes, images, detectLandmarks)
 
-    @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetectOne(  # noqa: F811
         self,
         image: VLImage,
@@ -304,7 +300,6 @@ class HumanDetector:
         )
         return postProcessingRedetect(error, detectRes, image)
 
-    @CoreExceptionWrap(LunaVLError.DetectHumansError)
     def redetect(
         self,
         images: List[ImageForRedetection],

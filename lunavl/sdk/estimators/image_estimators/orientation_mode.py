@@ -9,8 +9,7 @@ from typing import Union, List
 from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType
 
 from lunavl.sdk.async_task import AsyncTask
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.errors.exceptions import assertError
 from lunavl.sdk.estimators.base import BaseEstimator
 from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInputByBatchEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarp, FaceWarpedImage
@@ -74,7 +73,6 @@ class OrientationModeEstimator(BaseEstimator):
         """
         super().__init__(coreOrientationModeEstimator)
 
-    @CoreExceptionWrap(LunaVLError.EstimationOrientationModeError)
     def estimate(
         self, image: Union[VLImage, FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[OrientationType, AsyncTask[OrientationType]]:
@@ -100,7 +98,6 @@ class OrientationModeEstimator(BaseEstimator):
         error, coreOrientationType = self._coreEstimator.estimate(coreImage)
         return postProcessing(error, coreOrientationType)
 
-    @CoreExceptionWrap(LunaVLError.EstimationOrientationModeError)
     def estimateBatch(
         self, images: List[Union[VLImage, FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
     ) -> Union[List[OrientationType], AsyncTask[List[OrientationType]]]:

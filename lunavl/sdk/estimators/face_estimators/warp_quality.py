@@ -7,12 +7,10 @@ from typing import Dict, Union, List
 from FaceEngine import SubjectiveQuality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Quality(BaseEstimation):
@@ -105,15 +103,7 @@ class Quality(BaseEstimation):
         }
 
 
-def postProcessing(error, quality):
-    assertError(error)
-    return Quality(quality)
-
-
-def postProcessingBatch(error, qualities):
-    assertError(error)
-
-    return [Quality(quality) for quality in qualities]
+POST_PROCESSING = DefaultPostprocessingFactory(Quality)
 
 
 class WarpQualityEstimator(BaseEstimator):
@@ -132,7 +122,6 @@ class WarpQualityEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationWarpQualityError)
     def estimate(
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Quality, AsyncTask[Quality]]:
@@ -150,12 +139,11 @@ class WarpQualityEstimator(BaseEstimator):
         """
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
-            return AsyncTask(task, postProcessing)
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, emotions = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        return postProcessing(error, emotions)
+        return POST_PROCESSING.postProcessing(error, emotions)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationWarpQualityError)
     def estimateBatch(
         self, warps: List[Union[FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
     ) -> Union[List[Quality], AsyncTask[List[Quality]]]:
@@ -175,6 +163,6 @@ class WarpQualityEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
             task = self._coreEstimator.async_estimate_subjective_quality(coreImages)
-            return AsyncTask(task, postProcessingBatch)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, masks = self._coreEstimator.estimate(coreImages)
-        return postProcessingBatch(error, masks)
+        return POST_PROCESSING.postProcessingBatch(error, masks)

@@ -15,12 +15,10 @@ from FaceEngine import (
 )  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Ethnicity(Enum):
@@ -206,22 +204,9 @@ class BasicAttributes(BaseEstimation):
         return res
 
 
-def postProcessing(error, baseAttributes):
-    assertError(error)
-    return BasicAttributes(baseAttributes)
-
-
-def postProcessingBatch(error, baseAttributes, aggregateAttribute, aggregate):
-    assertError(error)
-
-    attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
-    if aggregate:
-        return attributes, BasicAttributes(aggregateAttribute)
-    else:
-        return attributes, None
-
-
 BasicAttributesBatchResult = Tuple[List[BasicAttributes], Union[None, BasicAttributes]]
+
+POST_PROCESSING = DefaultPostprocessingFactory(BasicAttributes)
 
 
 class BasicAttributesEstimator(BaseEstimator):
@@ -240,7 +225,6 @@ class BasicAttributesEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationBasicAttributeError)
     def estimate(
         self,
         warp: Union[FaceWarp, FaceWarpedImage],
@@ -273,11 +257,10 @@ class BasicAttributesEstimator(BaseEstimator):
             dtAttributes |= AttributeRequest.estimateEthnicity
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage, AttributeRequest(dtAttributes))
-            return AsyncTask(task, postProcessing)
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage, AttributeRequest(dtAttributes))
-        return postProcessing(error, baseAttributes)
+        return POST_PROCESSING.postProcessing(error, baseAttributes)
 
-    @CoreExceptionWrap(LunaVLError.BatchEstimationBasicAttributeError)
     def estimateBasicAttributesBatch(
         self,
         warps: List[Union[FaceWarp, FaceWarpedImage]],
@@ -320,6 +303,12 @@ class BasicAttributesEstimator(BaseEstimator):
 
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(images, AttributeRequest(dtAttributes))
-            return AsyncTask(task, postProcessing=partial(postProcessingBatch, aggregate=aggregate))
-        error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
-        return postProcessingBatch(error, baseAttributes, aggregateAttribute, aggregate)
+            return AsyncTask(
+                task, postProcessing=partial(POST_PROCESSING.postProcessingBatchWithAggregation, aggregate=aggregate)
+            )
+        error, baseAttributes, aggregatedAttribute = self._coreEstimator.estimate(
+            images, AttributeRequest(dtAttributes)
+        )
+        return POST_PROCESSING.postProcessingBatchWithAggregation(
+            error, baseAttributes, aggregatedAttribute, aggregate=aggregate
+        )

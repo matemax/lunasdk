@@ -9,7 +9,6 @@ from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL.Image import Image as PilImage
 from numpy import ndarray
 
-from .async_task import AsyncTask, wrap
 from .detectors.base import ImageForDetection, ImageForRedetection
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
 from .estimator_collections import FaceEstimatorsCollection
@@ -434,7 +433,15 @@ class VLFaceDetector:
             detectRes.coreEstimation, detectRes.image, self.estimatorsCollection, self._estimationSettings
         )
 
-    def postProcessingBatch(self, detectRes: List[List[FaceDetection]]):
+    def postProcessingDetectionBatch(self, detectRes: List[List[FaceDetection]]):
+        """
+        Post processing detection results (wrap to  VLFaceDetection)
+        Args:
+            detectRes: detection results
+
+        Returns:
+            VLFaceDetection's
+        """
         res = []
         for imageDetections in detectRes:
             res.append(
@@ -452,7 +459,15 @@ class VLFaceDetector:
             )
         return res
 
-    def postProcessing(self, detection):
+    def postProcessing(self, detection: Optional[FaceDetection]) -> Optional[VLFaceDetection]:
+        """
+        Post processing detection (wrap to  VLFaceDetection)
+        Args:
+            detection: detection results
+
+        Returns:
+            VLFaceDetection
+        """
         if detection:
             return VLFaceDetection(
                 detection.coreEstimation, detection.image, self.estimatorsCollection, self._estimationSettings
@@ -460,8 +475,8 @@ class VLFaceDetector:
         return None
 
     def detect(
-        self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5, asyncEstimate=False
-    ) -> Union[List[List[VLFaceDetection]], AsyncTask[List[List[VLFaceDetection]]]]:
+        self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5
+    ) -> Union[List[List[VLFaceDetection]], List[List[VLFaceDetection]]]:
         """
         Batch detect faces on images.
 
@@ -471,16 +486,12 @@ class VLFaceDetector:
         Returns:
             return list of lists detection, order of detection lists is corresponding to order of input images
         """
-
-        if asyncEstimate:
-            task: AsyncTask = self._faceDetector.detect(images, limit, True, True, asyncEstimate=asyncEstimate)
-            return wrap(task, self.postProcessingBatch)
-        detectRes = self._faceDetector.detect(images, limit, True, True, asyncEstimate=asyncEstimate)
-        return self.postProcessingBatch(detectRes)
+        detectRes = self._faceDetector.detect(images, limit, True, True)
+        return self.postProcessingDetectionBatch(detectRes)
 
     def redetectOne(
-        self, image: Union[VLImage, VLFaceDetection], bBox: Rect, asyncEstimate=False
-    ) -> Union[Union[VLFaceDetection, None], AsyncTask[Union[VLFaceDetection, None]]]:
+        self, image: Union[VLImage, VLFaceDetection], bBox: Rect
+    ) -> Union[Union[VLFaceDetection, None], Union[VLFaceDetection, None]]:
         """
         Redetect faces on an image. If VLFaceDetection is provided, only VLImage from that object will be used.
 
@@ -494,17 +505,15 @@ class VLFaceDetector:
             imageForRedetct = image.image
         else:
             imageForRedetct = image
-        redetection: Union[None, FaceDetection, AsyncTask] = self._faceDetector.redetectOne(
+        redetection: Union[None, FaceDetection] = self._faceDetector.redetectOne(
             imageForRedetct, bBox=bBox, detect5Landmarks=True, detect68Landmarks=True
         )
-        if asyncEstimate:
-            task: AsyncTask = redetection  # type: ignore
-            return wrap(task, self.postProcessing)
         return self.postProcessing(redetection)
 
     def redetect(
-        self, imagesAndBBoxes: List[ImageForRedetection], asyncEstimate=False
-    ) -> Union[List[List[Union[VLFaceDetection, None]]], AsyncTask[List[List[Union[VLFaceDetection, None]]]]]:
+        self,
+        imagesAndBBoxes: List[ImageForRedetection],
+    ) -> Union[List[List[Union[VLFaceDetection, None]]], List[List[Union[VLFaceDetection, None]]]]:
         """
         Redetect faces on images.
 
@@ -516,11 +525,8 @@ class VLFaceDetector:
                 Order of detections is corresponding to order of input bounding boxes.
         """
 
-        redetections = self._faceDetector.redetect(imagesAndBBoxes, True, True, asyncEstimate=asyncEstimate)
-        if asyncEstimate:
-            task: AsyncTask = redetections
-            return wrap(task, self.postProcessingBatch)
-        return self.postProcessingBatch(redetections)
+        redetections = self._faceDetector.redetect(imagesAndBBoxes, True, True)
+        return self.postProcessingDetectionBatch(redetections)
 
 
 class VLWarpedImage(FaceWarpedImage):

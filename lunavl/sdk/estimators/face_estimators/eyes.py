@@ -21,12 +21,10 @@ from FaceEngine import (
 
 from lunavl.sdk.base import BaseEstimation, Landmarks
 from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class EyeState(Enum):
@@ -191,14 +189,7 @@ class WarpWithLandmarks(NamedTuple):
     landmarks: Union[Landmarks5, Landmarks68]
 
 
-def postProcessingEyes(error, eyesEstimation):
-    assertError(error)
-    return EyesEstimation(eyesEstimation)
-
-
-def postProcessingEyesBatch(error, eyesEstimations):
-    assertError(error)
-    return [EyesEstimation(eyesEstimation) for eyesEstimation in eyesEstimations]
+POST_PROCESSING_EYES = DefaultPostprocessingFactory(EyesEstimation)
 
 
 class EyeEstimator(BaseEstimator):
@@ -217,7 +208,6 @@ class EyeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(
         self,
         warpWithLandmarks: WarpWithLandmarks,
@@ -246,12 +236,11 @@ class EyeEstimator(BaseEstimator):
             )
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
-            return AsyncTask(task, postProcessingEyes)
+            return AsyncTask(task, POST_PROCESSING_EYES.postProcessing)
         error, eyesEstimation = self._coreEstimator.estimate(warpWithLandmarks.warp.warpedImage.coreImage, eyeRects)
-        return postProcessingEyes(error, eyesEstimation)
+        return POST_PROCESSING_EYES.postProcessing(error, eyesEstimation)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimateBatch(
         self, warpWithLandmarksList: List[WarpWithLandmarks], asyncEstimate: bool = False
     ) -> Union[List[EyesEstimation], AsyncTask[List[EyesEstimation]]]:
@@ -287,9 +276,9 @@ class EyeEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages, eyeRectList)
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(coreImages, eyeRectList)
-            return AsyncTask(task, postProcessingEyesBatch)
+            return AsyncTask(task, POST_PROCESSING_EYES.postProcessingBatch)
         error, eyesEstimations = self._coreEstimator.estimate(coreImages, eyeRectList)
-        return postProcessingEyesBatch(error, eyesEstimations)
+        return POST_PROCESSING_EYES.postProcessingBatch(error, eyesEstimations)
 
 
 def _isNotNan(value: float) -> bool:
@@ -370,15 +359,7 @@ class WarpWithLandmarks5(NamedTuple):
     landmarks: Landmarks5
 
 
-def postProcessingBatch(error, gazeList):
-    assertError(error)
-
-    return [GazeDirection(gaze) for gaze in gazeList]
-
-
-def postProcessing(error, gaze):
-    assertError(error)
-    return GazeDirection(gaze)
+POST_PROCESSING_GAZE = DefaultPostprocessingFactory(GazeDirection)
 
 
 class GazeEstimator(BaseEstimator):
@@ -397,7 +378,6 @@ class GazeEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimate(
         self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: bool = False
     ) -> Union[GazeDirection, AsyncTask[GazeDirection]]:
@@ -416,12 +396,11 @@ class GazeEstimator(BaseEstimator):
         landmarks = warpWithLandmarks5.landmarks.coreEstimation
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(image, landmarks)
-            return AsyncTask(task, postProcessing)
+            return AsyncTask(task, POST_PROCESSING_GAZE.postProcessing)
         error, gaze = self._coreEstimator.estimate(image, landmarks)
-        return postProcessing(error, gaze)
+        return POST_PROCESSING_GAZE.postProcessing(error, gaze)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEyesGazeError)
     def estimateBatch(
         self, warpWithLandmarks5List: List[WarpWithLandmarks5], asyncEstimate: bool = False
     ) -> Union[List[GazeDirection], AsyncTask[List[GazeDirection]]]:
@@ -441,6 +420,6 @@ class GazeEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, images, landmarks)
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(images, landmarks)
-            return AsyncTask(task, postProcessingBatch)
+            return AsyncTask(task, POST_PROCESSING_GAZE.postProcessingBatch)
         error, gazeList = self._coreEstimator.estimate(images, landmarks)
-        return postProcessingBatch(error, gazeList)
+        return POST_PROCESSING_GAZE.postProcessingBatch(error, gazeList)

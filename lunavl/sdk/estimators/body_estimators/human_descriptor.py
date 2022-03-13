@@ -9,8 +9,6 @@ from typing import Union, Optional, List, Tuple
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.descriptors.descriptors import HumanDescriptorBatch, HumanDescriptor, HumanDescriptorFactory
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap
 from ..base import BaseEstimator
 from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
 from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
@@ -63,7 +61,6 @@ class HumanDescriptorEstimator(BaseEstimator):
             asyncEstimate=asyncEstimate,
         )
 
-    @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
         self,
         warps: List[Union[HumanWarp, HumanWarpedImage]],

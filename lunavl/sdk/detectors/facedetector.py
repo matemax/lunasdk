@@ -29,7 +29,7 @@ from ..detectors.base import (
     validateReDetectInput,
 )
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
+from ..errors.exceptions import assertError, LunaSDKException
 from ..faceengine.setting_provider import DetectorType
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
@@ -182,7 +182,6 @@ def collectDetectionsResult(
 
 def postProcessingRedetect(error, detectionsBatch, coreImages, images):
     assertError(error)
-
     res = collectDetectionsResult(detectionsBatch, coreImages, images)
     return res
 
@@ -224,7 +223,6 @@ class FaceDetector:
 
         return DetectionType(toDetect)
 
-    @CoreExceptionWrap(LunaVLError.DetectOneFaceError)
     def detectOne(
         self,
         image: VLImage,
@@ -263,7 +261,6 @@ class FaceDetector:
         )
         return postProcessing(error, detectRes, image)
 
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
         self,
         images: List[Union[VLImage, ImageForDetection]],
@@ -297,7 +294,6 @@ class FaceDetector:
         error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
         return postProcessingRedetect(error, fsdkDetectRes, coreImages=coreImages, images=images)
 
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetectOne(  # noqa: F811
         self,
         image: VLImage,
@@ -375,7 +371,6 @@ class FaceDetector:
             LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
         )
 
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
         self,
         images: List[ImageForRedetection],

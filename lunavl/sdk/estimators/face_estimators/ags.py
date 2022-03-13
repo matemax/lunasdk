@@ -7,8 +7,7 @@ from typing import Optional, List, Union
 from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.detectors.facedetector import FaceDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.errors.exceptions import assertError
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -29,7 +28,6 @@ class AGSEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
     def estimate(
         self, detection: Optional[FaceDetection] = None, imageWithFaceDetection: Optional[ImageWithFaceDetection] = None
     ) -> float:
@@ -58,7 +56,6 @@ class AGSEstimator(BaseEstimator):
         assertError(error)
         return ags
 
-    @CoreExceptionWrap(LunaVLError.EstimationAGSError)
     def estimateBatch(self, detections: Union[List[FaceDetection], List[ImageWithFaceDetection]]) -> List[float]:
         """
         Estimate ags for list of detections.

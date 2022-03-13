@@ -10,11 +10,9 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import Landmarks68, FaceDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class FrontalType(Enum):
@@ -114,14 +112,7 @@ class HeadPose(BaseEstimation):
         return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
 
 
-def postProcessing(error, headPoseEstimation):
-    assertError(error)
-    return HeadPose(headPoseEstimation)
-
-
-def postProcessingBatch(error, headPoseEstimations):
-    assertError(error)
-    return [HeadPose(estimation) for estimation in headPoseEstimations]
+POST_PROCESSING = DefaultPostprocessingFactory(HeadPose)
 
 
 class HeadPoseEstimator(BaseEstimator):
@@ -139,7 +130,6 @@ class HeadPoseEstimator(BaseEstimator):
         """
         super().__init__(coreHeadPoseEstimator)
 
-    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
     def estimateBy68Landmarks(
         self, landmarks68: Landmarks68, asyncEstimate: bool = False
     ) -> Union[HeadPose, AsyncTask[HeadPose]]:
@@ -157,9 +147,9 @@ class HeadPoseEstimator(BaseEstimator):
         """
         if not asyncEstimate:
             error, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
-            return postProcessing(error, headPoseEstimation)
+            return POST_PROCESSING.postProcessing(error, headPoseEstimation)
         task = self._coreEstimator.asyncEstimate(landmarks68.coreEstimation)
-        return AsyncTask(task, postProcessing)
+        return AsyncTask(task, POST_PROCESSING.postProcessing)
 
     #  pylint: disable=W0221
     def estimate(  # type: ignore
@@ -170,7 +160,6 @@ class HeadPoseEstimator(BaseEstimator):
         """
         return self.estimateBy68Landmarks(landmarks68, asyncEstimate=asyncEstimate)
 
-    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
     def estimateByBoundingBox(
         self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False
     ) -> Union[HeadPose, AsyncTask[HeadPose]]:
@@ -189,13 +178,12 @@ class HeadPoseEstimator(BaseEstimator):
             error, headPoseEstimation = self._coreEstimator.estimate(
                 imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
             )
-            return postProcessing(error, headPoseEstimation)
+            return POST_PROCESSING.postProcessing(error, headPoseEstimation)
         task = self._coreEstimator.asyncEstimate(
             imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
         )
-        return AsyncTask(task, postProcessing)
+        return AsyncTask(task, POST_PROCESSING.postProcessing)
 
-    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
     def estimateBatch(
         self, batch: Union[List[ImageWithFaceDetection], List[FaceDetection]], asyncEstimate: bool = False
     ) -> Union[List[HeadPose], AsyncTask[List[HeadPose]]]:
@@ -217,6 +205,6 @@ class HeadPoseEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
         if not asyncEstimate:
             error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
-            return postProcessingBatch(error, headPoseEstimations)
+            return POST_PROCESSING.postProcessingBatch(error, headPoseEstimations)
         task = self._coreEstimator.asyncEstimate(coreImages, detections)
-        return AsyncTask(task, postProcessingBatch)
+        return AsyncTask(task, POST_PROCESSING.postProcessingBatch)

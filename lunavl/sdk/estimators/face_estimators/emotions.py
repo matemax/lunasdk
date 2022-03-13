@@ -8,12 +8,10 @@ from typing import Union, List
 from FaceEngine import IEmotionsEstimatorPtr, Emotions as CoreEmotions  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Emotion(Enum):
@@ -180,15 +178,7 @@ class Emotions(BaseEstimation):
         return Emotion.fromCoreEmotion(self._coreEstimation.getPredominantEmotion())
 
 
-def postProcessing(error, emotions):
-    assertError(error)
-    return Emotions(emotions)
-
-
-def postProcessingBatch(error, emotions):
-    assertError(error)
-
-    return [Emotions(mask) for mask in emotions]
+POST_PROCESSING = DefaultPostprocessingFactory(Emotions)
 
 
 class EmotionsEstimator(BaseEstimator):
@@ -207,7 +197,6 @@ class EmotionsEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEmotionsError)
     def estimate(
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Emotions, AsyncTask[Emotions]]:
@@ -225,12 +214,11 @@ class EmotionsEstimator(BaseEstimator):
         """
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
-            return AsyncTask(task, postProcessing)
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, emotions = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        return postProcessing(error, emotions)
+        return POST_PROCESSING.postProcessing(error, emotions)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEmotionsError)
     def estimateBatch(
         self, warps: List[Union[FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
     ) -> Union[List[Emotions], AsyncTask[List[Emotions]]]:
@@ -250,6 +238,6 @@ class EmotionsEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(coreImages)
-            return AsyncTask(task, postProcessingBatch)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, masks = self._coreEstimator.estimate(coreImages)
-        return postProcessingBatch(error, masks)
+        return POST_PROCESSING.postProcessingBatch(error, masks)

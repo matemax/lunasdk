@@ -12,12 +12,10 @@ from FaceEngine import (
 )  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from lunavl.sdk.detectors.facedetector import FaceDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ...base import BaseEstimation
 
 
@@ -139,15 +137,7 @@ class Mask(BaseEstimation):
         }
 
 
-def postProcessing(error, mask):
-    assertError(error)
-    return Mask(mask)
-
-
-def postProcessingBatch(error, masks):
-    assertError(error)
-
-    return [Mask(mask) for mask in masks]
+POST_PROCESSING = DefaultPostprocessingFactory(Mask)
 
 
 class MaskEstimator(BaseEstimator):
@@ -165,7 +155,6 @@ class MaskEstimator(BaseEstimator):
         super().__init__(maskEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationMaskError)
     def estimate(
         self, faceObject: Union[FaceWarpedImage, FaceWarp, FaceDetection], asyncEstimate: bool = False
     ) -> Union[Mask, AsyncTask[Mask]]:
@@ -185,19 +174,18 @@ class MaskEstimator(BaseEstimator):
         if isinstance(faceObject, (FaceWarpedImage, FaceWarp)):
             if asyncEstimate:
                 task = self._coreEstimator.asyncEstimate(faceObject.warpedImage.coreImage)
-                return AsyncTask(task, postProcessing)
+                return AsyncTask(task, POST_PROCESSING.postProcessing)
             error, mask = self._coreEstimator.estimate(faceObject.warpedImage.coreImage)
         else:
             if asyncEstimate:
                 task = self._coreEstimator.asyncEstimate(
                     faceObject.image.coreImage, faceObject.coreEstimation.detection
                 )
-                return AsyncTask(task, postProcessing)
+                return AsyncTask(task, POST_PROCESSING.postProcessing)
             error, mask = self._coreEstimator.estimate(faceObject.image.coreImage, faceObject.coreEstimation.detection)
-        return postProcessing(error, mask)
+        return POST_PROCESSING.postProcessing(error, mask)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationMaskError)
     def estimateBatch(
         self, warps: List[Union[FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
     ) -> Union[List[Mask], AsyncTask[List[Mask]]]:
@@ -219,6 +207,6 @@ class MaskEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(coreImages)
-            return AsyncTask(task, postProcessingBatch)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, masks = self._coreEstimator.estimate(coreImages)
-        return postProcessingBatch(error, masks)
+        return POST_PROCESSING.postProcessingBatch(error, masks)

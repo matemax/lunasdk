@@ -8,8 +8,7 @@ from PIL.Image import Image as PilImage
 from numpy import ndarray
 
 from lunavl.sdk.detectors.humandetector import HumanDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.errors.exceptions import assertError
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
@@ -127,7 +126,6 @@ class HumanWarper:
         """
         self._coreWarper = coreWarper
 
-    @CoreExceptionWrap(LunaVLError.CreationWarpError)
     def warp(self, humanDetection: HumanDetection) -> HumanWarp:
         """
         Create warp from detection.

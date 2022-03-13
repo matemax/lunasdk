@@ -117,7 +117,7 @@ class TestHeadPose(BaseTestClass):
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))
 
     def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
         """
@@ -127,7 +127,7 @@ class TestHeadPose(BaseTestClass):
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection.format("Invalid detection"))
 
     def test_default_estimation(self):
         """
@@ -184,5 +184,6 @@ class TestHeadPose(BaseTestClass):
         """
         Batch estimation invalid input
         """
-        with pytest.raises(TypeError):
+        with pytest.raises(LunaSDKException) as exceptionInfo:
             self.headPoseEstimator.estimateBatch([], [])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))

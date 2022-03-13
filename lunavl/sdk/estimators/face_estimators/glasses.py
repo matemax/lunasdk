@@ -7,12 +7,10 @@ from typing import Union, Dict, List
 
 from FaceEngine import GlassesEstimation, IGlassesEstimatorPtr
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ...base import BaseEstimation
 
 
@@ -83,14 +81,7 @@ class Glasses(BaseEstimation):
         return {"glasses": str(self.glasses)}
 
 
-def postProcessing(error, glasses) -> Glasses:
-    assertError(error)
-    return Glasses(glasses)
-
-
-def postProcessingBatch(error, glasses) -> List[Glasses]:
-    assertError(error)
-    return [Glasses(gl) for gl in glasses]
+POST_PROCESSING = DefaultPostprocessingFactory(Glasses)
 
 
 class GlassesEstimator(BaseEstimator):
@@ -107,7 +98,6 @@ class GlassesEstimator(BaseEstimator):
         """
         super().__init__(glassesEstimator)
 
-    @CoreExceptionWrap(LunaVLError.EstimationGlassesError)
     def estimate(
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Glasses, AsyncTask[Glasses]]:
@@ -125,12 +115,11 @@ class GlassesEstimator(BaseEstimator):
         """
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
-            return AsyncTask(task, postProcessing)
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, glasses = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        return postProcessing(error, glasses)
+        return POST_PROCESSING.postProcessing(error, glasses)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationEmotionsError)
     def estimateBatch(
         self, warps: List[Union[FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
     ) -> Union[List[Glasses], AsyncTask[List[Glasses]]]:
@@ -150,6 +139,6 @@ class GlassesEstimator(BaseEstimator):
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(coreImages)
-            return AsyncTask(task, postProcessingBatch)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, masks = self._coreEstimator.estimate(coreImages)
-        return postProcessingBatch(error, masks)
+        return POST_PROCESSING.postProcessingBatch(error, masks)
