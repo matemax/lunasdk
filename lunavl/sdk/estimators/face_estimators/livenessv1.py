@@ -10,6 +10,7 @@ from FaceEngine import (
     LivenessOneShotRGBEstimation,  # pylint: disable=E0611,E0401
     ILivenessOneShotRGBEstimatorPtr,
     LivenessOneShotState,
+    FSDKErrorResult,
 )
 
 from lunavl.sdk.async_task import AsyncTask
@@ -105,12 +106,30 @@ class LivenessV1(BaseEstimation):
         return self._coreEstimation.qualityScore
 
 
-def postProcessing(error, estimation):
+def postProcessing(error: FSDKErrorResult, estimation: LivenessOneShotRGBEstimation) -> LivenessV1:
+    """
+    Convert a livenessV1 estimation from core result  and check error.
+    Args:
+        error: error
+        estimations:  core batch livenesv1 estimation
+
+    Returns:
+        livenessv1
+    """
     assertError(error)
     return LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State))
 
 
-def postProcessingBatch(error, estimations):
+def postProcessingBatch(error: FSDKErrorResult, estimations: List[LivenessOneShotRGBEstimation]) -> List[LivenessV1]:
+    """
+    Convert a livenessV1 batch estimation from core result  and check error.
+    Args:
+        error: error
+        estimations:  core batch livenesv1 estimation
+
+    Returns:
+        livenessv1 list
+    """
     assertError(error)
 
     return [LivenessV1(estimation, LivenessPrediction.fromCoreEmotion(estimation.State)) for estimation in estimations]

@@ -186,4 +186,4 @@ class TestHeadPose(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.headPoseEstimator.estimateBatch([], [])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))

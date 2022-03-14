@@ -1,8 +1,8 @@
 """Common descriptor extractor utils"""
 from functools import partial
-from typing import Optional, Union, List, Tuple, Type
+from typing import Optional, Union, List, Tuple, Type, TypeVar
 
-from FaceEngine import IDescriptorExtractorPtr, FSDKError  # pylint: disable=E0611,E0401
+from FaceEngine import IDescriptorExtractorPtr, FSDKError, FSDKErrorResult  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorFactory, BaseDescriptorBatch
@@ -11,20 +11,72 @@ from lunavl.sdk.errors.exceptions import LunaSDKException, assertError
 from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
+GenericDesciptor = TypeVar("GenericDesciptor", bound=BaseDescriptor)
+GenericDescriptorBatch = TypeVar("GenericDescriptorBatch", bound=BaseDescriptorBatch)
 
-def postProcessing(error, gs, descriptor):
+
+def postProcessing(error: FSDKErrorResult, gs: float, descriptor: GenericDesciptor) -> GenericDesciptor:
+    """
+    Post processing extraction result, error check.
+
+    Args:
+        error: extractor error, usually error.isError is False
+        gs: garbage score extracted descriptor
+        descriptor: extracted descriptor
+
+    Raises:
+        LunaSDKException: if extraction is failed
+    Returns:
+        descriptor
+    """
     assertError(error)
     descriptor.garbageScore = gs
     return descriptor
 
 
-def postProcessingBatch(error, gScores, descriptorBatch):
+def postProcessingBatch(
+    error: FSDKErrorResult, gScores: List[float], descriptorBatch: GenericDescriptorBatch
+) -> Tuple[GenericDescriptorBatch, None]:
+    """
+    Post processing batch extraction result without aggregation, error check.
+
+    Args:
+        error: extractor error, usually error.isError is False
+        gScores: garbage scores of extracted descriptors
+        descriptorBatch: extracted descriptor batch
+
+    Raises:
+        LunaSDKException: if extraction is failed
+    Returns:
+        descriptor batch + None (aggregated descriptor
+    """
     assertError(error)
     descriptorBatch.scores = gScores
     return descriptorBatch, None
 
 
-def postProcessingBatchWithAggregation(error, aggregetionGs, gScores, descriptorBatch, aggregatedDescriptor):
+def postProcessingBatchWithAggregation(
+    error: FSDKErrorResult,
+    aggregetionGs: float,
+    gScores: List[float],
+    descriptorBatch: GenericDescriptorBatch,
+    aggregatedDescriptor: GenericDesciptor,
+) -> Tuple[GenericDescriptorBatch, GenericDesciptor]:
+    """
+    Post processing batch extraction result with aggregation, error check.
+
+    Args:
+        error: extractor error, usually error.isError is False
+        gScores: garbage scores of extracted descriptors
+        descriptorBatch: extracted descriptor batch
+        aggregetionGs: garbage score of aggregated descriptor
+        aggregatedDescriptor: aggregated descriptor
+
+    Raises:
+        LunaSDKException: if extraction is failed
+    Returns:
+        descriptor batch + aggregated descriptor
+    """
     assertError(error)
     aggregatedDescriptor.garbageScore = aggregetionGs
     descriptorBatch.scores = gScores

@@ -231,7 +231,9 @@ class TestHumanDetector(HumanDetectTestClass):
                 self.detector.detect(images=[colorImage])
             self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
             assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-            self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat)
+            self.assertReceivedAndRawExpectedErrors(
+                exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat.format("Failed validation.")
+            )
 
     def test_batch_detect_by_area_without_human(self):
         """
@@ -294,7 +296,9 @@ class TestHumanDetector(HumanDetectTestClass):
             self.detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=Rect())])
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
         assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
+        self.assertReceivedAndRawExpectedErrors(
+            exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Failed validation.")
+        )
 
     def test_match_detection_one_image(self):
         """

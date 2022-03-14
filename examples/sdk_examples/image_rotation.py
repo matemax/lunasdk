@@ -43,6 +43,10 @@ async def asyncRotateNEstimateImage():
     image = VLImage.rotate(nonRotatedImage, RotationAngle.ANGLE_0)
     orientation = await orientationModeEstimator.estimate(image, asyncEstimate=True)
     pprint.pprint(orientation)
+    task1 = orientationModeEstimator.estimate(image, asyncEstimate=True)
+    task2 = orientationModeEstimator.estimate(image, asyncEstimate=True)
+    for task in (task1, task2):
+        pprint.pprint(task.get())
 
 
 if __name__ == "__main__":

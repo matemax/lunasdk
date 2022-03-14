@@ -144,10 +144,12 @@ class TestsRedetectFace(FaceDetectTestClass):
                             ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)]),
                         ]
                     )
-                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
                 assert len(exceptionInfo.value.context) == 2, "Expect two error in exception context"
-                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
-                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
+                self.assertReceivedAndRawExpectedErrors(
+                    exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Invalid rectangle")
+                )
+                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok.format("Ok"))
 
     def test_rect_float(self):
         """

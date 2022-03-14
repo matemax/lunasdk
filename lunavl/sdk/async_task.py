@@ -11,6 +11,16 @@ CoreTaskResult = TypeVar("CoreTaskResult")
 def postProcessingBatch(
     error: FSDKErrorResult, coreEstimations: List[CoreTaskResult], resultClass: Type[TaskResult]
 ) -> List[TaskResult]:
+    """
+    Post processing batch estimation
+    Args:
+        error:  estimation error
+        coreEstimations:  core batch estimation
+        resultClass: result class
+
+    Returns:
+        list of lunavl structure based on core estimation
+    """
     assertError(error)
 
     return [resultClass(coreEstimation) for coreEstimation in coreEstimations]
@@ -23,6 +33,18 @@ def postProcessingBatchWithAggregation(
     resultClass: Type[TaskResult],
     aggregate: bool,
 ) -> tuple[List[TaskResult], Optional[TaskResult]]:
+    """
+    Post processing batch estimation
+    Args:
+        error:  estimation error
+        coreEstimations:  core batch estimation
+        aggregatedAttribute: aggregated core estimation
+        aggregate: need or not aggregate result
+        resultClass: result class
+
+    Returns:
+        list of lunavl structure based on core estimation + aggregated estimation
+    """
     assertError(error)
 
     estimations = [resultClass(coreEstimation) for coreEstimation in coreEstimations]
@@ -38,10 +60,29 @@ def postProcessing(error: FSDKErrorResult, coreEstimation: CoreTaskResult, resul
 
 
 class DefaultPostprocessingFactory(Generic[TaskResult]):
+    """
+    Default estimation post processing factory.
+
+    Factory is intended for generation standard post procesing  core estimation object (conversion to lunavl structure
+    and check errors)
+
+    Attributes:
+        resultClass: result class
+    """
+
     def __init__(self, resultClass: Type[TaskResult]):
         self.resultClass = resultClass
 
     def postProcessingBatch(self, error: FSDKErrorResult, coreEstimations: List[CoreTaskResult]) -> List[TaskResult]:
+        """
+        Post processing batch estimation
+        Args:
+            error: estimation error
+            coreEstimations: core batch estimation
+
+        Returns:
+            list of lunavl structure based on core estimation
+        """
         return postProcessingBatch(error, coreEstimations, resultClass=self.resultClass)
 
     def postProcessingBatchWithAggregation(
@@ -51,6 +92,18 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
         aggregatedAttribute: CoreTaskResult,
         aggregate: bool,
     ) -> tuple[List[TaskResult], Optional[TaskResult]]:
+        """
+        Post processing batch estimation
+        Args:
+            error: estimation error
+            coreEstimations: core batch estimation
+            aggregate: need or not aggregate result
+
+            aggregatedAttribute: aggregated core estimation
+
+        Returns:
+            list of lunavl structure based on core estimation + aggregated estimation
+        """
         return postProcessingBatchWithAggregation(
             error=error,
             coreEstimations=coreEstimations,
@@ -60,6 +113,15 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
         )
 
     def postProcessing(self, error: FSDKErrorResult, coreEstimation: CoreTaskResult) -> TaskResult:
+        """
+        Postprocessing single core estimation
+        Args:
+            error: estimation error
+            coreEstimation: core batch estimation
+
+        Returns:
+            list of lunavl structure based on core estimation
+        """
         return postProcessing(error=error, coreEstimation=coreEstimation, resultClass=self.resultClass)
 
 

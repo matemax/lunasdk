@@ -438,4 +438,4 @@ class TestEstimateDescriptor(BaseTestClass):
                 _, descriptor = extractor.estimateDescriptorsBatch(
                     [faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch
                 )
-                assert descriptor.garbageScore < 0.52, "Expected low gs"
+                assert descriptor.garbageScore < 0.6, "Expected low gs"

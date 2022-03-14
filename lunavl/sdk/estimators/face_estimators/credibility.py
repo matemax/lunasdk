@@ -11,7 +11,7 @@ from FaceEngine import ICredibilityCheckEstimatorPtr
 from lunavl.sdk.errors.exceptions import assertError
 from ..base import BaseEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ...base import BaseEstimation
 
 
@@ -84,9 +84,7 @@ class Credibility(BaseEstimation):
         return {"estimations": {"score": self.score}, "prediction": self.prediction.value}
 
 
-def postProcessing(error, credibility):
-    assertError(error)
-    return Credibility(credibility)
+POST_PROCESSING = DefaultPostprocessingFactory(Credibility)
 
 
 class CredibilityEstimator(BaseEstimator):
@@ -120,6 +118,6 @@ class CredibilityEstimator(BaseEstimator):
         """
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
-            return AsyncTask(task, postProcessing)
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, credibility = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        return postProcessing(error, credibility)
+        return POST_PROCESSING.postProcessing(error, credibility)
