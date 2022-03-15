@@ -433,7 +433,7 @@ class VLFaceDetector:
             detectRes.coreEstimation, detectRes.image, self.estimatorsCollection, self._estimationSettings
         )
 
-    def postProcessingDetectionBatch(self, detectRes: List[List[FaceDetection]]):
+    def postProcessingDetectionBatch(self, detectRes: List[List[Optional[FaceDetection]]]):
         """
         Post processing detection results (wrap to  VLFaceDetection)
         Args:
