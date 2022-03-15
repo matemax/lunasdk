@@ -78,3 +78,13 @@ class TestOrientationMode(BaseTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.orientationModeEstimator.estimateBatch([])
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))
+
+    def test_async_estimate_orientation_mode(self):
+        """
+        Test async estimate orientation mode
+        """
+        image = VLImage.load(filename=ROTATED90)
+        task = self.orientationModeEstimator.estimate(image, asyncEstimate=True)
+        self.assertAsyncEstimation(task, OrientationType)
+        task = self.orientationModeEstimator.estimateBatch([image], asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, OrientationType)

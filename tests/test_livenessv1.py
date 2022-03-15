@@ -140,3 +140,13 @@ class TestEstimateLivenessV1(BaseTestClass):
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.livenessEstimator.estimateBatch([])
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))
+
+    def test_async_estimate_liveness(self):
+        """
+        Test async estimate liveness
+        """
+        detection = self.detector.detectOne(VLImage.load(filename=SPOOF))
+        task = self.livenessEstimator.estimate(detection, asyncEstimate=True)
+        self.assertAsyncEstimation(task, LivenessV1)
+        task = self.livenessEstimator.estimateBatch([detection], asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, LivenessV1)

@@ -236,3 +236,31 @@ class TestBasicAttributes(BaseTestClass):
         assert len(exceptionInfo.value.context) == 2, "Expect two errors in exception context"
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.Ok)
         self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.InvalidImageSize)
+
+    def test_async_estimate_basic_attributes(self):
+        """
+        Test async estimate basic attributes
+        """
+        task = self.estimator.estimate(
+            warp=self._warp, estimateAge=True, estimateGender=True, estimateEthnicity=True, asyncEstimate=True
+        )
+        self.assertAsyncEstimation(task, BasicAttributes)
+        task = self.estimator.estimateBasicAttributesBatch(
+            warps=[self._warp],
+            estimateAge=True,
+            estimateGender=True,
+            estimateEthnicity=True,
+            asyncEstimate=True,
+            aggregate=False,
+        )
+        self.assertAsyncBatchEstimation(task, BasicAttributes)
+
+        task = self.estimator.estimateBasicAttributesBatch(
+            warps=[self._warp],
+            estimateAge=True,
+            estimateGender=True,
+            estimateEthnicity=True,
+            asyncEstimate=True,
+            aggregate=True,
+        )
+        self.assertAsyncBatchEstimationWithAggregation(task, BasicAttributes)

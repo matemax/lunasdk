@@ -52,3 +52,11 @@ class TestCredibility(BaseTestClass):
         expectedResult = 0.923
         credibility = TestCredibility.credibilityEstimator.estimate(self.warp)
         self.assertCredibilityEstimation(credibility, expectedResult)
+
+    def test_async_estimation(self):
+        """
+        Test async credibility check estimations
+        """
+        task = self.credibilityEstimator.estimate(self.warp, asyncEstimate=True)
+        self.assertAsyncEstimation(task, Credibility)
+        self.assertCredibilityEstimation(task.get(), 0.923)

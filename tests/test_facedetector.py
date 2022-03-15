@@ -1,7 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForDetection
-from lunavl.sdk.detectors.facedetector import FaceDetector
+from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
@@ -474,3 +474,12 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with self.assertRaises(expected_exception=LunaSDKException):
                     detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_OUTSIDE_IMAGE)
+
+    def test_async_detect_face(self):
+        """
+        Test async detect face
+        """
+        task = self.defaultDetector.detectOne(VLIMAGE_ONE_FACE, asyncEstimate=True)
+        self.assertAsyncEstimation(task, FaceDetection)
+        task = self.defaultDetector.detect([VLIMAGE_ONE_FACE], asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, FaceDetection)

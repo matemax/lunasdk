@@ -172,3 +172,12 @@ class TestMask(BaseTestClass):
         faceDetection = self.detector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
         self.assertMaskEstimation(mask, case.expectedResult._asdict())
+
+    def test_async_estimate_mask(self):
+        """
+        Test async estimate mask
+        """
+        task = self.maskEstimator.estimate(self.warpImageMedicalMask, asyncEstimate=True)
+        self.assertAsyncEstimation(task, Mask)
+        task = self.maskEstimator.estimateBatch([self.warpImageMedicalMask], asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, Mask)

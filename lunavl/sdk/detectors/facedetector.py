@@ -391,7 +391,7 @@ class FaceDetector:
         validateBatchDetectInput(self._detector, coreImages, detectAreas)
         if asyncEstimate:
             task = self._detector.asyncDetect(coreImages, detectAreas, limit, detectionType)
-            return AsyncTask(task, postProcessing=partial(postProcessing, coreImages=coreImages, images=images))
+            return AsyncTask(task, postProcessing=partial(postProcessing, images=images))
         error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
         return postProcessing(error, fsdkDetectRes, images=images)
 
@@ -499,6 +499,6 @@ class FaceDetector:
         validateReDetectInput(self._detector, coreImages, detectAreas)
         if asyncEstimate:
             task = self._detector.asyncRedetect(coreImages, detectAreas, detectionType)
-            return AsyncTask(task, postProcessing=partial(postProcessingRedetect, coreImages=coreImages, images=images))
+            return AsyncTask(task, postProcessing=partial(postProcessingRedetect, images=images))
         error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
         return postProcessingRedetect(error, fsdkDetectRes, images=images)

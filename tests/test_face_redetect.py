@@ -1,6 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForRedetection
+from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
@@ -196,3 +197,16 @@ class TestsRedetectFace(FaceDetectTestClass):
                 self.assertFaceDetection(redetectOne, image)
                 redetect = detector.redetect(images=[ImageForRedetection(image=image, bBoxes=[rect])])
                 self.assertFaceDetection(redetect[0], image)
+
+    def test_async_redetect_face(self):
+        """
+        Test async redetect face
+        """
+        detector = self.detectors[-1]
+        detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE)
+        task = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detectOne, asyncEstimate=True)
+        self.assertAsyncEstimation(task, FaceDetection)
+        task = detector.redetect(
+            [ImageForRedetection(VLIMAGE_ONE_FACE, [detectOne.boundingBox.rect])], asyncEstimate=True
+        )
+        self.assertAsyncBatchEstimation(task, FaceDetection)

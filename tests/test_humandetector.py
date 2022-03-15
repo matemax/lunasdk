@@ -1,6 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForDetection
+from lunavl.sdk.detectors.humandetector import HumanDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
@@ -311,3 +312,12 @@ class TestHumanDetector(HumanDetectTestClass):
                 for human in detection:
                     assert human.boundingBox.asDict() == detectOne.boundingBox.asDict()
                     assert human.landmarks17.asDict() == detectOne.landmarks17.asDict()
+
+    def test_async_detect_human(self):
+        """
+        Test async detect human
+        """
+        task = self.detector.detectOne(VLIMAGE_ONE_FACE, asyncEstimate=True)
+        self.assertAsyncEstimation(task, HumanDetection)
+        task = self.detector.detect([VLIMAGE_ONE_FACE], asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, HumanDetection)

@@ -439,3 +439,22 @@ class TestEstimateDescriptor(BaseTestClass):
                     [faceWarp] * 2, aggregate=1, descriptorBatch=descriptorBatch
                 )
                 assert descriptor.garbageScore < 0.6, "Expected low gs"
+
+    def test_async_descriptor_estimation(self):
+        """
+        Test async descriptor estimations
+        """
+        for case in self.cases:
+            descriptorVersion = case.versions[-1]
+            extractor = case.extractorFactory(descriptorVersion)
+            if case.type == DescriptorType.face:
+                descriptorClass = FaceDescriptor
+            else:
+                descriptorClass = HumanDescriptor
+            with self.subTest(extractor=extractor.__class__.__name__):
+                task = extractor.estimate(case.warps[0], asyncEstimate=True)
+                self.assertAsyncEstimation(task, FaceDescriptor)
+                task = extractor.estimateDescriptorsBatch([case.warps[0]], asyncEstimate=True)
+                self.assertAsyncBatchEstimation(task, descriptorClass)
+                task = extractor.estimateDescriptorsBatch([case.warps[0]], asyncEstimate=True, aggregate=True)
+                self.assertAsyncBatchEstimationWithAggregation(task, descriptorClass)

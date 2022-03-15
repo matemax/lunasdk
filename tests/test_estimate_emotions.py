@@ -1,6 +1,9 @@
+import asyncio
 import unittest
 from typing import Optional
 
+from lunavl.sdk.async_task import AsyncTask
+from lunavl.sdk.estimators.face_estimators.emotions import Emotions
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -62,3 +65,14 @@ class TestEstimateEmotions(BaseTestClass):
                 warp = self.warper.warp(faceDetection)
                 emotionDict = self.emotionEstimator.estimate(warp.warpedImage).asDict()
                 self.assert_emotion_reply(emotionDict, emotion)
+
+    def test_async_estimate_emotion_reply(self):
+        """
+        Test async estimate emotions
+        """
+        faceDetection = self.detector.detectOne(EMOTION_IMAGES[ALL_EMOTIONS[0]])
+        warp = self.warper.warp(faceDetection)
+        task = self.emotionEstimator.estimate(warp.warpedImage, asyncEstimate=True)
+        self.assertAsyncEstimation(task, Emotions)
+        task = self.emotionEstimator.estimateBatch([warp.warpedImage], asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, Emotions)
