@@ -481,5 +481,5 @@ class TestFaceDetector(FaceDetectTestClass):
         """
         task = self.defaultDetector.detectOne(VLIMAGE_ONE_FACE, asyncEstimate=True)
         self.assertAsyncEstimation(task, FaceDetection)
-        task = self.defaultDetector.detect([VLIMAGE_ONE_FACE], asyncEstimate=True)
+        task = self.defaultDetector.detect([VLIMAGE_ONE_FACE] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, FaceDetection)

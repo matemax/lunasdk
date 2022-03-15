@@ -74,5 +74,5 @@ class TestEstimateEmotions(BaseTestClass):
         warp = self.warper.warp(faceDetection)
         task = self.emotionEstimator.estimate(warp.warpedImage, asyncEstimate=True)
         self.assertAsyncEstimation(task, Emotions)
-        task = self.emotionEstimator.estimateBatch([warp.warpedImage], asyncEstimate=True)
+        task = self.emotionEstimator.estimateBatch([warp.warpedImage] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, Emotions)

@@ -148,5 +148,5 @@ class TestEstimateLivenessV1(BaseTestClass):
         detection = self.detector.detectOne(VLImage.load(filename=SPOOF))
         task = self.livenessEstimator.estimate(detection, asyncEstimate=True)
         self.assertAsyncEstimation(task, LivenessV1)
-        task = self.livenessEstimator.estimateBatch([detection], asyncEstimate=True)
+        task = self.livenessEstimator.estimateBatch([detection] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, LivenessV1)

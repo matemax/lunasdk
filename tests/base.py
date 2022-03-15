@@ -136,29 +136,36 @@ class BaseTestClass(unittest.TestCase):
         isinstance(res, expectedTypeResult)
 
     @staticmethod
-    def assertAsyncBatchEstimation(task: AsyncTask, expectedTypeResult: Type[Any]):
+    def assertAsyncBatchEstimation(task: AsyncTask, expectedTypeResult: Type[Any], batchLength: int = 2):
         """
         Assert batch async estimation
         Args:
             task: async task
             expectedTypeResult: expected type of result
+            batchLength: batch length
         """
         isinstance(task, AsyncTask)
         res = task.get()
         isinstance(res, list)
-        isinstance(res[0], expectedTypeResult)
+        assert batchLength == len(res)
+        for estimation in res:
+            isinstance(estimation, expectedTypeResult)
 
     @staticmethod
-    def assertAsyncBatchEstimationWithAggregation(task: AsyncTask, expectedTypeResult: Type[Any]):
+    def assertAsyncBatchEstimationWithAggregation(task: AsyncTask, expectedTypeResult: Type[Any], batchLength: int = 2):
         """
         Assert batch async estimation with aggregation
         Args:
             task: async task
             expectedTypeResult: expected type of result
+            batchLength: batch length
         """
         isinstance(task, AsyncTask)
         res = task.get()
         isinstance(res, tuple)
         assert 2 == len(res)
-        isinstance(res[0][0], expectedTypeResult)
         isinstance(res[1], expectedTypeResult)
+        isinstance(res[0], list)
+        assert batchLength == len(res[0])
+        for estimation in res:
+            isinstance(estimation, expectedTypeResult)

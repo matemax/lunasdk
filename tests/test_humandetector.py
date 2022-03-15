@@ -319,5 +319,5 @@ class TestHumanDetector(HumanDetectTestClass):
         """
         task = self.detector.detectOne(VLIMAGE_ONE_FACE, asyncEstimate=True)
         self.assertAsyncEstimation(task, HumanDetection)
-        task = self.detector.detect([VLIMAGE_ONE_FACE], asyncEstimate=True)
+        task = self.detector.detect([VLIMAGE_ONE_FACE] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, HumanDetection)

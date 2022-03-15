@@ -147,6 +147,6 @@ class TestsRedetectHuman(HumanDetectTestClass):
         task = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detectOne, asyncEstimate=True)
         self.assertAsyncEstimation(task, HumanDetection)
         task = detector.redetect(
-            [ImageForRedetection(VLIMAGE_ONE_FACE, [detectOne.boundingBox.rect])], asyncEstimate=True
+            [ImageForRedetection(VLIMAGE_ONE_FACE, [detectOne.boundingBox.rect])] * 2, asyncEstimate=True
         )
         self.assertAsyncBatchEstimation(task, HumanDetection)

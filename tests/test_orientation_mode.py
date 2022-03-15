@@ -86,5 +86,5 @@ class TestOrientationMode(BaseTestClass):
         image = VLImage.load(filename=ROTATED90)
         task = self.orientationModeEstimator.estimate(image, asyncEstimate=True)
         self.assertAsyncEstimation(task, OrientationType)
-        task = self.orientationModeEstimator.estimateBatch([image], asyncEstimate=True)
+        task = self.orientationModeEstimator.estimateBatch([image] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, OrientationType)

@@ -62,5 +62,5 @@ class TestMouthEstimation(FaceDetectTestClass):
         """
         task = self.mouthEstimator.estimate(self.warpList[1].warp, asyncEstimate=True)
         self.assertAsyncEstimation(task, MouthStates)
-        task = self.mouthEstimator.estimateBatch([self.warpList[1].warp], asyncEstimate=True)
+        task = self.mouthEstimator.estimateBatch([self.warpList[1].warp] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, MouthStates)

@@ -75,5 +75,5 @@ class TestGlasses(BaseTestClass):
         """
         task = self.glassesEstimator.estimate(self.warpSunGlasses, asyncEstimate=True)
         self.assertAsyncEstimation(task, Glasses)
-        task = self.glassesEstimator.estimateBatch([self.warpSunGlasses], asyncEstimate=True)
+        task = self.glassesEstimator.estimateBatch([self.warpSunGlasses] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, Glasses)

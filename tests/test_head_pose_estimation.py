@@ -195,7 +195,7 @@ class TestHeadPose(BaseTestClass):
         """
         task = self.headPoseEstimator.estimate(self.detection.landmarks68, asyncEstimate=True)
         self.assertAsyncEstimation(task, HeadPose)
-        task = self.headPoseEstimator.estimateBatch([self.detection], asyncEstimate=True)
+        task = self.headPoseEstimator.estimateBatch([self.detection] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, HeadPose)
         task = self.headPoseEstimator.estimateByBoundingBox(
             ImageWithFaceDetection(self.image, self.detection.boundingBox), asyncEstimate=True

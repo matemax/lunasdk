@@ -179,5 +179,5 @@ class TestMask(BaseTestClass):
         """
         task = self.maskEstimator.estimate(self.warpImageMedicalMask, asyncEstimate=True)
         self.assertAsyncEstimation(task, Mask)
-        task = self.maskEstimator.estimateBatch([self.warpImageMedicalMask], asyncEstimate=True)
+        task = self.maskEstimator.estimateBatch([self.warpImageMedicalMask] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, Mask)

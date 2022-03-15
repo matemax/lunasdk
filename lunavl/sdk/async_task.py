@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Callable, Generator, List, Type, Optional
+from typing import TypeVar, Generic, Callable, Generator, List, Type, Optional, Tuple
 
 from FaceEngine import FSDKErrorResult  # pylint: disable=E0611,E0401
 
@@ -32,7 +32,7 @@ def postProcessingBatchWithAggregation(
     aggregatedAttribute: CoreTaskResult,
     resultClass: Type[TaskResult],
     aggregate: bool,
-) -> tuple[List[TaskResult], Optional[TaskResult]]:
+) -> Tuple[List[TaskResult], Optional[TaskResult]]:
     """
     Post processing batch estimation
     Args:
@@ -55,6 +55,15 @@ def postProcessingBatchWithAggregation(
 
 
 def postProcessing(error: FSDKErrorResult, coreEstimation: CoreTaskResult, resultClass: Type[TaskResult]) -> TaskResult:
+    """
+    Postprocessing single core estimation
+    Args:
+        error: estimation error
+        coreEstimation: core estimation
+
+    Returns:
+        list of lunavl structure based on core estimation
+    """
     assertError(error)
     return resultClass(coreEstimation)
 
@@ -91,7 +100,7 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
         coreEstimations: List[CoreTaskResult],
         aggregatedAttribute: CoreTaskResult,
         aggregate: bool,
-    ) -> tuple[List[TaskResult], Optional[TaskResult]]:
+    ) -> Tuple[List[TaskResult], Optional[TaskResult]]:
         """
         Post processing batch estimation
         Args:
@@ -117,7 +126,7 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
         Postprocessing single core estimation
         Args:
             error: estimation error
-            coreEstimation: core batch estimation
+            coreEstimation: core estimation
 
         Returns:
             list of lunavl structure based on core estimation

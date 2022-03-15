@@ -489,9 +489,7 @@ class VLFaceDetector:
         detectRes = self._faceDetector.detect(images, limit, True, True)
         return self.postProcessingDetectionBatch(detectRes)
 
-    def redetectOne(
-        self, image: Union[VLImage, VLFaceDetection], bBox: Rect
-    ) -> Union[Union[VLFaceDetection, None], Union[VLFaceDetection, None]]:
+    def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBox: Rect) -> Union[VLFaceDetection, None]:
         """
         Redetect faces on an image. If VLFaceDetection is provided, only VLImage from that object will be used.
 

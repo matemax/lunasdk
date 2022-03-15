@@ -111,5 +111,5 @@ class TestEstimateGazeDirection(BaseTestClass):
         warpWithLandmarks5 = WarpWithLandmarks5(self.warp, landMarks5Transformation)
         task = self.gazeEstimator.estimate(warpWithLandmarks5, asyncEstimate=True)
         self.assertAsyncEstimation(task, GazeDirection)
-        task = self.gazeEstimator.estimateBatch([warpWithLandmarks5], asyncEstimate=True)
+        task = self.gazeEstimator.estimateBatch([warpWithLandmarks5] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, GazeDirection)

@@ -6,7 +6,7 @@ See `orientation mode`_.
 from enum import Enum
 from typing import Union, List
 
-from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType
+from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType, FSDKErrorResult
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.errors.exceptions import assertError
@@ -46,13 +46,31 @@ class OrientationType(Enum):
         return self.value
 
 
-def postProcessingBatch(error, oientations):
+def postProcessingBatch(error: FSDKErrorResult, orientations):
+    """
+    Post processing batch image orientation estimation
+    Args:
+        error:  estimation error
+        orientations: estimated orientations
+
+    Returns:
+        list of `OrientationType`
+    """
     assertError(error)
 
-    return [OrientationType.fromCoreOrientationType(coreOrientationType) for coreOrientationType in oientations]
+    return [OrientationType.fromCoreOrientationType(coreOrientationType) for coreOrientationType in orientations]
 
 
-def postProcessing(error, orientationType):
+def postProcessing(error: FSDKErrorResult, orientationType):
+    """
+    Postprocessing single core image orientation estimation
+    Args:
+        error: estimation error
+        orientationType: core estimation
+
+    Returns:
+        image orientation
+    """
     assertError(error)
 
     return OrientationType.fromCoreOrientationType(orientationType)

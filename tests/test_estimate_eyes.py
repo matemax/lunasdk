@@ -173,5 +173,5 @@ class TestEstimateEyes(BaseTestClass):
         warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
         task = self.eyeEstimator.estimate(warpWithLandmarks, asyncEstimate=True)
         self.assertAsyncEstimation(task, EyesEstimation)
-        task = self.eyeEstimator.estimateBatch([warpWithLandmarks], asyncEstimate=True)
+        task = self.eyeEstimator.estimateBatch([warpWithLandmarks] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, EyesEstimation)

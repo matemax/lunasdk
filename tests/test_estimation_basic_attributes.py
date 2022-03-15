@@ -246,7 +246,7 @@ class TestBasicAttributes(BaseTestClass):
         )
         self.assertAsyncEstimation(task, BasicAttributes)
         task = self.estimator.estimateBasicAttributesBatch(
-            warps=[self._warp],
+            warps=[self._warp] * 2,
             estimateAge=True,
             estimateGender=True,
             estimateEthnicity=True,
@@ -256,7 +256,7 @@ class TestBasicAttributes(BaseTestClass):
         self.assertAsyncBatchEstimation(task, BasicAttributes)
 
         task = self.estimator.estimateBasicAttributesBatch(
-            warps=[self._warp],
+            warps=[self._warp] * 2,
             estimateAge=True,
             estimateGender=True,
             estimateEthnicity=True,

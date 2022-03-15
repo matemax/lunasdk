@@ -454,7 +454,7 @@ class TestEstimateDescriptor(BaseTestClass):
             with self.subTest(extractor=extractor.__class__.__name__):
                 task = extractor.estimate(case.warps[0], asyncEstimate=True)
                 self.assertAsyncEstimation(task, FaceDescriptor)
-                task = extractor.estimateDescriptorsBatch([case.warps[0]], asyncEstimate=True)
+                task = extractor.estimateDescriptorsBatch([case.warps[0]] * 2, asyncEstimate=True)
                 self.assertAsyncBatchEstimation(task, descriptorClass)
-                task = extractor.estimateDescriptorsBatch([case.warps[0]], asyncEstimate=True, aggregate=True)
+                task = extractor.estimateDescriptorsBatch([case.warps[0]] * 2, asyncEstimate=True, aggregate=True)
                 self.assertAsyncBatchEstimationWithAggregation(task, descriptorClass)

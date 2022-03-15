@@ -66,5 +66,5 @@ class TestEstimateQuality(BaseTestClass):
         """
         task = self.qualityEstimator.estimate(self.warp, asyncEstimate=True)
         self.assertAsyncEstimation(task, Quality)
-        task = self.qualityEstimator.estimateBatch([self.warp], asyncEstimate=True)
+        task = self.qualityEstimator.estimateBatch([self.warp] * 2, asyncEstimate=True)
         self.assertAsyncBatchEstimation(task, Quality)
