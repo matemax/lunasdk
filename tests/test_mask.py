@@ -130,7 +130,9 @@ class TestMask(BaseTestClass):
         Test mask estimations with face is occluded by other object
         """
         cases = [
-            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.260, 0.669, 0.071), None),  # TODO: bug
+            TestCase(
+                "occluded_warp", self.warpImageOccluded, True, MaskProperties(0.260, 0.669, 0.071), None
+            ),  # TODO: bug
             TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.000, 0.000, 1.000), None),
         ]
         for case in cases:
@@ -159,7 +161,7 @@ class TestMask(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.maskEstimator.estimateBatch([])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))
 
     def test_estimate_missing_mask_large_image(self):
         """
@@ -170,3 +172,12 @@ class TestMask(BaseTestClass):
         faceDetection = self.detector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
         self.assertMaskEstimation(mask, case.expectedResult._asdict())
+
+    def test_async_estimate_mask(self):
+        """
+        Test async estimate mask
+        """
+        task = self.maskEstimator.estimate(self.warpImageMedicalMask, asyncEstimate=True)
+        self.assertAsyncEstimation(task, Mask)
+        task = self.maskEstimator.estimateBatch([self.warpImageMedicalMask] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, Mask)

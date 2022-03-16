@@ -10,8 +10,7 @@ from typing import Union, Optional
 from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr, DescriptorBatchResult  # pylint: disable=E0611,E0401
 
 from ..base import BaseEstimation
-from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError
+from ..errors.exceptions import assertError
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 
 
@@ -215,7 +214,6 @@ class BaseDescriptorFactory:
         """
         return self._descriptorVersion
 
-    @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptor(
         self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
     ) -> BaseDescriptor:
@@ -251,7 +249,6 @@ class BaseDescriptorFactory:
             )
         return outputDescriptor
 
-    @CoreExceptionWrap(LunaVLError.CreationDescriptorError)
     def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> BaseDescriptorBatch:
         """
         Generate core descriptors batch.

@@ -2,6 +2,7 @@
 Module realize simple examples following features:
     * image rotation
 """
+import asyncio
 import pprint
 
 from resources import EXAMPLE_O
@@ -31,5 +32,23 @@ def rotateNEstimateImage():
     pprint.pprint(orientationModeEstimator.estimate(image))
 
 
+async def asyncRotateNEstimateImage():
+    """
+    Async example of image rotation.
+    """
+    nonRotatedImage = VLImage.load(filename=EXAMPLE_O)
+    faceEngine = VLFaceEngine()
+    orientationModeEstimator = faceEngine.createOrientationModeEstimator()
+    #: rotate & estimate | not rotated
+    image = VLImage.rotate(nonRotatedImage, RotationAngle.ANGLE_0)
+    orientation = await orientationModeEstimator.estimate(image, asyncEstimate=True)
+    pprint.pprint(orientation)
+    task1 = orientationModeEstimator.estimate(image, asyncEstimate=True)
+    task2 = orientationModeEstimator.estimate(image, asyncEstimate=True)
+    for task in (task1, task2):
+        pprint.pprint(task.get())
+
+
 if __name__ == "__main__":
     rotateNEstimateImage()
+    asyncio.run(asyncRotateNEstimateImage())

@@ -5,17 +5,17 @@ from typing import List, Optional, Union
 
 from .estimators.face_estimators.ags import AGSEstimator
 from .estimators.face_estimators.basic_attributes import BasicAttributesEstimator
+from .estimators.face_estimators.credibility import CredibilityEstimator
 from .estimators.face_estimators.emotions import EmotionsEstimator
 from .estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from .estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
+from .estimators.face_estimators.facewarper import FaceWarper
+from .estimators.face_estimators.glasses import GlassesEstimator
 from .estimators.face_estimators.head_pose import HeadPoseEstimator
+from .estimators.face_estimators.livenessv1 import LivenessV1Estimator
+from .estimators.face_estimators.mask import MaskEstimator
 from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
-from .estimators.face_estimators.mask import MaskEstimator
-from .estimators.face_estimators.glasses import GlassesEstimator
-from .estimators.face_estimators.credibility import CredibilityEstimator
-from .estimators.face_estimators.facewarper import FaceWarper
-from .estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from .estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from .faceengine.engine import VLFaceEngine
 

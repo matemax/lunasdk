@@ -10,10 +10,9 @@ from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceTyp
 
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import Landmarks68, FaceDetection
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class FrontalType(Enum):
@@ -113,6 +112,9 @@ class HeadPose(BaseEstimation):
         return FrontalType.fromCoreFrontalType(self._coreEstimation.getFrontalFaceType())
 
 
+POST_PROCESSING = DefaultPostprocessingFactory(HeadPose)
+
+
 class HeadPoseEstimator(BaseEstimator):
     """
     HeadPoseEstimator.
@@ -128,67 +130,81 @@ class HeadPoseEstimator(BaseEstimator):
         """
         super().__init__(coreHeadPoseEstimator)
 
-    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateBy68Landmarks(self, landmarks68: Landmarks68) -> HeadPose:
+    def estimateBy68Landmarks(
+        self, landmarks68: Landmarks68, asyncEstimate: bool = False
+    ) -> Union[HeadPose, AsyncTask[HeadPose]]:
         """
         Estimate head pose by 68 landmarks.
 
         Args:
             landmarks68: landmarks68
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimate head pose
+            estimate head pose if asyncExecute is False otherwise async task
         Raises:
             LunaSDKException: if estimation is failed
         """
-        error, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
-        assertError(error)
-
-        return HeadPose(headPoseEstimation)
+        if not asyncEstimate:
+            error, headPoseEstimation = self._coreEstimator.estimate(landmarks68.coreEstimation)
+            return POST_PROCESSING.postProcessing(error, headPoseEstimation)
+        task = self._coreEstimator.asyncEstimate(landmarks68.coreEstimation)
+        return AsyncTask(task, POST_PROCESSING.postProcessing)
 
     #  pylint: disable=W0221
-    def estimate(self, landmarks68: Landmarks68) -> HeadPose:  # type: ignore
+    def estimate(  # type: ignore
+        self, landmarks68: Landmarks68, asyncEstimate: bool = False
+    ) -> Union[HeadPose, AsyncTask[HeadPose]]:
         """
         Realize interface of a abstract  estimator. Call estimateBy68Landmarks
         """
-        return self.estimateBy68Landmarks(landmarks68)
+        return self.estimateBy68Landmarks(landmarks68, asyncEstimate=asyncEstimate)
 
-    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateByBoundingBox(self, imageWithFaceDetection: ImageWithFaceDetection) -> HeadPose:
+    def estimateByBoundingBox(
+        self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False
+    ) -> Union[HeadPose, AsyncTask[HeadPose]]:
         """
         Estimate head pose by detection.
 
         Args:
             imageWithFaceDetection: image with face detection
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            estimate head pose
+            head pose estimation if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation is failed
         """
-        error, headPoseEstimation = self._coreEstimator.estimate(
+        if not asyncEstimate:
+            error, headPoseEstimation = self._coreEstimator.estimate(
+                imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
+            )
+            return POST_PROCESSING.postProcessing(error, headPoseEstimation)
+        task = self._coreEstimator.asyncEstimate(
             imageWithFaceDetection.image.coreImage, imageWithFaceDetection.boundingBox.coreEstimation
         )
+        return AsyncTask(task, POST_PROCESSING.postProcessing)
 
-        assertError(error)
-        return HeadPose(headPoseEstimation)
-
-    @CoreExceptionWrap(LunaVLError.EstimationHeadPoseError)
-    def estimateBatch(self, batch: Union[List[ImageWithFaceDetection], List[FaceDetection]]) -> List[HeadPose]:
+    def estimateBatch(
+        self, batch: Union[List[ImageWithFaceDetection], List[FaceDetection]], asyncEstimate: bool = False
+    ) -> Union[List[HeadPose], AsyncTask[List[HeadPose]]]:
         """
         Batch estimate head pose by detection.
 
         Args:
             batch: list of image with face detection or face detections
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            list of head pose estimations
+            list of head pose estimations if asyncEstimate is False otherwise async task
         Raises:
             LunaSDKException: if estimation is failed
         """
+
         coreImages = [row.image.coreImage for row in batch]
         detections = [row.boundingBox.coreEstimation for row in batch]
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detections)
-        error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
-        assertError(error)
-
-        return [HeadPose(estimation) for estimation in headPoseEstimations]
+        if not asyncEstimate:
+            error, headPoseEstimations = self._coreEstimator.estimate(coreImages, detections)
+            return POST_PROCESSING.postProcessingBatch(error, headPoseEstimations)
+        task = self._coreEstimator.asyncEstimate(coreImages, detections)
+        return AsyncTask(task, POST_PROCESSING.postProcessingBatch)

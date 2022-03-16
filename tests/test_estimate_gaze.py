@@ -6,7 +6,7 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
-from lunavl.sdk.estimators.face_estimators.eyes import WarpWithLandmarks5
+from lunavl.sdk.estimators.face_estimators.eyes import WarpWithLandmarks5, GazeDirection
 
 
 class TestEstimateGazeDirection(BaseTestClass):
@@ -77,7 +77,7 @@ class TestEstimateGazeDirection(BaseTestClass):
         warpWithLandmarks5 = WarpWithLandmarks5(self.warp, faceDetection.landmarks5)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.gazeEstimator.estimate(warpWithLandmarks5)
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidLandmarks5)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidLandmarks5.format("Invalid landmarks 5"))
 
     def test_batch_estimate_gaze(self):
         """
@@ -99,5 +99,17 @@ class TestEstimateGazeDirection(BaseTestClass):
         """
         Test gaze estimator with invalid input
         """
-        with pytest.raises(TypeError):
+        with pytest.raises(LunaSDKException) as e:
             self.gazeEstimator.estimateBatch([], [])
+        assert e.value.error.errorCode == LunaVLError.InvalidSpanSize.errorCode
+
+    def test_async_estimate_gaze_direction(self):
+        """
+        Test async estimate gaze direction
+        """
+        landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(self.faceDetection, "L5")
+        warpWithLandmarks5 = WarpWithLandmarks5(self.warp, landMarks5Transformation)
+        task = self.gazeEstimator.estimate(warpWithLandmarks5, asyncEstimate=True)
+        self.assertAsyncEstimation(task, GazeDirection)
+        task = self.gazeEstimator.estimateBatch([warpWithLandmarks5] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, GazeDirection)

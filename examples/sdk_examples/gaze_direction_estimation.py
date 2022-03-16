@@ -1,6 +1,7 @@
 """
 Eyes estimation example
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
@@ -40,5 +41,32 @@ def estimateGazeDirection():
     pprint.pprint([estimation.asDict() for estimation in estimations])
 
 
+async def estimateGazeDirectionAsync():
+    """
+    Example of an async gaze direction estimation.
+
+    """
+    image = VLImage.load(filename=EXAMPLE_O)
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+    faceDetection = detector.detectOne(image, detect68Landmarks=True)
+
+    warper = faceEngine.createFaceWarper()
+    warp = warper.warp(faceDetection)
+    landMarks5Transformation = warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
+
+    gazeEstimator = faceEngine.createGazeEstimator()
+
+    warpWithLandmarks5 = WarpWithLandmarks5(warp, landMarks5Transformation)
+    # async estimation
+    pprint.pprint((await gazeEstimator.estimate(warpWithLandmarks5, asyncEstimate=True)).asDict())
+    # run tasks and get results
+    task1 = gazeEstimator.estimate(warpWithLandmarks5, asyncEstimate=True)
+    task2 = gazeEstimator.estimate(warpWithLandmarks5, asyncEstimate=True)
+    for task in (task1, task2):
+        pprint.pprint(task.get().asDict())
+
+
 if __name__ == "__main__":
     estimateGazeDirection()
+    asyncio.run(estimateGazeDirectionAsync())

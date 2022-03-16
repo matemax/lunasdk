@@ -1,6 +1,7 @@
 """
 Module contains function for detection faces on images.
 """
+from functools import partial
 from typing import Optional, Union, List, Dict, Any
 
 from FaceEngine import (
@@ -14,8 +15,10 @@ from FaceEngine import (
     DT_LANDMARKS68,
     Image as CoreImage,
     FSDKError,
+    FSDKErrorResult,
 )  # pylint: disable=E0611,E0401
 
+from ..async_task import AsyncTask
 from ..base import Landmarks
 from ..detectors.base import (
     ImageForDetection,
@@ -24,9 +27,10 @@ from ..detectors.base import (
     getArgsForCoreDetectorForImages,
     getArgsForCoreRedetect,
     validateBatchDetectInput,
+    validateReDetectInput,
 )
 from ..errors.errors import LunaVLError
-from ..errors.exceptions import CoreExceptionWrap, assertError, LunaSDKException
+from ..errors.exceptions import assertError, LunaSDKException
 from ..faceengine.setting_provider import DetectorType
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
@@ -124,6 +128,165 @@ class FaceDetection(BaseDetection):
         return res
 
 
+# alias for detection result
+FacesDetectResult = List[List[FaceDetection]]
+# alias for redetect one result
+FaceRedetectResult = Union[FaceDetection, None]
+# alias for redetect result
+FacesRedetectResult = List[List[FaceRedetectResult]]
+
+
+def _collectDetectionsResult(
+    fsdkDetectRes: IFaceDetectionBatchPtr,
+    images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
+    isRedectResult: bool = False,
+) -> Union[List[List[Optional[FaceDetection]]], List[List[Optional[FaceDetection]]]]:
+    """
+    Collect detection results from core reply and prepare face detections
+    Args:
+        fsdkDetectRes: fsdk (re)detect results
+        images: incoming images
+    Returns:
+        return list of lists detection, order of detection lists is corresponding to order input images
+    Raises:
+        RuntimeError: if any detection is not valid and it is not redection result
+    """
+    res = []
+    for imageIdx in range(fsdkDetectRes.getSize()):
+        imagesDetections = []
+        detections = fsdkDetectRes.getDetections(imageIdx)
+        landmarks5Array = fsdkDetectRes.getLandmarks5(imageIdx)
+        landmarks68Array = fsdkDetectRes.getLandmarks68(imageIdx)
+
+        image = images[imageIdx]
+        vlImage = image if isinstance(image, VLImage) else image.image
+
+        faceDetections = []
+        for detectionIdx, detection in enumerate(detections):
+            face = Face(vlImage.coreImage, detection)
+            if landmarks5Array:
+                face.landmarks5_opt.set(landmarks5Array[detectionIdx])
+            if landmarks68Array:
+                face.landmarks68_opt.set(landmarks68Array[detectionIdx])
+            imagesDetections.append(face)
+            if not face.isValid():
+                if not isRedectResult:
+                    raise RuntimeError("Invalid detection")
+                faceDetection = None
+            else:
+                faceDetection = FaceDetection(face, vlImage)
+            faceDetections.append(faceDetection)
+        res.append(faceDetections)
+
+    return res
+
+
+def collectReDetectionsResult(
+    fsdkDetectRes: IFaceDetectionBatchPtr,
+    images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
+) -> List[List[Optional[FaceDetection]]]:
+    """
+    Collect redetection results from core reply and prepare face detections
+    Args:
+        fsdkDetectRes: fsdk (re)detect results
+        images: incoming images
+    Returns:
+        return list of lists detection, order of detection lists is corresponding to order input images
+    """
+    return _collectDetectionsResult(fsdkDetectRes=fsdkDetectRes, images=images, isRedectResult=True)
+
+
+def collectDetectionsResult(
+    fsdkDetectRes: IFaceDetectionBatchPtr,
+    images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
+) -> List[List[FaceDetection]]:
+    """
+    Collect detection results from core reply and prepare face detections
+    Args:
+        fsdkDetectRes: fsdk (re)detect results
+        images: incoming images
+    Returns:
+        return list of lists detection, order of detection lists is corresponding to order input images
+    """
+    return _collectDetectionsResult(fsdkDetectRes=fsdkDetectRes, images=images, isRedectResult=False)
+
+
+def postProcessingOne(error: FSDKErrorResult, detectRes: Face, image: VLImage) -> Optional[FaceDetection]:
+    """
+    Convert core face detection to `FaceDetection` after detect one and error check.
+
+    Args:
+        error: detection error, usually error.isError is False
+        detectRes: detections
+        image: original image
+
+    Raises:
+        LunaSDKException: if detect is failed
+    Returns:
+        face detection
+    """
+    assertError(error)
+    if not detectRes.isValid():
+        return None
+    return FaceDetection(detectRes, image)
+
+
+def postProcessingRedetectOne(error: FSDKErrorResult, detectRes: Face, image: VLImage) -> Optional[FaceDetection]:
+    """
+    Convert core face detection to `FaceDetection`  after redect and error check.
+
+    Args:
+        error: detection error, usually error.isError is False
+        detectRes: detections
+        image: original image
+
+    Raises:
+        LunaSDKException: if detect is failed
+    Returns:
+        face detection if  detection is valid (face was found) otherwise None (face was not found)
+    """
+    assertError(error)
+    if detectRes.isValid():
+        return FaceDetection(detectRes, image)
+    return None
+
+
+def postProcessing(
+    error: FSDKErrorResult, detectionsBatch: IFaceDetectionBatchPtr, images: List[VLImage]
+) -> List[List[FaceDetection]]:
+    """
+    Convert core face detections from detector results to `FaceDetection` and error check.
+
+    Args:
+        error: detection error, usually error.isError is False
+        detectionsBatch: core detection batch
+        images: original images
+
+    Returns:
+        list, each item is face detections on corresponding image
+    """
+    assertError(error)
+    return collectDetectionsResult(detectionsBatch, images)
+
+
+def postProcessingRedetect(
+    error: FSDKErrorResult, detectionsBatch: IFaceDetectionBatchPtr, images: List[ImageForRedetection]
+) -> List[List[Optional[FaceDetection]]]:
+    """
+    Convert core face detections from redetector results to `FaceDetection` and error check.
+
+    Args:
+        error: detection error, usually error.isError is False
+        detectionsBatch: core detection batch
+        images: original images
+
+    Returns:
+        list, each item is face detections on corresponding image
+    """
+    assertError(error)
+    return collectReDetectionsResult(detectionsBatch, images)
+
+
 class FaceDetector:
     """
     Face detector.
@@ -139,46 +302,6 @@ class FaceDetector:
     def __init__(self, detectorPtr, detectorType: DetectorType):
         self._detector = detectorPtr
         self.detectorType = detectorType
-
-    @staticmethod
-    def collectDetectionsResult(
-        fsdkDetectRes: IFaceDetectionBatchPtr,
-        coreImages: List[CoreImage],
-        images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
-    ):
-        """
-        Collect detection results from core reply and prepare face detections
-        Args:
-            fsdkDetectRes: fsdk (re)detect results
-            coreImages: core images
-            images: incoming images
-        Returns:
-            return list of lists detection, order of detection lists is corresponding to order input images
-        """
-        res = []
-        for imageIdx in range(fsdkDetectRes.getSize()):
-            imagesDetections = []
-            detections = fsdkDetectRes.getDetections(imageIdx)
-            landmarks5Array = fsdkDetectRes.getLandmarks5(imageIdx)
-            landmarks68Array = fsdkDetectRes.getLandmarks68(imageIdx)
-
-            for detectionIdx, detection in enumerate(detections):
-                face = Face(coreImages[imageIdx], detection)
-                if landmarks5Array:
-                    face.landmarks5_opt.set(landmarks5Array[detectionIdx])
-                if landmarks68Array:
-                    face.landmarks68_opt.set(landmarks68Array[detectionIdx])
-                imagesDetections.append(face)
-
-            image = images[imageIdx]
-            vlImage = image if isinstance(image, VLImage) else image.image
-            res.append(
-                [
-                    FaceDetection(coreDetection, vlImage) if coreDetection.isValid() else None
-                    for coreDetection in imagesDetections
-                ]
-            )
-        return res
 
     @staticmethod
     def _getDetectionType(detect5Landmarks: bool = True, detect68Landmarks: bool = False) -> DetectionType:
@@ -201,14 +324,14 @@ class FaceDetector:
 
         return DetectionType(toDetect)
 
-    @CoreExceptionWrap(LunaVLError.DetectOneFaceError)
     def detectOne(
         self,
         image: VLImage,
         detectArea: Optional[Rect] = None,
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
-    ) -> Union[None, FaceDetection]:
+        asyncEstimate: bool = False,
+    ) -> Union[FaceRedetectResult, AsyncTask[FaceRedetectResult]]:
         """
         Detect just one best detection on the image.
 
@@ -217,8 +340,9 @@ class FaceDetector:
             detectArea: rectangle area which contains face to detect. If not set will be set image.rect
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            face detection if face is found otherwise None
+            face detection if face is found otherwise None if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if detectOne is failed or image format has wrong  the format
         """
@@ -228,23 +352,24 @@ class FaceDetector:
         else:
             _detectArea = detectArea.coreRectI
         validateBatchDetectInput(self._detector, image.coreImage, _detectArea)
+        if asyncEstimate:
+            task = self._detector.asyncDetectOne(
+                image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+            )
+            return AsyncTask(task, postProcessing=partial(postProcessingOne, image=image))
         error, detectRes = self._detector.detectOne(
             image.coreImage, _detectArea, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        assertError(error)
+        return postProcessingOne(error, detectRes, image)
 
-        if detectRes.isValid() is False:
-            return None
-        return FaceDetection(detectRes, image)
-
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def detect(
         self,
         images: List[Union[VLImage, ImageForDetection]],
         limit: int = 5,
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
-    ) -> List[List[FaceDetection]]:
+        asyncEstimate=False,
+    ) -> Union[FacesDetectResult, AsyncTask[FacesDetectResult]]:
         """
         Batch detect faces on images.
 
@@ -253,24 +378,31 @@ class FaceDetector:
             limit: max number of detections per input image
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            return list of lists detection, order of detection lists is corresponding to order input images
+            asyncEstimate is False: return list of lists detection, order of detection lists
+                                    is corresponding to order input images
+            asyncEstimate is True: async task
         Raises:
             LunaSDKException if an error occurs
         """
         coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
         validateBatchDetectInput(self._detector, coreImages, detectAreas)
+        if asyncEstimate:
+            task = self._detector.asyncDetect(coreImages, detectAreas, limit, detectionType)
+            return AsyncTask(task, postProcessing=partial(postProcessing, images=images))
         error, fsdkDetectRes = self._detector.detect(coreImages, detectAreas, limit, detectionType)
-        assertError(error)
+        return postProcessing(error, fsdkDetectRes, images=images)
 
-        res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
-        return res
-
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetectOne(  # noqa: F811
-        self, image: VLImage, bBox: Union[Rect, FaceDetection], detect5Landmarks=True, detect68Landmarks=False
-    ) -> Union[None, FaceDetection]:
+        self,
+        image: VLImage,
+        bBox: Union[Rect, FaceDetection],
+        detect5Landmarks=True,
+        detect68Landmarks=False,
+        asyncEstimate=False,
+    ) -> Union[FaceRedetectResult, AsyncTask[FaceRedetectResult]]:
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
 
@@ -280,9 +412,10 @@ class FaceDetector:
             bBox: detection bounding box
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            detection if face found otherwise None
+            detection if face found otherwise None if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException if an error occurs
         """
@@ -291,14 +424,15 @@ class FaceDetector:
         else:
             coreBBox = bBox.coreEstimation.detection
         self._validateReDetectInput(image.coreImage, coreBBox)
+        if asyncEstimate:
+            task = self._detector.asyncRedetectOne(
+                image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
+            )
+            return AsyncTask(task, partial(postProcessingRedetectOne, image=image))
         error, detectRes = self._detector.redetectOne(
             image.coreImage, coreBBox, self._getDetectionType(detect5Landmarks, detect68Landmarks)
         )
-        assertError(error)
-
-        if detectRes.isValid():
-            return FaceDetection(detectRes, image)
-        return None
+        return postProcessingRedetectOne(error, detectRes, image)
 
     def _validateReDetectInput(self, coreImages: List[CoreImage], detectAreas: List[List[Detection]]):
         """
@@ -338,10 +472,13 @@ class FaceDetector:
             LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
         )
 
-    @CoreExceptionWrap(LunaVLError.DetectFacesError)
     def redetect(
-        self, images: List[ImageForRedetection], detect5Landmarks: bool = True, detect68Landmarks: bool = False
-    ) -> List[List[Union[FaceDetection, None]]]:
+        self,
+        images: List[ImageForRedetection],
+        detect5Landmarks: bool = True,
+        detect68Landmarks: bool = False,
+        asyncEstimate: bool = False,
+    ) -> Union[FacesRedetectResult, AsyncTask[FacesRedetectResult]]:
         """
         Redetect face on each image.image in area, restricted with image.bBox.
 
@@ -349,18 +486,19 @@ class FaceDetector:
             images: images with a bounding boxes
             detect5Landmarks: detect or not landmarks5
             detect68Landmarks: detect or not landmarks68
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            detections
+            detections  if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException if an error occurs
         """
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
 
         coreImages, detectAreas = getArgsForCoreRedetect(images)
-        self._validateReDetectInput(coreImages, detectAreas)
+        validateReDetectInput(self._detector, coreImages, detectAreas)
+        if asyncEstimate:
+            task = self._detector.asyncRedetect(coreImages, detectAreas, detectionType)
+            return AsyncTask(task, postProcessing=partial(postProcessingRedetect, images=images))
         error, fsdkDetectRes = self._detector.redetect(coreImages, detectAreas, detectionType)
-        assertError(error)
-
-        res = self.collectDetectionsResult(fsdkDetectRes, coreImages, images)
-        return res
+        return postProcessingRedetect(error, fsdkDetectRes, images=images)

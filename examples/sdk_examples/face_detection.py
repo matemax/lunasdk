@@ -4,6 +4,7 @@ Module realize simple examples following features:
     * batch images face detection
     * detect landmarks68 and landmarks5
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
@@ -40,5 +41,33 @@ def detectFaces():
     pprint.pprint(severalFaces)
 
 
+async def asyncDetectFaces():
+    """
+    Async detect faces on images.
+    """
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+
+    image1 = VLImage.load(filename=EXAMPLE_O)
+    image2 = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
+    detections = await detector.detect([image1], asyncEstimate=True)
+    pprint.pprint(detections)
+    detections = await detector.detect(images=[image1], asyncEstimate=True)
+    pprint.pprint(detections)
+    task1 = detector.detect(
+        images=[image1],
+        asyncEstimate=True,
+    )
+    task2 = detector.detect(
+        images=[
+            image2,
+        ],
+        asyncEstimate=True,
+    )
+    for task in (task1, task2):
+        pprint.pprint(task.get())
+
+
 if __name__ == "__main__":
     detectFaces()
+    asyncio.run(asyncDetectFaces())

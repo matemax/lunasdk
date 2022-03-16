@@ -8,12 +8,13 @@ from typing import Union, Optional, List, Tuple
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
+from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.descriptors.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+
+FaceDescriptorBatchEstimation = Tuple[FaceDescriptorBatch, Union[FaceDescriptor, None]]
 
 
 class FaceDescriptorEstimator(BaseEstimator):
@@ -34,35 +35,39 @@ class FaceDescriptorEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     def estimate(  # type: ignore
-        self, warp: Union[FaceWarp, FaceWarpedImage], descriptor: Optional[FaceDescriptor] = None
-    ) -> FaceDescriptor:
+        self,
+        warp: Union[FaceWarp, FaceWarpedImage],
+        descriptor: Optional[FaceDescriptor] = None,
+        asyncEstimate: bool = False,
+    ) -> Union[FaceDescriptor, AsyncTask[FaceDescriptor]]:
         """
         Estimate face descriptor from a warp image.
 
         Args:
             warp: warped image
             descriptor: descriptor for saving extract result
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated descriptor
+            estimated descriptor if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
-        outputDescriptor = estimate(
+        return estimate(  # type: ignore
             warp=warp,
             descriptor=descriptor,
             descriptorFactory=self.descriptorFactory,
             coreEstimator=self._coreEstimator,
+            asyncEstimate=asyncEstimate,
         )
-        return outputDescriptor  # type: ignore
 
-    @CoreExceptionWrap(LunaVLError.EstimationBatchDescriptorError)
     def estimateDescriptorsBatch(
         self,
         warps: List[Union[FaceWarp, FaceWarpedImage]],
         aggregate: bool = False,
         descriptorBatch: Optional[FaceDescriptorBatch] = None,
-    ) -> Tuple[FaceDescriptorBatch, Union[FaceDescriptor, None]]:
+        asyncEstimate: bool = False,
+    ) -> Union[FaceDescriptorBatchEstimation, AsyncTask[FaceDescriptorBatchEstimation]]:
         """
         Estimate a batch of descriptors from warped images.
 
@@ -70,18 +75,18 @@ class FaceDescriptorEstimator(BaseEstimator):
             warps: warped images
             aggregate:  whether to estimate  aggregate descriptor or not
             descriptorBatch: optional batch for saving descriptors
-
+            asyncEstimate: estimate or run estimation in background
         Returns:
-            tuple of batch and the aggregate descriptors (or None)
+            tuple of batch and the aggregate descriptors (or None) if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
 
         """
-        batch, aggregatedDescriptor = estimateDescriptorsBatch(
+        return estimateDescriptorsBatch(  # type: ignore
             warps=warps,
             descriptorFactory=self.descriptorFactory,  # type: ignore
             aggregate=aggregate,
             descriptorBatch=descriptorBatch,
             coreEstimator=self._coreEstimator,
+            asyncEstimate=asyncEstimate,
         )
-        return batch, aggregatedDescriptor  # type: ignore

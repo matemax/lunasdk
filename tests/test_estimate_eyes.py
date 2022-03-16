@@ -1,5 +1,7 @@
 import pytest
 
+from lunavl.sdk.errors.errors import LunaVLError
+from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.eyes import EyeState, EyesEstimation, WarpWithLandmarks
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
@@ -157,5 +159,19 @@ class TestEstimateEyes(BaseTestClass):
         """
         Test batch eye estimator with invalid input
         """
-        with pytest.raises(TypeError):
+        with pytest.raises(LunaSDKException) as e:
             self.eyeEstimator.estimateBatch([], [])
+        assert e.value.error.errorCode == LunaVLError.InvalidSpanSize.errorCode
+
+    def test_async_estimate_eyes(self):
+        """
+        Test async estimate eyes
+        """
+        faceDetection = self.detector.detectOne(OPEN_EYES_IMAGE)
+        warp = self.warper.warp(faceDetection)
+        landMarks5Transformation = self.warper.makeWarpTransformationWithLandmarks(faceDetection, "L5")
+        warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
+        task = self.eyeEstimator.estimate(warpWithLandmarks, asyncEstimate=True)
+        self.assertAsyncEstimation(task, EyesEstimation)
+        task = self.eyeEstimator.estimateBatch([warpWithLandmarks] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, EyesEstimation)

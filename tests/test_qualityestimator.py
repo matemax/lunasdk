@@ -59,3 +59,12 @@ class TestEstimateQuality(BaseTestClass):
 
         qualityDict = self.qualityEstimator.estimate(self.warp.warpedImage).asDict()
         self.assertQualityReply(qualityDict)
+
+    def test_async_estimate_quality(self):
+        """
+        Test async estimate quality
+        """
+        task = self.qualityEstimator.estimate(self.warp, asyncEstimate=True)
+        self.assertAsyncEstimation(task, Quality)
+        task = self.qualityEstimator.estimateBatch([self.warp] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, Quality)

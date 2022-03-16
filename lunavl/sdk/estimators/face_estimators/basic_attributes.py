@@ -3,6 +3,7 @@
 See `basic attributes`_.
 """
 from enum import Enum
+from functools import partial
 from typing import Union, Dict, Any, List, Tuple
 
 from FaceEngine import (
@@ -14,11 +15,10 @@ from FaceEngine import (
 )  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Ethnicity(Enum):
@@ -204,6 +204,11 @@ class BasicAttributes(BaseEstimation):
         return res
 
 
+BasicAttributesBatchResult = Tuple[List[BasicAttributes], Union[None, BasicAttributes]]
+
+POST_PROCESSING = DefaultPostprocessingFactory(BasicAttributes)
+
+
 class BasicAttributesEstimator(BaseEstimator):
     """
     Basic attributes estimator.
@@ -220,10 +225,14 @@ class BasicAttributesEstimator(BaseEstimator):
         super().__init__(coreEstimator)
 
     #  pylint: disable=W0221
-    @CoreExceptionWrap(LunaVLError.EstimationBasicAttributeError)
     def estimate(
-        self, warp: Union[FaceWarp, FaceWarpedImage], estimateAge: bool, estimateGender: bool, estimateEthnicity: bool
-    ) -> BasicAttributes:
+        self,
+        warp: Union[FaceWarp, FaceWarpedImage],
+        estimateAge: bool,
+        estimateGender: bool,
+        estimateEthnicity: bool,
+        asyncEstimate: bool = False,
+    ) -> Union[BasicAttributes, AsyncTask[BasicAttributes]]:
         """
         Estimate a basic attributes (age, gender, ethnicity) from warped images.
 
@@ -232,9 +241,10 @@ class BasicAttributesEstimator(BaseEstimator):
             estimateAge: estimate age or not
             estimateGender: estimate gender or not
             estimateEthnicity: estimate ethnicity or not
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            estimated age, gender, ethnicity
+            estimated age, gender, ethnicity if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation failed
         """
@@ -245,12 +255,12 @@ class BasicAttributesEstimator(BaseEstimator):
             dtAttributes |= AttributeRequest.estimateGender
         if estimateEthnicity:
             dtAttributes |= AttributeRequest.estimateEthnicity
-
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage, AttributeRequest(dtAttributes))
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, baseAttributes = self._coreEstimator.estimate(warp.warpedImage.coreImage, AttributeRequest(dtAttributes))
-        assertError(error)
-        return BasicAttributes(baseAttributes)
+        return POST_PROCESSING.postProcessing(error, baseAttributes)
 
-    @CoreExceptionWrap(LunaVLError.BatchEstimationBasicAttributeError)
     def estimateBasicAttributesBatch(
         self,
         warps: List[Union[FaceWarp, FaceWarpedImage]],
@@ -258,7 +268,8 @@ class BasicAttributesEstimator(BaseEstimator):
         estimateGender: bool,
         estimateEthnicity: bool,
         aggregate: bool = False,
-    ) -> Tuple[List[BasicAttributes], Union[None, BasicAttributes]]:
+        asyncEstimate: bool = False,
+    ) -> Union[BasicAttributesBatchResult, AsyncTask[BasicAttributesBatchResult]]:
         """
         Batch basic attributes estimation on warped images.
 
@@ -267,11 +278,14 @@ class BasicAttributesEstimator(BaseEstimator):
             estimateAge: estimate age or not
             estimateGender: estimate gender or not
             estimateEthnicity: estimate ethnicity or not
-            aggregate:  aggregate attributes to one or not
+            aggregate: aggregate attributes to one or not
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
-            tuple, first element - list estimated attributes in corresponding order,
-            second - optional aggregated attributes.
+            asyncEstimate is False:
+                tuple, first element - list estimated attributes in corresponding order,
+                second - optional aggregated attributes.
+            asyncEstimate is True: async task
         Raises:
             LunaSDKException: if estimation failed
         """
@@ -286,11 +300,15 @@ class BasicAttributesEstimator(BaseEstimator):
         images = [warp.warpedImage.coreImage for warp in warps]
 
         validateInputByBatchEstimator(self._coreEstimator, images, AttributeRequest(dtAttributes))
-        error, baseAttributes, aggregateAttribute = self._coreEstimator.estimate(images, AttributeRequest(dtAttributes))
-        assertError(error)
 
-        attributes = [BasicAttributes(baseAttribute) for baseAttribute in baseAttributes]
-        if aggregate:
-            return attributes, BasicAttributes(aggregateAttribute)
-        else:
-            return attributes, None
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(images, AttributeRequest(dtAttributes))
+            return AsyncTask(
+                task, postProcessing=partial(POST_PROCESSING.postProcessingBatchWithAggregation, aggregate=aggregate)
+            )
+        error, baseAttributes, aggregatedAttribute = self._coreEstimator.estimate(
+            images, AttributeRequest(dtAttributes)
+        )
+        return POST_PROCESSING.postProcessingBatchWithAggregation(
+            error, baseAttributes, aggregatedAttribute, aggregate=aggregate
+        )

@@ -1,6 +1,7 @@
 """
 An emotion estimation example
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
@@ -11,7 +12,7 @@ from resources import EXAMPLE_SEVERAL_FACES
 
 def estimateBasicAttributes():
     """
-    Estimate emotion from a warped image.
+    Estimate basic attributes.
     """
     image = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
     faceEngine = VLFaceEngine()
@@ -41,5 +42,33 @@ def estimateBasicAttributes():
     )
 
 
+async def asyncEstimateBasicAttributes():
+    """
+    Async estimate basic attributes.
+    """
+    image = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+    faceDetections = detector.detect([image])[0]
+    warper = faceEngine.createFaceWarper()
+    warps = [warper.warp(faceDetection) for faceDetection in faceDetections]
+
+    basicAttributesEstimator = faceEngine.createBasicAttributesEstimator()
+    basicAttributes = await basicAttributesEstimator.estimate(
+        warps[0].warpedImage, estimateAge=True, estimateGender=True, estimateEthnicity=True, asyncEstimate=True
+    )
+    pprint.pprint(basicAttributes.asDict())
+
+    task1 = basicAttributesEstimator.estimate(
+        warps[0].warpedImage, estimateAge=True, estimateGender=True, estimateEthnicity=True, asyncEstimate=True
+    )
+    task2 = basicAttributesEstimator.estimate(
+        warps[0].warpedImage, estimateAge=True, estimateGender=True, estimateEthnicity=True, asyncEstimate=True
+    )
+    for task in (task1, task2):
+        pprint.pprint(task.get().asDict())
+
+
 if __name__ == "__main__":
     estimateBasicAttributes()
+    asyncio.run(asyncEstimateBasicAttributes())

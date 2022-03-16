@@ -3,14 +3,14 @@
 See `warp quality`_.
 """
 from enum import Enum
-from typing import Union, Dict
+from typing import Union, Dict, List
 
 from FaceEngine import GlassesEstimation, IGlassesEstimatorPtr
 
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
 from ..base import BaseEstimator
+from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ...base import BaseEstimation
 
 
@@ -81,6 +81,9 @@ class Glasses(BaseEstimation):
         return {"glasses": str(self.glasses)}
 
 
+POST_PROCESSING = DefaultPostprocessingFactory(Glasses)
+
+
 class GlassesEstimator(BaseEstimator):
     """
     Warp glasses estimator.
@@ -95,19 +98,47 @@ class GlassesEstimator(BaseEstimator):
         """
         super().__init__(glassesEstimator)
 
-    @CoreExceptionWrap(LunaVLError.EstimationGlassesError)
-    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage]) -> Glasses:
+    def estimate(
+        self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
+    ) -> Union[Glasses, AsyncTask[Glasses]]:
         """
         Estimate glasses from a warp.
 
         Args:
             warp: raw warped image or warp
+            asyncEstimate: estimate or run estimation in background
 
         Returns:
             estimated glasses
         Raises:
+            LunaSDKException: if estimation failed if asyncEstimate is false otherwise async task
+        """
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
+            return AsyncTask(task, POST_PROCESSING.postProcessing)
+        error, glasses = self._coreEstimator.estimate(warp.warpedImage.coreImage)
+        return POST_PROCESSING.postProcessing(error, glasses)
+
+    #  pylint: disable=W0221
+    def estimateBatch(
+        self, warps: List[Union[FaceWarp, FaceWarpedImage]], asyncEstimate: bool = False
+    ) -> Union[List[Glasses], AsyncTask[List[Glasses]]]:
+        """
+        Batch estimate glasses
+
+        Args:
+            warps:warped images
+            asyncEstimate: estimate or run estimation in background
+        Returns:
+            list of estimated glasses if asyncEstimate is false otherwise async task
+        Raises:
             LunaSDKException: if estimation failed
         """
-        error, glasses = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        assertError(error)
-        return Glasses(glasses)
+        coreImages = [warp.warpedImage.coreImage for warp in warps]
+
+        validateInputByBatchEstimator(self._coreEstimator, coreImages)
+        if asyncEstimate:
+            task = self._coreEstimator.asyncEstimate(coreImages)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
+        error, masks = self._coreEstimator.estimate(coreImages)
+        return POST_PROCESSING.postProcessingBatch(error, masks)

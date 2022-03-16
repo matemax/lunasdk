@@ -33,7 +33,7 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test estimation correctness with image.
         """
-        expectedAgs = 0.96425
+        expectedAgs = 0.96454
         imageWithFaceDetection = ImageWithFaceDetection(self.image1, self.detection1.boundingBox)
 
         singleValue = self.estimator.estimate(imageWithFaceDetection=imageWithFaceDetection)
@@ -46,7 +46,7 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test estimation correctness with detections.
         """
-        expectedAgs = 0.96425
+        expectedAgs = 0.96454
         singleValue = self.estimator.estimate(detection=self.detection1)
         batchValue = self.estimator.estimateBatch(detections=[self.detection1])[0]
         assert type(singleValue) == type(batchValue)
@@ -57,7 +57,7 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test batch estimation correctness with images.
         """
-        expectedAgsList = [0.96425, 1.00085]
+        expectedAgsList = [0.96454, 1.000867]
         result = self.estimator.estimateBatch(
             [
                 ImageWithFaceDetection(self.image1, self.detection1.boundingBox),
@@ -73,7 +73,7 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test batch estimation correctness with detections.
         """
-        expectedAgsList = [0.96425, 1.00085]
+        expectedAgsList = [0.96454, 1.00086]
         result = self.estimator.estimateBatch(detections=[self.detection1, self.detection2])
         assert isinstance(result, list)
         for idx, row in enumerate(result):
@@ -86,4 +86,4 @@ class TestBasicAttributes(BaseTestClass):
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
             self.estimator.estimateBatch([])
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))

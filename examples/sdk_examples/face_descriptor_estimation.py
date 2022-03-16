@@ -1,6 +1,7 @@
 """
 Face descriptor estimate example
 """
+import asyncio
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
@@ -31,5 +32,27 @@ def estimateDescriptor():
     pprint.pprint(aggregateDescriptor)
 
 
+async def asyncEstimateDescriptor():
+    """
+    Async estimate face descriptor.
+    """
+    image = VLImage.load(filename=EXAMPLE_O)
+    faceEngine = VLFaceEngine()
+    detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
+    faceDetection = detector.detectOne(image)
+    warper = faceEngine.createFaceWarper()
+    warp = warper.warp(faceDetection)
+
+    extractor = faceEngine.createFaceDescriptorEstimator()
+
+    pprint.pprint(await extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage], asyncEstimate=True))
+    # run tasks and get results
+    task1 = extractor.estimate(warp.warpedImage, asyncEstimate=True)
+    task2 = extractor.estimate(warp.warpedImage, asyncEstimate=True)
+    for task in (task1, task2):
+        pprint.pprint(task.get().asDict())
+
+
 if __name__ == "__main__":
     estimateDescriptor()
+    asyncio.run((asyncEstimateDescriptor()))

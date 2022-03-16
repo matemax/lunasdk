@@ -26,30 +26,6 @@ class LunaSDKException(Exception):
         self.context = context
 
 
-def CoreExceptionWrap(error: ErrorInfo):
-    """
-    Decorator catch runtime exceptions from core (as supposed)  and converts it to LunaSDKException.
-
-    Args:
-        error: returning error in the exception case
-    Returns:
-        if exception was caught, system calls error method with error
-    """
-
-    def realWarp(func: Callable):
-        @wraps(func)
-        def wrap(*func_args, **func_kwargs):
-            try:
-                res = func(*func_args, **func_kwargs)
-                return res
-            except RuntimeError as e:
-                raise LunaSDKException(error.format(str(e)), exception=e)
-
-        return wrap
-
-    return realWarp
-
-
 def assertError(error: FSDKErrorResult, context: Optional[List[Any]] = None) -> None:
     """
     Assert core optional.

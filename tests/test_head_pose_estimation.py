@@ -1,6 +1,4 @@
 from collections import namedtuple
-
-from FaceEngine import Detection, RectFloat
 import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
@@ -11,6 +9,9 @@ from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
 from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
+
+from FaceEngine import Detection, RectFloat
+
 from tests.base import BaseTestClass
 from tests.resources import (
     ONE_FACE,
@@ -117,7 +118,7 @@ class TestHeadPose(BaseTestClass):
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))
 
     def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
         """
@@ -127,7 +128,7 @@ class TestHeadPose(BaseTestClass):
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
             TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection)
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection.format("Invalid detection"))
 
     def test_default_estimation(self):
         """
@@ -184,5 +185,21 @@ class TestHeadPose(BaseTestClass):
         """
         Batch estimation invalid input
         """
-        with pytest.raises(TypeError):
+        with pytest.raises(LunaSDKException) as exceptionInfo:
             self.headPoseEstimator.estimateBatch([], [])
+        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))
+
+    def test_async_estimate_head_pose(self):
+        """
+        Test async estimate head pose
+        """
+        task = self.headPoseEstimator.estimate(self.detection.landmarks68, asyncEstimate=True)
+        self.assertAsyncEstimation(task, HeadPose)
+        task = self.headPoseEstimator.estimateBatch([self.detection] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, HeadPose)
+        task = self.headPoseEstimator.estimateByBoundingBox(
+            ImageWithFaceDetection(self.image, self.detection.boundingBox), asyncEstimate=True
+        )
+        self.assertAsyncEstimation(task, HeadPose)
+        task = self.headPoseEstimator.estimateBy68Landmarks(self.detection.landmarks68, asyncEstimate=True)
+        self.assertAsyncEstimation(task, HeadPose)

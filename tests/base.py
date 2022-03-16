@@ -1,11 +1,12 @@
 import unittest
 from operator import attrgetter
-from typing import Dict
+from typing import Dict, Any, Type
 
 import numpy as np
 from PIL import Image
 from _pytest._code import ExceptionInfo
 
+from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.errors.errors import ErrorInfo
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.image_utils.geometry import Rect
@@ -121,3 +122,50 @@ class BaseTestClass(unittest.TestCase):
             color: VLImage.fromNumpyArray(ndarray, color)
             for color, ndarray in BaseTestClass.generateColorToArrayMap().items()
         }
+
+    @staticmethod
+    def assertAsyncEstimation(task: AsyncTask, expectedTypeResult: Type[Any]):
+        """
+        Assert single async estimation
+        Args:
+            task: async task
+            expectedTypeResult: expected type of result
+        """
+        isinstance(task, AsyncTask)
+        res = task.get()
+        isinstance(res, expectedTypeResult)
+
+    @staticmethod
+    def assertAsyncBatchEstimation(task: AsyncTask, expectedTypeResult: Type[Any], batchLength: int = 2):
+        """
+        Assert batch async estimation
+        Args:
+            task: async task
+            expectedTypeResult: expected type of result
+            batchLength: batch length
+        """
+        isinstance(task, AsyncTask)
+        res = task.get()
+        isinstance(res, list)
+        assert batchLength == len(res)
+        for estimation in res:
+            isinstance(estimation, expectedTypeResult)
+
+    @staticmethod
+    def assertAsyncBatchEstimationWithAggregation(task: AsyncTask, expectedTypeResult: Type[Any], batchLength: int = 2):
+        """
+        Assert batch async estimation with aggregation
+        Args:
+            task: async task
+            expectedTypeResult: expected type of result
+            batchLength: batch length
+        """
+        isinstance(task, AsyncTask)
+        res = task.get()
+        isinstance(res, tuple)
+        assert 2 == len(res)
+        isinstance(res[1], expectedTypeResult)
+        isinstance(res[0], list)
+        assert batchLength == len(res[0])
+        for estimation in res:
+            isinstance(estimation, expectedTypeResult)

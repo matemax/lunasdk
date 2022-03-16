@@ -1,7 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForDetection
-from lunavl.sdk.detectors.facedetector import FaceDetector
+from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
@@ -306,7 +306,7 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(image=imageWithOneFaces)
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format("Invalid image format"))
 
     def test_batch_detect_invalid_image_format(self):
         """
@@ -328,10 +328,12 @@ class TestFaceDetector(FaceDetectTestClass):
                     else:
                         with pytest.raises(LunaSDKException) as exceptionInfo:
                             detector.detect(images=[colorImage])
-                        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                        self.assertLunaVlError(
+                            exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation.")
+                        )
                         assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
                         self.assertReceivedAndRawExpectedErrors(
-                            exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat
+                            exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat.format("Failed validation.")
                         )
 
     def test_batch_detect_by_area_without_face(self):
@@ -364,7 +366,7 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))
 
     def test_batch_detect_in_area_outside_image(self):
         """
@@ -374,9 +376,11 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=OUTSIDE_AREA)])
-                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
                 assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
+                self.assertReceivedAndRawExpectedErrors(
+                    exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Invalid rectangle")
+                )
 
     @pytest.mark.skip("unstable")
     def test_excessive_image_list_detection(self):
@@ -395,7 +399,7 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=Rect())
-                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))
 
     def test_batch_detect_invalid_rectangle(self):
         """
@@ -405,9 +409,11 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with pytest.raises(LunaSDKException) as exceptionInfo:
                     detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=Rect())])
-                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
                 assert len(exceptionInfo.value.context) == 1, "Expect one error in exception context"
-                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
+                self.assertReceivedAndRawExpectedErrors(
+                    exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Invalid rectangle")
+                )
 
     def test_match_detection_one_image(self):
         """
@@ -468,3 +474,12 @@ class TestFaceDetector(FaceDetectTestClass):
             with self.subTest(detectorType=detector.detectorType):
                 with self.assertRaises(expected_exception=LunaSDKException):
                     detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=AREA_OUTSIDE_IMAGE)
+
+    def test_async_detect_face(self):
+        """
+        Test async detect face
+        """
+        task = self.defaultDetector.detectOne(VLIMAGE_ONE_FACE, asyncEstimate=True)
+        self.assertAsyncEstimation(task, FaceDetection)
+        task = self.defaultDetector.detect([VLIMAGE_ONE_FACE] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, FaceDetection)

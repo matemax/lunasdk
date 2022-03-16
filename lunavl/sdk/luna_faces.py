@@ -1,6 +1,7 @@
 """
 High-level api for estimating face attributes
 """
+from dataclasses import dataclass
 from typing import Optional, Union, List, Dict
 
 from FaceEngine import Face  # pylint: disable=E0611,E0401
@@ -28,7 +29,6 @@ from .faceengine.engine import VLFaceEngine
 from .faceengine.setting_provider import DetectorType
 from .image_utils.geometry import Rect
 from .image_utils.image import VLImage, ColorFormat
-from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -255,8 +255,10 @@ class VLFaceDetection(FaceDetection):
             mouth state
         """
         if self._descriptor is None:
-            self._descriptor = self.estimatorCollection.descriptorEstimator.estimate(self.warp)
-        return self._descriptor
+            self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(
+                self.warp
+            )  # type: ignore
+        return self._descriptor  # type: ignore
 
     def _getTransformedLandmarks5(self) -> Landmarks5:
         """
@@ -431,7 +433,50 @@ class VLFaceDetector:
             detectRes.coreEstimation, detectRes.image, self.estimatorsCollection, self._estimationSettings
         )
 
-    def detect(self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5) -> List[List[VLFaceDetection]]:
+    def postProcessingDetectionBatch(self, detectRes: List[List[Optional[FaceDetection]]]):
+        """
+        Post processing detection results (wrap to  VLFaceDetection)
+        Args:
+            detectRes: detection results
+
+        Returns:
+            VLFaceDetection's
+        """
+        res = []
+        for imageDetections in detectRes:
+            res.append(
+                [
+                    VLFaceDetection(
+                        detection.coreEstimation,
+                        detection.image,
+                        self.estimatorsCollection,
+                        self._estimationSettings,
+                    )
+                    if detection
+                    else None
+                    for detection in imageDetections
+                ]
+            )
+        return res
+
+    def postProcessing(self, detection: Optional[FaceDetection]) -> Optional[VLFaceDetection]:
+        """
+        Post processing detection (wrap to  VLFaceDetection)
+        Args:
+            detection: detection results
+
+        Returns:
+            VLFaceDetection
+        """
+        if detection:
+            return VLFaceDetection(
+                detection.coreEstimation, detection.image, self.estimatorsCollection, self._estimationSettings
+            )
+        return None
+
+    def detect(
+        self, images: List[Union[VLImage, ImageForDetection]], limit: int = 5
+    ) -> Union[List[List[VLFaceDetection]], List[List[VLFaceDetection]]]:
         """
         Batch detect faces on images.
 
@@ -442,20 +487,7 @@ class VLFaceDetector:
             return list of lists detection, order of detection lists is corresponding to order of input images
         """
         detectRes = self._faceDetector.detect(images, limit, True, True)
-        res = []
-        for imageNumber, image in enumerate(images):
-            res.append(
-                [
-                    VLFaceDetection(
-                        detectRes.coreEstimation,
-                        image if isinstance(image, VLImage) else image.image,
-                        self.estimatorsCollection,
-                        self._estimationSettings,
-                    )
-                    for detectRes in detectRes[imageNumber]
-                ]
-            )
-        return res
+        return self.postProcessingDetectionBatch(detectRes)
 
     def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBox: Rect) -> Union[VLFaceDetection, None]:
         """
@@ -474,13 +506,12 @@ class VLFaceDetector:
         redetection: Union[None, FaceDetection] = self._faceDetector.redetectOne(
             imageForRedetct, bBox=bBox, detect5Landmarks=True, detect68Landmarks=True
         )
-        if redetection:
-            return VLFaceDetection(
-                redetection.coreEstimation, redetection.image, self.estimatorsCollection, self._estimationSettings
-            )
-        return None
+        return self.postProcessing(redetection)
 
-    def redetect(self, imagesAndBBoxes: List[ImageForRedetection]) -> List[List[Union[VLFaceDetection, None]]]:
+    def redetect(
+        self,
+        imagesAndBBoxes: List[ImageForRedetection],
+    ) -> Union[List[List[Union[VLFaceDetection, None]]], List[List[Union[VLFaceDetection, None]]]]:
         """
         Redetect faces on images.
 
@@ -492,19 +523,8 @@ class VLFaceDetector:
                 Order of detections is corresponding to order of input bounding boxes.
         """
 
-        redetections: List[List[Union[FaceDetection, None]]] = self._faceDetector.redetect(imagesAndBBoxes, True, True)
-        res = []
-        for redetectionsOfImage in redetections:
-            imageRes = [
-                VLFaceDetection(
-                    redetection.coreEstimation, redetection.image, self.estimatorsCollection, self._estimationSettings
-                )
-                if redetection
-                else None
-                for redetection in redetectionsOfImage
-            ]
-            res.append(imageRes)
-        return res
+        redetections = self._faceDetector.redetect(imagesAndBBoxes, True, True)
+        return self.postProcessingDetectionBatch(redetections)
 
 
 class VLWarpedImage(FaceWarpedImage):
@@ -584,8 +604,8 @@ class VLWarpedImage(FaceWarpedImage):
             mouth state
         """
         if self._descriptor is None:
-            self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(self)
-        return self._descriptor
+            self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(self)  # type: ignore
+        return self._descriptor  # type: ignore
 
     @property
     def emotions(self) -> Emotions:

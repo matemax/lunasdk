@@ -173,3 +173,40 @@ def validateBatchDetectInput(
     else:
         errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
     raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors)
+
+
+def validateReDetectInput(detector, coreImages: List[CoreImage], detectAreas: List[List[Detection]]):
+    """
+    Validate input data for face re-detect
+    Args:
+        coreImages:core images
+        detectAreas: face re-detect areas
+    Raises:
+        LunaSDKException(LunaVLError.BatchedInternalError): if validation failed and coreImages has type list
+                                                                                              (batch redetect)
+        LunaSDKException: if validation failed and coreImages has type CoreImage
+    """
+    if isinstance(coreImages, list):
+        mainError, imagesErrors = detector.validate(coreImages, detectAreas)
+    else:
+        mainError, imagesErrors = detector.validate([coreImages], [[detectAreas]])
+    if mainError.isOk:
+        return
+    if mainError.error != FSDKError.ValidationFailed:
+        raise LunaSDKException(
+            LunaVLError.ValidationFailed.format(mainError.what),
+            [LunaVLError.fromSDKError(errors[0]) for errors in imagesErrors],
+        )
+    if not isinstance(coreImages, list):
+        raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0][0]))
+    errors = []
+
+    for imageErrors in imagesErrors:
+        for error in imageErrors:
+            if error.isOk:
+                continue
+            errors.append(LunaVLError.fromSDKError(error))
+            break
+        else:
+            errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+    raise LunaSDKException(LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors)

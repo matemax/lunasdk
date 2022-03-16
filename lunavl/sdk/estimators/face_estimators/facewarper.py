@@ -8,8 +8,7 @@ from PIL.Image import Image as PilImage
 from numpy import ndarray
 
 from lunavl.sdk.detectors.facedetector import FaceDetection, Landmarks68, Landmarks5
-from lunavl.sdk.errors.errors import LunaVLError
-from lunavl.sdk.errors.exceptions import CoreExceptionWrap, assertError
+from lunavl.sdk.errors.exceptions import assertError
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat
 
 
@@ -131,7 +130,6 @@ class FaceWarper:
         """
         self._coreWarper = coreWarper
 
-    @CoreExceptionWrap(LunaVLError.WarpTransformationError)
     def _createWarpTransformation(self, faceDetection: FaceDetection) -> Transformation:
         """
         Create warp transformation.
@@ -150,7 +148,6 @@ class FaceWarper:
             faceDetection.coreEstimation.detection, faceDetection.landmarks5.coreEstimation
         )
 
-    @CoreExceptionWrap(LunaVLError.CreationWarpError)
     def warp(self, faceDetection: FaceDetection) -> FaceWarp:
         """
         Create warp from detection.

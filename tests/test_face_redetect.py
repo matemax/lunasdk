@@ -1,6 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForRedetection
+from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
@@ -144,10 +145,12 @@ class TestsRedetectFace(FaceDetectTestClass):
                             ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[Rect(0, 0, 100, 100)]),
                         ]
                     )
-                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError)
+                self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
                 assert len(exceptionInfo.value.context) == 2, "Expect two error in exception context"
-                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidRect)
-                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok)
+                self.assertReceivedAndRawExpectedErrors(
+                    exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Invalid rectangle")
+                )
+                self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[1], LunaVLError.Ok.format("Ok"))
 
     def test_rect_float(self):
         """
@@ -194,3 +197,16 @@ class TestsRedetectFace(FaceDetectTestClass):
                 self.assertFaceDetection(redetectOne, image)
                 redetect = detector.redetect(images=[ImageForRedetection(image=image, bBoxes=[rect])])
                 self.assertFaceDetection(redetect[0], image)
+
+    def test_async_redetect_face(self):
+        """
+        Test async redetect face
+        """
+        detector = self.detectors[-1]
+        detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE)
+        task = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detectOne, asyncEstimate=True)
+        self.assertAsyncEstimation(task, FaceDetection)
+        task = detector.redetect(
+            [ImageForRedetection(VLIMAGE_ONE_FACE, [detectOne.boundingBox.rect])] * 2, asyncEstimate=True
+        )
+        self.assertAsyncBatchEstimation(task, FaceDetection)

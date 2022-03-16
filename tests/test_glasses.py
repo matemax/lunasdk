@@ -68,3 +68,12 @@ class TestGlasses(BaseTestClass):
         expectedResult = {"glasses": "sunglasses"}
         glasses = TestGlasses.glassesEstimator.estimate(self.warpSunGlasses)
         self.assertGlassesEstimation(glasses, expectedResult)
+
+    def test_async_estimate_glasses(self):
+        """
+        Test async estimate glasses
+        """
+        task = self.glassesEstimator.estimate(self.warpSunGlasses, asyncEstimate=True)
+        self.assertAsyncEstimation(task, Glasses)
+        task = self.glassesEstimator.estimateBatch([self.warpSunGlasses] * 2, asyncEstimate=True)
+        self.assertAsyncBatchEstimation(task, Glasses)
