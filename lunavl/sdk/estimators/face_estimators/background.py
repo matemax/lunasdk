@@ -1,7 +1,7 @@
 """
-Module contains a fisheye estimator.
+Module contains a background estimator.
 
-See `fisheye`_.
+See `background`_.
 """
 from typing import Dict, List, Union
 
@@ -29,15 +29,15 @@ class FaceDetectionBackground(BaseEstimation):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreFishEye: CoreBackgroundEstimation):
+    def __init__(self, coreBackground: CoreBackgroundEstimation):
         """
         Init.
 
         Args:
-            coreFishEye: core fisheye estimation.
+            coreBackground: core background estimation.
         """
 
-        super().__init__(coreFishEye)
+        super().__init__(coreBackground)
 
     @property
     def backgroundColor(self) -> float:
@@ -52,7 +52,7 @@ class FaceDetectionBackground(BaseEstimation):
     @property
     def lightBackground(self) -> float:
         """
-        Background light score,  1 - is light background, 0 - is too dark.
+        Background light score, 1 - is light background, 0 - is too dark.
         """
         return self._coreEstimation.backgroundColorScore
 
@@ -75,30 +75,30 @@ POST_PROCESSING = DefaultPostprocessingFactory(FaceDetectionBackground)
 
 class FaceDetectionBackgroundEstimator(BaseEstimator):
     """
-    Fisheye effect estimator. Work on face detections
+    Face detection background estimator. Work on face detections
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreFishEyeEstimator: IBackgroundEstimatorPtr):
+    def __init__(self, corBackgroundEstimator: IBackgroundEstimatorPtr):
         """
         Init.
 
         Args:
-            coreFishEyeEstimator: core estimator
+            corBackgroundEstimator: core estimator
         """
-        super().__init__(coreFishEyeEstimator)
+        super().__init__(corBackgroundEstimator)
 
     def estimate(
         self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False
     ) -> Union[FaceDetectionBackground, AsyncTask[FaceDetectionBackground]]:
         """
-        Estimate fisheye.
+        Estimate a face detection background.
 
         Args:
             imageWithFaceDetection: image with face detection
             asyncEstimate: estimate or run estimation in background
         Returns:
-            fisheye estimation if asyncEstimate is false otherwise async task
+            background estimation if asyncEstimate is false otherwise async task
         Raises:
             LunaSDKException: if estimation is failed
         """
@@ -116,13 +116,13 @@ class FaceDetectionBackgroundEstimator(BaseEstimator):
         self, batch: Union[List[ImageWithFaceDetection], List[FaceDetection]], asyncEstimate: bool = False
     ) -> Union[List[FaceDetectionBackground], AsyncTask[List[FaceDetectionBackground]]]:
         """
-        Estimate fisheye batch.
+        Estimate background batch.
 
         Args:
             batch: list of image with face detection or face detections
             asyncEstimate: estimate or run estimation in background
         Returns:
-            list of fisheye estimations if asyncEstimate is False otherwise async task
+            list of background estimations if asyncEstimate is False otherwise async task
         Raises:
             LunaSDKException: if estimation is failed
         """

@@ -44,11 +44,33 @@ REQUIRED_HUMAN_BODY_DETECTION = {
     "required": ["rect", "score"],
 }
 
+MOUTH_SMILE_TYPE_ESTIMATIONS =  {
+    "type": "object",
+    "properties": {"regular": TYPE_SCORE, "with_teeth": TYPE_SCORE},
+    "additionalProperties": False,
+    "required": ["regular", "with_teeth"],
+}
+MOUTH_SMILE_TYPE_ENUM =  {"type": "string", "enum": ["no", "with_teeth", "regular"]}
+
+MOUTH_SMILE_TYPE = {
+    "type": "object",
+    "properties": {"estimations": MOUTH_SMILE_TYPE_ESTIMATIONS, "predominant_type": MOUTH_SMILE_TYPE_ENUM},
+    "additionalProperties": False,
+    "required": ["estimations", "predominant_type"],
+}
+
+MOUTH_PROPERTIES = {
+    "type": "object",
+    "properties": {"smile_type": MOUTH_SMILE_TYPE,},
+    "additionalProperties": False,
+    "required": ["smile_type"],
+}
+
 MOUTH_STATES_SCHEMA = {
     "type": "object",
-    "properties": {"opened": TYPE_SCORE, "occluded": TYPE_SCORE, "smile": TYPE_SCORE},
+    "properties": {"opened": TYPE_SCORE, "occluded": TYPE_SCORE, "smile": TYPE_SCORE, "properties": MOUTH_PROPERTIES},
     "additionalProperties": False,
-    "required": ["opened", "occluded", "smile"],
+    "required": ["opened", "occluded", "smile", "properties"],
 }
 
 QUALITY_SCHEMA = {

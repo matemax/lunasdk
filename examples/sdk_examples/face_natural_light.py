@@ -20,9 +20,9 @@ def estimateFaceNaturalLight():
     warper = faceEngine.createFaceWarper()
     warp = warper.warp(faceDetection)
 
-    eyebrowEstimator = faceEngine.createFaceNaturalLightEstimator()
+    naturalLightEstimator = faceEngine.createFaceNaturalLightEstimator()
 
-    pprint.pprint(eyebrowEstimator.estimate(warp.warpedImage).asDict())
+    pprint.pprint(naturalLightEstimator.estimate(warp.warpedImage).asDict())
 
 
 if __name__ == "__main__":

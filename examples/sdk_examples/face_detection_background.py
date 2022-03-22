@@ -33,8 +33,8 @@ def estimateBackground():
         ImageWithFaceDetection(image, faceDetection.boundingBox),
         ImageWithFaceDetection(image2, faceDetection2.boundingBox),
     ]
-    fisheyeList = backgroundEstimator.estimateBatch(imageWithFaceDetectionList)
-    pprint.pprint(fisheyeList)
+    backgrounds = backgroundEstimator.estimateBatch(imageWithFaceDetectionList)
+    pprint.pprint(backgrounds)
 
 
 if __name__ == "__main__":
