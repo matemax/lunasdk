@@ -23,6 +23,7 @@ TURNED_HEAD_POSE_FACE = getPathToImage("turned_head_pose.jpg")
 FRONTAL_HEAD_POSE_FACE = getPathToImage("frontal_head_pose.jpg")
 
 OPEN_EYES = getPathToImage("girl_front_face.jpg")
+# https://unsplash.com/photos/RfoISVdKM4U/download?ixid=MnwxMjA3fDB8MXxzZWFyY2h8NDZ8fGdpcmxzfGVufDB8fHx8MTY0NzU5NDU3NA&force=true&w=1920
 MIXED_EYES = getPathToImage("mixed_eyes.jpg")
 CLOSED_EYES = getPathToImage("closed_eyes.jpg")
 

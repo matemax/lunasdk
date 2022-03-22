@@ -103,7 +103,7 @@ class TestEstimateEyes(BaseTestClass):
         warpWithLandmarks = WarpWithLandmarks(warp, landMarks5Transformation)
         eyesResult = self.eyeEstimator.estimate(warpWithLandmarks)
         assert eyesResult.leftEye.state == EyeState.Occluded
-        assert eyesResult.rightEye.state == EyeState.Open
+        assert eyesResult.rightEye.state == EyeState.Closed
 
     def test_estimate_batch(self):
         """
