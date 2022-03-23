@@ -44,13 +44,13 @@ REQUIRED_HUMAN_BODY_DETECTION = {
     "required": ["rect", "score"],
 }
 
-MOUTH_SMILE_TYPE_ESTIMATIONS =  {
+MOUTH_SMILE_TYPE_ESTIMATIONS = {
     "type": "object",
     "properties": {"regular": TYPE_SCORE, "with_teeth": TYPE_SCORE},
     "additionalProperties": False,
     "required": ["regular", "with_teeth"],
 }
-MOUTH_SMILE_TYPE_ENUM =  {"type": "string", "enum": ["no", "with_teeth", "regular"]}
+MOUTH_SMILE_TYPE_ENUM = {"type": "string", "enum": ["no", "with_teeth", "regular"]}
 
 MOUTH_SMILE_TYPE = {
     "type": "object",
@@ -61,7 +61,9 @@ MOUTH_SMILE_TYPE = {
 
 MOUTH_PROPERTIES = {
     "type": "object",
-    "properties": {"smile_type": MOUTH_SMILE_TYPE,},
+    "properties": {
+        "smile_type": MOUTH_SMILE_TYPE,
+    },
     "additionalProperties": False,
     "required": ["smile_type"],
 }
