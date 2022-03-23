@@ -68,9 +68,9 @@ class RedEye(BaseEstimation):
         }
 
 
-class RedEyeEstimation(BaseEstimation):
+class RedEyes(BaseEstimation):
     """
-    Red-eye estimation structure for both eyes.
+    Red-eyes estimation structure for both eyes.
 
     Attributes:
         leftEye (Eye): estimation for left eye
@@ -100,7 +100,7 @@ class RedEyeEstimation(BaseEstimation):
         return {"left_eye": self.leftEye.asDict(), "right_eye": self.rightEye.asDict()}
 
 
-POST_PROCESSING = DefaultPostprocessingFactory(RedEyeEstimation)
+POST_PROCESSING = DefaultPostprocessingFactory(RedEyes)
 
 
 class RedEyeEstimator(BaseEstimator):
@@ -121,7 +121,7 @@ class RedEyeEstimator(BaseEstimator):
     #  pylint: disable=W0221
     def estimate(
         self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: bool = False
-    ) -> Union[RedEyeEstimation, AsyncTask[RedEyeEstimation]]:
+    ) -> Union[RedEyes, AsyncTask[RedEyes]]:
         """
         Estimate red-eye on warp.
 
@@ -145,7 +145,7 @@ class RedEyeEstimator(BaseEstimator):
     #  pylint: disable=W0221
     def estimateBatch(
         self, warpWithLandmarks5List: List[WarpWithLandmarks5], asyncEstimate: bool = False
-    ) -> Union[List[RedEyeEstimation], AsyncTask[List[RedEyeEstimation]]]:
+    ) -> Union[List[RedEyes], AsyncTask[List[RedEyes]]]:
         """
         Estimate batch of red-eye.
 
