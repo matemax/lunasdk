@@ -103,7 +103,7 @@ class RedEyes(BaseEstimation):
 POST_PROCESSING = DefaultPostprocessingFactory(RedEyes)
 
 
-class RedEyeEstimator(BaseEstimator):
+class RedEyesEstimator(BaseEstimator):
     """
     Red-eye estimator.
     """

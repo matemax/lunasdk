@@ -30,7 +30,7 @@ from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
 from ..estimators.face_estimators.natural_light import FaceNaturalLightEstimator
-from ..estimators.face_estimators.red_eye import RedEyeEstimator
+from ..estimators.face_estimators.red_eye import RedEyesEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
@@ -368,13 +368,13 @@ class VLFaceEngine:
         """
         return FaceNaturalLightEstimator(self._faceEngine.createNaturalLightEstimator())
 
-    def createRedEyeEstimator(self) -> RedEyeEstimator:
+    def createRedEyeEstimator(self) -> RedEyesEstimator:
         """
         Create a red-eye estimator.
         Returns:
             estimator
         """
-        return RedEyeEstimator(self._faceEngine.createRedEyeEstimator())
+        return RedEyesEstimator(self._faceEngine.createRedEyeEstimator())
 
     def createFishEstimator(self) -> FisheyeEstimator:
         """
