@@ -376,7 +376,7 @@ class VLFaceEngine:
         """
         return RedEyesEstimator(self._faceEngine.createRedEyeEstimator())
 
-    def createFishEstimator(self) -> FisheyeEstimator:
+    def createFisheyeEstimator(self) -> FisheyeEstimator:
         """
         Create a fisheye effect estimator.
         Returns:

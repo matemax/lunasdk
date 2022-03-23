@@ -18,7 +18,7 @@ def estimateFisheye():
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
-    fishEstimator = faceEngine.createFishEstimator()
+    fishEstimator = faceEngine.createFisheyeEstimator()
     faceDetection = detector.detectOne(image, detect5Landmarks=False, detect68Landmarks=True)
 
     #: single estimation
