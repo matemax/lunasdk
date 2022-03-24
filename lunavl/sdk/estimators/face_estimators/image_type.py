@@ -24,8 +24,8 @@ class ImageColorSchema(Enum):
     A Image Color type enum
     """
 
-    #: Black and white
-    BlackWhite = 1
+    #: Grayscale
+    Grayscale = 1
     #: Color
     Color = 2
     #: Infrared
