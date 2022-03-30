@@ -45,7 +45,7 @@ class RedEye(BaseEstimation):
         Get a red-eye status.
 
         Returns:
-            True if face has a natural light otherwise False
+            True if eye has red-eye effect otherwise False
 
         """
         return True if self._coreEstimation.status == RedEyeStatusCore.Red else False

@@ -1,5 +1,5 @@
 """
-Module realize simple fisheye estimation examples.
+Module realize simple face detection background estimation examples.
 """
 import pprint
 
@@ -7,12 +7,12 @@ from lunavl.sdk.estimators.base import ImageWithFaceDetection
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from resources import EXAMPLE_O, EXAMPLE_1, EXAMPLE_3, EXAMPLE_4
+from resources import EXAMPLE_4
 
 
 def estimateBackground():
     """
-    Example of a face detection bacground estimation.
+    Example of a face detection background estimation.
 
     """
     image = VLImage.load(filename=EXAMPLE_4)

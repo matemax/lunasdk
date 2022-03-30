@@ -164,5 +164,5 @@ class WarpQualityEstimator(BaseEstimator):
         if asyncEstimate:
             task = self._coreEstimator.async_estimate_subjective_quality(coreImages)
             return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
-        error, masks = self._coreEstimator.estimate(coreImages)
+        error, masks = self._coreEstimator.estimate_subjective_quality(coreImages)
         return POST_PROCESSING.postProcessingBatch(error, masks)
