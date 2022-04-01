@@ -150,7 +150,7 @@ class MouthStates(BaseEstimation):
             "opened": self.opened,
             "occluded": self.occlusion,
             "smile": self.smile,
-            "properies": self.properties.asDict(),
+            "properties": self.properties.asDict(),
         }
 
 
