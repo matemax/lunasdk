@@ -72,9 +72,10 @@ class SmileType:
 
     def asDict(self) -> Dict:
         """Convert to dict"""
+        predominant = "none" if self.predominantType == SmileTypeEnum.No else self.predominantType.name.lower()
         return {
             "estimations": {"regular": self.regular, "with_teeth": self.withTeeth},
-            "predominant_type": self.predominantType.name.lower(),
+            "predominant_type": predominant,
         }
 
 

@@ -50,7 +50,7 @@ MOUTH_SMILE_TYPE_ESTIMATIONS = {
     "additionalProperties": False,
     "required": ["regular", "with_teeth"],
 }
-MOUTH_SMILE_TYPE_ENUM = {"type": "string", "enum": ["no", "with_teeth", "regular"]}
+MOUTH_SMILE_TYPE_ENUM = {"type": "string", "enum": ["none", "with_teeth", "regular"]}
 
 MOUTH_SMILE_TYPE = {
     "type": "object",
