@@ -2,15 +2,98 @@
 
 see `mouth state`_
 """
+from enum import Enum
 from typing import Union, Dict, List
 
-from FaceEngine import MouthEstimation, IMouthEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import MouthEstimation, IMouthEstimatorPtr, SmileType as CoreSmileType  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...async_task import AsyncTask, DefaultPostprocessingFactory
+
+
+class SmileTypeEnum(Enum):
+    """Smile type enum"""
+
+    No = 0  # no smile
+    Regular = 1  # regular smile, without teeths exposed (polite smile)
+    WithTeeth = 2  # smile with teeths exposed
+
+    @staticmethod
+    def fromCoreSmile(coreSmile) -> "SmileTypeEnum":
+        """
+        Get enum element by core smile type.
+
+        Args:
+            coreSmile: enum value from core
+
+        Returns:
+            corresponding mask prediction
+        """
+        if coreSmile == getattr(CoreSmileType, "None"):
+            return SmileTypeEnum.No
+        if coreSmile == CoreSmileType.SmileLips:
+            return SmileTypeEnum.Regular
+        if coreSmile == CoreSmileType.SmileOpen:
+            return SmileTypeEnum.WithTeeth
+        raise RuntimeError(f"bad core smile type {coreSmile}")
+
+
+class SmileType:
+    """
+    Smile type container
+    Attributes:
+        _coreSmileType: core smile type estimation
+        _coreSmileScores:  smile type scores
+    """
+
+    __slots__ = ("_coreSmileType", "_coreSmileScores")
+
+    def __init__(self, coreSmileType, coreSmileScores):
+        self._coreSmileType = coreSmileType
+        self._coreSmileScores = coreSmileScores
+
+    @property
+    def predominantType(self) -> SmileTypeEnum:
+        """Get predominant smile type (if smile not found return SmileTypeEnum.No)"""
+        return SmileTypeEnum.fromCoreSmile(self._coreSmileType)
+
+    @property
+    def regular(self):
+        """Regular (polite) smile score"""
+        return self._coreSmileScores.smileLips
+
+    @property
+    def withTeeth(self):
+        """With teeth smile score"""
+        return self._coreSmileScores.smileOpen
+
+    def asDict(self) -> Dict:
+        """Convert to dict"""
+        predominant = "none" if self.predominantType == SmileTypeEnum.No else self.predominantType.name.lower()
+        return {
+            "estimations": {"regular": self.regular, "with_teeth": self.withTeeth},
+            "predominant_type": predominant,
+        }
+
+
+class MouthProperties:
+    """
+    Container for mouth properties
+    Attributes:
+        smileType: smile type estimation
+    """
+
+    __slots__ = ("smileType",)
+
+    def __init__(self, coreSmileType, coreSmileScores):
+        self.smileType = SmileType(coreSmileType, coreSmileScores)
+
+    def asDict(self) -> Dict:
+        """Convert  mouth properties to dict"""
+        return {"smile_type": self.smileType.asDict()}
 
 
 class MouthStates(BaseEstimation):
@@ -24,9 +107,12 @@ class MouthStates(BaseEstimation):
         - occlusion
     """
 
+    __slots__ = "properties"
+
     #  pylint: disable=W0235
     def __init__(self, coreEstimation: MouthEstimation):
         super().__init__(coreEstimation)
+        self.properties = MouthProperties(self._coreEstimation.smileType, self._coreEstimation.smileTypeScores)
 
     @property
     def smile(self) -> float:
@@ -59,13 +145,13 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.occluded
 
     def asDict(self) -> Dict[str, float]:
-        """
-        Convert to dict.
-
-        Returns:
-            {'opened': self.opened, 'occlusion': self.occlusion, 'smile': self.smile}
-        """
-        return {"opened": self.opened, "occluded": self.occlusion, "smile": self.smile}
+        """ Convert to dict."""
+        return {
+            "opened": self.opened,
+            "occluded": self.occlusion,
+            "smile": self.smile,
+            "properties": self.properties.asDict(),
+        }
 
 
 POST_PROCESSING = DefaultPostprocessingFactory(MouthStates)
@@ -105,9 +191,9 @@ class MouthStateEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         if asyncEstimate:
-            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
+            task = self._coreEstimator.async_estimate_extended(warp.warpedImage.coreImage)
             return AsyncTask(task, POST_PROCESSING.postProcessing)
-        error, mouthState = self._coreEstimator.estimate(warp.warpedImage.coreImage)
+        error, mouthState = self._coreEstimator.estimate_extended(warp.warpedImage.coreImage)
         return POST_PROCESSING.postProcessing(error, mouthState)
 
     #  pylint: disable=W0221
@@ -129,7 +215,7 @@ class MouthStateEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
-            task = self._coreEstimator.asyncEstimate(coreImages)
+            task = self._coreEstimator.async_estimate_extended(coreImages)
             return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
-        error, masks = self._coreEstimator.estimate(coreImages)
+        error, masks = self._coreEstimator.estimate_extended(coreImages)
         return POST_PROCESSING.postProcessingBatch(error, masks)

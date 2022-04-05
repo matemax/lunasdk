@@ -13,17 +13,24 @@ from ..detectors.humandetector import HumanDetector
 from ..estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
 from ..estimators.body_estimators.humanwarper import HumanWarper
 from ..estimators.face_estimators.ags import AGSEstimator
+from ..estimators.face_estimators.background import FaceDetectionBackgroundEstimator
 from ..estimators.face_estimators.basic_attributes import BasicAttributesEstimator
 from ..estimators.face_estimators.credibility import CredibilityEstimator
 from ..estimators.face_estimators.emotions import EmotionsEstimator
+from ..estimators.face_estimators.eyebrow_expressions import EyebrowExpressionEstimator
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from ..estimators.face_estimators.facewarper import FaceWarper
+from ..estimators.face_estimators.fisheye import FisheyeEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
+from ..estimators.face_estimators.headwear import HeadwearEstimator
+from ..estimators.face_estimators.image_type import ImageColorTypeEstimator
 from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
+from ..estimators.face_estimators.natural_light import FaceNaturalLightEstimator
+from ..estimators.face_estimators.red_eye import RedEyesEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
@@ -336,3 +343,59 @@ class VLFaceEngine:
             estimator
         """
         return CredibilityEstimator(self._faceEngine.createCredibilityCheckEstimator())
+
+    def createEyebrowExpressionEstimator(self) -> EyebrowExpressionEstimator:
+        """
+        Create a eyebrow expression estimator.
+        Returns:
+            estimator
+        """
+        return EyebrowExpressionEstimator(self._faceEngine.createEyeBrowEstimator())
+
+    def createHeadwearEstimator(self) -> HeadwearEstimator:
+        """
+        Create a headwear estimator.
+        Returns:
+            estimator
+        """
+        return HeadwearEstimator(self._faceEngine.createHeadWearEstimator())
+
+    def createFaceNaturalLightEstimator(self) -> FaceNaturalLightEstimator:
+        """
+        Create a face natural light estimator.
+        Returns:
+            estimator
+        """
+        return FaceNaturalLightEstimator(self._faceEngine.createNaturalLightEstimator())
+
+    def createRedEyeEstimator(self) -> RedEyesEstimator:
+        """
+        Create a red-eye estimator.
+        Returns:
+            estimator
+        """
+        return RedEyesEstimator(self._faceEngine.createRedEyeEstimator())
+
+    def createFisheyeEstimator(self) -> FisheyeEstimator:
+        """
+        Create a fisheye effect estimator.
+        Returns:
+            estimator
+        """
+        return FisheyeEstimator(self._faceEngine.createFishEyeEstimator())
+
+    def createFaceDetectionBackgroundEstimator(self) -> FaceDetectionBackgroundEstimator:
+        """
+        Create a face background estimator.
+        Returns:
+            estimator
+        """
+        return FaceDetectionBackgroundEstimator(self._faceEngine.createBackgroundEstimator())
+
+    def createImageColorTypeEstimator(self) -> ImageColorTypeEstimator:
+        """
+        Create a image color type estimator.
+        Returns:
+            estimator
+        """
+        return ImageColorTypeEstimator(self._faceEngine.createBlackWhiteEstimator())

@@ -23,6 +23,7 @@ TURNED_HEAD_POSE_FACE = getPathToImage("turned_head_pose.jpg")
 FRONTAL_HEAD_POSE_FACE = getPathToImage("frontal_head_pose.jpg")
 
 OPEN_EYES = getPathToImage("girl_front_face.jpg")
+# https://unsplash.com/photos/RfoISVdKM4U/download?ixid=MnwxMjA3fDB8MXxzZWFyY2h8NDZ8fGdpcmxzfGVufDB8fHx8MTY0NzU5NDU3NA&force=true&w=1920
 MIXED_EYES = getPathToImage("mixed_eyes.jpg")
 CLOSED_EYES = getPathToImage("closed_eyes.jpg")
 
@@ -53,3 +54,34 @@ FULL_OCCLUDED_FACE = getPathToImage("occluded_face.jpg")
 FULL_FACE_NO_MASK = getPathToImage("no_mask_face.jpg")
 # https://unsplash.com/photos/IhuHLIxS_Tk
 LARGE_IMAGE = getPathToImage("large_image.jpg")
+
+# https://commons.wikimedia.org/wiki/File:Red-eye_effect.png
+RED_EYES = getPathToImage("red_eyes.png")
+
+# https://www.pexels.com/ru-ru/photo/11462516/
+BLACK_AND_WHITE = getPathToImage("b&w.jpg")
+
+# https://www.pexels.com/ru-ru/photo/11495661/
+BASEBALL_CAP = getPathToImage("baseball_cap.jpg")
+# https://free-images.com/display/russian_boy_in_cap.html
+PEAKED_CAP = getPathToImage("peaked_cap.jpg")
+# https://www.pexels.com/ru-ru/photo/10513680/
+SHAWL = getPathToImage("shawl.jpg")
+# https://unsplash.com/photos/8vT-DgHZDG4
+BEANIE = getPathToImage("beanie.jpg")
+# https://free-images.com/display/ushanka_sport_norka_kozha.html
+USHANKA = getPathToImage("ushanka.jpg")
+# https://free-images.com/display/cyclist_sports_cycling_man_0.html
+HELMET = getPathToImage("helmet.jpg")
+# https://unsplash.com/photos/lxEqRDB9Ng8
+HOOD = getPathToImage("hood.jpg")
+# https://unsplash.com/photos/rr4bawLxOjc
+HAT = getPathToImage("hat.jpg")
+# https://www.freeimages.com/photo/stupid-1431759
+FISHEYE = getPathToImage("fisheye.jpg")
+# https://www.freeimages.com/photo/boy-in-swimming-pool-3-1394664
+SQUINTING = getPathToImage("squinting.jpg")
+# https://free-images.com/display/pouting_boy_in_shamar.html
+FROWNING = getPathToImage("frowning.jpg")
+# https://unsplash.com/photos/5xbCj_VWKcs
+RAISED = getPathToImage("raised.jpg")
