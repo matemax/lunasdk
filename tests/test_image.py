@@ -1,21 +1,21 @@
-import os
-
 from collections import namedtuple
 from pathlib import Path
 from typing import List, Union
+import os
+import io
 
-from lunavl.sdk.errors.errors import LunaVLError
 import FaceEngine as fe
 import numpy as np
 import pytest
 from PIL import Image
+import PIL.Image
 
-
+from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE
+from tests.resources import ONE_FACE, PALETTE_MODE, ROTATED0
 
 SINGLE_CHANNEL_IMAGE: Image.Image = Image.open(ONE_FACE).convert("L")
 IMAGE = Image.open(ONE_FACE)
@@ -275,3 +275,15 @@ class TestImage(BaseTestClass):
                     else:
                         targetImg = sourceImage.convert(target)
                         assert target == targetImg.format, targetImg.format
+
+    def test_auto_convert_color_palette_mode_image_pil_image(self):
+        """
+        Test auto convert palette-mode png image during VLImage loading from PIL image
+        """
+        with open(ROTATED0, "rb") as f:
+            rgbPilImage = PIL.Image.open(io.BytesIO(f.read()))
+        rgbImage = VLImage(rgbPilImage)
+        with open(PALETTE_MODE, "rb") as f:
+            testPilImage = PIL.Image.open(io.BytesIO(f.read()))
+        testImage = VLImage(testPilImage)
+        assert testImage.source.mode == rgbImage.source.mode
