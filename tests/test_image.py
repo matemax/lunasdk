@@ -15,7 +15,7 @@ from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, PALETTE_MODE, ROTATED0
+from tests.resources import ONE_FACE, PALETTE_MODE
 
 SINGLE_CHANNEL_IMAGE: Image.Image = Image.open(ONE_FACE).convert("L")
 IMAGE = Image.open(ONE_FACE)
@@ -280,10 +280,9 @@ class TestImage(BaseTestClass):
         """
         Test auto convert palette-mode png image during VLImage loading from PIL image
         """
-        with open(ROTATED0, "rb") as f:
-            rgbPilImage = PIL.Image.open(io.BytesIO(f.read()))
-        rgbImage = VLImage(rgbPilImage)
         with open(PALETTE_MODE, "rb") as f:
-            testPilImage = PIL.Image.open(io.BytesIO(f.read()))
-        testImage = VLImage(testPilImage)
-        assert testImage.source.mode == rgbImage.source.mode
+            imageInBytes = f.read()
+        vlImageFromPil = VLImage(PIL.Image.open(io.BytesIO(imageInBytes)))
+        vlImageFromBytes = VLImage(imageInBytes)
+
+        assert vlImageFromPil.asNPArray().tobytes() == vlImageFromBytes.asNPArray().tobytes()
