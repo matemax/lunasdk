@@ -190,6 +190,12 @@ class VLImage:
                 ndarray=body, inputColorFormat=ColorFormat.load(mode), colorFormat=colorFormat or ColorFormat.R8G8B8
             )
         elif isinstance(body, PilImage):
+            # prevent palette-mode colorful images conversion to grayscale image by converting it
+            # with considering palette info
+            # modes description: https://pillow.readthedocs.io/en/stable/handbook/concepts.html#concept-modes
+            blackNWhiteModes = ("1", "L", "LA", "La")
+            if body.mode == "P" and body.palette is not None and body.palette.mode not in blackNWhiteModes:
+                body = body.convert()
             array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
