@@ -297,11 +297,12 @@ class FaceDetector:
 
     """
 
-    __slots__ = ("_detector", "detectorType")
+    __slots__ = ("_detector", "detectorType", "launchOptions")
 
-    def __init__(self, detectorPtr, detectorType: DetectorType):
+    def __init__(self, detectorPtr, detectorType: DetectorType, launchOptions):
         self._detector = detectorPtr
         self.detectorType = detectorType
+        self.launchOptions  = launchOptions
 
     @staticmethod
     def _getDetectionType(detect5Landmarks: bool = True, detect68Landmarks: bool = False) -> DetectionType:
@@ -386,7 +387,11 @@ class FaceDetector:
         Raises:
             LunaSDKException if an error occurs
         """
-        coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
+        if self.launchOptions.deviceClass.value == "gpu":
+            coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
+            coreImages = [image.gpuCoreImage if image.gpuCoreImage else image.coreImage for image in images ]
+        else:
+            coreImages, detectAreas = getArgsForCoreDetectorForImages(images)
         detectionType = self._getDetectionType(detect5Landmarks, detect68Landmarks)
         validateBatchDetectInput(self._detector, coreImages, detectAreas)
         if asyncEstimate:

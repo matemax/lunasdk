@@ -8,7 +8,7 @@ from typing import Optional, Union
 
 import numpy as np
 import requests
-from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
+from FaceEngine import FormatType, Image as CoreImage, TargetDevice as CoreTargetDevice, MemoryResidence  # pylint: disable=E0611,E0401
 from PIL import Image as pilImage
 from PIL.Image import Image as PilImage
 
@@ -139,6 +139,15 @@ class ColorFormat(Enum):
         raise ValueError(f"Cannot load '{colorFormat}' color format.")
 
 
+class TargetDevice(Enum):
+    """
+    Target device for image storing
+    """
+
+    cpu = CoreTargetDevice.CPU
+    gpu = CoreTargetDevice.GPU
+
+
 class VLImage:
     """
     Class image.
@@ -149,13 +158,14 @@ class VLImage:
         filename (str): filename of the file which is source of image
     """
 
-    __slots__ = ("coreImage", "source", "filename")
+    __slots__ = ("coreImage", "source", "filename", "gpuCoreImage",)
 
     def __init__(
         self,
         body: Union[bytes, bytearray, PilImage, CoreImage],
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
+        device: Optional[TargetDevice] = None,
     ):
         """
         Init.
@@ -200,6 +210,10 @@ class VLImage:
 
         self.source = body
         self.filename = filename
+        if device == TargetDevice.gpu:
+            error, self.gpuCoreImage = self.coreImage.convert(colorFormat.coreFormat, device.value)
+        else:
+            self.gpuCoreImage = None
 
     @classmethod
     def rotate(cls, image: "VLImage", angle: RotationAngle):
@@ -228,7 +242,8 @@ class VLImage:
 
     @classmethod
     def load(
-        cls, *, filename: Optional[str] = None, url: Optional[str] = None, colorFormat: Optional[ColorFormat] = None
+        cls, *, filename: Optional[str] = None, url: Optional[str] = None, colorFormat: Optional[ColorFormat] = None,
+        device: Optional[TargetDevice] = None,
     ) -> "VLImage":
 
         """
@@ -256,6 +271,10 @@ class VLImage:
                 body = file.read()
                 img = cls(body, colorFormat)
                 img.filename = path.name
+                if device == TargetDevice.gpu:
+                    gpuCoreImage = CoreImage(img.rect.width, img.rect.height, img.format.coreFormat)
+                    error = img.coreImage.create(img.coreImage, MemoryResidence.MemoryGPU)
+                    img.gpuCoreImage = gpuCoreImage
                 return img
 
         if url is not None:
@@ -263,6 +282,10 @@ class VLImage:
             if response.status_code == 200:
                 img = cls(response.content, colorFormat)
                 img.filename = url
+                if device == TargetDevice.gpu:
+                    gpuCoreImage = CoreImage(img.rect.width, img.rect.height, img.format.coreFormat)
+                    error = img.coreImage.convert(img.coreImage, MemoryResidence.MemoryGPU)
+                    img.gpuCoreImage = gpuCoreImage
                 return img
         raise ValueError
 

@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from typing import Optional, Union
 
-import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
+import FaceEngine as CoreFE # pylint: disable=E0611,E0401
 
 from ..descriptors.descriptors import FaceDescriptorFactory, HumanDescriptorFactory
 from ..descriptors.matcher import FaceMatcher
@@ -33,9 +33,31 @@ from ..estimators.face_estimators.natural_light import FaceNaturalLightEstimator
 from ..estimators.face_estimators.red_eye import RedEyesEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
-from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
+from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider, DeviceClass
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from ..indexes.builder import IndexBuilder
+
+
+class LaunchOptions:
+
+    def __init__(self, deviceClass: Optional[DeviceClass] = None, deviceId: Optional[int] = None,
+                 runConcurrently: Optional[bool] = None):
+        self._coreLaunchOptions = CoreFE.LaunchOptions()
+        if deviceClass:
+            self._coreLaunchOptions.deviceClass = CoreFE.DeviceClass.GPU if deviceClass == DeviceClass.gpu else CoreFE.DeviceClass.CPU
+        if deviceId:
+            self._coreLaunchOptions.deviceClass = deviceId
+        if runConcurrently is not None:
+            self._coreLaunchOptions.runConcurrently = runConcurrently
+
+    @property
+    def deviceClass(self):
+        return DeviceClass(self._coreLaunchOptions.deviceClass.name.lower())
+
+    @property
+    def coreLaunchOptions(self):
+        return self._coreLaunchOptions
+
 
 
 class VLFaceEngine:
@@ -110,7 +132,7 @@ class VLFaceEngine:
             _license, pathToLicense if isinstance(pathToLicense, str) else (str(pathToLicense))
         )
 
-    def createFaceDetector(self, detectorType: DetectorType) -> FaceDetector:
+    def createFaceDetector(self, detectorType: DetectorType, launchOptions: Optional[LaunchOptions] = None) -> FaceDetector:
         """
         Create face detector.
 
@@ -120,7 +142,11 @@ class VLFaceEngine:
         Returns:
             detector
         """
-        return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType), detectorType)
+        if not launchOptions:
+            launchOptions = LaunchOptions()
+        return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType,
+                                                            launchOptions=launchOptions.coreLaunchOptions), detectorType,
+                            launchOptions)
 
     def createHeadPoseEstimator(self) -> HeadPoseEstimator:
         """
