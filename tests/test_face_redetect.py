@@ -6,8 +6,13 @@ from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
 from lunavl.sdk.image_utils.image import VLImage
-from tests.detect_test_class import FaceDetectTestClass
-from tests.detect_test_class import VLIMAGE_SEVERAL_FACE, VLIMAGE_SMALL, INVALID_RECT, ERROR_CORE_RECT
+from tests.detect_test_class import (
+    ERROR_CORE_RECT,
+    INVALID_RECT,
+    VLIMAGE_SEVERAL_FACE,
+    VLIMAGE_SMALL,
+    FaceDetectTestClass,
+)
 from tests.resources import CLEAN_ONE_FACE, FACE_WITH_MASK
 
 VLIMAGE_ONE_FACE = VLImage.load(filename=CLEAN_ONE_FACE)

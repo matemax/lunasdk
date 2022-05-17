@@ -1,5 +1,5 @@
 from lunavl.sdk.estimators.image_estimators.orientation_mode import OrientationModeEstimator, OrientationType
-from lunavl.sdk.image_utils.image import VLImage, RotationAngle
+from lunavl.sdk.image_utils.image import RotationAngle, VLImage
 from tests.base import BaseTestClass
 from tests.resources import ROTATED0, ROTATED90, ROTATED180, ROTATED270
 

@@ -60,6 +60,8 @@ class FaceMatcher:
 
         Returns:
             List of matching results if match by several descriptors otherwise one MatchingResult.
+        Raises:
+            TypeError: if candidates has incorrect type
         """
         if isinstance(reference, bytes):
             referenceForMatcher = self.descriptorFactory.generateDescriptor(reference)
@@ -68,29 +70,24 @@ class FaceMatcher:
 
         if isinstance(candidates, bytes):
             candidatesForMatcher = self.descriptorFactory.generateDescriptor(candidates)
+            error, matchResults = self._coreMatcher.match(
+                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
+            )
+        elif isinstance(candidates, FaceDescriptor):
+            error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation, candidates.coreEstimation)
         elif isinstance(candidates, list):
-            candidatesForMatcher = []
-            for idx in range(len(candidates)):
-                if isinstance(candidates[idx], bytes):
-                    candidatesForMatcher.append(self.descriptorFactory.generateDescriptor(candidates[idx]))
+            batch = self.descriptorFactory.generateDescriptorsBatch(len(candidates))
+            for cand in candidates:
+                if isinstance(cand, bytes):
+                    candidate = self.descriptorFactory.generateDescriptor(cand)
                 else:
-                    candidatesForMatcher.append(candidates[idx])
-        else:
-            candidatesForMatcher = candidates
-
-        if isinstance(candidatesForMatcher, FaceDescriptor):
-            error, matchResults = self._coreMatcher.match(
-                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
-            )
-        elif isinstance(candidatesForMatcher, FaceDescriptorBatch):
-            error, matchResults = self._coreMatcher.match(
-                referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
-            )
-        else:
-            batch = self.descriptorFactory.generateDescriptorsBatch(len(candidatesForMatcher))
-            for candidate in candidatesForMatcher:
+                    candidate = cand
                 batch.append(candidate)
             error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation, batch.coreEstimation)
+        elif isinstance(candidates, FaceDescriptorBatch):
+            error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation, candidates.coreEstimation)
+        else:
+            raise TypeError(f"Bad candidates type: {type(candidates)}")
 
         assertError(error)
         return matchResults

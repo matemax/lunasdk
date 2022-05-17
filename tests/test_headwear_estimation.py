@@ -1,10 +1,10 @@
 import snakecase
 
-from lunavl.sdk.estimators.face_estimators.headwear import HeadwearType, Headwear
+from lunavl.sdk.estimators.face_estimators.headwear import Headwear, HeadwearType
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import HAT, HOOD, BASEBALL_CAP, USHANKA, SHAWL, BEANIE, HELMET, ONE_FACE, PEAKED_CAP
+from tests.resources import BASEBALL_CAP, BEANIE, HAT, HELMET, HOOD, ONE_FACE, PEAKED_CAP, SHAWL, USHANKA
 
 
 class TestHeadwear(BaseTestClass):

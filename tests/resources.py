@@ -1,4 +1,5 @@
 import pathlib
+
 from lunavl.sdk.estimators.face_estimators.emotions import Emotion
 
 

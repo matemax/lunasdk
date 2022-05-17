@@ -2,9 +2,11 @@
 Example of using VLFaceDetector
 """
 import pprint
+
+from resources import EXAMPLE_O
+
 from lunavl.sdk.image_utils.image import VLImage
 from lunavl.sdk.luna_faces import VLFaceDetector
-from resources import EXAMPLE_O
 
 
 def estimateAll():
@@ -25,7 +27,6 @@ def estimateAll():
     pprint.pprint(detection.ags)
     pprint.pprint(detection.descriptor.asDict())
     pprint.pprint(detection.liveness.asDict())
-    pprint.pprint(detection.orientationMode.name)
 
 
 if __name__ == "__main__":

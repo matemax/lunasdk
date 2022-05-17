@@ -1,24 +1,21 @@
 """
 Test build an index with descriptors.
 """
-from typing import Union
 import os
+from typing import Union
 
 import pytest
 
-from lunavl.sdk.descriptors.descriptors import (
-    FaceDescriptor,
-    FaceDescriptorBatch,
-)
+from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.indexes.base import IndexResult
 from lunavl.sdk.indexes.builder import IndexBuilder
-from lunavl.sdk.indexes.stored_index import DynamicIndex, DenseIndex, IndexType
-from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
+from lunavl.sdk.indexes.stored_index import DenseIndex, DynamicIndex, IndexType
 from tests.base import BaseTestClass
-from tests.resources import WARP_WHITE_MAN, WARP_ONE_FACE, WARP_CLEAN_FACE
+from tests.resources import WARP_CLEAN_FACE, WARP_ONE_FACE, WARP_WHITE_MAN
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58]
 
@@ -140,7 +137,7 @@ class TestIndexFunctionality(BaseTestClass):
         assert len(self.faceDescriptorBatch) == self.indexBuilder.bufSize
         nonExistentIndex = 2
         with pytest.raises(LunaSDKException) as ex:
-            descriptor = self.indexBuilder[nonExistentIndex]
+            descriptor = self.indexBuilder[nonExistentIndex]  # noqa: F841
         self.assertLunaVlError(ex, LunaVLError.InvalidDescriptorId.format("Invalid descriptor id."))
 
     def test_append_non_default_descriptor_to_builder(self):

@@ -2,10 +2,11 @@
 Module with base classes of estimators and estimations
 """
 from abc import ABC, abstractmethod
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
 from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.image_utils.image import VLImage
+from lunavl.sdk.launch_options import LaunchOptions
 
 
 class BaseEstimator(ABC):
@@ -17,9 +18,9 @@ class BaseEstimator(ABC):
         _coreEstimator: core estimator
     """
 
-    __slots__ = ("_coreEstimator",)
+    __slots__ = ("_coreEstimator", "_launchOptions")
 
-    def __init__(self, coreEstimator):
+    def __init__(self, coreEstimator, launchOptions: LaunchOptions):
         """
         Init.
 
@@ -27,9 +28,14 @@ class BaseEstimator(ABC):
             coreEstimator: core estimator
         """
         self._coreEstimator = coreEstimator
+        self._launchOptions = launchOptions
+
+    @property
+    def launchOptions(self) -> LaunchOptions:
+        return self._launchOptions
 
     @abstractmethod
-    def estimate(self, *args, **kwargs) -> Any:
+    def estimate(self, *args, **kwargs):
         """
         Estimate attributes on warp.
 

@@ -4,10 +4,9 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from typing import Dict, List, Iterator, Type
-from typing import Union, Optional
+from typing import Dict, Iterator, List, Optional, Type, Union
 
-from FaceEngine import IDescriptorPtr, IDescriptorBatchPtr, DescriptorBatchResult  # pylint: disable=E0611,E0401
+from FaceEngine import DescriptorBatchResult, IDescriptorBatchPtr, IDescriptorPtr  # pylint: disable=E0611,E0401
 
 from ..base import BaseEstimation
 from ..errors.exceptions import assertError

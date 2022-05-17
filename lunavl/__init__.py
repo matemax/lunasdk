@@ -2,8 +2,8 @@
 Patch env for load binary library
 """
 import os
-import sys
 import platform
+import sys
 
 
 def _patchLoadLib():

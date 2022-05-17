@@ -2,11 +2,11 @@ import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
+from lunavl.sdk.estimators.face_estimators.eyes import GazeDirection, WarpWithLandmarks5
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
-from lunavl.sdk.estimators.face_estimators.eyes import WarpWithLandmarks5, GazeDirection
 
 
 class TestEstimateGazeDirection(BaseTestClass):

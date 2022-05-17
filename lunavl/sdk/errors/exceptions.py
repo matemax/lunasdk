@@ -1,8 +1,7 @@
 """
 Module realizes LunaSDKException - single exception for rising in sdk module
 """
-from functools import wraps
-from typing import Optional, Any, Callable, List
+from typing import Any, List, Optional
 
 from FaceEngine import FSDKErrorResult  # pylint: disable=E0611,E0401
 

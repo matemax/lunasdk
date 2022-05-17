@@ -1,16 +1,25 @@
-from typing import TypeVar, Generic, Callable, Generator, List, Type, Optional, Tuple
+from abc import abstractmethod
+from typing import Any, Callable, Generator, Generic, List, Optional, Protocol, Tuple, Type, TypeVar
 
 from FaceEngine import FSDKErrorResult  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.errors.exceptions import assertError
 
+
+class TResult(Protocol):
+    @abstractmethod
+    def __init__(self, result: Any):
+        ...
+
+
+CommonTaskResult = TypeVar("CommonTaskResult", bound="TResult")
 TaskResult = TypeVar("TaskResult")
 CoreTaskResult = TypeVar("CoreTaskResult")
 
 
 def postProcessingBatch(
-    error: FSDKErrorResult, coreEstimations: List[CoreTaskResult], resultClass: Type[TaskResult]
-) -> List[TaskResult]:
+    error: FSDKErrorResult, coreEstimations: List[CoreTaskResult], resultClass: Type[CommonTaskResult]
+) -> List[CommonTaskResult]:
     """
     Post processing batch estimation
     Args:
@@ -30,9 +39,9 @@ def postProcessingBatchWithAggregation(
     error: FSDKErrorResult,
     coreEstimations: List[CoreTaskResult],
     aggregatedAttribute: CoreTaskResult,
-    resultClass: Type[TaskResult],
+    resultClass: Type[CommonTaskResult],
     aggregate: bool,
-) -> Tuple[List[TaskResult], Optional[TaskResult]]:
+) -> Tuple[List[CommonTaskResult], Optional[CommonTaskResult]]:
     """
     Post processing batch estimation
     Args:
@@ -54,7 +63,9 @@ def postProcessingBatchWithAggregation(
         return estimations, None
 
 
-def postProcessing(error: FSDKErrorResult, coreEstimation: CoreTaskResult, resultClass: Type[TaskResult]) -> TaskResult:
+def postProcessing(
+    error: FSDKErrorResult, coreEstimation: CoreTaskResult, resultClass: Type[CommonTaskResult]
+) -> CommonTaskResult:
     """
     Postprocessing single core estimation
     Args:
@@ -68,7 +79,7 @@ def postProcessing(error: FSDKErrorResult, coreEstimation: CoreTaskResult, resul
     return resultClass(coreEstimation)
 
 
-class DefaultPostprocessingFactory(Generic[TaskResult]):
+class DefaultPostprocessingFactory(Generic[CommonTaskResult]):
     """
     Default estimation post processing factory.
 
@@ -79,10 +90,12 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
         resultClass: result class
     """
 
-    def __init__(self, resultClass: Type[TaskResult]):
+    def __init__(self, resultClass: Type[CommonTaskResult]):
         self.resultClass = resultClass
 
-    def postProcessingBatch(self, error: FSDKErrorResult, coreEstimations: List[CoreTaskResult]) -> List[TaskResult]:
+    def postProcessingBatch(
+        self, error: FSDKErrorResult, coreEstimations: List[CoreTaskResult]
+    ) -> List[CommonTaskResult]:
         """
         Post processing batch estimation
         Args:
@@ -100,7 +113,7 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
         coreEstimations: List[CoreTaskResult],
         aggregatedAttribute: CoreTaskResult,
         aggregate: bool,
-    ) -> Tuple[List[TaskResult], Optional[TaskResult]]:
+    ) -> Tuple[List[CommonTaskResult], Optional[CommonTaskResult]]:
         """
         Post processing batch estimation
         Args:
@@ -121,7 +134,7 @@ class DefaultPostprocessingFactory(Generic[TaskResult]):
             resultClass=self.resultClass,
         )
 
-    def postProcessing(self, error: FSDKErrorResult, coreEstimation: CoreTaskResult) -> TaskResult:
+    def postProcessing(self, error: FSDKErrorResult, coreEstimation: CoreTaskResult) -> CommonTaskResult:
         """
         Postprocessing single core estimation
         Args:

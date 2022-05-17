@@ -1,13 +1,8 @@
-from lunavl.sdk.estimators.face_estimators.eyebrow_expressions import EyebrowExpressions, EyebrowExpression
+from lunavl.sdk.estimators.face_estimators.eyebrow_expressions import EyebrowExpression, EyebrowExpressions
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import (
-    ONE_FACE,
-    SQUINTING,
-    FROWNING,
-    RAISED,
-)
+from tests.resources import FROWNING, ONE_FACE, RAISED, SQUINTING
 
 
 class TestEyeybrowExpression(BaseTestClass):

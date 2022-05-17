@@ -3,20 +3,20 @@
 See headwear_.
 """
 from enum import Enum
-from typing import Union, List
+from typing import List, Union
 
-from FaceEngine import (
-    IHeadWearEstimatorPtr,
+from FaceEngine import (  # pylint: disable=E0611,E0401
+    HeadWearEstimation as HeadWearCore,
     HeadWearState as HeadWearStateCore,
     HeadWearTypeEstimation as HeadWearTypeCore,
-    HeadWearEstimation as HeadWearCore,
-)  # pylint: disable=E0611,E0401
+)
 
 from lunavl.sdk.base import BaseEstimation
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class HeadwearType(Enum):
@@ -129,18 +129,8 @@ class HeadwearEstimator(BaseEstimator):
     Headwear estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IHeadWearEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
-    def estimate(
+    def estimate(  # type: ignore
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Headwear, AsyncTask[Headwear]]:
         """

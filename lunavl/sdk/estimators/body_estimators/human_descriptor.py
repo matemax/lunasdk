@@ -4,15 +4,17 @@ Module contains a human descriptor estimator
 See `human descriptor`_.
 
 """
-from typing import Union, Optional, List, Tuple
+from typing import List, Optional, Tuple, Union
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.descriptors.descriptors import HumanDescriptorBatch, HumanDescriptor, HumanDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import HumanDescriptor, HumanDescriptorBatch, HumanDescriptorFactory
+
+from ...async_task import AsyncTask
+from ...launch_options import LaunchOptions
 from ..base import BaseEstimator
 from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
-from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
-from ...async_task import AsyncTask
+from ..estimators_utils.extractor_utils import estimate, estimateDescriptorsBatch
 
 HummanDescriptorsResult = Tuple[HumanDescriptorBatch, Union[HumanDescriptor, None]]
 
@@ -23,14 +25,19 @@ class HumanDescriptorEstimator(BaseEstimator):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreExtractor: IDescriptorExtractorPtr, humanDescriptorFactory: "HumanDescriptorFactory"):
+    def __init__(
+        self,
+        coreExtractor: IDescriptorExtractorPtr,
+        humanDescriptorFactory: "HumanDescriptorFactory",
+        launchOptions: LaunchOptions,
+    ):
         """
         Init.
 
         Args:
             coreExtractor: core extractor
         """
-        super().__init__(coreExtractor)
+        super().__init__(coreExtractor, launchOptions)
         self.descriptorFactory = humanDescriptorFactory
 
     #  pylint: disable=W0221

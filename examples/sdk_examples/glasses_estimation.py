@@ -4,10 +4,11 @@ Glasses estimation example
 import asyncio
 import pprint
 
+from resources import EXAMPLE_3
+
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from resources import EXAMPLE_3
 
 
 def estimateGlasses():

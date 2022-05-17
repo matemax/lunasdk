@@ -4,21 +4,21 @@ See `basic attributes`_.
 """
 from enum import Enum
 from functools import partial
-from typing import Union, Dict, Any, List, Tuple
+from typing import Any, Dict, List, Literal, Tuple, Union, overload
 
-from FaceEngine import (
-    IAttributeEstimatorPtr,
+from FaceEngine import (  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
     AttributeRequest,
     AttributeResult,
-    EthnicityEstimation,
     Ethnicity as CoreEthnicity,
-)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+    EthnicityEstimation,
+)
 
 from lunavl.sdk.base import BaseEstimation
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Ethnicity(Enum):
@@ -214,18 +214,30 @@ class BasicAttributesEstimator(BaseEstimator):
     Basic attributes estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IAttributeEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
+    @overload  # type: ignore
     def estimate(
+        self,
+        warp: Union[FaceWarp, FaceWarpedImage],
+        estimateAge: bool,
+        estimateGender: bool,
+        estimateEthnicity: bool,
+        asyncEstimate: Literal[False] = False,
+    ) -> BasicAttributes:
+        ...
+
+    @overload
+    def estimate(
+        self,
+        warp: Union[FaceWarp, FaceWarpedImage],
+        estimateAge: bool,
+        estimateGender: bool,
+        estimateEthnicity: bool,
+        asyncEstimate: Literal[True],
+    ) -> AsyncTask[BasicAttributes]:
+        ...
+
+    def estimate(  # type: ignore
         self,
         warp: Union[FaceWarp, FaceWarpedImage],
         estimateAge: bool,

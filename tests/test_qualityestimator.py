@@ -3,7 +3,7 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
-from tests.schemas import jsonValidator, QUALITY_SCHEMA
+from tests.schemas import QUALITY_SCHEMA, jsonValidator
 
 QUALITY_PROPERTIES = [key for key in Quality.__dict__.keys() if not (key.startswith("_") or key == "asDict")]
 

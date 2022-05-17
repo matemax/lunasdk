@@ -1,19 +1,17 @@
 import os
-
 from collections import namedtuple
 from pathlib import Path
 from typing import List, Union
 
-from lunavl.sdk.errors.errors import LunaVLError
 import FaceEngine as fe
 import numpy as np
 import pytest
 from PIL import Image
 
-
+from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage, ColorFormat, ImageFormat
+from lunavl.sdk.image_utils.image import ColorFormat, ImageFormat, VLImage
 from tests.base import BaseTestClass
 from tests.resources import ONE_FACE
 

@@ -2,20 +2,20 @@
 
 See face_natural_light_.
 """
-from typing import Union, List
+from typing import List, Union
 
-from FaceEngine import (
-    INaturalLightEstimatorPtr,
-    RedEyeStatus as RedEyeStatusCore,
+from FaceEngine import (  # pylint: disable=E0611,E0401
     RedEyeAttributes as RedEyeCore,
     RedEyeEstimation as RedEyeEstimationCore,
-)  # pylint: disable=E0611,E0401
+    RedEyeStatus as RedEyeStatusCore,
+)
 
 from lunavl.sdk.base import BaseEstimation
-from .eyes import WarpWithLandmarks5
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
+from .eyes import WarpWithLandmarks5
 
 
 class RedEye(BaseEstimation):
@@ -108,18 +108,8 @@ class RedEyesEstimator(BaseEstimator):
     Red-eye estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: INaturalLightEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
-    def estimate(
+    def estimate(  # type: ignore
         self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: bool = False
     ) -> Union[RedEyes, AsyncTask[RedEyes]]:
         """

@@ -1,8 +1,8 @@
 """
 Module contains helper functions for a pillow image conversion into np array
 """
-import PIL.Image
 import numpy as np
+import PIL.Image
 from PIL.Image import Image, _fromarray_typemap as imageTypeMap
 
 

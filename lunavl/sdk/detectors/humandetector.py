@@ -2,31 +2,32 @@
 Module contains function for detection human bodies on images.
 """
 from functools import partial
-from typing import Optional, Union, List, Dict, Any
+from typing import Any, Dict, List, Optional, Union
 
-from FaceEngine import (
-    Human,
-    HumanLandmarks17 as CoreLandmarks17,
+from FaceEngine import (  # pylint: disable=E0611,E0401
     Detection,
-    HumanDetectionType,
     FSDKErrorResult,
-)  # pylint: disable=E0611,E0401
-
-from .base import (
-    ImageForDetection,
-    ImageForRedetection,
-    BaseDetection,
-    assertImageForDetection,
-    getArgsForCoreDetectorForImages,
-    validateBatchDetectInput,
-    getArgsForCoreRedetect,
-    validateReDetectInput,
+    Human,
+    HumanDetectionType,
+    HumanLandmarks17 as CoreLandmarks17,
 )
+
 from ..async_task import AsyncTask
 from ..base import LandmarksWithScore
 from ..errors.exceptions import assertError
 from ..image_utils.geometry import Rect
 from ..image_utils.image import VLImage
+from ..launch_options import LaunchOptions
+from .base import (
+    BaseDetection,
+    ImageForDetection,
+    ImageForRedetection,
+    assertImageForDetection,
+    getArgsForCoreDetectorForImages,
+    getArgsForCoreRedetect,
+    validateBatchDetectInput,
+    validateReDetectInput,
+)
 
 
 def _createCoreHumans(image: ImageForRedetection) -> List[Human]:
@@ -211,7 +212,7 @@ def postProcessingRedetectOne(error: FSDKErrorResult, detectRes, image: VLImage)
 
 
 def postProcessing(
-    error: FSDKErrorResult, fsdkDetectRes, images: List[VLImage], detectLandmarks: bool
+    error: FSDKErrorResult, fsdkDetectRes, images: List[Union[VLImage, ImageForDetection]], detectLandmarks: bool
 ) -> List[List[HumanDetection]]:
     """
     Convert core human detections from detector results to `HumanDetection` and error check.
@@ -225,7 +226,9 @@ def postProcessing(
         list, each item is face detections on corresponding image
     """
     assertError(error)
-    return collectDetectionsResult(fsdkDetectRes, images=images, detectLandmarks=detectLandmarks, isRedectResult=False)
+    return collectDetectionsResult(
+        fsdkDetectRes, images=images, detectLandmarks=detectLandmarks, isRedectResult=False  # type: ignore
+    )
 
 
 def postProcessingRedect(
@@ -243,7 +246,9 @@ def postProcessingRedect(
         list, each item is face detections on corresponding image
     """
     assertError(error)
-    return collectDetectionsResult(fsdkDetectRes, images=images, detectLandmarks=detectLandmarks, isRedectResult=True)
+    return collectDetectionsResult(
+        fsdkDetectRes, images=images, detectLandmarks=detectLandmarks, isRedectResult=True  # type: ignore
+    )
 
 
 # alias for detect one result
@@ -264,10 +269,14 @@ class HumanDetector:
         _detector (IDetectorPtr): core detector
     """
 
-    __slots__ = ("_detector",)
+    __slots__ = (
+        "_detector",
+        "_launchOptions",
+    )
 
-    def __init__(self, detectorPtr):
+    def __init__(self, detectorPtr, launchOptions: LaunchOptions):
         self._detector = detectorPtr
+        self._launchOptions = launchOptions
 
     @staticmethod
     def _getDetectionType(detectLandmarks: bool = True) -> HumanDetectionType:

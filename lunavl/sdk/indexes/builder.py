@@ -6,13 +6,11 @@ from typing import Union
 
 from FaceEngine import PyIFaceEngine
 
-from lunavl.sdk.descriptors.descriptors import (
-    FaceDescriptor,
-    FaceDescriptorBatch,
-)
+from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
 from lunavl.sdk.errors.exceptions import assertError
+
 from .base import CoreIndex
-from .stored_index import DynamicIndex, IndexType, DenseIndex
+from .stored_index import DenseIndex, DynamicIndex, IndexType
 
 
 class IndexBuilder(CoreIndex):

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, Optional, Tuple, Dict, Any
+from typing import Any, Dict, Optional, Tuple, Union
 
 from FaceEngine import Detection, HumanLandmark, HumanLandmarks17  # pylint: disable=E0611,E0401
 

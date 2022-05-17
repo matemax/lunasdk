@@ -2,12 +2,12 @@
 High-level api for estimating face attributes
 """
 from dataclasses import dataclass
-from typing import Optional, Union, List, Dict
+from typing import Dict, List, Optional, Union
 
 from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
-from PIL.Image import Image as PilImage
 from numpy import ndarray
+from PIL.Image import Image as PilImage
 
 from .detectors.base import ImageForDetection, ImageForRedetection
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
@@ -28,7 +28,7 @@ from .estimators.face_estimators.warp_quality import Quality
 from .faceengine.engine import VLFaceEngine
 from .faceengine.setting_provider import DetectorType
 from .image_utils.geometry import Rect
-from .image_utils.image import VLImage, ColorFormat
+from .image_utils.image import ColorFormat, VLImage
 
 
 @dataclass(frozen=True)
@@ -255,9 +255,7 @@ class VLFaceDetection(FaceDetection):
             mouth state
         """
         if self._descriptor is None:
-            self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(
-                self.warp
-            )  # type: ignore
+            self._descriptor = self.estimatorCollection.descriptorEstimator.estimate(self.warp)  # type: ignore
         return self._descriptor  # type: ignore
 
     def _getTransformedLandmarks5(self) -> Landmarks5:
@@ -433,7 +431,9 @@ class VLFaceDetector:
             detectRes.coreEstimation, detectRes.image, self.estimatorsCollection, self._estimationSettings
         )
 
-    def postProcessingDetectionBatch(self, detectRes: List[List[Optional[FaceDetection]]]):
+    def postProcessingDetectionBatch(
+        self, detectRes: List[List[Optional[FaceDetection]]]
+    ) -> List[List[Optional[VLFaceDetection]]]:
         """
         Post processing detection results (wrap to  VLFaceDetection)
         Args:
@@ -487,7 +487,7 @@ class VLFaceDetector:
             return list of lists detection, order of detection lists is corresponding to order of input images
         """
         detectRes = self._faceDetector.detect(images, limit, True, True)
-        return self.postProcessingDetectionBatch(detectRes)
+        return self.postProcessingDetectionBatch(detectRes)  # type: ignore
 
     def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBox: Rect) -> Union[VLFaceDetection, None]:
         """

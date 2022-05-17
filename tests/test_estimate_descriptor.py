@@ -2,16 +2,16 @@
 Test estimate descriptor.
 """
 from enum import Enum
-from typing import Tuple, Generator, NamedTuple, Callable, List, Union, ContextManager
+from typing import Callable, ContextManager, Generator, List, NamedTuple, Tuple, Union
 
 import pytest
 
 from lunavl.sdk.descriptors.descriptors import (
-    FaceDescriptor,
     BaseDescriptor,
     BaseDescriptorBatch,
-    HumanDescriptor,
+    FaceDescriptor,
     FaceDescriptorBatch,
+    HumanDescriptor,
     HumanDescriptorBatch,
 )
 from lunavl.sdk.errors.errors import LunaVLError
@@ -23,7 +23,7 @@ from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.detect_test_class import VLIMAGE_SMALL
-from tests.resources import WARP_WHITE_MAN, HUMAN_WARP, WARP_CLEAN_FACE, BAD_THRESHOLD_WARP
+from tests.resources import BAD_THRESHOLD_WARP, HUMAN_WARP, WARP_CLEAN_FACE, WARP_WHITE_MAN
 
 EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58, 59]
 

@@ -9,7 +9,7 @@ from lunavl.sdk.estimators.face_estimators.livenessv1 import LivenessPrediction,
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import SPOOF, UNKNOWN_LIVENESS, LIVENESS_FACE, CLEAN_ONE_FACE
+from tests.resources import CLEAN_ONE_FACE, LIVENESS_FACE, SPOOF, UNKNOWN_LIVENESS
 from tests.schemas import LIVENESSV1_SCHEMA, jsonValidator
 
 

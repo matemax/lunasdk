@@ -5,17 +5,17 @@ See `background`_.
 """
 from typing import Dict, List, Union
 
-from FaceEngine import (
-    IBackgroundEstimatorPtr,
-    BackroundEstimation as CoreBackgroundEstimation,
+from FaceEngine import (  # pylint: disable=E0611,E0401
     BackgroundStatus as CoreBackgroundStatus,
-)  # pylint: disable=E0611,E0401
+    BackroundEstimation as CoreBackgroundEstimation,
+)
 
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import FaceDetection
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class FaceDetectionBackground(BaseEstimation):
@@ -78,17 +78,7 @@ class FaceDetectionBackgroundEstimator(BaseEstimator):
     Face detection background estimator. Work on face detections
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, corBackgroundEstimator: IBackgroundEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            corBackgroundEstimator: core estimator
-        """
-        super().__init__(corBackgroundEstimator)
-
-    def estimate(
+    def estimate(  # type: ignore
         self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False
     ) -> Union[FaceDetectionBackground, AsyncTask[FaceDetectionBackground]]:
         """
