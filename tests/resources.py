@@ -40,6 +40,7 @@ ROTATED0 = getPathToImage("rotated0.png")
 ROTATED90 = getPathToImage("rotated90.png")
 ROTATED180 = getPathToImage("rotated180.png")
 ROTATED270 = getPathToImage("rotated270.png")
+PALETTE_MODE = getPathToImage("palette_mode.png")
 
 BAD_IMAGE = getPathToImage("bad_image.jpg")
 BAD_THRESHOLD_WARP = getPathToImage("thumb.jpg")
