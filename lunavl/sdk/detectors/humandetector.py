@@ -267,6 +267,7 @@ class HumanDetector:
 
     Attributes:
         _detector (IDetectorPtr): core detector
+        _launchOptions (LaunchOptions): detector launch options
     """
 
     __slots__ = (

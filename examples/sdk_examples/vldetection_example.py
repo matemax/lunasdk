@@ -19,7 +19,7 @@ def estimateAll():
             descriptorVersion=59, launchOptions=LaunchOptions(deviceClass=DeviceClass.cpu)
         )
     )
-    detectorSettings = FaceDetectorSettings(launchOptions=LaunchOptions(deviceClass=DeviceClass.gpu))
+    detectorSettings = FaceDetectorSettings(launchOptions=LaunchOptions(deviceClass=DeviceClass.cpu))
     VLFaceDetector.initialize(estimatorsSettings=estimatorsSettings)
 
     detector = VLFaceDetector(detectorSettings=detectorSettings)

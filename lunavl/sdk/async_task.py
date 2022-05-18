@@ -7,6 +7,8 @@ from lunavl.sdk.errors.exceptions import assertError
 
 
 class TResult(Protocol):
+    """Common task result protocol"""
+
     @abstractmethod
     def __init__(self, result: Any):
         ...

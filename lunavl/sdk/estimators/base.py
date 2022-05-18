@@ -16,6 +16,7 @@ class BaseEstimator(ABC):
 
     Attributes:
         _coreEstimator: core estimator
+        _launchOptions: estimator launch options
     """
 
     __slots__ = ("_coreEstimator", "_launchOptions")
@@ -32,6 +33,7 @@ class BaseEstimator(ABC):
 
     @property
     def launchOptions(self) -> LaunchOptions:
+        """Get estimator launch options"""
         return self._launchOptions
 
     @abstractmethod

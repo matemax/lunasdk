@@ -8,17 +8,13 @@ from typing import Optional, Union
 
 import numpy as np
 import requests
-from FaceEngine import (  # pylint: disable=E0611,E0401
-    FormatType,
-    Image as CoreImage,
-    MemoryResidence as CoreMemoryResidence,
-)
+from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL import Image as pilImage
 from PIL.Image import Image as PilImage
 
-from ..errors.exceptions import assertError
 from .geometry import Rect
 from .pil.np import getNPImageType, pilToNumpy
+from ..errors.exceptions import assertError
 
 
 class ImageFormat(Enum):
@@ -143,24 +139,6 @@ class ColorFormat(Enum):
         raise ValueError(f"Cannot load '{colorFormat}' color format.")
 
 
-class MemoryResidence(Enum):
-    """
-    Target device for image storing
-    """
-
-    cpu = CoreMemoryResidence.MemoryCPU
-    gpu = CoreMemoryResidence.MemoryGPU
-    # npu = CoreMemoryResidence.MemoryNPU
-
-
-class ResidenceDevice:
-    __slots__ = ("memoryResidence", "deviceId")
-
-    def __init__(self, memoryResidence: MemoryResidence = MemoryResidence.cpu, deviceId: Optional[int] = None):
-        self.memoryResidence = memoryResidence
-        self.deviceId = deviceId
-
-
 class VLImage:
     """
     Class image.
@@ -171,14 +149,13 @@ class VLImage:
         filename (str): filename of the file which is source of image
     """
 
-    __slots__ = ("coreImage", "source", "filename", "gpuCoreImage", "_coreImages")
+    __slots__ = ("coreImage", "source", "filename")
 
     def __init__(
         self,
         body: Union[bytes, bytearray, PilImage, CoreImage],
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
-        targetDevice: Optional[ResidenceDevice] = None,
     ):
         """
         Init.
@@ -191,9 +168,6 @@ class VLImage:
             TypeError: if body has incorrect type
             LunaSDKException: if failed to load image to sdk Image
         """
-        if not targetDevice:
-            targetDevice = ResidenceDevice()
-
         if isinstance(body, bytearray):
             body = bytes(body)
 
@@ -233,26 +207,6 @@ class VLImage:
         self.source = body
         self.filename = filename
 
-        if targetDevice.memoryResidence == MemoryResidence.gpu:
-            cf = colorFormat or ColorFormat.R8G8B8
-            error, coreImage = self.coreImage.convert(cf.coreFormat, targetDevice.memoryResidence.value)
-            assertError(error)
-        # elif targetDevice.memoryResidence == MemoryResidence.npu:
-        #     error, coreImage = self.coreImage.convert(colorFormat.coreFormat, targetDevice.memoryResidence.value)
-        #     assertError(error)
-        else:
-            coreImage = self.coreImage
-
-        self._coreImages = {targetDevice: coreImage}
-
-    def getCoreImage(self, device: ResidenceDevice) -> CoreImage:
-        coreImage = self._coreImages.get(device)
-        if coreImage is None:
-            error, coreImage = self.coreImage.convert(self.coreImage.getFormat(), device.memoryResidence.value)
-            assertError(error)
-            self._coreImages[device] = coreImage
-        return coreImage
-
     @classmethod
     def rotate(cls, image: "VLImage", angle: RotationAngle):
         """
@@ -280,12 +234,7 @@ class VLImage:
 
     @classmethod
     def load(
-        cls,
-        *,
-        filename: Optional[str] = None,
-        url: Optional[str] = None,
-        colorFormat: Optional[ColorFormat] = None,
-        device: Optional[ResidenceDevice] = None,
+        cls, *, filename: Optional[str] = None, url: Optional[str] = None, colorFormat: Optional[ColorFormat] = None
     ) -> "VLImage":
 
         """
@@ -307,19 +256,12 @@ class VLImage:
 
         todo: more doc test
         """
-        if device is None:
-            device = ResidenceDevice()
         if filename is not None:
             path = Path(filename)
             with path.open("rb") as file:
                 body = file.read()
                 img = cls(body, colorFormat)
                 img.filename = path.name
-                if device.memoryResidence == MemoryResidence.gpu:
-                    gpuCoreImage = CoreImage(img.rect.width, img.rect.height, img.format.coreFormat)
-                    error = img.coreImage.create(img.coreImage, CoreMemoryResidence.MemoryGPU)
-                    assertError(error)
-                    img._coreImages[device] = gpuCoreImage
                 return img
 
         if url is not None:
@@ -327,11 +269,6 @@ class VLImage:
             if response.status_code == 200:
                 img = cls(response.content, colorFormat)
                 img.filename = url
-                if device == device.memoryResidence.gpu:
-                    gpuCoreImage = CoreImage(img.rect.width, img.rect.height, img.format.coreFormat)
-                    error = img.coreImage.convert(img.coreImage, MemoryResidence.gpu)
-                    assertError(error)
-                    img._coreImages[device] = gpuCoreImage
                 return img
         raise ValueError
 

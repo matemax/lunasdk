@@ -295,7 +295,7 @@ class FaceDetector:
     Attributes:
         _detector (IDetectorPtr): core detector
         detectorType (DetectorType): detector type
-
+        _launchOptions (LaunchOptions): detector launch options
     """
 
     __slots__ = ("_detector", "_detectorType", "_launchOptions")
@@ -307,10 +307,12 @@ class FaceDetector:
 
     @property
     def detectorType(self) -> DetectionType:
+        """Get detector type"""
         return self._detectorType
 
     @property
     def launchOptions(self) -> LaunchOptions:
+        """Get detector launch options"""
         return self._launchOptions
 
     @staticmethod

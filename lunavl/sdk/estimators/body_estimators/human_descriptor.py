@@ -35,7 +35,7 @@ class HumanDescriptorEstimator(BaseEstimator):
         Init.
 
         Args:
-            coreExtractor: core extractor
+            humanDescriptorFactory: human descriptor factory
         """
         super().__init__(coreExtractor, launchOptions)
         self.descriptorFactory = humanDescriptorFactory

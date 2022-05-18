@@ -35,7 +35,7 @@ class FaceDescriptorEstimator(BaseEstimator):
         Init.
 
         Args:
-            coreExtractor: core extractor
+            faceDescriptorFactory: face descriptor factory
         """
         super().__init__(coreExtractor, launchOptions)
         self.descriptorFactory = faceDescriptorFactory
