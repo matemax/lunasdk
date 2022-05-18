@@ -3,18 +3,26 @@ Example of using VLFaceDetector
 """
 import pprint
 
-from resources import EXAMPLE_O
-
+from lunavl.sdk.estimator_collections import EstimatorsSettings, FaceDescriptorEstimatorSettings
 from lunavl.sdk.image_utils.image import VLImage
-from lunavl.sdk.luna_faces import VLFaceDetector
+from lunavl.sdk.launch_options import LaunchOptions, DeviceClass
+from lunavl.sdk.luna_faces import VLFaceDetector, FaceDetectorSettings
+from resources import EXAMPLE_O
 
 
 def estimateAll():
     """
     Estimate all attributes
     """
-    VLFaceDetector.initialize()
-    detector = VLFaceDetector()
+    estimatorsSettings = EstimatorsSettings(
+        descriptor=FaceDescriptorEstimatorSettings(
+            descriptorVersion=59, launchOptions=LaunchOptions(deviceClass=DeviceClass.cpu)
+        )
+    )
+    detectorSettings = FaceDetectorSettings(launchOptions=LaunchOptions(deviceClass=DeviceClass.gpu))
+    VLFaceDetector.initialize(estimatorsSettings=estimatorsSettings)
+
+    detector = VLFaceDetector(detectorSettings=detectorSettings)
     image = VLImage.load(filename=EXAMPLE_O)
     detection = detector.detectOne(image)
     pprint.pprint(detection.basicAttributes.asDict())

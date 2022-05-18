@@ -1,5 +1,6 @@
 """Module contains face estimator collections.
 """
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -18,6 +19,7 @@ from .estimators.face_estimators.mouth_state import MouthStateEstimator
 from .estimators.face_estimators.warp_quality import WarpQualityEstimator
 from .estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from .faceengine.engine import VLFaceEngine
+from .launch_options import LaunchOptions
 
 
 class FaceEstimator(Enum):
@@ -53,6 +55,58 @@ class FaceEstimator(Enum):
     OrientationMode = 13
     #: credibility estimator
     Credibility = 14
+
+
+@dataclass
+class CommonEstimatorSettings:
+    """common estimator settings"""
+
+    # estimator launch options
+    launchOptions: LaunchOptions = field(default_factory=LaunchOptions)
+
+
+@dataclass
+class FaceDescriptorEstimatorSettings:
+    """Face descriptor estimator settings"""
+
+    # descriptor version, 0 - get from fe config
+    descriptorVersion: int = 0
+    # extractor launch options
+    launchOptions: LaunchOptions = field(default_factory=LaunchOptions)
+
+
+@dataclass
+class EstimatorsSettings:
+    """Container for estimator creation settings"""
+
+    #: headpose estimator settings
+    headPose: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: eye estimator settings
+    eye: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: gaze direction estimator settings
+    gaze: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: mask estimator settings
+    mask: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: mouth estimator settings
+    mouth: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: face warp quality estimator settings
+    warpQuality: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: basic attributes estimator settings
+    basicAttributes: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: emotions estimator settings
+    emotions: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: ags estimator settings
+    ags: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: face descriptor estimator settings
+    descriptor: FaceDescriptorEstimatorSettings = field(default_factory=FaceDescriptorEstimatorSettings)
+    #: glasses estimator settings
+    glasses: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: liveness estimator settings
+    liveness: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: credibility estimator settings
+    credibility: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
+    #: orientation mode estimator settings
+    orientationMode: CommonEstimatorSettings = field(default_factory=CommonEstimatorSettings)
 
 
 class FaceEstimatorsCollection:
@@ -94,10 +148,14 @@ class FaceEstimatorsCollection:
         "_livenessV1Estimator",
         "_orientationModeEstimator",
         "_credibilityEstimator",
+        "_estimatorsSettings",
     )
 
     def __init__(
-        self, startEstimators: Optional[List[FaceEstimator]] = None, faceEngine: Optional[VLFaceEngine] = None
+        self,
+        startEstimators: Optional[List[FaceEstimator]] = None,
+        faceEngine: Optional[VLFaceEngine] = None,
+        estimatorsSettings: Optional[EstimatorsSettings] = None,
     ):
         """
         Init.
@@ -105,11 +163,17 @@ class FaceEstimatorsCollection:
         Args:
             startEstimators: list of estimators which will be initiate now
             faceEngine: faceengine, factory for estimators
+            estimatorsSettings: settings for estimator creation
         """
         if faceEngine is None:
             self._faceEngine = VLFaceEngine()
         else:
             self._faceEngine = faceEngine
+
+        if estimatorsSettings is None:
+            self._estimatorsSettings = EstimatorsSettings()
+        else:
+            self._estimatorsSettings = estimatorsSettings
 
         self._basicAttributesEstimator: Union[None, BasicAttributesEstimator] = None
         self._eyeEstimator: Union[None, EyeEstimator] = None
@@ -180,33 +244,33 @@ class FaceEstimatorsCollection:
             ValueError: if estimator not found
         """
         if estimator == FaceEstimator.BasicAttributes:
-            self._basicAttributesEstimator = self._faceEngine.createBasicAttributesEstimator()
+            self._basicAttributesEstimator = self.basicAttributesEstimator
         elif estimator == FaceEstimator.Eye:
-            self._eyeEstimator = self._faceEngine.createEyeEstimator()
+            self._eyeEstimator = self.eyeEstimator
         elif estimator == FaceEstimator.Emotions:
-            self._emotionsEstimator = self._faceEngine.createEmotionEstimator()
+            self._emotionsEstimator = self.emotionsEstimator
         elif estimator == FaceEstimator.GazeDirection:
-            self._gazeDirectionEstimator = self._faceEngine.createGazeEstimator()
+            self._gazeDirectionEstimator = self.gazeDirectionEstimator
         elif estimator == FaceEstimator.MouthState:
-            self._mouthStateEstimator = self._faceEngine.createMouthEstimator()
+            self._mouthStateEstimator = self.mouthStateEstimator
         elif estimator == FaceEstimator.WarpQuality:
-            self._warpQualityEstimator = self._faceEngine.createWarpQualityEstimator()
+            self._warpQualityEstimator = self.warpQualityEstimator
         elif estimator == FaceEstimator.HeadPose:
-            self._headPoseEstimator = self._faceEngine.createHeadPoseEstimator()
+            self._headPoseEstimator = self.headPoseEstimator
         elif estimator == FaceEstimator.AGS:
-            self._AGSEstimator = self._faceEngine.createAGSEstimator()
+            self._AGSEstimator = self.AGSEstimator
         elif estimator == FaceEstimator.Descriptor:
-            self._descriptorEstimator = self._faceEngine.createFaceDescriptorEstimator()
+            self._descriptorEstimator = self.descriptorEstimator
         elif estimator == FaceEstimator.Mask:
-            self._maskEstimator = self._faceEngine.createMaskEstimator()
+            self._maskEstimator = self.maskEstimator
         elif estimator == FaceEstimator.Glasses:
-            self._glassesEstimator = self._faceEngine.createGlassesEstimator()
+            self._glassesEstimator = self.glassesEstimator
         elif estimator == FaceEstimator.LivenessV1:
-            self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator()
+            self._livenessV1Estimator = self.livenessV1Estimator
         elif estimator == FaceEstimator.OrientationMode:
-            self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
+            self._orientationModeEstimator = self.orientationModeEstimator
         elif estimator == FaceEstimator.Credibility:
-            self._credibilityEstimator = self._faceEngine.createCredibilityEstimator()
+            self._credibilityEstimator = self.credibilityEstimator
         else:
             raise ValueError("Bad estimator type")
 
@@ -221,7 +285,11 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._descriptorEstimator is None:
-            self._descriptorEstimator = self._faceEngine.createFaceDescriptorEstimator()
+            descriptorVersion = self._estimatorsSettings.descriptor.descriptorVersion
+            self._descriptorEstimator = self._faceEngine.createFaceDescriptorEstimator(
+                launchOptions=self._estimatorsSettings.descriptor.launchOptions,
+                descriptorVersion=descriptorVersion,
+            )
         return self._descriptorEstimator
 
     @property
@@ -235,7 +303,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._headPoseEstimator is None:
-            self._headPoseEstimator = self._faceEngine.createHeadPoseEstimator()
+            self._headPoseEstimator = self._faceEngine.createHeadPoseEstimator(
+                launchOptions=self._estimatorsSettings.headPose.launchOptions
+            )
         return self._headPoseEstimator
 
     @headPoseEstimator.setter
@@ -260,7 +330,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._AGSEstimator is None:
-            self._AGSEstimator = self._faceEngine.createAGSEstimator()
+            self._AGSEstimator = self._faceEngine.createAGSEstimator(
+                launchOptions=self._estimatorsSettings.ags.launchOptions
+            )
         return self._AGSEstimator
 
     # pylint: disable=C0103
@@ -285,7 +357,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._basicAttributesEstimator is None:
-            self._basicAttributesEstimator = self._faceEngine.createBasicAttributesEstimator()
+            self._basicAttributesEstimator = self._faceEngine.createBasicAttributesEstimator(
+                launchOptions=self._estimatorsSettings.basicAttributes.launchOptions
+            )
         return self._basicAttributesEstimator
 
     @basicAttributesEstimator.setter
@@ -309,7 +383,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._eyeEstimator is None:
-            self._eyeEstimator = self._faceEngine.createEyeEstimator()
+            self._eyeEstimator = self._faceEngine.createEyeEstimator(
+                launchOptions=self._estimatorsSettings.eye.launchOptions
+            )
         return self._eyeEstimator
 
     @eyeEstimator.setter
@@ -333,7 +409,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._emotionsEstimator is None:
-            self._emotionsEstimator = self._faceEngine.createEmotionEstimator()
+            self._emotionsEstimator = self._faceEngine.createEmotionEstimator(
+                launchOptions=self._estimatorsSettings.emotions.launchOptions
+            )
         return self._emotionsEstimator
 
     @emotionsEstimator.setter
@@ -357,7 +435,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._gazeDirectionEstimator is None:
-            self._gazeDirectionEstimator = self._faceEngine.createGazeEstimator()
+            self._gazeDirectionEstimator = self._faceEngine.createGazeEstimator(
+                launchOptions=self._estimatorsSettings.gaze.launchOptions
+            )
         return self._gazeDirectionEstimator
 
     @gazeDirectionEstimator.setter
@@ -381,7 +461,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._mouthStateEstimator is None:
-            self._mouthStateEstimator = self._faceEngine.createMouthEstimator()
+            self._mouthStateEstimator = self._faceEngine.createMouthEstimator(
+                launchOptions=self._estimatorsSettings.mouth.launchOptions
+            )
         return self._mouthStateEstimator
 
     @mouthStateEstimator.setter
@@ -405,7 +487,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._warpQualityEstimator is None:
-            self._warpQualityEstimator = self._faceEngine.createWarpQualityEstimator()
+            self._warpQualityEstimator = self._faceEngine.createWarpQualityEstimator(
+                launchOptions=self._estimatorsSettings.warpQuality.launchOptions
+            )
         return self._warpQualityEstimator
 
     @warpQualityEstimator.setter
@@ -429,7 +513,9 @@ class FaceEstimatorsCollection:
             mask estimator
         """
         if self._maskEstimator is None:
-            self._maskEstimator = self._faceEngine.createMaskEstimator()
+            self._maskEstimator = self._faceEngine.createMaskEstimator(
+                launchOptions=self._estimatorsSettings.mask.launchOptions
+            )
         return self._maskEstimator
 
     @maskEstimator.setter
@@ -452,7 +538,9 @@ class FaceEstimatorsCollection:
             glasses estimator
         """
         if self._glassesEstimator is None:
-            self._glassesEstimator = self._faceEngine.createGlassesEstimator()
+            self._glassesEstimator = self._faceEngine.createGlassesEstimator(
+                launchOptions=self._estimatorsSettings.glasses.launchOptions
+            )
         return self._glassesEstimator
 
     @glassesEstimator.setter
@@ -475,7 +563,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._livenessV1Estimator is None:
-            self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator()
+            self._livenessV1Estimator = self._faceEngine.createLivenessV1Estimator(
+                launchOptions=self._estimatorsSettings.liveness.launchOptions
+            )
         return self._livenessV1Estimator
 
     @livenessV1Estimator.setter
@@ -499,7 +589,9 @@ class FaceEstimatorsCollection:
             estimator
         """
         if self._orientationModeEstimator is None:
-            self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator()
+            self._orientationModeEstimator = self._faceEngine.createOrientationModeEstimator(
+                launchOptions=self._estimatorsSettings.orientationMode.launchOptions
+            )
         return self._orientationModeEstimator
 
     @orientationModeEstimator.setter
@@ -519,7 +611,9 @@ class FaceEstimatorsCollection:
             credibility estimator
         """
         if self._credibilityEstimator is None:
-            self._credibilityEstimator = self._faceEngine.createCredibilityEstimator()
+            self._credibilityEstimator = self._faceEngine.createCredibilityEstimator(
+                launchOptions=self._estimatorsSettings.credibility.launchOptions
+            )
         return self._credibilityEstimator
 
     @credibilityEstimator.setter

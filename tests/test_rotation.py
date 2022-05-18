@@ -35,6 +35,4 @@ class TestImageRotation(BaseTestClass):
                 orientationMode = self.orientationModeEstimator.estimate(rotatedImage)
                 assert orientationMode == expectedOrientationMode
                 pilImage = rotatedImage.asPillow()
-                assert (
-                    VLImage.load(filename=expectedImageFileName).asPillow().tobytes() == pilImage.tobytes()
-                )
+                assert VLImage.load(filename=expectedImageFileName).asPillow().tobytes() == pilImage.tobytes()
