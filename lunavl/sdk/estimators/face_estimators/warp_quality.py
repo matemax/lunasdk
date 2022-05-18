@@ -138,10 +138,10 @@ class WarpQualityEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         if asyncEstimate:
-            task = self._coreEstimator.asyncEstimate(warp.warpedImage.coreImage)
+            task = self._coreEstimator.asyncEstimate_subjective_quality(warp.warpedImage.coreImage)
             return AsyncTask(task, POST_PROCESSING.postProcessing)
-        error, emotions = self._coreEstimator.estimate(warp.warpedImage.coreImage)
-        return POST_PROCESSING.postProcessing(error, emotions)
+        error, quality = self._coreEstimator.estimate_subjective_quality(warp.warpedImage.coreImage)
+        return POST_PROCESSING.postProcessing(error, quality)
 
     #  pylint: disable=W0221
     def estimateBatch(
@@ -162,7 +162,7 @@ class WarpQualityEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
-            task = self._coreEstimator.async_estimate_subjective_quality(coreImages)
+            task = self._coreEstimator.asyncEstimate_subjective_quality(coreImages)
             return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, masks = self._coreEstimator.estimate_subjective_quality(coreImages)
         return POST_PROCESSING.postProcessingBatch(error, masks)
