@@ -7,7 +7,7 @@ from typing import Dict, List, Union
 
 from FaceEngine import (
     IBackgroundEstimatorPtr,
-    BackroundEstimation as CoreBackgroundEstimation,
+    BackgroundEstimation as CoreBackgroundEstimation,
     BackgroundStatus as CoreBackgroundStatus,
 )  # pylint: disable=E0611,E0401
 
