@@ -199,7 +199,7 @@ def collectReDetectionsResult(
 
 def collectDetectionsResult(
     fsdkDetectRes: IFaceDetectionBatchPtr,
-    images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
+    images: Union[List[VLImage], List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
 ) -> List[List[FaceDetection]]:
     """
     Collect detection results from core reply and prepare face detections
