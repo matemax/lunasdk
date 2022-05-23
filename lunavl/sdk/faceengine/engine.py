@@ -124,7 +124,8 @@ class VLFaceEngine:
         Create face detector.
 
         Args:
-            detectorType: detector type
+            detectorType: detector type.
+            launchOptions: estimator launch options
 
         Returns:
             detector
@@ -141,7 +142,10 @@ class VLFaceEngine:
 
     def createHeadPoseEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> HeadPoseEstimator:
         """
-        Create head pose estimator
+        Create head pose estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -155,6 +159,9 @@ class VLFaceEngine:
     def createWarpQualityEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> WarpQualityEstimator:
         """
         Create an image quality estimator
+
+        Args:
+            launchOptions: estimator launch options.
 
         Returns:
             estimator
@@ -175,7 +182,10 @@ class VLFaceEngine:
 
     def createEmotionEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> EmotionsEstimator:
         """
-        Create emotions estimator
+        Create emotions estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -187,7 +197,10 @@ class VLFaceEngine:
 
     def createMouthEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> MouthStateEstimator:
         """
-        Create mouth state estimator
+        Create mouth state estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -199,7 +212,10 @@ class VLFaceEngine:
 
     def createEyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> EyeEstimator:
         """
-        Create eyes estimator
+        Create eyes estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -211,7 +227,10 @@ class VLFaceEngine:
 
     def createGazeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> GazeEstimator:
         """
-        Create gaze direction estimator
+        Create gaze direction estimator.
+
+        Args:
+            launchOptions: estimator launch options.
 
         Returns:
             estimator
@@ -223,7 +242,10 @@ class VLFaceEngine:
 
     def createBasicAttributesEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> BasicAttributesEstimator:
         """
-        Create basic attributes estimator (age, gender, ethnicity)
+        Create basic attributes estimator (age, gender, ethnicity).
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -236,6 +258,9 @@ class VLFaceEngine:
     def createAGSEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> AGSEstimator:
         """
         Approximate garbage score estimator
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -253,6 +278,7 @@ class VLFaceEngine:
 
         Args:
             descriptorVersion: descriptor version to init estimator for or zero for use default descriptor version
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -299,6 +325,10 @@ class VLFaceEngine:
     def createHumanDetector(self, launchOptions: Optional[LaunchOptions] = None) -> HumanDetector:
         """
         Create human detector.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             detector
         """
@@ -333,7 +363,11 @@ class VLFaceEngine:
         self, descriptorVersion: int = DHDV, launchOptions: Optional[LaunchOptions] = None
     ) -> HumanDescriptorEstimator:
         """
-        Create human descriptor estimator
+        Create human descriptor estimator.
+
+        Args:
+            launchOptions: estimator launch options
+            descriptorVersion: human descriptor version
 
         Returns:
             estimator
@@ -347,7 +381,10 @@ class VLFaceEngine:
 
     def createMaskEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> MaskEstimator:
         """
-        Create an medical mask estimator
+        Create an medical mask estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -362,6 +399,9 @@ class VLFaceEngine:
         """
         Create a glasses estimator.
 
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -374,6 +414,10 @@ class VLFaceEngine:
     def createLivenessV1Estimator(self, launchOptions: Optional[LaunchOptions] = None) -> LivenessV1Estimator:
         """
         Create an one shot liveness estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -385,7 +429,10 @@ class VLFaceEngine:
 
     def createOrientationModeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> OrientationModeEstimator:
         """
-        Create an orientation mode estimator
+        Create an orientation mode estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
@@ -401,6 +448,7 @@ class VLFaceEngine:
         Args:
             descriptorVersion: descriptor version, or zero if default should be used
             capacity: index capacity, or zero if default should be used
+
         Returns:
             index builder
         """
@@ -409,6 +457,10 @@ class VLFaceEngine:
     def createCredibilityEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> CredibilityEstimator:
         """
         Create a credibility estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -423,6 +475,10 @@ class VLFaceEngine:
     ) -> EyebrowExpressionEstimator:
         """
         Create a eyebrow expression estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -434,6 +490,10 @@ class VLFaceEngine:
     def createHeadwearEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> HeadwearEstimator:
         """
         Create a headwear estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -447,6 +507,10 @@ class VLFaceEngine:
     ) -> FaceNaturalLightEstimator:
         """
         Create a face natural light estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -458,6 +522,10 @@ class VLFaceEngine:
     def createRedEyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> RedEyesEstimator:
         """
         Create a red-eye estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
@@ -469,6 +537,9 @@ class VLFaceEngine:
     def createFisheyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FisheyeEstimator:
         """
         Create a fisheye effect estimator.
+
+        Args:
+            launchOptions: estimator launch options
         Returns:
             estimator
         """

@@ -11,7 +11,6 @@ class DeviceClass(Enum):
 
     cpu = "cpu"
     gpu = "gpu"
-    # npu = "npu"
 
 
 class LaunchOptions:
@@ -37,8 +36,6 @@ class LaunchOptions:
         if deviceClass:
             if deviceClass == DeviceClass.gpu:
                 device = CoreFE.DeviceClass.GPU
-            # elif deviceClass == DeviceClass.npu:
-            #     device = CoreFE.DeviceClass.NPU
             else:
                 device = CoreFE.DeviceClass.CPU
             self._coreLaunchOptions.deviceClass = device
