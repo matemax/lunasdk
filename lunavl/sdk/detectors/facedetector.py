@@ -306,7 +306,7 @@ class FaceDetector:
         self._launchOptions = launchOptions
 
     @property
-    def detectorType(self) -> DetectionType:
+    def detectorType(self) -> DetectorType:
         """Get detector type"""
         return self._detectorType
 
