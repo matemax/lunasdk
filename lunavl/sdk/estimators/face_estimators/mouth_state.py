@@ -190,7 +190,7 @@ class MouthStateEstimator(BaseEstimator):
             LunaSDKException: if estimation failed
         """
         if asyncEstimate:
-            task = self._coreEstimator.async_estimate_extended(warp.warpedImage.coreImage)
+            task = self._coreEstimator.asyncEstimate_extended(warp.warpedImage.coreImage)
             return AsyncTask(task, POST_PROCESSING.postProcessing)
         error, mouthState = self._coreEstimator.estimate_extended(warp.warpedImage.coreImage)
         return POST_PROCESSING.postProcessing(error, mouthState)
@@ -214,7 +214,7 @@ class MouthStateEstimator(BaseEstimator):
 
         validateInputByBatchEstimator(self._coreEstimator, coreImages)
         if asyncEstimate:
-            task = self._coreEstimator.async_estimate_extended(coreImages)
+            task = self._coreEstimator.asyncEstimate_extended(coreImages)
             return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, masks = self._coreEstimator.estimate_extended(coreImages)
         return POST_PROCESSING.postProcessingBatch(error, masks)
