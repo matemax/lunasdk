@@ -2,17 +2,14 @@
 Module for estimate a credibility person by face.
 """
 from enum import Enum
-from typing import Union
+from typing import Literal, Union, overload
 
-from FaceEngine import CredibilityCheckEstimation
-from FaceEngine import CredibilityStatus
-from FaceEngine import ICredibilityCheckEstimatorPtr
+from FaceEngine import CredibilityCheckEstimation, CredibilityStatus
 
-from lunavl.sdk.errors.exceptions import assertError
-from ..base import BaseEstimator
-from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ...base import BaseEstimation
+from ..base import BaseEstimator
+from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 
 class CredibilityPrediction(Enum):
@@ -92,16 +89,15 @@ class CredibilityEstimator(BaseEstimator):
     Warp credibility estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, credibilityEstimator: ICredibilityCheckEstimatorPtr):
-        """
-        Init.
-        Args:
-            credibilityEstimator: core credibility check estimator
-        """
-        super().__init__(credibilityEstimator)
+    @overload  # type: ignore
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[False] = False) -> Credibility:
+        ...
 
-    def estimate(
+    @overload
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[True]) -> AsyncTask[Credibility]:
+        ...
+
+    def estimate(  # type: ignore
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Credibility, AsyncTask[Credibility]]:
         """

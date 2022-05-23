@@ -6,17 +6,17 @@ See `image color type`_.
 from enum import Enum
 from typing import Dict, List, Union
 
-from FaceEngine import (
-    IBlackWhiteEstimatorPtr,
+from FaceEngine import (  # pylint: disable=E0611,E0401
     ImageColorEstimation as CoreImageColorEstimation,
     ImageColorType as CoreImageColorType,
-)  # pylint: disable=E0611,E0401
+)
 
 from lunavl.sdk.base import BaseEstimation
-from .facewarper import FaceWarp, FaceWarpedImage
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
+from .facewarper import FaceWarp, FaceWarpedImage
 
 
 class ImageColorSchema(Enum):
@@ -95,18 +95,8 @@ class ImageColorTypeEstimator(BaseEstimator):
     Image color type estimator. Work on face detections. Allowed types see `ImageColorSchema`.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreImageColorTypeEstimator: IBlackWhiteEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreImageColorTypeEstimator: core estimator
-        """
-        super().__init__(coreImageColorTypeEstimator)
-
     #  pylint: disable=W0221
-    def estimate(
+    def estimate(  # type: ignore
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[ImageColorType, AsyncTask[ImageColorType]]:
         """

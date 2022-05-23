@@ -2,8 +2,8 @@ from collections import namedtuple
 
 import jsonschema
 
-from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator, MouthStates
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
+from lunavl.sdk.estimators.face_estimators.mouth_state import MouthStateEstimator, MouthStates
 from lunavl.sdk.image_utils.image import VLImage
 from tests.detect_test_class import FaceDetectTestClass
 from tests.resources import CLEAN_ONE_FACE, WARP_WHITE_MAN

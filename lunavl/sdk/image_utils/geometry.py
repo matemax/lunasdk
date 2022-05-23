@@ -1,11 +1,18 @@
 """
 Module contains geometric structures (Rect, Point, Size)
 """
-from typing import TypeVar, Generic, Union, Dict, Tuple
+from typing import Dict, Generic, Tuple, TypeVar, Union
 
-from FaceEngine import Landmarks5, Landmarks68, IrisLandmarks, EyelidLandmarks  # pylint: disable=E0611,E0401
-from FaceEngine import Rect as CoreRectI, RectFloat as CoreRectF  # pylint: disable=E0611,E0401
-from FaceEngine import Vector2i, Vector2f  # pylint: disable=E0611,E0401
+from FaceEngine import (  # pylint: disable=E0611,E0401
+    EyelidLandmarks,
+    IrisLandmarks,
+    Landmarks5,
+    Landmarks68,
+    Rect as CoreRectI,
+    RectFloat as CoreRectF,
+    Vector2f,
+    Vector2i,
+)
 
 COORDINATE_TYPE = TypeVar("COORDINATE_TYPE", float, int)  #: generic type for allowed values type of coordinates
 LANDMARKS = TypeVar(

@@ -7,7 +7,7 @@ from lunavl.sdk.estimators.face_estimators.red_eye import RedEyes
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import OPEN_EYES, RED_EYES, MANY_FACES
+from tests.resources import MANY_FACES, OPEN_EYES, RED_EYES
 
 OPEN_EYES_IMAGE = VLImage.load(filename=OPEN_EYES)
 RED_EYES_IMAGE = VLImage.load(filename=RED_EYES)

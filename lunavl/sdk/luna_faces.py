@@ -1,17 +1,17 @@
 """
 High-level api for estimating face attributes
 """
-from dataclasses import dataclass
-from typing import Optional, Union, List, Dict
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Union
 
 from FaceEngine import Face  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
-from PIL.Image import Image as PilImage
 from numpy import ndarray
+from PIL.Image import Image as PilImage
 
 from .detectors.base import ImageForDetection, ImageForRedetection
 from .detectors.facedetector import FaceDetection, FaceDetector, Landmarks5
-from .estimator_collections import FaceEstimatorsCollection
+from .estimator_collections import FaceEstimatorsCollection, EstimatorsSettings
 from .estimators.base import ImageWithFaceDetection
 from .estimators.face_estimators.basic_attributes import BasicAttributes
 from .estimators.face_estimators.credibility import Credibility
@@ -28,7 +28,8 @@ from .estimators.face_estimators.warp_quality import Quality
 from .faceengine.engine import VLFaceEngine
 from .faceengine.setting_provider import DetectorType
 from .image_utils.geometry import Rect
-from .image_utils.image import VLImage, ColorFormat
+from .image_utils.image import ColorFormat, VLImage
+from .launch_options import LaunchOptions
 
 
 @dataclass(frozen=True)
@@ -255,9 +256,7 @@ class VLFaceDetection(FaceDetection):
             mouth state
         """
         if self._descriptor is None:
-            self._descriptor = VLWarpedImage.estimatorsCollection.descriptorEstimator.estimate(
-                self.warp
-            )  # type: ignore
+            self._descriptor = self.estimatorCollection.descriptorEstimator.estimate(self.warp)  # type: ignore
         return self._descriptor  # type: ignore
 
     def _getTransformedLandmarks5(self) -> Landmarks5:
@@ -367,6 +366,16 @@ class VLFaceDetection(FaceDetection):
         return res
 
 
+@dataclass
+class FaceDetectorSettings:
+    """Face detector settings"""
+
+    # detector type
+    detectorType: DetectorType = DetectorType.FACE_DET_V3
+    # detector launch options
+    launchOptions: LaunchOptions = field(default_factory=LaunchOptions)
+
+
 class VLFaceDetector:
     """
     High level face detector. Return *VLFaceDetection* instead simple *FaceDetection*.
@@ -384,9 +393,10 @@ class VLFaceDetector:
 
     def __init__(
         self,
-        detectorType: DetectorType = DetectorType.FACE_DET_DEFAULT,
+        detectorSettings: Optional[FaceDetectorSettings] = None,
         faceEngine: Optional[VLFaceEngine] = None,
         estimationSettings: Optional[VLFaceDetectionSettings] = None,
+        estimatorsSettings: Optional[EstimatorsSettings] = None,
     ):
         """
         Init.
@@ -394,27 +404,43 @@ class VLFaceDetector:
         Args:
             detectorType: detector type
             faceEngine: face engine for detector and estimators
-            estimationSettings: settings for detection
+            estimationSettings: settings for estimation
+            estimatorsSettings: settings for estimators creation
         """
         if faceEngine is None:
             if not hasattr(self, "faceEngine"):
                 raise RuntimeError(f"Initialize the '{self.__class__.__name__}' first or pass faceEngine")
         else:
             self.faceEngine = faceEngine
-            self.estimatorsCollection = FaceEstimatorsCollection(faceEngine=self.faceEngine)
-        self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(detectorType)
+            if estimatorsSettings is None:
+                estimatorsSettings = EstimatorsSettings()
+            self.estimatorsCollection = FaceEstimatorsCollection(
+                faceEngine=self.faceEngine, estimatorsSettings=estimatorsSettings
+            )
+        if detectorSettings is None:
+            detectorSettings = FaceDetectorSettings()
+        self._faceDetector: FaceDetector = self.faceEngine.createFaceDetector(
+            detectorSettings.detectorType, launchOptions=detectorSettings.launchOptions
+        )
         self._estimationSettings: Optional[VLFaceDetectionSettings] = estimationSettings
 
     @classmethod
-    def initialize(cls, faceEngine: Optional[VLFaceEngine] = None) -> None:
+    def initialize(
+        cls, faceEngine: Optional[VLFaceEngine] = None, estimatorsSettings: Optional[EstimatorsSettings] = None
+    ) -> None:
         """
         Initialize class attributes.
 
         Args:
             faceEngine: face engine for detector and estimators
+            estimatorsSettings: settings for estimators creation
         """
         cls.faceEngine = faceEngine or VLFaceEngine()
-        cls.estimatorsCollection = FaceEstimatorsCollection(faceEngine=cls.faceEngine)
+        if estimatorsSettings is None:
+            estimatorsSettings = EstimatorsSettings()
+        cls.estimatorsCollection = FaceEstimatorsCollection(
+            faceEngine=cls.faceEngine, estimatorsSettings=estimatorsSettings
+        )
 
     def detectOne(self, image: VLImage, detectArea: Optional[Rect] = None) -> Union[None, VLFaceDetection]:
         """
@@ -433,7 +459,9 @@ class VLFaceDetector:
             detectRes.coreEstimation, detectRes.image, self.estimatorsCollection, self._estimationSettings
         )
 
-    def postProcessingDetectionBatch(self, detectRes: List[List[Optional[FaceDetection]]]):
+    def postProcessingDetectionBatch(
+        self, detectRes: List[List[Optional[FaceDetection]]]
+    ) -> List[List[Optional[VLFaceDetection]]]:
         """
         Post processing detection results (wrap to  VLFaceDetection)
         Args:
@@ -487,7 +515,7 @@ class VLFaceDetector:
             return list of lists detection, order of detection lists is corresponding to order of input images
         """
         detectRes = self._faceDetector.detect(images, limit, True, True)
-        return self.postProcessingDetectionBatch(detectRes)
+        return self.postProcessingDetectionBatch(detectRes)  # type: ignore
 
     def redetectOne(self, image: Union[VLImage, VLFaceDetection], bBox: Rect) -> Union[VLFaceDetection, None]:
         """

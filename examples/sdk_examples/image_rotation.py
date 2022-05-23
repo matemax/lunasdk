@@ -8,7 +8,7 @@ import pprint
 from resources import EXAMPLE_O
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.image_utils.image import VLImage, RotationAngle
+from lunavl.sdk.image_utils.image import RotationAngle, VLImage
 
 
 def rotateNEstimateImage():

@@ -4,7 +4,8 @@ Module realize simple examples following features:
 """
 import pprint
 
-from resources import EXAMPLE_O, EXAMPLE_1
+from resources import EXAMPLE_1, EXAMPLE_O
+
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.image_utils.image import VLImage
 

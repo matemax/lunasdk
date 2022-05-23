@@ -3,10 +3,9 @@ from typing import Dict
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.glasses import Glasses, GlassesEstimator
 from lunavl.sdk.image_utils.image import VLImage
-
 from tests.base import BaseTestClass
 from tests.resources import WARP_CLEAN_FACE, WARP_FACE_WITH_EYEGLASSES, WARP_FACE_WITH_SUNGLASSES
-from tests.schemas import jsonValidator, GLASSES_SCHEMA
+from tests.schemas import GLASSES_SCHEMA, jsonValidator
 
 
 class TestGlasses(BaseTestClass):

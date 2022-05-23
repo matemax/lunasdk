@@ -5,26 +5,25 @@ See `eyes`_ and `gaze direction`_.
 
 """
 from enum import Enum
-from typing import Union, List, NamedTuple
+from typing import List, Literal, NamedTuple, Union, overload
 
-from FaceEngine import (
-    IEyeEstimatorPtr,
-    EyeCropper,
-    IGazeEstimatorPtr,
-    GazeEstimation,
-    EyelidLandmarks as CoreEyelidLandmarks,
+from FaceEngine import (  # pylint: disable=E0611,E0401
     EyeAttributes,
+    EyeCropper,
+    EyelidLandmarks as CoreEyelidLandmarks,
+    EyesEstimation as CoreEyesEstimation,
+    GazeEstimation,
     IrisLandmarks as CoreIrisLandmarks,
     State as CoreEyeState,
-    EyesEstimation as CoreEyesEstimation,
-)  # pylint: disable=E0611,E0401
+)
 
 from lunavl.sdk.base import BaseEstimation, Landmarks
 from lunavl.sdk.detectors.facedetector import Landmarks5, Landmarks68
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class EyeState(Enum):
@@ -197,18 +196,16 @@ class EyeEstimator(BaseEstimator):
     Eye estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IEyeEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
-    def estimate(
+    @overload  # type: ignore
+    def estimate(self, warpWithLandmarks: WarpWithLandmarks, asyncEstimate: Literal[False] = False) -> EyesEstimation:
+        ...
+
+    @overload
+    def estimate(self, warpWithLandmarks: WarpWithLandmarks, asyncEstimate: Literal[True]) -> AsyncTask[EyesEstimation]:
+        ...
+
+    def estimate(  # type: ignore
         self,
         warpWithLandmarks: WarpWithLandmarks,
         asyncEstimate: bool = False,
@@ -367,18 +364,18 @@ class GazeEstimator(BaseEstimator):
     Gaze direction estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IGazeEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
+    @overload  # type: ignore
+    def estimate(self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: Literal[False] = False) -> GazeDirection:
+        ...
+
+    @overload
     def estimate(
+        self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: Literal[True]
+    ) -> AsyncTask[GazeDirection]:
+        ...
+
+    def estimate(  # type: ignore
         self, warpWithLandmarks5: WarpWithLandmarks5, asyncEstimate: bool = False
     ) -> Union[GazeDirection, AsyncTask[GazeDirection]]:
         """

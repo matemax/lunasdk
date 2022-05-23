@@ -7,11 +7,12 @@ Module realize simple examples following features:
 import asyncio
 import pprint
 
+from resources import EXAMPLE_1, EXAMPLE_O
+
 from lunavl.sdk.estimators.base import ImageWithFaceDetection
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-from resources import EXAMPLE_O, EXAMPLE_1
 
 
 def estimateHeadPose():

@@ -5,7 +5,7 @@ from lunavl.sdk.estimators.face_estimators.emotions import Emotions
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import EMOTION_FACES, ALL_EMOTIONS
+from tests.resources import ALL_EMOTIONS, EMOTION_FACES
 
 EMOTION_IMAGES = {emotion: VLImage.load(filename=imagePath) for emotion, imagePath in EMOTION_FACES.items()}
 

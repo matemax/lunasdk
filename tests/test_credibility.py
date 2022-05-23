@@ -1,10 +1,9 @@
-from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.credibility import Credibility, CredibilityEstimator
+from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
-
 from tests.base import BaseTestClass
 from tests.resources import WARP_CLEAN_FACE
-from tests.schemas import jsonValidator, CREDIBILITY_SCHEMA
+from tests.schemas import CREDIBILITY_SCHEMA, jsonValidator
 
 
 class TestCredibility(BaseTestClass):

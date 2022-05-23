@@ -3,15 +3,16 @@
 See emotions_.
 """
 from enum import Enum
-from typing import Union, List
+from typing import List, Literal, Union, overload
 
-from FaceEngine import IEmotionsEstimatorPtr, Emotions as CoreEmotions  # pylint: disable=E0611,E0401
+from FaceEngine import Emotions as CoreEmotions  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Emotion(Enum):
@@ -186,17 +187,15 @@ class EmotionsEstimator(BaseEstimator):
     Emotions estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IEmotionsEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
+    @overload  # type: ignore
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[False] = False) -> Emotions:
+        ...
+
+    @overload
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[True]) -> AsyncTask[Emotions]:
+        ...
+
     def estimate(
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Emotions, AsyncTask[Emotions]]:

@@ -3,24 +3,24 @@ from typing import Dict
 
 import pytest
 
+from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.detectors.facedetector import FaceDetector
-from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
+from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import (
-    WARP_CLEAN_FACE,
     FACE_WITH_MASK,
-    OCCLUDED_FACE,
     FULL_FACE_NO_MASK,
     FULL_FACE_WITH_MASK,
     FULL_OCCLUDED_FACE,
     LARGE_IMAGE,
+    OCCLUDED_FACE,
+    WARP_CLEAN_FACE,
 )
-from tests.schemas import jsonValidator, MASK_SCHEMA
+from tests.schemas import MASK_SCHEMA, jsonValidator
 
 MaskProperties = namedtuple("MaskProperties", ("missing", "medicalMask", "occluded"))
 WarpNExpectedProperties = namedtuple("WarpNExpectedProperties", ("warp", "expectedProperties"))

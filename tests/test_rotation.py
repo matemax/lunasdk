@@ -1,5 +1,5 @@
 from lunavl.sdk.estimators.image_estimators.orientation_mode import OrientationModeEstimator, OrientationType
-from lunavl.sdk.image_utils.image import VLImage, RotationAngle
+from lunavl.sdk.image_utils.image import RotationAngle, VLImage
 from tests.base import BaseTestClass
 from tests.resources import ROTATED0, ROTATED90, ROTATED180, ROTATED270
 
@@ -34,7 +34,5 @@ class TestImageRotation(BaseTestClass):
                 rotatedImage = VLImage.rotate(self.image, rotationAngle)
                 orientationMode = self.orientationModeEstimator.estimate(rotatedImage)
                 assert orientationMode == expectedOrientationMode
-                assert (
-                    VLImage.load(filename=expectedImageFileName).asPillow().tobytes()
-                    == rotatedImage.asPillow().tobytes()
-                )
+                pilImage = rotatedImage.asPillow()
+                assert VLImage.load(filename=expectedImageFileName).asPillow().tobytes() == pilImage.tobytes()

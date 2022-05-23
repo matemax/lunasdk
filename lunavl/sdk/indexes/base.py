@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Dict, Union
 
-from FaceEngine import SearchResult, IIndexBuilderPtr, IDenseIndexPtr, IDynamicIndexPtr, PyIFaceEngine
+from FaceEngine import IDenseIndexPtr, IDynamicIndexPtr, IIndexBuilderPtr, PyIFaceEngine, SearchResult
 
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.descriptors.descriptors import FaceDescriptor

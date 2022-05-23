@@ -4,9 +4,9 @@ Module contains an orientation mode estimator.
 See `orientation mode`_.
 """
 from enum import Enum
-from typing import Union, List
+from typing import List, Union
 
-from FaceEngine import IOrientationEstimatorPtr, OrientationType as CoreOrientationType, FSDKErrorResult
+from FaceEngine import FSDKErrorResult, OrientationType as CoreOrientationType
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.errors.exceptions import assertError
@@ -81,17 +81,7 @@ class OrientationModeEstimator(BaseEstimator):
     OrientationModeEstimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreOrientationModeEstimator: IOrientationEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreOrientationModeEstimator: core orientation mode estimator
-        """
-        super().__init__(coreOrientationModeEstimator)
-
-    def estimate(
+    def estimate(  # type: ignore
         self, image: Union[VLImage, FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[OrientationType, AsyncTask[OrientationType]]:
         """

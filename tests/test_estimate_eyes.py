@@ -2,11 +2,11 @@ import pytest
 
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.face_estimators.eyes import EyeState, EyesEstimation, WarpWithLandmarks
+from lunavl.sdk.estimators.face_estimators.eyes import EyesEstimation, EyeState, WarpWithLandmarks
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import OPEN_EYES, CLOSED_EYES, MIXED_EYES
+from tests.resources import CLOSED_EYES, MIXED_EYES, OPEN_EYES
 
 OPEN_EYES_IMAGE = VLImage.load(filename=OPEN_EYES)
 MIXED_EYES_IMAGE = VLImage.load(filename=MIXED_EYES)

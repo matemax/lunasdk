@@ -3,20 +3,16 @@ Module contains a fisheye estimator.
 
 See `fisheye`_.
 """
-from enum import Enum
 from typing import Dict, List, Union
 
-from FaceEngine import (
-    IFishEyeEstimatorPtr,
-    FishEyeEstimation as CoreFishEyeEstimation,
-    FishEye as CoreFishEye,
-)  # pylint: disable=E0611,E0401
+from FaceEngine import FishEye as CoreFishEye, FishEyeEstimation as CoreFishEyeEstimation  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
 from lunavl.sdk.detectors.facedetector import FaceDetection
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Fisheye(BaseEstimation):
@@ -67,17 +63,7 @@ class FisheyeEstimator(BaseEstimator):
     Fisheye effect estimator. Work on face detections
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreFishEyeEstimator: IFishEyeEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreFishEyeEstimator: core estimator
-        """
-        super().__init__(coreFishEyeEstimator)
-
-    def estimate(
+    def estimate(  # type: ignore
         self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False
     ) -> Union[Fisheye, AsyncTask[Fisheye]]:
         """

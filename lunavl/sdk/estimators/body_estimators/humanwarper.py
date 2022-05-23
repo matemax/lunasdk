@@ -1,15 +1,15 @@
 """Module for creating warped images
 """
-from typing import Union, Optional
+from typing import Optional, Union
 
 from FaceEngine import IHumanWarperPtr  # pylint: disable=E0611,E0401
 from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
-from PIL.Image import Image as PilImage
 from numpy import ndarray
+from PIL.Image import Image as PilImage
 
 from lunavl.sdk.detectors.humandetector import HumanDetection
 from lunavl.sdk.errors.exceptions import assertError
-from lunavl.sdk.image_utils.image import VLImage, ColorFormat
+from lunavl.sdk.image_utils.image import ColorFormat, VLImage
 
 
 class HumanWarpedImage(VLImage):

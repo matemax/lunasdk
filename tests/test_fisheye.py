@@ -2,7 +2,7 @@ from lunavl.sdk.estimators.face_estimators.fisheye import Fisheye
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import BLACK_AND_WHITE, ONE_FACE, FISHEYE
+from tests.resources import FISHEYE, ONE_FACE
 
 
 class TestFisheyeEffect(BaseTestClass):

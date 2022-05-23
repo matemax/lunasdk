@@ -3,6 +3,12 @@ requires = ["poetry"]
 build-backend = "poetry.masonry.api"
 
 [tool]
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+multi_line_output = 3
+line_length = 120
+
 [tool.poetry]
 name = "lunavl"
 version = "0.3.2"

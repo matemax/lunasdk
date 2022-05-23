@@ -3,9 +3,10 @@ Creating human warp example.
 """
 import pprint
 
+from resources import EXAMPLE_O
+
 from lunavl.sdk.faceengine.engine import VLFaceEngine
 from lunavl.sdk.image_utils.image import VLImage
-from resources import EXAMPLE_O
 
 
 def createWarp():

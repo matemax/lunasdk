@@ -4,14 +4,16 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from typing import Union, Optional, List, Tuple
+from typing import List, Optional, Tuple, Union
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.async_task import AsyncTask
-from lunavl.sdk.descriptors.descriptors import FaceDescriptorBatch, FaceDescriptor, FaceDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch, FaceDescriptorFactory
+
+from ...launch_options import LaunchOptions
 from ..base import BaseEstimator
-from ..estimators_utils.extractor_utils import estimateDescriptorsBatch, estimate
+from ..estimators_utils.extractor_utils import estimate, estimateDescriptorsBatch
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 FaceDescriptorBatchEstimation = Tuple[FaceDescriptorBatch, Union[FaceDescriptor, None]]
@@ -23,14 +25,19 @@ class FaceDescriptorEstimator(BaseEstimator):
     """
 
     #  pylint: disable=W0235
-    def __init__(self, coreExtractor: IDescriptorExtractorPtr, faceDescriptorFactory: "FaceDescriptorFactory"):
+    def __init__(
+        self,
+        coreExtractor: IDescriptorExtractorPtr,
+        faceDescriptorFactory: "FaceDescriptorFactory",
+        launchOptions: LaunchOptions,
+    ):
         """
         Init.
 
         Args:
-            coreExtractor: core extractor
+            faceDescriptorFactory: face descriptor factory
         """
-        super().__init__(coreExtractor)
+        super().__init__(coreExtractor, launchOptions)
         self.descriptorFactory = faceDescriptorFactory
 
     #  pylint: disable=W0221

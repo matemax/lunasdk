@@ -1,18 +1,16 @@
-from collections import namedtuple
-from typing import List, Union, Type
-
 import itertools
+from collections import namedtuple
+from typing import List, Type, Union
 
 from lunavl.sdk.base import BoundingBox, LandmarkWithScore
 from lunavl.sdk.detectors.base import BaseDetection
 from lunavl.sdk.detectors.facedetector import FaceDetection, FaceDetector, Landmarks5, Landmarks68
 from lunavl.sdk.detectors.humandetector import HumanDetection, HumanDetector, Landmarks17
 from lunavl.sdk.faceengine.engine import DetectorType
-from lunavl.sdk.image_utils.geometry import Point
-from lunavl.sdk.image_utils.geometry import Rect
+from lunavl.sdk.image_utils.geometry import Point, Rect
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import ONE_FACE, SEVERAL_FACES, SMALL_IMAGE, BAD_IMAGE, LARGE_IMAGE
+from tests.resources import BAD_IMAGE, LARGE_IMAGE, ONE_FACE, SEVERAL_FACES, SMALL_IMAGE
 
 VLIMAGE_SMALL = VLImage.load(filename=SMALL_IMAGE)
 VLIMAGE_ONE_FACE = VLImage.load(filename=ONE_FACE)

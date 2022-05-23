@@ -5,14 +5,14 @@ from lunavl.sdk.detectors.humandetector import HumanDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
-from tests.detect_test_class import HumanDetectTestClass
 from tests.detect_test_class import (
+    ERROR_CORE_RECT,
+    INVALID_RECT,
+    OUTSIDE_AREA,
     VLIMAGE_ONE_FACE,
     VLIMAGE_SEVERAL_FACE,
     VLIMAGE_SMALL,
-    OUTSIDE_AREA,
-    INVALID_RECT,
-    ERROR_CORE_RECT,
+    HumanDetectTestClass,
 )
 
 

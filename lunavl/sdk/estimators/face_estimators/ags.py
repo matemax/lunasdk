@@ -2,12 +2,11 @@
 
 See ags_.
 """
-from typing import Optional, List, Union
-
-from FaceEngine import IAGSEstimatorPtr  # pylint: disable=E0611,E0401
+from typing import List, Optional, Union
 
 from lunavl.sdk.detectors.facedetector import FaceDetection
 from lunavl.sdk.errors.exceptions import assertError
+
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 
@@ -17,18 +16,8 @@ class AGSEstimator(BaseEstimator):
     Approximate garbage score estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IAGSEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
-    def estimate(
+    def estimate(  # type: ignore
         self, detection: Optional[FaceDetection] = None, imageWithFaceDetection: Optional[ImageWithFaceDetection] = None
     ) -> float:
         """

@@ -4,10 +4,12 @@ SDK configuration module.
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Union, Optional, Tuple, Any, TypeVar, Type
+from typing import Any, Optional, Tuple, Type, TypeVar, Union
 
 import FaceEngine as CoreFE
 from FaceEngine import ObjectDetectorClassType, PyISettingsProvider  # pylint: disable=E0611,E0401
+
+from lunavl.sdk.launch_options import DeviceClass
 
 BI_ENUM = TypeVar("BI_ENUM", bound="BiDirectionEnum")
 
@@ -55,15 +57,6 @@ class VerboseLogging(BiDirectionEnum):
     warnings = 1
     info = 2
     debug = 3
-
-
-class DeviceClass(Enum):
-    """
-    Device enum
-    """
-
-    cpu = "cpu"
-    gpu = "gpu"
 
 
 class Distance(BiDirectionEnum):

@@ -2,15 +2,16 @@
 
 See `warp quality`_.
 """
-from typing import Dict, Union, List
+from typing import Dict, List, Literal, Union, overload
 
-from FaceEngine import SubjectiveQuality as CoreQuality, IQualityEstimatorPtr  # pylint: disable=E0611,E0401
+from FaceEngine import SubjectiveQuality as CoreQuality  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class Quality(BaseEstimation):
@@ -111,17 +112,17 @@ class WarpQualityEstimator(BaseEstimator):
     Warp quality estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IQualityEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core quality estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
+    @overload  # type: ignore
+    def estimate(
+        self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[False] = False
+    ) -> Quality:  # type: ignore
+        ...
+
+    @overload
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[True]) -> AsyncTask[Quality]:
+        ...
+
     def estimate(
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Quality, AsyncTask[Quality]]:

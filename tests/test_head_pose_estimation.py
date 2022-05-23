@@ -1,25 +1,18 @@
 from collections import namedtuple
-import pytest
 
+import pytest
+from FaceEngine import Detection, RectFloat
+
+from lunavl.sdk.base import BoundingBox
+from lunavl.sdk.detectors.facedetector import FaceDetection, FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.base import ImageWithFaceDetection
-from lunavl.sdk.estimators.face_estimators.head_pose import HeadPoseEstimator, HeadPose, FrontalType
-from lunavl.sdk.detectors.facedetector import FaceDetector, FaceDetection
-from lunavl.sdk.base import BoundingBox
+from lunavl.sdk.estimators.face_estimators.head_pose import FrontalType, HeadPose, HeadPoseEstimator
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
-
-from FaceEngine import Detection, RectFloat
-
 from tests.base import BaseTestClass
-from tests.resources import (
-    ONE_FACE,
-    NO_FACES,
-    GOST_HEAD_POSE_FACE,
-    TURNED_HEAD_POSE_FACE,
-    FRONTAL_HEAD_POSE_FACE,
-)
+from tests.resources import FRONTAL_HEAD_POSE_FACE, GOST_HEAD_POSE_FACE, ONE_FACE, TURNED_HEAD_POSE_FACE
 
 
 class TestHeadPose(BaseTestClass):
@@ -104,7 +97,6 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose on image without faces by bounding box from other image.
         """
-        image = VLImage.load(filename=NO_FACES)
         angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
             ImageWithFaceDetection(self.image, self.detection.boundingBox)
         )

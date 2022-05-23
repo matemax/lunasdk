@@ -6,6 +6,7 @@ from typing import List
 
 from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
 from lunavl.sdk.errors.exceptions import assertError
+
 from .base import CoreIndex, IndexResult
 
 

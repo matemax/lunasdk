@@ -4,14 +4,10 @@ Module contains a  livenessv1 estimator.
 See `livenessv1`_.
 """
 from enum import Enum
-from typing import Optional, List, Union
+from typing import List, Literal, Optional, Union, overload
 
-from FaceEngine import (
-    LivenessOneShotRGBEstimation,  # pylint: disable=E0611,E0401
-    ILivenessOneShotRGBEstimatorPtr,
-    LivenessOneShotState,
-    FSDKErrorResult,
-)
+from FaceEngine import LivenessOneShotRGBEstimation  # pylint: disable=E0611,E0401
+from FaceEngine import FSDKErrorResult, LivenessOneShotState
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.base import BaseEstimation
@@ -140,17 +136,25 @@ class LivenessV1Estimator(BaseEstimator):
     Liveness estimator version 1 (LivenessOneShotRGBEstimator).
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: ILivenessOneShotRGBEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
+    @overload  # type: ignore
+    def estimate(
+        self,
+        faceDetection: FaceDetection,
+        qualityThreshold: Optional[float] = None,
+        asyncEstimate: Literal[False] = False,
+    ) -> LivenessV1:
+        ...
+
+    @overload
+    def estimate(
+        self,
+        faceDetection: FaceDetection,
+        qualityThreshold: Optional[float] = None,
+        asyncEstimate: Literal[True],
+    ) -> AsyncTask[LivenessV1]:
+        ...
+
     def estimate(  # type: ignore
         self,
         faceDetection: FaceDetection,

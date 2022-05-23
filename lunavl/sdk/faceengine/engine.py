@@ -36,6 +36,13 @@ from ..estimators.image_estimators.orientation_mode import OrientationModeEstima
 from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from ..indexes.builder import IndexBuilder
+from ..launch_options import DeviceClass, LaunchOptions
+
+
+def _getLaunchOptions(launchOptions: Optional[LaunchOptions]) -> LaunchOptions:
+    if not launchOptions:
+        launchOptions = LaunchOptions()
+    return launchOptions
 
 
 class VLFaceEngine:
@@ -110,35 +117,59 @@ class VLFaceEngine:
             _license, pathToLicense if isinstance(pathToLicense, str) else (str(pathToLicense))
         )
 
-    def createFaceDetector(self, detectorType: DetectorType) -> FaceDetector:
+    def createFaceDetector(
+        self, detectorType: DetectorType, launchOptions: Optional[LaunchOptions] = None
+    ) -> FaceDetector:
         """
         Create face detector.
 
         Args:
-            detectorType: detector type
+            detectorType: detector type.
+            launchOptions: estimator launch options
 
         Returns:
             detector
         """
-        return FaceDetector(self._faceEngine.createDetector(detectorType.coreDetectorType), detectorType)
+        if not launchOptions:
+            launchOptions = LaunchOptions()
+        return FaceDetector(
+            self._faceEngine.createDetector(
+                detectorType.coreDetectorType, launchOptions=launchOptions.coreLaunchOptions
+            ),
+            detectorType,
+            launchOptions,
+        )
 
-    def createHeadPoseEstimator(self) -> HeadPoseEstimator:
+    def createHeadPoseEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> HeadPoseEstimator:
         """
-        Create head pose estimator
+        Create head pose estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return HeadPoseEstimator(self._faceEngine.createHeadPoseEstimator())
+        if not launchOptions:
+            launchOptions = LaunchOptions(DeviceClass.gpu)
+        return HeadPoseEstimator(
+            self._faceEngine.createHeadPoseEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createWarpQualityEstimator(self) -> WarpQualityEstimator:
+    def createWarpQualityEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> WarpQualityEstimator:
         """
         Create an image quality estimator
 
+        Args:
+            launchOptions: estimator launch options.
+
         Returns:
             estimator
         """
-        return WarpQualityEstimator(self._faceEngine.createQualityEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return WarpQualityEstimator(
+            self._faceEngine.createQualityEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
     def createFaceWarper(self) -> FaceWarper:
         """
@@ -149,72 +180,114 @@ class VLFaceEngine:
         """
         return FaceWarper(self._faceEngine.createWarper())
 
-    def createEmotionEstimator(self) -> EmotionsEstimator:
+    def createEmotionEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> EmotionsEstimator:
         """
-        Create emotions estimator
+        Create emotions estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return EmotionsEstimator(self._faceEngine.createEmotionsEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return EmotionsEstimator(
+            self._faceEngine.createEmotionsEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createMouthEstimator(self) -> MouthStateEstimator:
+    def createMouthEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> MouthStateEstimator:
         """
-        Create mouth state estimator
+        Create mouth state estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return MouthStateEstimator(self._faceEngine.createMouthEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return MouthStateEstimator(
+            self._faceEngine.createMouthEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createEyeEstimator(self) -> EyeEstimator:
+    def createEyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> EyeEstimator:
         """
-        Create eyes estimator
+        Create eyes estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return EyeEstimator(self._faceEngine.createEyeEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return EyeEstimator(
+            self._faceEngine.createEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createGazeEstimator(self) -> GazeEstimator:
+    def createGazeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> GazeEstimator:
         """
-        Create gaze direction estimator
+        Create gaze direction estimator.
+
+        Args:
+            launchOptions: estimator launch options.
 
         Returns:
             estimator
         """
-        return GazeEstimator(self._faceEngine.createGazeEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return GazeEstimator(
+            self._faceEngine.createGazeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createBasicAttributesEstimator(self) -> BasicAttributesEstimator:
+    def createBasicAttributesEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> BasicAttributesEstimator:
         """
-        Create basic attributes estimator (age, gender, ethnicity)
+        Create basic attributes estimator (age, gender, ethnicity).
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return BasicAttributesEstimator(self._faceEngine.createAttributeEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return BasicAttributesEstimator(
+            self._faceEngine.createAttributeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createAGSEstimator(self) -> AGSEstimator:
+    def createAGSEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> AGSEstimator:
         """
         Approximate garbage score estimator
 
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return AGSEstimator(self._faceEngine.createAGSEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return AGSEstimator(
+            self._faceEngine.createAGSEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createFaceDescriptorEstimator(self, descriptorVersion: int = 0) -> FaceDescriptorEstimator:
+    def createFaceDescriptorEstimator(
+        self, descriptorVersion: int = 0, launchOptions: Optional[LaunchOptions] = None
+    ) -> FaceDescriptorEstimator:
         """
         Approximate garbage score estimator
 
         Args:
             descriptorVersion: descriptor version to init estimator for or zero for use default descriptor version
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
+        launchOptions = _getLaunchOptions(launchOptions)
         return FaceDescriptorEstimator(
-            self._faceEngine.createExtractor(descriptorVersion), self.createFaceDescriptorFactory(descriptorVersion)
+            self._faceEngine.createExtractor(descriptorVersion, launchOptions=launchOptions.coreLaunchOptions),
+            self.createFaceDescriptorFactory(descriptorVersion),
+            launchOptions,
         )
 
     def createFaceDescriptorFactory(self, descriptorVersion: int = 0) -> FaceDescriptorFactory:
@@ -249,13 +322,20 @@ class VLFaceEngine:
         """
         return self._faceEngine
 
-    def createHumanDetector(self) -> HumanDetector:
+    def createHumanDetector(self, launchOptions: Optional[LaunchOptions] = None) -> HumanDetector:
         """
         Create human detector.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             detector
         """
-        return HumanDetector(self._faceEngine.createHumanDetector())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return HumanDetector(
+            self._faceEngine.createHumanDetector(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
     def createHumanWarper(self) -> HumanWarper:
         """
@@ -279,51 +359,88 @@ class VLFaceEngine:
         """
         return HumanDescriptorFactory(self, descriptorVersion=descriptorVersion)
 
-    def createHumanDescriptorEstimator(self, descriptorVersion: int = DHDV) -> HumanDescriptorEstimator:
+    def createHumanDescriptorEstimator(
+        self, descriptorVersion: int = DHDV, launchOptions: Optional[LaunchOptions] = None
+    ) -> HumanDescriptorEstimator:
         """
-        Create human descriptor estimator
+        Create human descriptor estimator.
+
+        Args:
+            launchOptions: estimator launch options
+            descriptorVersion: human descriptor version
 
         Returns:
             estimator
         """
+        launchOptions = _getLaunchOptions(launchOptions)
         return HumanDescriptorEstimator(
-            self._faceEngine.createExtractor(descriptorVersion), self.createHumanDescriptorFactory(descriptorVersion)
+            self._faceEngine.createExtractor(descriptorVersion, launchOptions=launchOptions.coreLaunchOptions),
+            self.createHumanDescriptorFactory(descriptorVersion),
+            launchOptions,
         )
 
-    def createMaskEstimator(self) -> MaskEstimator:
+    def createMaskEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> MaskEstimator:
         """
-        Create an medical mask estimator
+        Create an medical mask estimator.
+
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return MaskEstimator(self._faceEngine.createMedicalMaskEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return MaskEstimator(
+            self._faceEngine.createMedicalMaskEstimator(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
+        )
 
-    def createGlassesEstimator(self) -> GlassesEstimator:
+    def createGlassesEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> GlassesEstimator:
         """
         Create a glasses estimator.
 
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return GlassesEstimator(self._faceEngine.createGlassesEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return GlassesEstimator(
+            self._faceEngine.createGlassesEstimator(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
+        )
 
-    def createLivenessV1Estimator(self) -> LivenessV1Estimator:
+    def createLivenessV1Estimator(self, launchOptions: Optional[LaunchOptions] = None) -> LivenessV1Estimator:
         """
         Create an one shot liveness estimator.
-        Returns:
-            estimator
-        """
-        return LivenessV1Estimator(self._faceEngine.createLivenessOneShotRGBEstimator())
 
-    def createOrientationModeEstimator(self) -> OrientationModeEstimator:
-        """
-        Create an orientation mode estimator
+        Args:
+            launchOptions: estimator launch options
 
         Returns:
             estimator
         """
-        return OrientationModeEstimator(self._faceEngine.createOrientationEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return LivenessV1Estimator(
+            self._faceEngine.createLivenessOneShotRGBEstimator(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
+        )
+
+    def createOrientationModeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> OrientationModeEstimator:
+        """
+        Create an orientation mode estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
+        Returns:
+            estimator
+        """
+        launchOptions = _getLaunchOptions(launchOptions)
+        return OrientationModeEstimator(
+            self._faceEngine.createOrientationEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
     def createIndexBuilder(self, descriptorVersion: int = 0, capacity: int = 0) -> IndexBuilder:
         """
@@ -331,71 +448,132 @@ class VLFaceEngine:
         Args:
             descriptorVersion: descriptor version, or zero if default should be used
             capacity: index capacity, or zero if default should be used
+
         Returns:
             index builder
         """
         return IndexBuilder(self._faceEngine, descriptorVersion=descriptorVersion, capacity=capacity)
 
-    def createCredibilityEstimator(self) -> CredibilityEstimator:
+    def createCredibilityEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> CredibilityEstimator:
         """
         Create a credibility estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return CredibilityEstimator(self._faceEngine.createCredibilityCheckEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return CredibilityEstimator(
+            self._faceEngine.createCredibilityCheckEstimator(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
+        )
 
-    def createEyebrowExpressionEstimator(self) -> EyebrowExpressionEstimator:
+    def createEyebrowExpressionEstimator(
+        self, launchOptions: Optional[LaunchOptions] = None
+    ) -> EyebrowExpressionEstimator:
         """
         Create a eyebrow expression estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return EyebrowExpressionEstimator(self._faceEngine.createEyeBrowEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return EyebrowExpressionEstimator(
+            self._faceEngine.createEyeBrowEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createHeadwearEstimator(self) -> HeadwearEstimator:
+    def createHeadwearEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> HeadwearEstimator:
         """
         Create a headwear estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return HeadwearEstimator(self._faceEngine.createHeadWearEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return HeadwearEstimator(
+            self._faceEngine.createHeadWearEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createFaceNaturalLightEstimator(self) -> FaceNaturalLightEstimator:
+    def createFaceNaturalLightEstimator(
+        self, launchOptions: Optional[LaunchOptions] = None
+    ) -> FaceNaturalLightEstimator:
         """
         Create a face natural light estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return FaceNaturalLightEstimator(self._faceEngine.createNaturalLightEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return FaceNaturalLightEstimator(
+            self._faceEngine.createNaturalLightEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createRedEyeEstimator(self) -> RedEyesEstimator:
+    def createRedEyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> RedEyesEstimator:
         """
         Create a red-eye estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
         Returns:
             estimator
         """
-        return RedEyesEstimator(self._faceEngine.createRedEyeEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return RedEyesEstimator(
+            self._faceEngine.createRedEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createFisheyeEstimator(self) -> FisheyeEstimator:
+    def createFisheyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FisheyeEstimator:
         """
         Create a fisheye effect estimator.
+
+        Args:
+            launchOptions: estimator launch options
         Returns:
             estimator
         """
-        return FisheyeEstimator(self._faceEngine.createFishEyeEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return FisheyeEstimator(
+            self._faceEngine.createFishEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createFaceDetectionBackgroundEstimator(self) -> FaceDetectionBackgroundEstimator:
+    def createFaceDetectionBackgroundEstimator(
+        self, launchOptions: Optional[LaunchOptions] = None
+    ) -> FaceDetectionBackgroundEstimator:
         """
         Create a face background estimator.
+
+        Args:
+            launchOptions: estimator launch options
         Returns:
             estimator
         """
-        return FaceDetectionBackgroundEstimator(self._faceEngine.createBackgroundEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return FaceDetectionBackgroundEstimator(
+            self._faceEngine.createBackgroundEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
 
-    def createImageColorTypeEstimator(self) -> ImageColorTypeEstimator:
+    def createImageColorTypeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> ImageColorTypeEstimator:
         """
         Create a image color type estimator.
+
+        Args:
+            launchOptions: estimator launch options
         Returns:
             estimator
         """
-        return ImageColorTypeEstimator(self._faceEngine.createBlackWhiteEstimator())
+        launchOptions = _getLaunchOptions(launchOptions)
+        return ImageColorTypeEstimator(
+            self._faceEngine.createBlackWhiteEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )

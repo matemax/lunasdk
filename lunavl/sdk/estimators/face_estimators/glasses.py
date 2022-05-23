@@ -3,15 +3,15 @@
 See `warp quality`_.
 """
 from enum import Enum
-from typing import Union, Dict, List
+from typing import Dict, List, Literal, Union, overload
 
-from FaceEngine import GlassesEstimation, IGlassesEstimatorPtr
+from FaceEngine import GlassesEstimation
 
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
+from ...base import BaseEstimation
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
-from ...base import BaseEstimation
 
 
 class GlassesState(Enum):
@@ -89,16 +89,15 @@ class GlassesEstimator(BaseEstimator):
     Warp glasses estimator.
     """
 
-    def __init__(self, glassesEstimator: IGlassesEstimatorPtr):
-        """
-        Init.
+    @overload  # type: ignore
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[False] = False) -> Glasses:
+        ...
 
-        Args:
-            glassesEstimator: core glasses estimator
-        """
-        super().__init__(glassesEstimator)
+    @overload
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[True]) -> AsyncTask[Glasses]:
+        ...
 
-    def estimate(
+    def estimate(  # type: ignore
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[Glasses, AsyncTask[Glasses]]:
         """

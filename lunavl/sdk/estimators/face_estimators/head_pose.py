@@ -4,15 +4,16 @@ Module contains a head pose estimator.
 See `head pose`_.
 """
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List, Literal, Union, overload
 
-from FaceEngine import IHeadPoseEstimatorPtr, HeadPoseEstimation, FrontalFaceType  # pylint: disable=E0611,E0401
+from FaceEngine import FrontalFaceType, HeadPoseEstimation  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from lunavl.sdk.detectors.facedetector import Landmarks68, FaceDetection
+from lunavl.sdk.detectors.facedetector import FaceDetection, Landmarks68
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator, ImageWithFaceDetection
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class FrontalType(Enum):
@@ -120,16 +121,6 @@ class HeadPoseEstimator(BaseEstimator):
     HeadPoseEstimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreHeadPoseEstimator: IHeadPoseEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreHeadPoseEstimator: core estimator
-        """
-        super().__init__(coreHeadPoseEstimator)
-
     def estimateBy68Landmarks(
         self, landmarks68: Landmarks68, asyncEstimate: bool = False
     ) -> Union[HeadPose, AsyncTask[HeadPose]]:
@@ -159,6 +150,18 @@ class HeadPoseEstimator(BaseEstimator):
         Realize interface of a abstract  estimator. Call estimateBy68Landmarks
         """
         return self.estimateBy68Landmarks(landmarks68, asyncEstimate=asyncEstimate)
+
+    @overload
+    def estimateByBoundingBox(
+        self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: Literal[False] = False
+    ) -> HeadPose:
+        ...
+
+    @overload
+    def estimateByBoundingBox(
+        self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: Literal[True]
+    ) -> AsyncTask[HeadPose]:
+        ...
 
     def estimateByBoundingBox(
         self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False

@@ -3,15 +3,16 @@
 see `mouth state`_
 """
 from enum import Enum
-from typing import Union, Dict, List
+from typing import Dict, List, Literal, Union, overload
 
-from FaceEngine import MouthEstimation, IMouthEstimatorPtr, SmileType as CoreSmileType  # pylint: disable=E0611,E0401
+from FaceEngine import MouthEstimation, SmileType as CoreSmileType  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class SmileTypeEnum(Enum):
@@ -144,7 +145,7 @@ class MouthStates(BaseEstimation):
         """
         return self._coreEstimation.occluded
 
-    def asDict(self) -> Dict[str, float]:
+    def asDict(self) -> Dict:
         """ Convert to dict."""
         return {
             "opened": self.opened,
@@ -162,15 +163,13 @@ class MouthStateEstimator(BaseEstimator):
     Mouth state estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: IMouthEstimatorPtr):
-        """
-        Init.
+    @overload  # type: ignore
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[False] = False) -> MouthStates:
+        ...
 
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
+    @overload
+    def estimate(self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: Literal[True]) -> AsyncTask[MouthStates]:
+        ...
 
     #  pylint: disable=W0221
     def estimate(

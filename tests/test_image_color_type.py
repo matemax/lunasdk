@@ -1,4 +1,4 @@
-from lunavl.sdk.estimators.face_estimators.image_type import ImageColorType, ImageColorSchema
+from lunavl.sdk.estimators.face_estimators.image_type import ImageColorSchema, ImageColorType
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass

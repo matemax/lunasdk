@@ -1,12 +1,12 @@
-from typing import NamedTuple, List, Any, Dict, Union, Tuple
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
-from FaceEngine import Rect as CoreRectI, Detection, Image as CoreImage, FSDKError  # pylint: disable=E0611,E0401
+from FaceEngine import Detection, FSDKError, Image as CoreImage, Rect as CoreRectI  # pylint: disable=E0611,E0401
 
 from ..base import BaseEstimation, BoundingBox
 from ..errors.errors import LunaVLError
 from ..errors.exceptions import LunaSDKException
 from ..image_utils.geometry import Rect
-from ..image_utils.image import VLImage, ColorFormat
+from ..image_utils.image import ColorFormat, VLImage
 
 
 class ImageForDetection(NamedTuple):

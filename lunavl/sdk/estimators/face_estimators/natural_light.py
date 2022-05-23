@@ -2,19 +2,19 @@
 
 See face_natural_light_.
 """
-from typing import Union, List
+from typing import List, Union
 
-from FaceEngine import (
-    INaturalLightEstimatorPtr,
+from FaceEngine import (  # pylint: disable=E0611,E0401
     LightStatus as LightStatusCore,
     NaturalLightEstimation as NaturalLightEstimationCore,
-)  # pylint: disable=E0611,E0401
+)
 
 from lunavl.sdk.base import BaseEstimation
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
 
 
 class FaceNaturalLight(BaseEstimation):
@@ -75,18 +75,8 @@ class FaceNaturalLightEstimator(BaseEstimator):
     Face natural light estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, coreEstimator: INaturalLightEstimatorPtr):
-        """
-        Init.
-
-        Args:
-            coreEstimator: core estimator
-        """
-        super().__init__(coreEstimator)
-
     #  pylint: disable=W0221
-    def estimate(
+    def estimate(  # type: ignore
         self, warp: Union[FaceWarp, FaceWarpedImage], asyncEstimate: bool = False
     ) -> Union[FaceNaturalLight, AsyncTask[FaceNaturalLight]]:
         """

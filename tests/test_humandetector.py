@@ -5,19 +5,19 @@ from lunavl.sdk.detectors.humandetector import HumanDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
-from lunavl.sdk.image_utils.image import VLImage, ColorFormat
-from tests.detect_test_class import HumanDetectTestClass
+from lunavl.sdk.image_utils.image import ColorFormat, VLImage
 from tests.detect_test_class import (
-    VLIMAGE_ONE_FACE,
-    GOOD_AREA,
-    VLIMAGE_SEVERAL_FACE,
     AREA_WITHOUT_FACE,
+    GOOD_AREA,
     OUTSIDE_AREA,
-    VLIMAGE_SMALL,
     VLIMAGE_BAD_IMAGE,
+    VLIMAGE_ONE_FACE,
+    VLIMAGE_SEVERAL_FACE,
+    VLIMAGE_SMALL,
+    HumanDetectTestClass,
 )
-from tests.resources import ONE_FACE, MANY_FACES, NO_FACES
-from tests.schemas import jsonValidator, REQUIRED_HUMAN_BODY_DETECTION, LANDMARKS17
+from tests.resources import MANY_FACES, NO_FACES, ONE_FACE
+from tests.schemas import LANDMARKS17, REQUIRED_HUMAN_BODY_DETECTION, jsonValidator
 
 
 class TestHumanDetector(HumanDetectTestClass):

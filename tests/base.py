@@ -1,10 +1,10 @@
 import unittest
 from operator import attrgetter
-from typing import Dict, Any, Type
+from typing import Any, Dict, Type
 
 import numpy as np
-from PIL import Image
 from _pytest._code import ExceptionInfo
+from PIL import Image
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.errors.errors import ErrorInfo

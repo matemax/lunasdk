@@ -3,20 +3,20 @@
 See `warp quality`_.
 """
 from enum import Enum
-from typing import Union, Dict, List
+from typing import Dict, List, Literal, Union, overload
 
-from FaceEngine import (
-    MedicalMaskEstimation,
-    IMedicalMaskEstimatorPtr,
+from FaceEngine import (  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
     MedicalMask as CoreMask,
-)  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
+    MedicalMaskEstimation,
+)
 
 from lunavl.sdk.detectors.facedetector import FaceDetection
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
+from ...base import BaseEstimation
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
-from ...base import BaseEstimation
 
 
 class MaskState(Enum):
@@ -145,16 +145,19 @@ class MaskEstimator(BaseEstimator):
     Warp mask estimator.
     """
 
-    #  pylint: disable=W0235
-    def __init__(self, maskEstimator: IMedicalMaskEstimatorPtr):
-        """
-        Init.
-        Args:
-            maskEstimator: core mask estimator
-        """
-        super().__init__(maskEstimator)
-
     #  pylint: disable=W0221
+    @overload  # type: ignore
+    def estimate(
+        self, faceObject: Union[FaceWarpedImage, FaceWarp, FaceDetection], asyncEstimate: Literal[False] = False
+    ) -> Mask:  # type: ignore
+        ...
+
+    @overload
+    def estimate(
+        self, faceObject: Union[FaceWarpedImage, FaceWarp, FaceDetection], asyncEstimate: Literal[True]
+    ) -> AsyncTask[Mask]:
+        ...
+
     def estimate(
         self, faceObject: Union[FaceWarpedImage, FaceWarp, FaceDetection], asyncEstimate: bool = False
     ) -> Union[Mask, AsyncTask[Mask]]:
