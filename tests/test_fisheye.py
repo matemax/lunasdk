@@ -16,7 +16,7 @@ class TestFisheyeEffect(BaseTestClass):
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
         cls.fisheyeEstimator = cls.faceEngine.createFisheyeEstimator()
 
-    def test_estimate_face_natural_light_correctness(self):
+    def test_estimate_fisheye_correctness(self):
         """
         Test fisheye estimator correctness
         """
@@ -39,7 +39,7 @@ class TestFisheyeEffect(BaseTestClass):
         assert not estimation.status
         assert 0 <= estimation.score <= 1
 
-    def test_face_natural_light_as_dict(self):
+    def test_fisheye_as_dict(self):
         """
         Test method Fisheye.asDict
         """
@@ -49,7 +49,7 @@ class TestFisheyeEffect(BaseTestClass):
             "score": estimation.score,
         } == estimation.asDict()
 
-    def test_estimate_face_natural_light_batch(self):
+    def test_estimate_fisheye_batch(self):
         """
         Batch fisheye estimation test
         """

@@ -87,3 +87,24 @@ SQUINTING = getPathToImage("squinting.jpg")
 FROWNING = getPathToImage("frowning.jpg")
 # https://unsplash.com/photos/5xbCj_VWKcs
 RAISED = getPathToImage("raised.jpg")
+# https://unsplash.com/photos/rwCjbjaK-Zs
+BACKPACK = getPathToImage("backpack.jpg")
+# https://unsplash.com/photos/u73veL8JTbk
+T_SHORT = getPathToImage("t-short.jpg")
+# https://unsplash.com/photos/WhnbNX5yeJo
+LONG_SLEEVE = getPathToImage("long_sleeve.jpg")
+ANGER = getPathToImage("anger.jpg")
+# https://unsplash.com/photos/_3ykLzLhOhQ
+PINK = getPathToImage("pink.jpg")
+# https://unsplash.com/photos/nimElTcTNyY
+YELLOW = getPathToImage("yellow.jpg")
+# https://unsplash.com/photos/zeh5pg_7H1g
+BEIGE = getPathToImage("beige.jpg")
+# https://unsplash.com/photos/2rIs8OH5ng0
+BLACK = getPathToImage("black.jpg")
+# https://unsplash.com/photos/EgZW3jyDlCo
+KHAKI = getPathToImage("khaki.jpg")
+# https://unsplash.com/photos/KjDAe0dezaY
+COLORFUL = getPathToImage("colorful.jpg")
+# https://unsplash.com/photos/xgNSlx7DjYM
+RED = getPathToImage("red.jpg")

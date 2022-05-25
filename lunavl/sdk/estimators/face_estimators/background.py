@@ -6,10 +6,8 @@ See `background`_.
 from typing import Dict, List, Union
 
 from FaceEngine import (  # pylint: disable=E0611,E0401
-    IBackgroundEstimatorPtr,
-    BackgroundEstimation as CoreBackgroundEstimation,
     BackgroundStatus as CoreBackgroundStatus,
-    BackroundEstimation as CoreBackgroundEstimation,
+    BackgroundEstimation as CoreBackgroundEstimation,
 )
 
 from lunavl.sdk.base import BaseEstimation
@@ -68,7 +66,7 @@ class FaceDetectionBackground(BaseEstimation):
         return True if self._coreEstimation.status == CoreBackgroundStatus.Solid else False
 
     def asDict(self) -> Dict[str, Union[float, bool]]:
-        """Convert estimation to dict. """
+        """Convert estimation to dict."""
         return {"light_background": self.lightBackground, "status": self.status, "solid_color": self.solidColor}
 
 
