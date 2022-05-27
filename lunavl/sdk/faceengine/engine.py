@@ -40,12 +40,6 @@ from ..indexes.builder import IndexBuilder
 from ..launch_options import DeviceClass, LaunchOptions
 
 
-def _getLaunchOptions(launchOptions: Optional[LaunchOptions]) -> LaunchOptions:
-    if not launchOptions:
-        launchOptions = LaunchOptions()
-    return launchOptions
-
-
 class VLFaceEngine:
     """
     Wraper on FaceEngine.
@@ -107,6 +101,17 @@ class VLFaceEngine:
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
 
+    def getLaunchOptions(self, launchOptions: Optional[LaunchOptions]) -> LaunchOptions:
+        """
+        Get launch options. If launchOptions is none LaunchOptions will be generated based on the runtime settings.
+        """
+        if not launchOptions:
+            device = self.runtimeProvider.runtimeSettings.deviceClass
+            if device is None:
+                device = DeviceClass.cpu
+            launchOptions = LaunchOptions(deviceClass=device)
+        return launchOptions
+
     def activate(self, pathToLicense: Union[str, Path]):
         """
         Activate license
@@ -167,7 +172,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return WarpQualityEstimator(
             self._faceEngine.createQualityEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -191,7 +196,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return EmotionsEstimator(
             self._faceEngine.createEmotionsEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -206,7 +211,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return MouthStateEstimator(
             self._faceEngine.createMouthEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -221,7 +226,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return EyeEstimator(
             self._faceEngine.createEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -236,7 +241,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return GazeEstimator(
             self._faceEngine.createGazeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -251,7 +256,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return BasicAttributesEstimator(
             self._faceEngine.createAttributeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -266,7 +271,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return AGSEstimator(
             self._faceEngine.createAGSEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -284,7 +289,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return FaceDescriptorEstimator(
             self._faceEngine.createExtractor(descriptorVersion, launchOptions=launchOptions.coreLaunchOptions),
             self.createFaceDescriptorFactory(descriptorVersion),
@@ -333,7 +338,7 @@ class VLFaceEngine:
         Returns:
             detector
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return HumanDetector(
             self._faceEngine.createHumanDetector(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -373,7 +378,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return HumanDescriptorEstimator(
             self._faceEngine.createExtractor(descriptorVersion, launchOptions=launchOptions.coreLaunchOptions),
             self.createHumanDescriptorFactory(descriptorVersion),
@@ -390,7 +395,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return MaskEstimator(
             self._faceEngine.createMedicalMaskEstimator(launchOptions=launchOptions.coreLaunchOptions),
             launchOptions,
@@ -406,7 +411,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return GlassesEstimator(
             self._faceEngine.createGlassesEstimator(launchOptions=launchOptions.coreLaunchOptions),
             launchOptions,
@@ -422,7 +427,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return LivenessV1Estimator(
             self._faceEngine.createLivenessOneShotRGBEstimator(launchOptions=launchOptions.coreLaunchOptions),
             launchOptions,
@@ -438,7 +443,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return OrientationModeEstimator(
             self._faceEngine.createOrientationEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -465,7 +470,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return CredibilityEstimator(
             self._faceEngine.createCredibilityCheckEstimator(launchOptions=launchOptions.coreLaunchOptions),
             launchOptions,
@@ -483,7 +488,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return EyebrowExpressionEstimator(
             self._faceEngine.createEyeBrowEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -498,7 +503,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return HeadwearEstimator(
             self._faceEngine.createHeadWearEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -515,7 +520,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return FaceNaturalLightEstimator(
             self._faceEngine.createNaturalLightEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -530,7 +535,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return RedEyesEstimator(
             self._faceEngine.createRedEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -544,7 +549,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return FisheyeEstimator(
             self._faceEngine.createFishEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -560,7 +565,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return FaceDetectionBackgroundEstimator(
             self._faceEngine.createBackgroundEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -574,7 +579,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return ImageColorTypeEstimator(
             self._faceEngine.createBlackWhiteEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
@@ -588,7 +593,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        launchOptions = _getLaunchOptions(launchOptions)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return BodyAttributesEstimator(
             self._faceEngine.createHumanAttributeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
