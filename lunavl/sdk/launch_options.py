@@ -30,7 +30,7 @@ class LaunchOptions:
         self,
         deviceClass: Optional[DeviceClass] = None,
         deviceId: Optional[int] = None,
-        runConcurrently: Optional[bool] = None,
+        runConcurrently: bool = True,
     ):
         self._coreLaunchOptions = CoreFE.LaunchOptions()
         if deviceClass:
@@ -42,16 +42,26 @@ class LaunchOptions:
             device = CoreFE.DeviceClass.CPU_AVX2
         self._coreLaunchOptions.deviceClass = device
         if deviceId:
-            self._coreLaunchOptions.deviceClass = deviceId
-        if runConcurrently is not None:
-            self._coreLaunchOptions.runConcurrently = runConcurrently
-        else:
-            self._coreLaunchOptions.runConcurrently = True
+            self._coreLaunchOptions.deviceId = deviceId
+        self._coreLaunchOptions.runConcurrently = runConcurrently
 
     @property
     def deviceClass(self) -> DeviceClass:
         """Get device class"""
-        return DeviceClass(self._coreLaunchOptions.deviceClass.name.lower())
+        if self._coreLaunchOptions.deviceClass == CoreFE.DeviceClass.CPU_AVX2:
+            return DeviceClass.cpu
+        else:
+            return DeviceClass.gpu
+
+    @property
+    def runConcurrently(self) -> bool:
+        """Get runConcurrently"""
+        return self._coreLaunchOptions.runConcurrently
+
+    @property
+    def deviceId(self) -> int:
+        """Get runConcurrently"""
+        return self._coreLaunchOptions.deviceId
 
     @property
     def coreLaunchOptions(self) -> CoreFE.LaunchOptions:
