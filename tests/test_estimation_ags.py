@@ -57,7 +57,7 @@ class TestBasicAttributes(BaseTestClass):
         """
         Test batch estimation correctness with images.
         """
-        expectedAgsList = [0.96425, 1.000867]
+        expectedAgsList = [0.96425, 1.00085]
         result = self.estimator.estimateBatch(
             [
                 ImageWithFaceDetection(self.image1, self.detection1.boundingBox),
