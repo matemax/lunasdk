@@ -136,8 +136,7 @@ class VLFaceEngine:
         Returns:
             detector
         """
-        if not launchOptions:
-            launchOptions = LaunchOptions()
+        launchOptions = self.getLaunchOptions(launchOptions)
         return FaceDetector(
             self._faceEngine.createDetector(
                 detectorType.coreDetectorType, launchOptions=launchOptions.coreLaunchOptions
@@ -156,8 +155,7 @@ class VLFaceEngine:
         Returns:
             estimator
         """
-        if not launchOptions:
-            launchOptions = LaunchOptions(DeviceClass.gpu)
+        launchOptions = self.getLaunchOptions(launchOptions)
         return HeadPoseEstimator(
             self._faceEngine.createHeadPoseEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
