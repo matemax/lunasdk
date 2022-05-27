@@ -101,7 +101,7 @@ class VLFaceEngine:
         self._faceEngine.setSettingsProvider(self.faceEngineProvider.coreProvider)
         self._faceEngine.setRuntimeSettingsProvider(self.runtimeProvider.coreProvider)
 
-    def getLaunchOptions(self, launchOptions: Optional[LaunchOptions]) -> LaunchOptions:
+    def getLaunchOptions(self, launchOptions: Optional[LaunchOptions] = None) -> LaunchOptions:
         """
         Get launch options. If launchOptions is none LaunchOptions will be generated based on the runtime settings.
         """

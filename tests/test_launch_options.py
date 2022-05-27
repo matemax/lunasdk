@@ -39,4 +39,5 @@ class TestLaunchOptions(BaseTestClass):
     def test_launch_options_device_0(self):
         """Initialize launch options with deviceId=0"""
         lo = LaunchOptions(deviceId=0)
+        # 0 means - use default device id 
         assert -1 == lo.deviceId
