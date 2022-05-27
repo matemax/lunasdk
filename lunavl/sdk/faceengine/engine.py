@@ -10,6 +10,7 @@ from ..descriptors.descriptors import FaceDescriptorFactory, HumanDescriptorFact
 from ..descriptors.matcher import FaceMatcher
 from ..detectors.facedetector import FaceDetector
 from ..detectors.humandetector import HumanDetector
+from ..estimators.body_estimators.body_attributes import BodyAttributesEstimator
 from ..estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
 from ..estimators.body_estimators.humanwarper import HumanWarper
 from ..estimators.face_estimators.ags import AGSEstimator
@@ -576,4 +577,18 @@ class VLFaceEngine:
         launchOptions = _getLaunchOptions(launchOptions)
         return ImageColorTypeEstimator(
             self._faceEngine.createBlackWhiteEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
+
+    def createBodyAttributesEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> BodyAttributesEstimator:
+        """
+        Create a body attributes estimator.
+
+        Args:
+            launchOptions: estimator launch options
+        Returns:
+            estimator
+        """
+        launchOptions = _getLaunchOptions(launchOptions)
+        return BodyAttributesEstimator(
+            self._faceEngine.createHumanAttributeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )

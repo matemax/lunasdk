@@ -37,12 +37,16 @@ class LaunchOptions:
             if deviceClass == DeviceClass.gpu:
                 device = CoreFE.DeviceClass.GPU
             else:
-                device = CoreFE.DeviceClass.CPU
-            self._coreLaunchOptions.deviceClass = device
+                device = CoreFE.DeviceClass.CPU_AVX2
+        else:
+            device = CoreFE.DeviceClass.CPU_AVX2
+        self._coreLaunchOptions.deviceClass = device
         if deviceId:
             self._coreLaunchOptions.deviceClass = deviceId
         if runConcurrently is not None:
             self._coreLaunchOptions.runConcurrently = runConcurrently
+        else:
+            self._coreLaunchOptions.runConcurrently = True
 
     @property
     def deviceClass(self) -> DeviceClass:

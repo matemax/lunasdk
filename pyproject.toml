@@ -11,7 +11,7 @@ line_length = 120
 
 [tool.poetry]
 name = "lunavl"
-version = "0.3.3"
+version = "0.3.4"
 description = "Python interface for VisionLabs Luna platform"
 authors = ["VisionLabs <m.limonov@visionlabs.ru>"]
 repository = "https://github.com/matemax/lunasdk"
@@ -31,7 +31,7 @@ sphinx = ">=2.0.0"
 pytest = ">=4.4"
 pytest-subtests = "*"
 sphinx-autodoc-typehints = "*"
-pre-commit = "^1.18"
+pre-commit = "^2.19"
 
 black = {version = "^20.8b1",allow-prereleases = true}
 jsonschema = "^3.2.0"

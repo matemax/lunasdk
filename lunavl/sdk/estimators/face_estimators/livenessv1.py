@@ -150,7 +150,7 @@ class LivenessV1Estimator(BaseEstimator):
     def estimate(
         self,
         faceDetection: FaceDetection,
-        qualityThreshold: Optional[float] = None,
+        qualityThreshold: Optional[float],
         asyncEstimate: Literal[True],
     ) -> AsyncTask[LivenessV1]:
         ...
