@@ -101,8 +101,8 @@ class ApparentGender(BaseEstimation):
 
 class BackpackStateEnum(Enum):
     """Backpack state enum"""
-    
-    No = 0 # backpack not in place
+
+    No = 0  # backpack not in place
     Yes = 1  # backpack in place
     Unknown = 2  # unknown state
 
@@ -271,8 +271,8 @@ class HeawearState(BaseEstimation):
 
 class SleeveLength(Enum):
     """Sleeve length enum"""
-    
-    Short = 0 # short sleeve length
+
+    Short = 0  # short sleeve length
     Long = 1  # long sleeve length
     Unknown = 2  # unknown sleeve length
 
