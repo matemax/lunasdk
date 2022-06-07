@@ -124,7 +124,7 @@ class BackpackState(BaseEstimation):
     """
     Class for backpack state estimation.
 
-    Heawear state properties:
+    Headwear state properties:
 
         - yes
         - no
@@ -184,7 +184,7 @@ class BackpackState(BaseEstimation):
         }
 
 
-class HeawearStateEnum(Enum):
+class HeadwearStateEnum(Enum):
     """Headwear state enum"""
 
     No = 0  # headwear not in place
@@ -192,24 +192,24 @@ class HeawearStateEnum(Enum):
     Unknown = 2  # unknown state
 
     @classmethod
-    def fromCoreHeadwear(cls, coreHeadwear) -> "HeawearStateEnum":
+    def fromCoreHeadwear(cls, coreHeadwear) -> "HeadwearStateEnum":
         """
-        Get enum element by core heawear.
+        Get enum element by core headwear.
 
         Args:
-            coreHeadwear: core heawear state enum
+            coreHeadwear: core headwear state enum
 
         Returns:
-            corresponding heawear
+            corresponding headwear
         """
         return cls[coreHeadwear.name]
 
 
-class HeawearState(BaseEstimation):
+class HeadwearState(BaseEstimation):
     """
-    Class for Heawear state estimation.
+    Class for Headwear state estimation.
 
-    Heawear state properties:
+    Headwear state properties:
 
         - yes
         - no
@@ -248,9 +248,9 @@ class HeawearState(BaseEstimation):
         return self._coreEstimation.unknown
 
     @property
-    def predominantState(self) -> HeawearStateEnum:
+    def predominantState(self) -> HeadwearStateEnum:
         """Get headwear predominant state"""
-        return HeawearStateEnum.fromCoreHeadwear(self._coreEstimation.result)
+        return HeadwearStateEnum.fromCoreHeadwear(self._coreEstimation.result)
 
     def asDict(self) -> dict:
         """
@@ -438,7 +438,7 @@ class BodyAttributes(BaseEstimation):
         apparentGender (Optional[ApparentGender]): apparent gender markers such as physical build, voice, clothes,
           and hair
         backpack (Optional[BackpackState]): backpack state (yes, unknown or not)
-        headwear (Optional[HeawearState]): backpack state (yes, unknown or not)
+        headwear (Optional[HeadwearState]): backpack state (yes, unknown or not)
         outwearColor (Optional[OutwearColor]): outwear color list
         sleeve (Optional[Sleeve]): sleeve size estimation
 
@@ -467,7 +467,7 @@ class BodyAttributes(BaseEstimation):
         if not coreEstimation.headwear_opt.isValid():
             self.headwear = None
         else:
-            self.headwear = HeawearState(coreEstimation.headwear_opt.value())
+            self.headwear = HeadwearState(coreEstimation.headwear_opt.value())
 
         if not coreEstimation.outwearColor_opt.isValid():
             self.outwearColor = None
