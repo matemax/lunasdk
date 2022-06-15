@@ -70,4 +70,4 @@ class LaunchOptions:
 
     def __repr__(self) -> str:
         """Get representation"""
-        return f"deviceClass: {self.deviceClass}, deviceId: {self.deviceId}, runConcurrently: {self.runConcurrently}"
+        return f"deviceClass={self.deviceClass}, deviceId={self.deviceId}, runConcurrently={self.runConcurrently}"
