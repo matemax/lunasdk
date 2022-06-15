@@ -67,3 +67,7 @@ class LaunchOptions:
     def coreLaunchOptions(self) -> CoreFE.LaunchOptions:
         """Get core launch options"""
         return self._coreLaunchOptions
+
+    def __repr__(self) -> str:
+        """Get representation"""
+        return f"deviceClass: {self.deviceClass}, deviceId: {self.deviceId}, runConcurrently: {self.runConcurrently}"
