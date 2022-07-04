@@ -159,7 +159,7 @@ class TestHumanDetector(HumanDetectTestClass):
         detection = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE])
         self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
         assert 1 == len(detection)
-        assert 2 == len(detection[0]), f"Expected 2 faces, got {len(detection[0])}"
+        assert 5 == len(detection[0]), f"Expected 5 faces, got {len(detection[0])}"
 
     def test_batch_detect_of_multiple_images(self):
         """
@@ -169,7 +169,7 @@ class TestHumanDetector(HumanDetectTestClass):
         self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
         self.assertHumanDetection(detection[1], VLIMAGE_ONE_FACE)
         assert 2 == len(detection)
-        assert 2 == len(detection[0])
+        assert 5 == len(detection[0])
         assert 1 == len(detection[1])
 
     def test_get_landmarks_for_detect_one(self):

@@ -4,10 +4,10 @@ from lunavl.sdk.estimators.body_estimators.body_attributes import (
     BodyAttributes,
     OutwearColorEnum,
     SleeveLength,
-    HeawearStateEnum,
+    HeadwearStateEnum,
     ApparentGenderEnum,
     Sleeve,
-    HeawearState,
+    HeadwearState,
     OutwearColor,
     ApparentGender,
     BackpackState,
@@ -66,12 +66,14 @@ class TestBodyAttributes(BaseTestClass):
             OutwearColorEnum.White,
             OutwearColorEnum.Orange,
             OutwearColorEnum.Grey,
+            OutwearColorEnum.Yellow,
+            OutwearColorEnum.Red,
         }
         assert isinstance(estimation.sleeve, Sleeve)
         assert estimation.sleeve.predominantState == SleeveLength.Long
 
-        assert isinstance(estimation.headwear, HeawearState)
-        assert estimation.headwear.predominantState == HeawearStateEnum.No
+        assert isinstance(estimation.headwear, HeadwearState)
+        assert estimation.headwear.predominantState == HeadwearStateEnum.No
 
         assert isinstance(estimation.apparentGender, ApparentGender)
         assert estimation.apparentGender.predominantGender == ApparentGenderEnum.Female
@@ -188,9 +190,9 @@ class TestBodyAttributes(BaseTestClass):
     def test_headwear_correctness(self):
         """Headwear estimation correctness test"""
         cases = (
-            (HOOD, HeawearStateEnum.Yes),
-            (LONG_SLEEVE, HeawearStateEnum.No),
-            (PALETTE_MODE, HeawearStateEnum.Unknown),
+            (HOOD, HeadwearStateEnum.Yes),
+            (LONG_SLEEVE, HeadwearStateEnum.No),
+            (PALETTE_MODE, HeadwearStateEnum.Unknown),
         )
         for image, expectedLength in cases:
             with self.subTest(expectedLength):
