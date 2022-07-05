@@ -311,7 +311,7 @@ class TestHumanDetector(HumanDetectTestClass):
             for detection in batchDetect:
                 for human in detection:
                     assert human.boundingBox.asDict() == detectOne.boundingBox.asDict()
-                    # non stable
+                    # unstable
                     # assert human.landmarks17.asDict() == detectOne.landmarks17.asDict()
 
     def test_async_detect_human(self):
