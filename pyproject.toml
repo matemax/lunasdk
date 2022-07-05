@@ -32,6 +32,7 @@ pytest = ">=4.4"
 pytest-subtests = "*"
 sphinx-autodoc-typehints = "*"
 pre-commit = "^2.19"
+snakecase = "*"
 
 black = {version = "^20.8b1",allow-prereleases = true}
 jsonschema = "^3.2.0"
