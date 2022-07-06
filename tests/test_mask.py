@@ -129,7 +129,7 @@ class TestMask(BaseTestClass):
         cases = [
             TestCase(
                 "occluded_warp", self.warpImageOccluded, True, MaskProperties(0.409, 0.018, 0.573), None
-            ),  # TODO: bug
+            ),
             TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.373, 0.026, 0.600), None),
         ]
         for case in cases:
