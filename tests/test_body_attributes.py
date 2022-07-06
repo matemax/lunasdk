@@ -4,15 +4,16 @@ from lunavl.sdk.estimators.body_estimators.body_attributes import (
     BodyAttributes,
     OutwearColorEnum,
     SleeveLength,
-    HeawearStateEnum,
+    HeadwearStateEnum,
     ApparentGenderEnum,
     Sleeve,
-    HeawearState,
+    HeadwearState,
     OutwearColor,
     ApparentGender,
     BackpackState,
     BackpackStateEnum,
 )
+from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import (
@@ -36,6 +37,7 @@ from tests.resources import (
     PINK,
     BLACK,
     RED,
+    HUMAN_WARP,
 )
 
 
@@ -55,32 +57,29 @@ class TestBodyAttributes(BaseTestClass):
         """
         Test simple body attributes estimato
         """
-        estimation = self.estimate(ONE_FACE)[0]
+        estimation = self.bodyAttributesEstimator.estimate(HumanWarpedImage.load(filename=HUMAN_WARP))
+        assert isinstance(estimation, BodyAttributes)
 
         assert isinstance(estimation.outwearColor, OutwearColor)
         assert set(estimation.outwearColor.colors) == {
-            OutwearColorEnum.Blue,
-            OutwearColorEnum.Green,
-            OutwearColorEnum.Yellow,
-            OutwearColorEnum.Purple,
             OutwearColorEnum.White,
             OutwearColorEnum.Orange,
-            OutwearColorEnum.Grey,
+            OutwearColorEnum.Red,
         }
         assert isinstance(estimation.sleeve, Sleeve)
-        assert estimation.sleeve.predominantState == SleeveLength.Long
+        assert estimation.sleeve.predominantState == SleeveLength.Unknown
 
-        assert isinstance(estimation.headwear, HeawearState)
-        assert estimation.headwear.predominantState == HeawearStateEnum.No
+        assert isinstance(estimation.headwear, HeadwearState)
+        assert estimation.headwear.predominantState == HeadwearStateEnum.Unknown
 
         assert isinstance(estimation.apparentGender, ApparentGender)
         assert estimation.apparentGender.predominantGender == ApparentGenderEnum.Female
 
         assert isinstance(estimation.apparentAge, float)
-        assert round(estimation.apparentAge) == 44
+        assert round(estimation.apparentAge) == 14
 
         assert isinstance(estimation.backpack, BackpackState)
-        assert estimation.backpack.predominantState == BackpackStateEnum.No
+        assert estimation.backpack.predominantState == BackpackStateEnum.Unknown
 
     def estimate(self, image: str = ONE_FACE) -> List[BodyAttributes]:
         """Estimate body attributes on image"""
@@ -188,9 +187,9 @@ class TestBodyAttributes(BaseTestClass):
     def test_headwear_correctness(self):
         """Headwear estimation correctness test"""
         cases = (
-            (HOOD, HeawearStateEnum.Yes),
-            (LONG_SLEEVE, HeawearStateEnum.No),
-            (PALETTE_MODE, HeawearStateEnum.Unknown),
+            (HOOD, HeadwearStateEnum.Yes),
+            (LONG_SLEEVE, HeadwearStateEnum.No),
+            (PALETTE_MODE, HeadwearStateEnum.Unknown),
         )
         for image, expectedLength in cases:
             with self.subTest(expectedLength):

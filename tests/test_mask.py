@@ -42,13 +42,13 @@ class TestMask(BaseTestClass):
         cls.maskEstimator = cls.faceEngine.createMaskEstimator()
 
         cls.medicalMaskWarpNProperties = WarpNExpectedProperties(
-            FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK)), MaskProperties(0.000, 0.999, 0.000)
+            FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK)), MaskProperties(0.000, 0.884, 0.112)
         )
         cls.missingMaskWarpNProperties = WarpNExpectedProperties(
-            FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE)), MaskProperties(0.998, 0.002, 0.000)
+            FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE)), MaskProperties(0.821, 0.002, 0.178)
         )
         cls.occludedMaskWarpNProperties = WarpNExpectedProperties(
-            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.260, 0.669, 0.071)  # TODO: bug
+            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.409, 0.018, 0.572)
         )
         cls.imageMedicalMask = VLImage.load(filename=FULL_FACE_WITH_MASK)
         cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
@@ -75,12 +75,9 @@ class TestMask(BaseTestClass):
             actualPropertyResult = getattr(mask, propertyName)
             assert isinstance(actualPropertyResult, float), f"{propertyName} is not float"
             assert 0 <= actualPropertyResult <= 1, f"{propertyName} is out of range [0,1]"
-            self.assertAlmostEqual(
-                actualPropertyResult,
-                expectedEstimationResults[propertyName],
-                delta=0.005,
-                msg=f"property value '{propertyName}' is incorrect",
-            )
+            assert expectedEstimationResults[propertyName] == pytest.approx(
+                actualPropertyResult, abs=0.005
+            ), f"property value '{propertyName}' is incorrect"
 
     def test_estimate_mask_as_dict(self):
         """
@@ -96,8 +93,8 @@ class TestMask(BaseTestClass):
         Test mask estimations with mask exists on the face
         """
         cases = [
-            TestCase("medical_mask_warp", self.warpImageMedicalMask, True, MaskProperties(0.000, 0.999, 0.000), None),
-            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.000, 0.999, 0.000), None),
+            TestCase("medical_mask_warp", self.warpImageMedicalMask, True, MaskProperties(0.003, 0.884, 0.112), None),
+            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.026, 0.771, 0.203), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -113,8 +110,8 @@ class TestMask(BaseTestClass):
         Test mask estimations without mask on the face
         """
         cases = [
-            TestCase("no_mask_warp", self.warpImageMissing, True, MaskProperties(0.998, 0.002, 0.000), None),
-            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.974, 0.002, 0.0245), None),
+            TestCase("no_mask_warp", self.warpImageMissing, True, MaskProperties(0.821, 0.001, 0.178), None),
+            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.861, 0.001, 0.138), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -131,9 +128,9 @@ class TestMask(BaseTestClass):
         """
         cases = [
             TestCase(
-                "occluded_warp", self.warpImageOccluded, True, MaskProperties(0.260, 0.669, 0.071), None
-            ),  # TODO: bug
-            TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.000, 0.000, 1.000), None),
+                "occluded_warp", self.warpImageOccluded, True, MaskProperties(0.409, 0.018, 0.573), None
+            ),
+            TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.373, 0.026, 0.600), None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -167,7 +164,7 @@ class TestMask(BaseTestClass):
         """
         Test mask estimations without mask on the face
         """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.000, 0.000, 1.000), None)
+        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.572, 0.038, 0.389), None)
 
         faceDetection = self.detector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
