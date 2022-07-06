@@ -108,3 +108,9 @@ KHAKI = getPathToImage("khaki.jpg")
 COLORFUL = getPathToImage("colorful.jpg")
 # https://unsplash.com/photos/xgNSlx7DjYM
 RED = getPathToImage("red.jpg")
+# https://unsplash.com/photos/LL0Rdbcd8X4
+MASK_CHIN = getPathToImage("mask_chin.jpg")
+# https://free-images.com/display/doctor_medical_medicine_health.html
+MASK_MOUTH = getPathToImage("medical_mask_mouth.jpg")
+# https://unsplash.com/photos/uCpBPcdK0ew
+MASK_FULL = getPathToImage("balaclava.jpg")

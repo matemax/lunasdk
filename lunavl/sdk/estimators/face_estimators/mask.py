@@ -8,15 +8,131 @@ from typing import Dict, List, Literal, Union, overload
 from FaceEngine import (  # pylint: disable=E0611,E0401; pylint: disable=E0611,E0401
     MedicalMask as CoreMask,
     MedicalMaskEstimation,
+    DetailedMaskType,
 )
-
 from lunavl.sdk.detectors.facedetector import FaceDetection
 
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
-from ...base import BaseEstimation
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
+from ...base import BaseEstimation
+
+
+class FaceOcclusionState(Enum):
+    """
+    Face occlusion by a mask enum
+    """
+
+    # no mask on the face
+    Clear = "clear"
+    # clear face with a mask around of a chin, mask does not cover anything in the face region (from mouth to eyes)
+    Chin = "chin"
+    # correct mask on the face (mouth and nose are covered correctly)
+    Correct = "correct"
+    # mask covers only a mouth
+    Mouth = "mouth"
+    # face is covered with not a medical mask or a full mask
+    Partially = "partially"
+    # face is covered with a full face mask (such as balaclava, sky mask, etc.)
+    Full = "full"
+
+    @staticmethod
+    def fromCoreEmotion(coreFaceOcclusion: DetailedMaskType) -> "FaceOcclusionState":
+        """
+        Get enum element by core detailed mask type.
+
+        Args:
+            coreFaceOcclusion: enum value from core
+
+        Returns:
+            corresponding occlusion prediction
+        """
+        if coreFaceOcclusion == DetailedMaskType.CorrectMask:
+            return FaceOcclusionState.Correct
+        if coreFaceOcclusion == DetailedMaskType.MouthCoveredWithMask:
+            return FaceOcclusionState.Mouth
+        if coreFaceOcclusion == DetailedMaskType.ClearFace:
+            return FaceOcclusionState.Clear
+        if coreFaceOcclusion == DetailedMaskType.ClearFaceWithMaskUnderChin:
+            return FaceOcclusionState.Chin
+        if coreFaceOcclusion == DetailedMaskType.PartlyCoveredFace:
+            return FaceOcclusionState.Partially
+        if coreFaceOcclusion == DetailedMaskType.FullMask:
+            return FaceOcclusionState.Full
+        raise RuntimeError(f"bad core mask state {coreFaceOcclusion}")
+
+
+class _FaceOcclusion(BaseEstimation):
+    """
+    Face occlusion by a mask estimation
+
+    Estimation properties:
+
+        - clear
+        - chin
+        - correct
+        - mouth
+        - partially
+        - full
+
+    Attributes:
+        predominantOcclusion (FaceOcclusionState): predominant occlusion
+    """
+
+    #  pylint: disable=W0235
+    def __init__(self, scores: list[float], predominantOcclusion: DetailedMaskType):
+        """
+        Init.
+        Args:
+            mask: estimated mask
+        """
+        self.predominantOcclusion = FaceOcclusionState.fromCoreEmotion(predominantOcclusion)
+        super().__init__(scores)
+
+    @property
+    def clear(self) -> float:
+        """No mask on the face score"""
+        return self._coreEstimation[DetailedMaskType.ClearFace]
+
+    @property
+    def chin(self) -> float:
+        """Clear face with a mask around of a chin score"""
+        return self._coreEstimation[DetailedMaskType.ClearFaceWithMaskUnderChin]
+
+    @property
+    def correct(self) -> float:
+        """Correct mask wearing score"""
+        return self._coreEstimation[DetailedMaskType.CorrectMask]
+
+    @property
+    def mouth(self) -> float:
+        """Mask covers only a mouth score"""
+        return self._coreEstimation[DetailedMaskType.MouthCoveredWithMask]
+
+    @property
+    def partially(self) -> float:
+        """Partialy face occlusion score. Face is occluded by not mask"""
+        return self._coreEstimation[DetailedMaskType.PartlyCoveredFace]
+
+    @property
+    def full(self) -> float:
+        """Full face mask score"""
+        return self._coreEstimation[DetailedMaskType.FullMask]
+
+    def asDict(self) -> dict:
+        """Convert estimation to dict"""
+        return {
+            "predominant_occlusion": self.predominantOcclusion.value,
+            "estimations": {
+                "chin": self.chin,
+                "mouth": self.mouth,
+                "clear": self.clear,
+                "correct": self.correct,
+                "partially": self.partially,
+                "full": self.full,
+            },
+        }
 
 
 class MaskState(Enum):
@@ -68,6 +184,7 @@ class Mask(BaseEstimation):
             mask: estimated mask
         """
         super().__init__(mask)
+        self.faceOcclusion = _FaceOcclusion(mask.getScores(), mask.maskType)
 
     @property
     def medicalMask(self) -> float:
@@ -134,6 +251,7 @@ class Mask(BaseEstimation):
         return {
             "predominant_mask": predominantName,
             "estimations": {"medical_mask": self.medicalMask, "missing": self.missing, "occluded": self.occluded},
+            "face_occlusion": self.faceOcclusion.asDict(),
         }
 
 

@@ -7,7 +7,7 @@ from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
-from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator
+from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator, FaceOcclusionState, _FaceOcclusion
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -19,6 +19,9 @@ from tests.resources import (
     LARGE_IMAGE,
     OCCLUDED_FACE,
     WARP_CLEAN_FACE,
+    MASK_CHIN,
+    MASK_MOUTH,
+    MASK_FULL,
 )
 from tests.schemas import MASK_SCHEMA, jsonValidator
 
@@ -70,6 +73,8 @@ class TestMask(BaseTestClass):
             expectedEstimationResults: dictionary with probability scores
         """
         assert isinstance(mask, Mask), f"{mask.__class__} is not {Mask}"
+
+        assert isinstance(mask.faceOcclusion, _FaceOcclusion)
 
         for propertyName in expectedEstimationResults:
             actualPropertyResult = getattr(mask, propertyName)
@@ -127,9 +132,7 @@ class TestMask(BaseTestClass):
         Test mask estimations with face is occluded by other object
         """
         cases = [
-            TestCase(
-                "occluded_warp", self.warpImageOccluded, True, MaskProperties(0.409, 0.018, 0.573), None
-            ),
+            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.409, 0.018, 0.573), None),
             TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.373, 0.026, 0.600), None),
         ]
         for case in cases:
@@ -169,6 +172,31 @@ class TestMask(BaseTestClass):
         faceDetection = self.detector.detectOne(case.inputImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
         self.assertMaskEstimation(mask, case.expectedResult._asdict())
+
+    def test_estimate_face_occlusion_by_mask(self):
+        """
+        Test occlusion face by mask
+        """
+
+        TestCase = namedtuple("TestCase", ("occlusion", "image"))
+        cases = (
+            TestCase(FaceOcclusionState.Chin, MASK_CHIN),
+            TestCase(FaceOcclusionState.Mouth, MASK_MOUTH),
+            TestCase(FaceOcclusionState.Correct, FACE_WITH_MASK),
+            TestCase(FaceOcclusionState.Partially, OCCLUDED_FACE),
+            TestCase(FaceOcclusionState.Clear, WARP_CLEAN_FACE),
+            TestCase(FaceOcclusionState.Full, MASK_FULL),
+        )
+        warper = self.faceEngine.createFaceWarper()
+
+        for case in cases:
+            with self.subTest(case.occlusion):
+                detection = self.detector.detectOne(VLImage.load(filename=case.image))
+                warp = warper.warp(detection)
+                mask = self.maskEstimator.estimate(warp)
+                assert case.occlusion == mask.faceOcclusion.predominantOcclusion
+                # check that we use correct DetailedMaskType in score properties
+                assert getattr(mask.faceOcclusion, case.occlusion.name.lower()) > 0.4
 
     def test_async_estimate_mask(self):
         """
