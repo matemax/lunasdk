@@ -48,7 +48,7 @@ class TestMask(BaseTestClass):
             FaceWarpedImage(VLImage.load(filename=WARP_CLEAN_FACE)), MaskProperties(0.821, 0.002, 0.178)
         )
         cls.occludedMaskWarpNProperties = WarpNExpectedProperties(
-            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.409, 0.018, 0.572)  # TODO: bug
+            FaceWarpedImage(VLImage.load(filename=OCCLUDED_FACE)), MaskProperties(0.409, 0.018, 0.572)
         )
         cls.imageMedicalMask = VLImage.load(filename=FULL_FACE_WITH_MASK)
         cls.warpImageMedicalMask = FaceWarpedImage(VLImage.load(filename=FACE_WITH_MASK))
