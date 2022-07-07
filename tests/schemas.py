@@ -95,13 +95,38 @@ MASK_ESTIMATION_SCHEMA = {
     "required": ["medical_mask", "missing", "occluded"],
 }
 
+MASK_FACE_OCCLUSION_ESTIMATION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "full": TYPE_SCORE,
+        "clear": TYPE_SCORE,
+        "correct": TYPE_SCORE,
+        "partially": TYPE_SCORE,
+        "mouth": TYPE_SCORE,
+        "chin": TYPE_SCORE,
+    },
+    "additionalProperties": False,
+    "required": ["full", "clear", "correct", "partially", "mouth", "chin"],
+}
+
+MASK_FACE_OCCLUSION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "estimations": MASK_FACE_OCCLUSION_ESTIMATION_SCHEMA,
+        "predominant_occlusion": {"type": "string", "enum": ["full", "clear", "correct", "partially", "mouth", "chin"]},
+    },
+    "required": ["estimations", "predominant_occlusion"],
+    "additionalProperties": False,
+}
+
 MASK_SCHEMA = {
     "type": "object",
     "properties": {
         "estimations": MASK_ESTIMATION_SCHEMA,
         "predominant_mask": {"type": "string", "enum": ["medical_mask", "missing", "occluded"]},
+        "face_occlusion": MASK_FACE_OCCLUSION_SCHEMA,
     },
-    "required": ["estimations", "predominant_mask"],
+    "required": ["estimations", "predominant_mask", "face_occlusion"],
     "additionalProperties": False,
 }
 
