@@ -35,10 +35,8 @@ class TestFaceDetectionBackgroundEffect(BaseTestClass):
         Test background estimator correctness
         """
         estimation = self.estimate(MASK_CHIN)
-        self.assertEstimation(estimation)
         assert estimation.status
         estimation = self.estimate(ONE_FACE)
-        self.assertEstimation(estimation)
         assert not estimation.status
 
     def estimate(self, image: str = ONE_FACE) -> FaceDetectionBackground:
@@ -50,7 +48,7 @@ class TestFaceDetectionBackgroundEffect(BaseTestClass):
 
     def test_estimate_background(self):
         """
-        Simple fisheye estimation
+        Simple face detection background estimation
         """
         estimation = self.estimate(ONE_FACE)
         assert not estimation.status
