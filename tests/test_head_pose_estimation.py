@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 import pytest
-from FaceEngine import Detection, RectFloat
 
 from lunavl.sdk.base import BoundingBox
 from lunavl.sdk.detectors.facedetector import FaceDetection, FaceDetector
@@ -13,6 +12,8 @@ from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import FRONTAL_HEAD_POSE_FACE, GOST_HEAD_POSE_FACE, ONE_FACE, TURNED_HEAD_POSE_FACE
+
+from FaceEngine import Detection, RectFloat
 
 
 class TestHeadPose(BaseTestClass):
@@ -81,14 +82,14 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose by 68 landmarks test.
         """
-        angles = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(self.detection.landmarks68)
+        angles = self.headPoseEstimator.estimateBy68Landmarks(self.detection.landmarks68)
         self.assertHeadPose(angles)
 
     def test_estimate_head_pose_by_bounding_box(self):
         """
         Estimating head pose by bounding box test.
         """
-        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
+        angles = self.headPoseEstimator.estimateByBoundingBox(
             ImageWithFaceDetection(self.image, self.detection.boundingBox)
         )
         self.assertHeadPose(angles)
@@ -97,7 +98,7 @@ class TestHeadPose(BaseTestClass):
         """
         Estimating head pose on image without faces by bounding box from other image.
         """
-        angles = TestHeadPose.headPoseEstimator.estimateByBoundingBox(
+        angles = self.headPoseEstimator.estimateByBoundingBox(
             ImageWithFaceDetection(self.image, self.detection.boundingBox)
         )
         self.assertHeadPose(angles)
@@ -109,7 +110,7 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = Detection(RectFloat(3000.0, 3000.0, 100.0, 100.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
+            self.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidRect.format("Invalid rectangle"))
 
     def test_estimate_head_pose_by_image_and_bounding_box_empty_bounding_box(self):
@@ -119,15 +120,15 @@ class TestHeadPose(BaseTestClass):
         fakeDetection = Detection(RectFloat(0.0, 0.0, 0.0, 0.0), 0.9)
         bBox = BoundingBox(fakeDetection)
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHeadPose.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
+            self.headPoseEstimator.estimateByBoundingBox(ImageWithFaceDetection(self.image, bBox))
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidDetection.format("Invalid detection"))
 
     def test_default_estimation(self):
         """
         Default estimating head pose test.
         """
-        angles1 = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(self.detection.landmarks68)
-        angles2 = TestHeadPose.headPoseEstimator.estimate(self.detection.landmarks68)
+        angles1 = self.headPoseEstimator.estimateBy68Landmarks(self.detection.landmarks68)
+        angles2 = self.headPoseEstimator.estimate(self.detection.landmarks68)
         assert angles1.pitch == angles2.pitch
         assert angles1.roll == angles2.roll
         assert angles1.yaw == angles2.yaw
@@ -152,8 +153,8 @@ class TestHeadPose(BaseTestClass):
         )
         for case in cases:
             with self.subTest(type=case.type):
-                detection = TestHeadPose.detector.detectOne(case.image, detect5Landmarks=True, detect68Landmarks=True)
-                angles = TestHeadPose.headPoseEstimator.estimateBy68Landmarks(detection.landmarks68)
+                detection = self.detector.detectOne(case.image, detect5Landmarks=True, detect68Landmarks=True)
+                angles = self.headPoseEstimator.estimateBy68Landmarks(detection.landmarks68)
                 self.assertHeadPose(angles)
                 assert angles.getFrontalType() == case.type
 

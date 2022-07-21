@@ -40,11 +40,6 @@ class FaceDetectionBackground(BaseEstimation):
         super().__init__(coreBackground)
 
     @property
-    def backgroundColor(self) -> float:
-        """Background color score"""
-        return self._coreEstimation.backgroundColorScore
-
-    @property
     def solidColor(self) -> float:
         """Background solid color score, 1 - is uniform background, 0 - is non uniform"""
         return self._coreEstimation.backgroundScore
@@ -79,7 +74,7 @@ class FaceDetectionBackgroundEstimator(BaseEstimator):
     """
 
     def estimate(  # type: ignore
-        self, imageWithFaceDetection: ImageWithFaceDetection, asyncEstimate: bool = False
+        self, imageWithFaceDetection: Union[ImageWithFaceDetection, FaceDetection], asyncEstimate: bool = False
     ) -> Union[FaceDetectionBackground, AsyncTask[FaceDetectionBackground]]:
         """
         Estimate a face detection background.
