@@ -326,3 +326,13 @@ class TestIndexFunctionality(BaseTestClass):
         self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=1, expectedBufSize=1)
         result = dynamicIndex.search(self.nonDefaultFaceDescriptor)
         assert 1 == len(result), result
+
+    def test_async_search(self):
+        """Test async search result for descriptors."""
+        self.indexBuilder.appendBatch(self.faceDescriptorBatch)
+        dynamicIndex = self.indexBuilder.buildIndex()
+        self.assertDynamicIndex(dynamicIndex, expectedDescriptorCount=2, expectedBufSize=2)
+        task = dynamicIndex.search(self.faceDescriptor, len(self.faceDescriptorBatch), asyncSearch=True)
+        self.assertAsyncBatchEstimation(task, IndexResult)
+        result = task.get()
+        assert 2 == len(result), result
