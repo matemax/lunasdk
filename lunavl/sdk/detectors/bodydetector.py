@@ -30,7 +30,7 @@ from .base import (
 )
 
 
-def _createCoreHumans(image: ImageForRedetection) -> List[Human]:
+def _createCoreBodies(image: ImageForRedetection) -> List[Human]:
     """
     Create core humans for redetection
     Args:
@@ -63,7 +63,7 @@ class Landmarks17(LandmarksWithScore):
         super().__init__(coreLandmark17)
 
 
-class HumanDetection(BaseDetection):
+class BodyDetection(BaseDetection):
     """
     Attributes:
         landmarks17 (Optional[Landmarks17]): optional landmarks17
@@ -115,7 +115,7 @@ def createHumanDetection(image: VLImage, detection: Detection, landmarks17: Opti
     human.detection = detection
     if landmarks17:
         human.landmarks17_opt.set(landmarks17)
-    return HumanDetection(human, image)
+    return BodyDetection(human, image)
 
 
 def collectDetectionsResult(
@@ -123,7 +123,7 @@ def collectDetectionsResult(
     images: Union[List[Union[VLImage, ImageForDetection]], List[ImageForRedetection]],
     detectLandmarks: bool = True,
     isRedectResult: bool = False,
-) -> Union[List[List[HumanDetection]], List[List[Optional[HumanDetection]]]]:
+) -> Union[List[List[BodyDetection]], List[List[Optional[BodyDetection]]]]:
     """
     Collect detection results from core reply and prepare human detections
     Args:
@@ -156,9 +156,9 @@ def collectDetectionsResult(
     return res
 
 
-def postProcessingOne(error: FSDKErrorResult, detectRes, image: VLImage) -> Optional[HumanDetection]:
+def postProcessingOne(error: FSDKErrorResult, detectRes, image: VLImage) -> Optional[BodyDetection]:
     """
-    Convert a core human detection to `HumanDetection` after detect one and error check.
+    Convert a core human detection to `BodyDetection` after detect one and error check.
 
     Args:
         error: detection error, usually error.isError is False
@@ -191,9 +191,9 @@ def postProcessingOne(error: FSDKErrorResult, detectRes, image: VLImage) -> Opti
     return humanDetection
 
 
-def postProcessingRedetectOne(error: FSDKErrorResult, detectRes, image: VLImage) -> Optional[HumanDetection]:
+def postProcessingRedetectOne(error: FSDKErrorResult, detectRes, image: VLImage) -> Optional[BodyDetection]:
     """
-    Convert a core human detection to `HumanDetection` after redect and error check.
+    Convert a core human detection to `BodyDetection` after redect and error check.
 
     Args:
         error: detection error, usually error.isError is False
@@ -207,13 +207,13 @@ def postProcessingRedetectOne(error: FSDKErrorResult, detectRes, image: VLImage)
     """
     assertError(error)
     if detectRes.isValid():
-        return HumanDetection(detectRes, image)
+        return BodyDetection(detectRes, image)
     return None
 
 
 def postProcessing(
     error: FSDKErrorResult, fsdkDetectRes, images: List[Union[VLImage, ImageForDetection]], detectLandmarks: bool
-) -> List[List[HumanDetection]]:
+) -> List[List[BodyDetection]]:
     """
     Convert core human detections from detector results to `HumanDetection` and error check.
 
@@ -233,7 +233,7 @@ def postProcessing(
 
 def postProcessingRedect(
     error: FSDKErrorResult, fsdkDetectRes, images: List[ImageForRedetection], detectLandmarks: bool
-) -> List[List[Optional[HumanDetection]]]:
+) -> List[List[Optional[BodyDetection]]]:
     """
     Convert core human redetections from detector results to `HumanDetection` and error check.
 
@@ -252,16 +252,16 @@ def postProcessingRedect(
 
 
 # alias for detect one result
-DetectOneResult = Union[None, HumanDetection]
+DetectOneResult = Union[None, BodyDetection]
 # alias for detection result
-DetectResult = List[List[HumanDetection]]
+DetectResult = List[List[BodyDetection]]
 # alias for redection result
-RedetectBatchResult = List[List[Union[HumanDetection, None]]]
+RedetectBatchResult = List[List[Union[BodyDetection, None]]]
 # alias for redect one result
-RedetectResult = Union[None, HumanDetection]
+RedetectResult = Union[None, BodyDetection]
 
 
-class HumanDetector:
+class BodyDetector:
     """
     Human body detector.
 
@@ -363,7 +363,7 @@ class HumanDetector:
     def redetectOne(  # noqa: F811
         self,
         image: VLImage,
-        bBox: Union[Rect, HumanDetection],
+        bBox: Union[Rect, BodyDetection],
         detectLandmarks: bool = True,
         asyncEstimate=False,
     ) -> Union[RedetectResult, AsyncTask[RedetectResult]]:

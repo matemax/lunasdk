@@ -25,7 +25,7 @@ from tests.resources import WARP_CLEAN_FACE, WARP_ONE_FACE
 
 @dataclass
 class Eth:
-    """ Class for Ethnicities estimation. """
+    """Class for Ethnicities estimation."""
 
     class Predominant(str):
         def __eq__(self, other):
@@ -55,7 +55,7 @@ Estimation = namedtuple("Estimation", ("Age", "Gender", "Ethnicity"))
 
 
 class TestBasicAttributes(BaseTestClass):
-    """ Test basic attributes. """
+    """Test basic attributes."""
 
     # estimator to call
     estimator: BasicAttributesEstimator = BaseTestClass.faceEngine.createBasicAttributesEstimator()
@@ -67,7 +67,7 @@ class TestBasicAttributes(BaseTestClass):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """ Load warps. """
+        """Load warps."""
         cls._warp = FaceWarpedImage.load(filename=WARP_ONE_FACE)
         cls._warp2 = FaceWarpedImage.load(filename=WARP_CLEAN_FACE)
 

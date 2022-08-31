@@ -7,7 +7,13 @@ from lunavl.sdk.detectors.facedetector import FaceDetector
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
-from lunavl.sdk.estimators.face_estimators.mask import Mask, MaskEstimator, FaceOcclusionState, _FaceOcclusion
+from lunavl.sdk.estimators.face_estimators.mask import (
+    Mask,
+    MaskEstimator,
+    FaceOcclusionState,
+    _FaceOcclusion,
+    MaskState,
+)
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -20,8 +26,8 @@ from tests.resources import (
     OCCLUDED_FACE,
     WARP_CLEAN_FACE,
     MASK_CHIN,
-    MASK_MOUTH,
     MASK_FULL,
+    MASK_NOT_IN_PLACE,
 )
 from tests.schemas import MASK_SCHEMA, jsonValidator
 
@@ -93,30 +99,17 @@ class TestMask(BaseTestClass):
             jsonValidator(schema=MASK_SCHEMA).validate(maskDict) is None
         ), f"{maskDict} does not match with schema {MASK_SCHEMA}"
 
-    def test_estimate_medical_mask(self):
-        """
-        Test mask estimations with mask exists on the face
-        """
-        cases = [
-            TestCase("medical_mask_warp", self.warpImageMedicalMask, True, MaskProperties(0.003, 0.884, 0.112), None),
-            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskProperties(0.026, 0.771, 0.203), None),
-        ]
-        for case in cases:
-            with self.subTest(name=case.name):
-                if case.isWarp:
-                    mask = TestMask.maskEstimator.estimate(case.inputImage)
-                else:
-                    faceDetection = self.detector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(faceDetection)
-                self.assertMaskEstimation(mask, case.expectedResult._asdict())
-
-    def test_estimate_missing_mask(self):
+    def test_estimate_mask_correctness(self):
         """
         Test mask estimations without mask on the face
         """
         cases = [
-            TestCase("no_mask_warp", self.warpImageMissing, True, MaskProperties(0.821, 0.001, 0.178), None),
-            TestCase("no_mask_image", self.imageMissing, False, MaskProperties(0.861, 0.001, 0.138), None),
+            TestCase("no_mask_warp", self.warpImageMissing, True, MaskState.Missing, None),
+            TestCase("no_mask_image", self.imageMissing, False, MaskState.Missing, None),
+            TestCase("occluded_warp", self.warpImageOccluded, True, MaskState.Occluded, None),
+            TestCase("occluded_image", self.imageOccluded, False, MaskState.Occluded, None),
+            TestCase("medical_mask_warp", self.warpImageMedicalMask, True, MaskState.MedicalMask, None),
+            TestCase("medical_mask_image", self.imageMedicalMask, False, MaskState.MedicalMask, None),
         ]
         for case in cases:
             with self.subTest(name=case.name):
@@ -125,24 +118,7 @@ class TestMask(BaseTestClass):
                 else:
                     faceDetection = self.detector.detectOne(case.inputImage)
                     mask = TestMask.maskEstimator.estimate(faceDetection)
-                self.assertMaskEstimation(mask, case.expectedResult._asdict())
-
-    def test_estimate_mask_occluded(self):
-        """
-        Test mask estimations with face is occluded by other object
-        """
-        cases = [
-            TestCase("occluded_warp", self.warpImageOccluded, True, MaskProperties(0.409, 0.018, 0.573), None),
-            TestCase("occluded_image", self.imageOccluded, False, MaskProperties(0.373, 0.026, 0.600), None),
-        ]
-        for case in cases:
-            with self.subTest(name=case.name):
-                if case.isWarp:
-                    mask = TestMask.maskEstimator.estimate(case.inputImage)
-                else:
-                    faceDetection = self.detector.detectOne(case.inputImage)
-                    mask = TestMask.maskEstimator.estimate(faceDetection)
-                self.assertMaskEstimation(mask, case.expectedResult._asdict())
+                assert case.expectedResult == mask.predominateMask
 
     def test_estimate_mask_batch(self):
         """
@@ -163,15 +139,13 @@ class TestMask(BaseTestClass):
             self.maskEstimator.estimateBatch([])
         self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidSpanSize.format("Invalid span size"))
 
-    def test_estimate_missing_mask_large_image(self):
+    def test_estimate_mask_on_large_image(self):
         """
-        Test mask estimations without mask on the face
+        Test mask estimations on large image
         """
-        case = TestCase("no_mask_image", self.largeImage, False, MaskProperties(0.572, 0.038, 0.389), None)
-
-        faceDetection = self.detector.detectOne(case.inputImage)
+        faceDetection = self.detector.detectOne(self.largeImage)
         mask = TestMask.maskEstimator.estimate(faceDetection)
-        self.assertMaskEstimation(mask, case.expectedResult._asdict())
+        assert MaskState.Occluded == mask.predominateMask
 
     def test_estimate_face_occlusion_by_mask(self):
         """
@@ -181,7 +155,7 @@ class TestMask(BaseTestClass):
         TestCase = namedtuple("TestCase", ("occlusion", "image"))
         cases = (
             TestCase(FaceOcclusionState.Chin, MASK_CHIN),
-            TestCase(FaceOcclusionState.Mouth, MASK_MOUTH),
+            TestCase(FaceOcclusionState.Mouth, MASK_NOT_IN_PLACE),
             TestCase(FaceOcclusionState.Correct, FACE_WITH_MASK),
             TestCase(FaceOcclusionState.Partially, OCCLUDED_FACE),
             TestCase(FaceOcclusionState.Clear, WARP_CLEAN_FACE),

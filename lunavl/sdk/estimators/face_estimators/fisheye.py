@@ -51,7 +51,7 @@ class Fisheye(BaseEstimation):
         return True if self._coreEstimation.result == CoreFishEye.FishEyeEffect else False
 
     def asDict(self) -> Dict[str, Union[float, bool]]:
-        """Convert estimation to dict. """
+        """Convert estimation to dict."""
         return {"score": self.score, "status": self.status}
 
 

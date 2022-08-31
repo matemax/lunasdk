@@ -1,7 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForRedetection
-from lunavl.sdk.detectors.humandetector import HumanDetection
+from lunavl.sdk.detectors.bodydetector import BodyDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
@@ -12,13 +12,13 @@ from tests.detect_test_class import (
     VLIMAGE_ONE_FACE,
     VLIMAGE_SEVERAL_FACE,
     VLIMAGE_SMALL,
-    HumanDetectTestClass,
+    BodyDetectTestClass,
 )
 
 
-class TestsRedetectHuman(HumanDetectTestClass):
+class TestsRedetectBody(BodyDetectTestClass):
     """
-    Human redetection tests.
+    Human body redetection tests.
     """
 
     def test_redetect_one_with_bbox_option(self):
@@ -28,7 +28,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
 
         detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE)
         redetect = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection.boundingBox.rect)
-        self.assertHumanDetection(redetect, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_redetect_one_with_detection_option(self):
         """
@@ -36,7 +36,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         """
         detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE)
         redetect = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detection)
-        self.assertHumanDetection(redetect, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect_with_one_human(self):
         """
@@ -46,7 +46,7 @@ class TestsRedetectHuman(HumanDetectTestClass):
         redetect = self.detector.redetect(
             images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[detection.boundingBox.rect])]
         )[0]
-        self.assertHumanDetection(redetect, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(redetect, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect(self):
         """
@@ -63,8 +63,8 @@ class TestsRedetectHuman(HumanDetectTestClass):
         )
 
         assert 2 == len(redetect)
-        self.assertHumanDetection(redetect[0], VLIMAGE_SEVERAL_FACE)
-        self.assertHumanDetection(redetect[1], VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(redetect[0], VLIMAGE_SEVERAL_FACE)
+        self.assertBodyDetection(redetect[1], VLIMAGE_ONE_FACE)
         assert 5 == len(redetect[0])
         assert 1 == len(redetect[1])
 
@@ -129,14 +129,14 @@ class TestsRedetectHuman(HumanDetectTestClass):
         Test re-detection of one human in area outside image
         """
         redetectOne = self.detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=OUTSIDE_AREA)
-        self.assertHumanDetection(redetectOne, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(redetectOne, VLIMAGE_ONE_FACE)
 
     def test_batch_redetect_in_area_outside_image(self):
         """
         Test batch re-detection in area outside image
         """
         redetect = self.detector.redetect(images=[ImageForRedetection(image=VLIMAGE_ONE_FACE, bBoxes=[OUTSIDE_AREA])])
-        self.assertHumanDetection(redetect[0], VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(redetect[0], VLIMAGE_ONE_FACE)
 
     def test_async_redetect_human_body(self):
         """
@@ -145,8 +145,8 @@ class TestsRedetectHuman(HumanDetectTestClass):
         detector = self.detector
         detectOne = detector.detectOne(image=VLIMAGE_ONE_FACE)
         task = detector.redetectOne(image=VLIMAGE_ONE_FACE, bBox=detectOne, asyncEstimate=True)
-        self.assertAsyncEstimation(task, HumanDetection)
+        self.assertAsyncEstimation(task, BodyDetection)
         task = detector.redetect(
             [ImageForRedetection(VLIMAGE_ONE_FACE, [detectOne.boundingBox.rect])] * 2, asyncEstimate=True
         )
-        self.assertAsyncBatchEstimation(task, HumanDetection)
+        self.assertAsyncBatchEstimation(task, BodyDetection)

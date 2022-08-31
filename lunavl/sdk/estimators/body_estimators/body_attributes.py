@@ -8,7 +8,7 @@ from typing import List, Union, Iterable
 from FaceEngine import HumanAttributeRequest  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from .humanwarper import HumanWarpedImage, HumanWarp
+from .bodywarper import BodyWarpedImage, BodyWarp
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
 from ...async_task import AsyncTask, DefaultPostprocessingFactory
@@ -501,7 +501,7 @@ class BodyAttributesEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     def estimate(  # type: ignore
-        self, warp: Union[HumanWarp, HumanWarpedImage], asyncEstimate: bool = False
+        self, warp: Union[BodyWarp, BodyWarpedImage], asyncEstimate: bool = False
     ) -> Union[BodyAttributes, AsyncTask[BodyAttributes]]:
         """
         Estimate body attributes on warp.
@@ -523,7 +523,7 @@ class BodyAttributesEstimator(BaseEstimator):
 
     #  pylint: disable=W0221
     def estimateBatch(
-        self, warps: List[Union[HumanWarp, HumanWarpedImage]], asyncEstimate: bool = False
+        self, warps: List[Union[BodyWarp, BodyWarpedImage]], asyncEstimate: bool = False
     ) -> Union[List[BodyAttributes], AsyncTask[List[BodyAttributes]]]:
         """
         Batch estimate body attributes

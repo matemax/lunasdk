@@ -7,12 +7,12 @@ from FaceEngine import Image as CoreImage  # pylint: disable=E0611,E0401
 from numpy import ndarray
 from PIL.Image import Image as PilImage
 
-from lunavl.sdk.detectors.humandetector import HumanDetection
+from lunavl.sdk.detectors.bodydetector import BodyDetection
 from lunavl.sdk.errors.exceptions import assertError
 from lunavl.sdk.image_utils.image import ColorFormat, VLImage
 
 
-class HumanWarpedImage(VLImage):
+class BodyWarpedImage(VLImage):
     """
     Raw warped image.
     Properties of a warped image:
@@ -59,7 +59,7 @@ class HumanWarpedImage(VLImage):
 
     #  pylint: disable=W0221
     @classmethod
-    def load(cls, *, filename: Optional[str] = None, url: Optional[str] = None) -> "HumanWarpedImage":  # type: ignore
+    def load(cls, *, filename: Optional[str] = None, url: Optional[str] = None) -> "BodyWarpedImage":  # type: ignore
         """
         Load image from numpy array or file or url.
 
@@ -75,7 +75,7 @@ class HumanWarpedImage(VLImage):
         return warp
 
     @property
-    def warpedImage(self) -> "HumanWarpedImage":
+    def warpedImage(self) -> "BodyWarpedImage":
         """
         Property for compatibility with *Warp* for outside methods.
         Returns:
@@ -84,18 +84,18 @@ class HumanWarpedImage(VLImage):
         return self
 
 
-class HumanWarp:
+class BodyWarp:
     """
     Structure for storing warp.
 
     Attributes:
-        sourceDetection (HumanDetection): detection which generated warp
-        warpedImage (HumanWarpedImage):  warped image
+        sourceDetection (BodyDetection): detection which generated warp
+        warpedImage (BodyWarpedImage):  warped image
     """
 
     __slots__ = ["sourceDetection", "warpedImage"]
 
-    def __init__(self, warpedImage: HumanWarpedImage, sourceDetection: HumanDetection):
+    def __init__(self, warpedImage: BodyWarpedImage, sourceDetection: BodyDetection):
         """
         Init.
 
@@ -107,7 +107,7 @@ class HumanWarp:
         self.warpedImage = warpedImage
 
 
-class HumanWarper:
+class BodyWarper:
     """
     Class warper.
 
@@ -126,7 +126,7 @@ class HumanWarper:
         """
         self._coreWarper = coreWarper
 
-    def warp(self, humanDetection: HumanDetection) -> HumanWarp:
+    def warp(self, humanDetection: BodyDetection) -> BodyWarp:
         """
         Create warp from detection.
 
@@ -141,6 +141,6 @@ class HumanWarper:
         error, warp = self._coreWarper.warp(humanDetection.image.coreImage, humanDetection.coreEstimation.detection)
         assertError(error)
 
-        warpedImage = HumanWarpedImage(body=warp, filename=humanDetection.image.filename)
+        warpedImage = BodyWarpedImage(body=warp, filename=humanDetection.image.filename)
 
-        return HumanWarp(warpedImage, humanDetection)
+        return BodyWarp(warpedImage, humanDetection)

@@ -23,7 +23,7 @@ from tests.detect_test_class import (
     VLIMAGE_SMALL,
     FaceDetectTestClass,
 )
-from tests.resources import MANY_FACES, NO_FACES, ONE_FACE, WARP_CLEAN_FACE
+from tests.resources import MANY_FACES, ONE_FACE, WARP_CLEAN_FACE, BAD_IMAGE
 from tests.schemas import LANDMARKS5, REQUIRED_FACE_DETECTION, jsonValidator
 
 
@@ -163,7 +163,7 @@ class TestFaceDetector(FaceDetectTestClass):
         """
         Test detection of one face with image without faces
         """
-        imageWithoutFace = VLImage.load(filename=NO_FACES)
+        imageWithoutFace = VLImage.load(filename=BAD_IMAGE)
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 detection = detector.detectOne(image=imageWithoutFace)
@@ -173,7 +173,7 @@ class TestFaceDetector(FaceDetectTestClass):
         """
         Test batch face detection with image without faces
         """
-        imageWithoutFace = VLImage.load(filename=NO_FACES)
+        imageWithoutFace = VLImage.load(filename=BAD_IMAGE)
         for detector in self.detectors:
             with self.subTest(detectorType=detector.detectorType):
                 detection = detector.detect(images=[imageWithoutFace])

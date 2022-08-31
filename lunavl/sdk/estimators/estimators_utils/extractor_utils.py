@@ -9,7 +9,7 @@ from lunavl.sdk.descriptors.descriptors import BaseDescriptor, BaseDescriptorBat
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException, assertError
 
-from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
+from ..body_estimators.bodywarper import BodyWarp, BodyWarpedImage
 from ..face_estimators.facewarper import FaceWarp, FaceWarpedImage
 
 GenericDesciptor = TypeVar("GenericDesciptor", bound=BaseDescriptor)
@@ -85,7 +85,7 @@ def postProcessingBatchWithAggregation(
 
 
 def estimate(
-    warp: Union[HumanWarp, HumanWarpedImage, FaceWarp, FaceWarpedImage],
+    warp: Union[BodyWarp, BodyWarpedImage, FaceWarp, FaceWarpedImage],
     descriptorFactory: BaseDescriptorFactory,
     coreEstimator: IDescriptorExtractorPtr,
     descriptor: Optional[BaseDescriptor] = None,
@@ -143,7 +143,7 @@ def validateInputByBatchEstimator(estimator, *args):
 
 
 def estimateDescriptorsBatch(
-    warps: Union[List[Union[HumanWarp, HumanWarpedImage]], List[Union[FaceWarp, FaceWarpedImage]]],
+    warps: Union[List[Union[BodyWarp, BodyWarpedImage]], List[Union[FaceWarp, FaceWarpedImage]]],
     descriptorFactory: BaseDescriptorFactory,
     coreEstimator: IDescriptorExtractorPtr,
     aggregate: bool = False,

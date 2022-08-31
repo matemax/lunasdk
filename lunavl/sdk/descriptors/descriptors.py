@@ -291,29 +291,29 @@ class FaceDescriptorFactory(BaseDescriptorFactory):
     _descriptorFactory = FaceDescriptor
 
 
-class HumanDescriptor(BaseDescriptor):
+class BodyDescriptor(BaseDescriptor):
     """
-    Human Descriptor class
+    Body Descriptor class
     """
 
     pass
 
 
-class HumanDescriptorBatch(BaseDescriptorBatch):
+class BodyDescriptorBatch(BaseDescriptorBatch):
     """
-    Human descriptor batch.
+    Body descriptor batch.
     """
 
-    _descriptorFactory = HumanDescriptor
+    _descriptorFactory = BodyDescriptor
 
 
-class HumanDescriptorFactory(BaseDescriptorFactory):
+class BodyDescriptorFactory(BaseDescriptorFactory):
     """
-    Human Descriptor factory.
+    Body Descriptor factory.
     """
 
     def __init__(self, faceEngine: "VLFaceEngine", descriptorVersion: int = DHDV):  # type: ignore # noqa: F821
         super().__init__(faceEngine, descriptorVersion)
 
-    _descriptorBatchFactory = HumanDescriptorBatch
-    _descriptorFactory = HumanDescriptor
+    _descriptorBatchFactory = BodyDescriptorBatch
+    _descriptorFactory = BodyDescriptor

@@ -11,13 +11,13 @@ from lunavl.sdk.descriptors.descriptors import (
     BaseDescriptorBatch,
     FaceDescriptor,
     FaceDescriptorBatch,
-    HumanDescriptor,
-    HumanDescriptorBatch,
+    BodyDescriptor,
+    BodyDescriptorBatch,
 )
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
-from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarpedImage
+from lunavl.sdk.estimators.body_estimators.human_descriptor import BodyDescriptorEstimator
+from lunavl.sdk.estimators.body_estimators.bodywarper import BodyWarpedImage
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
@@ -37,7 +37,7 @@ class DescriptorType(Enum):
 
 faceWarp = FaceWarpedImage.load(filename=WARP_WHITE_MAN)
 faceWarps = [faceWarp] * 3
-humanWarp = HumanWarpedImage.load(filename=HUMAN_WARP)
+humanWarp = BodyWarpedImage.load(filename=HUMAN_WARP)
 humanWarps = [humanWarp] * 3
 
 
@@ -46,14 +46,14 @@ class DescriptorCase(NamedTuple):
     aggregatedDescriptor: BaseDescriptor
     descriptorBatch: BaseDescriptorBatch
     type: DescriptorType
-    estimator: Union[FaceDescriptorEstimator, HumanDescriptorEstimator]
+    estimator: Union[FaceDescriptorEstimator, BodyDescriptorEstimator]
 
 
 class ExtractorCase(NamedTuple):
     type: DescriptorType
     extractorFactory: Callable
     versions: List[int]
-    warps: Union[List[HumanWarpedImage], List[FaceWarpedImage]]
+    warps: Union[List[BodyWarpedImage], List[FaceWarpedImage]]
 
 
 class TestDescriptorFunctionality(BaseTestClass):
@@ -64,10 +64,10 @@ class TestDescriptorFunctionality(BaseTestClass):
     aggregatedFaceDescriptor: FaceDescriptor
 
     humanDescriptorVersion: int = EHDVa[0]
-    humanEstimator: HumanDescriptorEstimator
-    humanDescriptor: HumanDescriptor
-    humanDescriptorBatch: HumanDescriptorBatch
-    aggregatedHumanDescriptor: HumanDescriptor
+    bodyEstimator: BodyDescriptorEstimator
+    bodyDescriptor: BodyDescriptor
+    bodyDescriptorBatch: BodyDescriptorBatch
+    aggregatedBodyDescriptor: BodyDescriptor
 
     @classmethod
     def setup_class(cls):
@@ -80,10 +80,10 @@ class TestDescriptorFunctionality(BaseTestClass):
         )
 
         cls.humanDescriptorVersion = EHDVa[0]
-        estimator = BaseTestClass.faceEngine.createHumanDescriptorEstimator(cls.humanDescriptorVersion)
-        cls.humanEstimator = estimator
-        cls.humanDescriptor = cls.humanEstimator.estimate(humanWarp)
-        cls.humanDescriptorBatch, cls.aggregatedHumanDescriptor = estimator.estimateDescriptorsBatch(
+        estimator = BaseTestClass.faceEngine.createBodyDescriptorEstimator(cls.humanDescriptorVersion)
+        cls.bodyEstimator = estimator
+        cls.bodyDescriptor = cls.bodyEstimator.estimate(humanWarp)
+        cls.bodyDescriptorBatch, cls.aggregatedBodyDescriptor = estimator.estimateDescriptorsBatch(
             humanWarps, aggregate=True
         )
 
@@ -97,10 +97,10 @@ class TestDescriptorFunctionality(BaseTestClass):
 
             subTest = self.subTest(descriptorType=descriptorType)
             if descriptorType == DescriptorType.human:
-                descriptor: BaseDescriptor = self.humanDescriptor
-                aggregatedDescriptor: BaseDescriptor = self.aggregatedHumanDescriptor
-                descriptorBatch: BaseDescriptorBatch = self.humanDescriptorBatch
-                estimator: Union[HumanDescriptorEstimator, FaceDescriptorEstimator] = self.humanEstimator
+                descriptor: BaseDescriptor = self.bodyDescriptor
+                aggregatedDescriptor: BaseDescriptor = self.aggregatedBodyDescriptor
+                descriptorBatch: BaseDescriptorBatch = self.bodyDescriptorBatch
+                estimator: Union[BodyDescriptorEstimator, FaceDescriptorEstimator] = self.bodyEstimator
             else:
                 descriptor = self.faceDescriptor
                 aggregatedDescriptor = self.aggregatedFaceDescriptor
@@ -236,7 +236,7 @@ class TestEstimateDescriptor(BaseTestClass):
         super().setup_class()
         cls.cases = (
             ExtractorCase(DescriptorType.face, cls.faceEngine.createFaceDescriptorEstimator, EFDVa, faceWarps),
-            ExtractorCase(DescriptorType.human, cls.faceEngine.createHumanDescriptorEstimator, EHDVa, humanWarps),
+            ExtractorCase(DescriptorType.human, cls.faceEngine.createBodyDescriptorEstimator, EHDVa, humanWarps),
         )
 
     @staticmethod
@@ -252,7 +252,7 @@ class TestEstimateDescriptor(BaseTestClass):
         if descriptorType == DescriptorType.face:
             assert isinstance(descriptor, FaceDescriptor)
         else:
-            assert isinstance(descriptor, HumanDescriptor)
+            assert isinstance(descriptor, BodyDescriptor)
         assert descriptor.model == expectedVersion, "descriptor has wrong version"
         length = {54: 512, 56: 512, 57: 512, 58: 512, 59: 512, 102: 2048, 103: 2048, 104: 2048}[expectedVersion]
         assert length == len(descriptor.asBytes)
@@ -272,7 +272,7 @@ class TestEstimateDescriptor(BaseTestClass):
         if descriptorType == DescriptorType.face:
             return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptor()
         else:
-            return self.faceEngine.createHumanDescriptorFactory(planVersion).generateDescriptor()
+            return self.faceEngine.createBodyDescriptorFactory(planVersion).generateDescriptor()
 
     def getBatch(self, planVersion, size, descriptorType: DescriptorType) -> BaseDescriptorBatch:
         """
@@ -288,7 +288,7 @@ class TestEstimateDescriptor(BaseTestClass):
         if descriptorType == DescriptorType.face:
             return self.faceEngine.createFaceDescriptorFactory(planVersion).generateDescriptorsBatch(size)
         else:
-            return self.faceEngine.createHumanDescriptorFactory(planVersion).generateDescriptorsBatch(size)
+            return self.faceEngine.createBodyDescriptorFactory(planVersion).generateDescriptorsBatch(size)
 
     def test_create_estimators_positive(self):
         """
@@ -450,7 +450,7 @@ class TestEstimateDescriptor(BaseTestClass):
             if case.type == DescriptorType.face:
                 descriptorClass = FaceDescriptor
             else:
-                descriptorClass = HumanDescriptor
+                descriptorClass = BodyDescriptor
             with self.subTest(extractor=extractor.__class__.__name__):
                 task = extractor.estimate(case.warps[0], asyncEstimate=True)
                 self.assertAsyncEstimation(task, FaceDescriptor)

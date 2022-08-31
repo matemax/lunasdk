@@ -1,5 +1,5 @@
 """
-Human descriptor estimate example
+Body descriptor estimate example
 """
 import asyncio
 import pprint
@@ -16,12 +16,12 @@ def estimateDescriptor():
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createHumanDetector()
+    detector = faceEngine.createBodyDetector()
     humanDetection = detector.detectOne(image)
-    warper = faceEngine.createHumanWarper()
+    warper = faceEngine.createBodyWarper()
     warp = warper.warp(humanDetection)
 
-    extractor = faceEngine.createHumanDescriptorEstimator()
+    extractor = faceEngine.createBodyDescriptorEstimator()
 
     pprint.pprint(extractor.estimate(warp.warpedImage))
     pprint.pprint(extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage]))
@@ -38,12 +38,12 @@ async def asyncEstimateDescriptor():
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createHumanDetector()
+    detector = faceEngine.createBodyDetector()
     humanDetection = detector.detectOne(image)
-    warper = faceEngine.createHumanWarper()
+    warper = faceEngine.createBodyWarper()
     warp = warper.warp(humanDetection)
 
-    extractor = faceEngine.createHumanDescriptorEstimator()
+    extractor = faceEngine.createBodyDescriptorEstimator()
 
     pprint.pprint(await extractor.estimateDescriptorsBatch([warp.warpedImage, warp.warpedImage], asyncEstimate=True))
     # run tasks and get results
