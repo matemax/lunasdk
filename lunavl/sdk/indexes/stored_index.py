@@ -2,12 +2,13 @@
 import os
 from enum import Enum
 from pathlib import Path
-from typing import List
+from typing import List, Literal, Union, overload
 
 from lunavl.sdk.descriptors.descriptors import FaceDescriptor, FaceDescriptorBatch
 from lunavl.sdk.errors.exceptions import assertError
 
 from .base import CoreIndex, IndexResult
+from ..async_task import DefaultPostprocessingFactory, AsyncTask
 
 
 class IndexType(Enum):
@@ -17,6 +18,9 @@ class IndexType(Enum):
     dense = "dense"
     # dynamic index
     dynamic = "dynamic"
+
+
+POST_PROCESSING = DefaultPostprocessingFactory(IndexResult)
 
 
 class DynamicIndex(CoreIndex):
@@ -51,17 +55,36 @@ class DynamicIndex(CoreIndex):
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         assertError(error)
 
-    def search(self, descriptor: FaceDescriptor, maxCount: int = 1) -> List[IndexResult]:
+    #  pylint: disable=W0221
+    @overload
+    def search(  # type: ignore
+        self, descriptor: FaceDescriptor, maxCount: int, asyncSearch: Literal[False] = False
+    ) -> List[IndexResult]:
+        ...
+
+    @overload
+    def search(
+        self, descriptor: FaceDescriptor, maxCount: int, asyncSearch: Literal[True] = True
+    ) -> AsyncTask[List[IndexResult]]:
+        ...
+
+    def search(
+        self, descriptor: FaceDescriptor, maxCount: int = 1, asyncSearch: bool = False
+    ) -> Union[List[IndexResult], AsyncTask[List[IndexResult]]]:
         """
         Search for descriptors with the shorter distance to passed descriptor.
         Args:
             descriptor: descriptor to match against index
             maxCount: max count of results (default is 1)
+            asyncSearch: search or run searching in background
         Raises:
             LunaSDKException: if an error occurs while searching for descriptors
         Returns:
             list with index search results
         """
+        if asyncSearch:
+            task = self._coreIndex.asyncSearch(descriptor.coreEstimation, maxCount)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         assertError(error)
         return [IndexResult(result) for result in resIndex]
@@ -99,17 +122,36 @@ class DenseIndex(CoreIndex):
         """Remove descriptor for a dense index is not supported."""
         raise AttributeError("'DenseIndex' object has no attribute '__delitem__'")
 
-    def search(self, descriptor: FaceDescriptor, maxCount: int = 1) -> List[IndexResult]:
+    #  pylint: disable=W0221
+    @overload
+    def search(  # type: ignore
+        self, descriptor: FaceDescriptor, maxCount: int, asyncSearch: Literal[False] = False
+    ) -> List[IndexResult]:
+        ...
+
+    @overload
+    def search(
+        self, descriptor: FaceDescriptor, maxCount: int, asyncSearch: Literal[True] = True
+    ) -> AsyncTask[List[IndexResult]]:
+        ...
+
+    def search(
+        self, descriptor: FaceDescriptor, maxCount: int = 1, asyncSearch: bool = False
+    ) -> Union[List[IndexResult], AsyncTask[List[IndexResult]]]:
         """
         Search for descriptors with the shorter distance to passed descriptor.
         Args:
             descriptor: descriptor to match against index
             maxCount: max count of results (default is 1)
+            asyncSearch: search or run searching in background
         Raises:
             LunaSDKException: if an error occurs while searching for descriptors
         Returns:
             list with index search results
         """
+        if asyncSearch:
+            task = self._coreIndex.asyncSearch(descriptor.coreEstimation, maxCount)
+            return AsyncTask(task, POST_PROCESSING.postProcessingBatch)
         error, resIndex = self._coreIndex.search(descriptor.coreEstimation, maxCount)
         assertError(error)
         return [IndexResult(result) for result in resIndex]
