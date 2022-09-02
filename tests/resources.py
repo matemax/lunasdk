@@ -71,7 +71,7 @@ PEAKED_CAP = getPathToImage("peaked_cap.jpg")
 SHAWL = getPathToImage("shawl.jpg")
 # https://unsplash.com/photos/8vT-DgHZDG4
 BEANIE = getPathToImage("beanie.jpg")
-# https://free-images.com/display/ushanka_sport_norka_kozha.html
+# https://www.pexels.com/photo/women-standing-back-to-back-7364483/
 USHANKA = getPathToImage("ushanka.jpg")
 # https://free-images.com/display/cyclist_sports_cycling_man_0.html
 HELMET = getPathToImage("helmet.jpg")
