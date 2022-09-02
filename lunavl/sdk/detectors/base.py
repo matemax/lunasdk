@@ -154,7 +154,7 @@ def validateBatchDetectInput(
     if not isinstance(coreImages, list):
         mainError, imageErrors = detector.validate([coreImages], [detectAreas], limit)
     else:
-        mainError, imageErrors = detector.validate(coreImages, detectAreas, limit)
+        mainError, imageErrors = detector.validate(coreImages, detectAreas)
     if mainError.isOk:
         return
     if mainError.error != FSDKError.ValidationFailed:

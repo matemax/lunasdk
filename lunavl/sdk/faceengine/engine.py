@@ -10,6 +10,7 @@ from ..descriptors.descriptors import FaceDescriptorFactory, BodyDescriptorFacto
 from ..descriptors.matcher import FaceMatcher
 from ..detectors.facedetector import FaceDetector
 from ..detectors.bodydetector import BodyDetector
+from ..detectors.humandetector import HumanDetector
 from ..estimators.body_estimators.body_attributes import BodyAttributesEstimator
 from ..estimators.body_estimators.human_descriptor import BodyDescriptorEstimator
 from ..estimators.body_estimators.bodywarper import BodyWarper
@@ -594,4 +595,20 @@ class VLFaceEngine:
         launchOptions = self.getLaunchOptions(launchOptions)
         return BodyAttributesEstimator(
             self._faceEngine.createHumanAttributeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
+
+    def createHumanDetector(self, launchOptions: Optional[LaunchOptions] = None) -> HumanDetector:
+        """
+        Create human detector. Human is optional union face, body, ...
+
+        Args:
+            launchOptions: estimator launch options
+
+        Returns:
+            detector
+        """
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return HumanDetector(
+            self._faceEngine.createHumanFaceDetector(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
         )
