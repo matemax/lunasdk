@@ -1,5 +1,5 @@
 """
-Human descriptor estimate example
+Body descriptor estimate example
 """
 import asyncio
 import pprint
@@ -15,9 +15,9 @@ def estimateAttributes():
     """
     image = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createHumanDetector()
+    detector = faceEngine.createBodyDetector()
     humanDetection = detector.detect([image])
-    warper = faceEngine.createHumanWarper()
+    warper = faceEngine.createBodyWarper()
     warp1 = warper.warp(humanDetection[0][0])
     warp2 = warper.warp(humanDetection[0][1])
 
@@ -35,9 +35,9 @@ async def asyncEstimateAttribures():
     """
     image = VLImage.load(filename=EXAMPLE_O)
     faceEngine = VLFaceEngine()
-    detector = faceEngine.createHumanDetector()
+    detector = faceEngine.createBodyDetector()
     humanDetection = detector.detectOne(image)
-    warper = faceEngine.createHumanWarper()
+    warper = faceEngine.createBodyWarper()
     warp = warper.warp(humanDetection)
 
     estimator = faceEngine.createBodyAttributesEstimator()

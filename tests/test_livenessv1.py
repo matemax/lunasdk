@@ -9,7 +9,7 @@ from lunavl.sdk.estimators.face_estimators.livenessv1 import LivenessPrediction,
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
-from tests.resources import CLEAN_ONE_FACE, LIVENESS_FACE, SPOOF, UNKNOWN_LIVENESS
+from tests.resources import CLEAN_ONE_FACE, LIVENESS_FACE, SPOOF, FULL_FACE_WITH_MASK
 from tests.schemas import LIVENESSV1_SCHEMA, jsonValidator
 
 
@@ -65,7 +65,7 @@ class TestEstimateLivenessV1(BaseTestClass):
         cases = (
             Case(LIVENESS_FACE, LivenessPrediction.Real),
             Case(SPOOF, LivenessPrediction.Spoof),
-            Case(UNKNOWN_LIVENESS, LivenessPrediction.Unknown),
+            Case(FULL_FACE_WITH_MASK, LivenessPrediction.Unknown),
         )
         for case in cases:
             with self.subTest(prediction=case.prediction):
@@ -126,12 +126,13 @@ class TestEstimateLivenessV1(BaseTestClass):
         qualityThreshold = 0.95
         detection = self.detector.detectOne(VLImage.load(filename=SPOOF))
         estimations = self.livenessEstimator.estimateBatch(
-            [self.detection, detection], qualityThreshold=qualityThreshold
+            [self.detection, detection],
+            qualityThreshold=qualityThreshold,
         )
         assert isinstance(estimations, list)
         assert len(estimations) == 2
         self.assertLivenessEstimation(estimations[0], LivenessPrediction.Real)
-        self.assertLivenessEstimation(estimations[1], LivenessPrediction.Unknown)
+        self.assertLivenessEstimation(estimations[1], LivenessPrediction.Spoof)
 
     def test_estimate_liveness_batch_invalid_input(self):
         """

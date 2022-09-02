@@ -5,7 +5,7 @@ from typing import List, Type, Union
 from lunavl.sdk.base import BoundingBox, LandmarkWithScore
 from lunavl.sdk.detectors.base import BaseDetection
 from lunavl.sdk.detectors.facedetector import FaceDetection, FaceDetector, Landmarks5, Landmarks68
-from lunavl.sdk.detectors.humandetector import HumanDetection, HumanDetector, Landmarks17
+from lunavl.sdk.detectors.bodydetector import BodyDetection, BodyDetector, Landmarks17
 from lunavl.sdk.faceengine.engine import DetectorType
 from lunavl.sdk.image_utils.geometry import Point, Rect
 from lunavl.sdk.image_utils.image import VLImage
@@ -66,7 +66,7 @@ class BaseDetectorTestClass(BaseTestClass):
 
     def assertDetection(
         self,
-        detection: Union[FaceDetection, HumanDetection, Union[List[FaceDetection], List[HumanDetection]]],
+        detection: Union[FaceDetection, BodyDetection, Union[List[FaceDetection], List[BodyDetection]]],
         imageVl: VLImage,
     ):
         """
@@ -89,14 +89,14 @@ class BaseDetectorTestClass(BaseTestClass):
             self.assertBoundingBox(detection.boundingBox)
 
 
-class HumanDetectTestClass(BaseDetectorTestClass):
+class BodyDetectTestClass(BaseDetectorTestClass):
     """
-    Base class for human detection tests
+    Base class for human body detection tests
     """
 
     #: global human detector
-    detector: HumanDetector
-    detectionClass: Type[HumanDetection] = HumanDetection
+    detector: BodyDetector
+    detectionClass: Type[BodyDetection] = BodyDetection
 
     @classmethod
     def setup_class(cls):
@@ -104,11 +104,11 @@ class HumanDetectTestClass(BaseDetectorTestClass):
         Create list of face detector
         """
         super().setup_class()
-        cls.detector = cls.faceEngine.createHumanDetector()
+        cls.detector = cls.faceEngine.createBodyDetector()
         CaseLandmarks = namedtuple("CaseLandmarks", ("detectLandmarks"))
         cls.landmarksCases = [CaseLandmarks(True), CaseLandmarks(False)]
 
-    def assertHumanDetection(self, detection: Union[HumanDetection, List[HumanDetection]], imageVl: VLImage):
+    def assertBodyDetection(self, detection: Union[BodyDetection, List[BodyDetection]], imageVl: VLImage):
         """
         Function checks if an instance is FaceDetection class
 
@@ -119,7 +119,7 @@ class HumanDetectTestClass(BaseDetectorTestClass):
         self.assertDetection(detection, imageVl)
 
     @staticmethod
-    def assertDetectionLandmarks(detection: HumanDetection, landmarksIsExpected: bool = False):
+    def assertDetectionLandmarks(detection: BodyDetection, landmarksIsExpected: bool = False):
         """
         Assert human detection landmarks
         Args:

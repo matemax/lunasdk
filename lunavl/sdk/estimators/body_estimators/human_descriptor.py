@@ -8,27 +8,27 @@ from typing import List, Optional, Tuple, Union
 
 from FaceEngine import IDescriptorExtractorPtr  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.descriptors.descriptors import HumanDescriptor, HumanDescriptorBatch, HumanDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import BodyDescriptor, BodyDescriptorBatch, BodyDescriptorFactory
 
 from ...async_task import AsyncTask
 from ...launch_options import LaunchOptions
 from ..base import BaseEstimator
-from ..body_estimators.humanwarper import HumanWarp, HumanWarpedImage
+from ..body_estimators.bodywarper import BodyWarp, BodyWarpedImage
 from ..estimators_utils.extractor_utils import estimate, estimateDescriptorsBatch
 
-HummanDescriptorsResult = Tuple[HumanDescriptorBatch, Union[HumanDescriptor, None]]
+HummanDescriptorsResult = Tuple[BodyDescriptorBatch, Union[BodyDescriptor, None]]
 
 
-class HumanDescriptorEstimator(BaseEstimator):
+class BodyDescriptorEstimator(BaseEstimator):
     """
-    Human descriptor estimator.
+    Human body descriptor estimator.
     """
 
     #  pylint: disable=W0235
     def __init__(
         self,
         coreExtractor: IDescriptorExtractorPtr,
-        humanDescriptorFactory: "HumanDescriptorFactory",
+        humanDescriptorFactory: "BodyDescriptorFactory",
         launchOptions: LaunchOptions,
     ):
         """
@@ -43,10 +43,10 @@ class HumanDescriptorEstimator(BaseEstimator):
     #  pylint: disable=W0221
     def estimate(  # type: ignore
         self,
-        warp: Union[HumanWarp, HumanWarpedImage],
-        descriptor: Optional[HumanDescriptor] = None,
+        warp: Union[BodyWarp, BodyWarpedImage],
+        descriptor: Optional[BodyDescriptor] = None,
         asyncEstimate: bool = False,
-    ) -> Union[HumanDescriptor, AsyncTask[HumanDescriptor]]:
+    ) -> Union[BodyDescriptor, AsyncTask[BodyDescriptor]]:
         """
         Estimate human descriptor from a warp image.
 
@@ -70,9 +70,9 @@ class HumanDescriptorEstimator(BaseEstimator):
 
     def estimateDescriptorsBatch(
         self,
-        warps: List[Union[HumanWarp, HumanWarpedImage]],
+        warps: List[Union[BodyWarp, BodyWarpedImage]],
         aggregate: bool = False,
-        descriptorBatch: Optional[HumanDescriptorBatch] = None,
+        descriptorBatch: Optional[BodyDescriptorBatch] = None,
         asyncEstimate: bool = False,
     ) -> Union[HummanDescriptorsResult, AsyncTask[HummanDescriptorsResult]]:
         """

@@ -1,7 +1,7 @@
 import pytest
 
 from lunavl.sdk.detectors.base import ImageForDetection
-from lunavl.sdk.detectors.humandetector import HumanDetection
+from lunavl.sdk.detectors.bodydetector import BodyDetection
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
 from lunavl.sdk.image_utils.geometry import Rect
@@ -14,13 +14,13 @@ from tests.detect_test_class import (
     VLIMAGE_ONE_FACE,
     VLIMAGE_SEVERAL_FACE,
     VLIMAGE_SMALL,
-    HumanDetectTestClass,
+    BodyDetectTestClass,
 )
 from tests.resources import MANY_FACES, NO_FACES, ONE_FACE
 from tests.schemas import LANDMARKS17, REQUIRED_HUMAN_BODY_DETECTION, jsonValidator
 
 
-class TestHumanDetector(HumanDetectTestClass):
+class TestBodyDetector(BodyDetectTestClass):
     """
     Test of detector.
     """
@@ -30,7 +30,7 @@ class TestHumanDetector(HumanDetectTestClass):
         Test structure image for detection
         """
         detection = self.detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=GOOD_AREA)])
-        self.assertHumanDetection(detection[0], VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(detection[0], VLIMAGE_ONE_FACE)
         assert 1 == len(detection)
 
     def test_check_landmarks_points(self):
@@ -38,7 +38,7 @@ class TestHumanDetector(HumanDetectTestClass):
         Test validation landmarks points
         """
         detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectLandmarks=True)
-        self.assertHumanDetection(detection, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(detection, VLIMAGE_ONE_FACE)
 
         self.assertLandmarksPoints(detection.landmarks17.points)
 
@@ -94,14 +94,14 @@ class TestHumanDetector(HumanDetectTestClass):
                     detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE)
                 else:
                     detection = self.detector.detect(images=[VLIMAGE_ONE_FACE])[0]
-                self.assertHumanDetection(detection, VLIMAGE_ONE_FACE)
+                self.assertBodyDetection(detection, VLIMAGE_ONE_FACE)
 
     def test_batch_detect_using_different_type_detector(self):
         """
         Test batch detection using different type of detector
         """
         detection = self.detector.detect(images=[VLIMAGE_ONE_FACE])[0]
-        self.assertHumanDetection(detection, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(detection, VLIMAGE_ONE_FACE)
 
     def test_batch_detect_with_success_and_error(self):
         """
@@ -119,7 +119,7 @@ class TestHumanDetector(HumanDetectTestClass):
         """
 
         detection = self.detector.detectOne(image=VLIMAGE_SEVERAL_FACE)
-        self.assertHumanDetection(detection, VLIMAGE_SEVERAL_FACE)
+        self.assertBodyDetection(detection, VLIMAGE_SEVERAL_FACE)
 
     def test_detect_one_with_image_without_humans(self):
         """
@@ -150,14 +150,14 @@ class TestHumanDetector(HumanDetectTestClass):
         Test detection of one human by area with human
         """
         detection = self.detector.detectOne(image=VLIMAGE_ONE_FACE, detectArea=GOOD_AREA)
-        self.assertHumanDetection(detection, VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(detection, VLIMAGE_ONE_FACE)
 
     def test_batch_detect_with_image_of_several_humans(self):
         """
         Test batch human detection with image of several humans
         """
         detection = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE])
-        self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
+        self.assertBodyDetection(detection[0], VLIMAGE_SEVERAL_FACE)
         assert 1 == len(detection)
         assert 5 == len(detection[0]), f"Expected 5 faces, got {len(detection[0])}"
 
@@ -166,8 +166,8 @@ class TestHumanDetector(HumanDetectTestClass):
         Test batch detection of multiple images
         """
         detection = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE, VLIMAGE_ONE_FACE])
-        self.assertHumanDetection(detection[0], VLIMAGE_SEVERAL_FACE)
-        self.assertHumanDetection(detection[1], VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(detection[0], VLIMAGE_SEVERAL_FACE)
+        self.assertBodyDetection(detection[1], VLIMAGE_ONE_FACE)
         assert 2 == len(detection)
         assert 5 == len(detection[0])
         assert 1 == len(detection[1])
@@ -252,7 +252,7 @@ class TestHumanDetector(HumanDetectTestClass):
         """
         detection = self.detector.detect(images=[ImageForDetection(image=VLIMAGE_ONE_FACE, detectArea=GOOD_AREA)])
         assert 1 == len(detection[0])
-        self.assertHumanDetection(detection[0], VLIMAGE_ONE_FACE)
+        self.assertBodyDetection(detection[0], VLIMAGE_ONE_FACE)
 
     def test_bad_area_detection(self):
         """
@@ -278,7 +278,7 @@ class TestHumanDetector(HumanDetectTestClass):
         Test excessive image list detection
         """
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            TestHumanDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 1000)
+            TestBodyDetector.defaultDetector.detect(images=[VLIMAGE_ONE_FACE] * 1000)
         self.assertLunaVlError(exceptionInfo, LunaVLError.HighMemoryUsage)
 
     def test_detect_one_invalid_rectangle(self):
@@ -319,6 +319,6 @@ class TestHumanDetector(HumanDetectTestClass):
         Test async detect human
         """
         task = self.detector.detectOne(VLIMAGE_ONE_FACE, asyncEstimate=True)
-        self.assertAsyncEstimation(task, HumanDetection)
+        self.assertAsyncEstimation(task, BodyDetection)
         task = self.detector.detect([VLIMAGE_ONE_FACE] * 2, asyncEstimate=True)
-        self.assertAsyncBatchEstimation(task, HumanDetection)
+        self.assertAsyncBatchEstimation(task, BodyDetection)

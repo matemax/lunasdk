@@ -974,7 +974,7 @@ class FaceDetV2Settings(FaceDetV12Settings):
     sectionName = "FaceDetV2::Settings"
 
 
-class HumanDetectorSettings(BaseSettingsSection):
+class BodyDetectorSettings(BaseSettingsSection):
     """
     HumanDetector detector settings.
 
@@ -2177,14 +2177,14 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
         return FaceDetV2Settings(self._coreSettingProvider)
 
     @property
-    def humanDetectorSettings(self) -> HumanDetectorSettings:
+    def bodyDetectorSettings(self) -> BodyDetectorSettings:
         """
         Getter for human body settings section.
 
         Returns:
             Mutable HumanDetectorSettings section
         """
-        return HumanDetectorSettings(self._coreSettingProvider)
+        return BodyDetectorSettings(self._coreSettingProvider)
 
     @property
     def lNetSettings(self) -> LNetSettings:

@@ -83,7 +83,7 @@ class ImageColorType(BaseEstimation):
         return ImageColorSchema.fromCoreEmotion(self._coreEstimation.colorType)
 
     def asDict(self) -> Dict[str, Union[float, str]]:
-        """Convert estimation to dict. """
+        """Convert estimation to dict."""
         return {"grayscale": self.grayscale, "infrared": self.infrared, "type": self.type.name.lower()}
 
 

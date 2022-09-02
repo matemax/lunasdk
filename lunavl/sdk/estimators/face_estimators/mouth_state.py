@@ -146,7 +146,7 @@ class MouthStates(BaseEstimation):
         return self._coreEstimation.occluded
 
     def asDict(self) -> Dict:
-        """ Convert to dict."""
+        """Convert to dict."""
         return {
             "opened": self.opened,
             "occluded": self.occlusion,

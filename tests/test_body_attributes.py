@@ -13,7 +13,7 @@ from lunavl.sdk.estimators.body_estimators.body_attributes import (
     BackpackState,
     BackpackStateEnum,
 )
-from lunavl.sdk.estimators.body_estimators.humanwarper import HumanWarpedImage
+from lunavl.sdk.estimators.body_estimators.bodywarper import BodyWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
 from tests.resources import (
@@ -49,15 +49,15 @@ class TestBodyAttributes(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.detector = cls.faceEngine.createHumanDetector()
-        cls.warper = cls.faceEngine.createHumanWarper()
+        cls.detector = cls.faceEngine.createBodyDetector()
+        cls.warper = cls.faceEngine.createBodyWarper()
         cls.bodyAttributesEstimator = cls.faceEngine.createBodyAttributesEstimator()
 
     def test_estimate_body_attributes(self):
         """
         Test simple body attributes estimato
         """
-        estimation = self.bodyAttributesEstimator.estimate(HumanWarpedImage.load(filename=HUMAN_WARP))
+        estimation = self.bodyAttributesEstimator.estimate(BodyWarpedImage.load(filename=HUMAN_WARP))
         assert isinstance(estimation, BodyAttributes)
 
         assert isinstance(estimation.outwearColor, OutwearColor)

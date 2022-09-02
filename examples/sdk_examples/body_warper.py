@@ -16,9 +16,9 @@ def createWarp():
     """
     faceEngine = VLFaceEngine()
     image = VLImage.load(filename=EXAMPLE_O)
-    detector = faceEngine.createHumanDetector()
+    detector = faceEngine.createBodyDetector()
     humanDetection = detector.detectOne(image)
-    warper = faceEngine.createHumanWarper()
+    warper = faceEngine.createBodyWarper()
     warp = warper.warp(humanDetection)
     pprint.pprint(warp.warpedImage.rect)
 

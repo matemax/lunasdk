@@ -6,13 +6,13 @@ from typing import Optional, Union
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
 
-from ..descriptors.descriptors import FaceDescriptorFactory, HumanDescriptorFactory
+from ..descriptors.descriptors import FaceDescriptorFactory, BodyDescriptorFactory
 from ..descriptors.matcher import FaceMatcher
 from ..detectors.facedetector import FaceDetector
-from ..detectors.humandetector import HumanDetector
+from ..detectors.bodydetector import BodyDetector
 from ..estimators.body_estimators.body_attributes import BodyAttributesEstimator
-from ..estimators.body_estimators.human_descriptor import HumanDescriptorEstimator
-from ..estimators.body_estimators.humanwarper import HumanWarper
+from ..estimators.body_estimators.human_descriptor import BodyDescriptorEstimator
+from ..estimators.body_estimators.bodywarper import BodyWarper
 from ..estimators.face_estimators.ags import AGSEstimator
 from ..estimators.face_estimators.background import FaceDetectionBackgroundEstimator
 from ..estimators.face_estimators.basic_attributes import BasicAttributesEstimator
@@ -326,9 +326,9 @@ class VLFaceEngine:
         """
         return self._faceEngine
 
-    def createHumanDetector(self, launchOptions: Optional[LaunchOptions] = None) -> HumanDetector:
+    def createBodyDetector(self, launchOptions: Optional[LaunchOptions] = None) -> BodyDetector:
         """
-        Create human detector.
+        Create human body detector.
 
         Args:
             launchOptions: estimator launch options
@@ -337,11 +337,11 @@ class VLFaceEngine:
             detector
         """
         launchOptions = self.getLaunchOptions(launchOptions)
-        return HumanDetector(
+        return BodyDetector(
             self._faceEngine.createHumanDetector(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
 
-    def createHumanWarper(self) -> HumanWarper:
+    def createBodyWarper(self) -> BodyWarper:
         """
         Create human body warper.
 
@@ -349,11 +349,11 @@ class VLFaceEngine:
             warper.
 
         """
-        return HumanWarper(self._faceEngine.createHumanWarper())
+        return BodyWarper(self._faceEngine.createHumanWarper())
 
-    def createHumanDescriptorFactory(self, descriptorVersion: int = DHDV) -> HumanDescriptorFactory:
+    def createBodyDescriptorFactory(self, descriptorVersion: int = DHDV) -> BodyDescriptorFactory:
         """
-        Create human descriptor factory
+        Create human body descriptor factory
 
         Args:
             descriptorVersion: descriptor version to init estimator for or zero for use default descriptor version
@@ -361,13 +361,13 @@ class VLFaceEngine:
         Returns:
             human descriptor factory
         """
-        return HumanDescriptorFactory(self, descriptorVersion=descriptorVersion)
+        return BodyDescriptorFactory(self, descriptorVersion=descriptorVersion)
 
-    def createHumanDescriptorEstimator(
+    def createBodyDescriptorEstimator(
         self, descriptorVersion: int = DHDV, launchOptions: Optional[LaunchOptions] = None
-    ) -> HumanDescriptorEstimator:
+    ) -> BodyDescriptorEstimator:
         """
-        Create human descriptor estimator.
+        Create human body descriptor estimator.
 
         Args:
             launchOptions: estimator launch options
@@ -377,9 +377,9 @@ class VLFaceEngine:
             estimator
         """
         launchOptions = self.getLaunchOptions(launchOptions)
-        return HumanDescriptorEstimator(
+        return BodyDescriptorEstimator(
             self._faceEngine.createExtractor(descriptorVersion, launchOptions=launchOptions.coreLaunchOptions),
-            self.createHumanDescriptorFactory(descriptorVersion),
+            self.createBodyDescriptorFactory(descriptorVersion),
             launchOptions,
         )
 

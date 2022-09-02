@@ -85,7 +85,7 @@ FISHEYE = getPathToImage("fisheye.jpg")
 SQUINTING = getPathToImage("squinting.jpg")
 # https://free-images.com/display/pouting_boy_in_shamar.html
 FROWNING = getPathToImage("frowning.jpg")
-# https://unsplash.com/photos/5xbCj_VWKcs
+# https://www.freeimages.com/ru/download/young-woman-using-computer-elevated-view-portrait-2353499
 RAISED = getPathToImage("raised.jpg")
 # https://unsplash.com/photos/rwCjbjaK-Zs
 BACKPACK = getPathToImage("backpack.jpg")
