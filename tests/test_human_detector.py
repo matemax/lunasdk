@@ -19,7 +19,13 @@ from tests.detect_test_class import (
     VLIMAGE_ONE_FACE,
     VLIMAGE_SEVERAL_FACE,
 )
-from tests.resources import MANY_FACES, NO_FACES, ONE_FACE
+from tests.resources import (
+    MANY_FACES,
+    NO_FACES,
+    ONE_FACE,
+    IMAGE_WITH_TWO_BODY_ONE_FACE,
+    WARP_FACE_WITH_SUNGLASSES,
+)
 
 
 class TestBodyDetector(BaseTestClass):
@@ -81,7 +87,7 @@ class TestBodyDetector(BaseTestClass):
                 assert face.landmarks68 is None
                 self.assertBoundingBox(face.boundingBox)
             assert face or body
-            assert 0 <= detection.associationScore <= 1
+            assert detection.associationScore is None or (0 <= detection.associationScore <= 1)
 
     def test_human_detection(self):
         """
@@ -205,6 +211,49 @@ class TestBodyDetector(BaseTestClass):
         )
         assert 1 == len(detection)
         assert 0 == len(detection[0])
+
+    def test_detect_body_without_face(self):
+        """
+        Test detect body without face
+        """
+
+        image = VLImage.load(filename=IMAGE_WITH_TWO_BODY_ONE_FACE)
+        res = self.detector.detect(images=[image])
+        assert 1 == len(res)
+        assert 2 == len(res[0])
+        detections = res[0]
+        self.assertDetections(detections, image)
+        detections.sort(key=lambda detection: detection.body.boundingBox.rect.x)
+        assert detections[0].face is None
+        assert detections[1].face is not None
+        assert detections[0].body is not None
+        assert detections[1].body is not None
+
+    def test_detect_face_and_body_without_associations(self):
+        """
+        Test detect face and  body without associations
+        """
+
+        image = VLImage.load(filename=WARP_FACE_WITH_SUNGLASSES)
+        res = self.detector.detect(images=[image])
+        detections = res[0]
+        self.assertDetections(detections, image)
+        assert 2 == len(detections)
+        assert detections[0].associationScore is None
+        assert detections[1].associationScore is None
+
+        assert detections[0].body or detections[1].body
+        assert detections[0].face or detections[1].face
+
+        if detections[0].face:
+            assert detections[0].body is None
+        else:
+            assert detections[0].body is not None
+
+        if detections[1].face:
+            assert detections[1].body is None
+        else:
+            assert detections[1].body is not None
 
     def test_batch_detect_in_area_outside_image(self):
         """

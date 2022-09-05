@@ -134,13 +134,13 @@ def collectDetectionsResult(
         for bodyIdx, body in enumerate(bodies):
             if bodyIdx in bodiesWithFace:
                 continue
-            humanDetection = HumanDetection(None, bodies[bodyIdx], score=0, image=vlImage)
+            humanDetection = HumanDetection(None, bodies[bodyIdx], image=vlImage)
             humanDetections.append(humanDetection)
 
         for faceIdx, face in enumerate(faces):
             if faceIdx in bodiesWithFace:
                 continue
-            humanDetection = HumanDetection(faces[faceIdx], None, score=0, image=vlImage)
+            humanDetection = HumanDetection(faces[faceIdx], None, image=vlImage)
             humanDetections.append(humanDetection)
 
         res.append(humanDetections)

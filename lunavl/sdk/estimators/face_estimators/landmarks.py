@@ -1,15 +1,13 @@
 from functools import partial
 from typing import Union, List, Literal, overload, Tuple, Dict
 
-from FaceEngine import (  # pylint: disable=E0611,E0401
-    Image as CoreImage,
-    Detection as CoreFaceDetection,
-)
+from FaceEngine import Image as CoreImage, Detection as CoreFaceDetection, FSDKError  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.async_task import AsyncTask
 from lunavl.sdk.detectors.facedetector import Landmarks5, FaceDetection, Landmarks68, FaceLandmarks
-from lunavl.sdk.errors.exceptions import assertError
+from lunavl.sdk.errors.exceptions import assertError, LunaSDKException
 from ..base import BaseEstimator
+from ...errors.errors import LunaVLError
 
 PreparedBatch = List[Tuple[CoreImage, CoreFaceDetection, List[int]]]
 
@@ -211,6 +209,7 @@ class FaceLandmarksEstimator(BaseEstimator):
             estimator = (
                 self._coreEstimator.asyncDetectLandmarks68 if asyncEstimate else self._coreEstimator.detectLandmarks68
             )
+        self._validate(detection.image.coreImage, detection.coreEstimation.detection)
         if asyncEstimate:
             task = estimator(detection.image.coreImage, [detection.coreEstimation.detection])
             return AsyncTask(task, postProcessing)
@@ -276,6 +275,7 @@ class FaceLandmarksEstimator(BaseEstimator):
         coreImages = [image[0] for image in preparedBatch]
         coreDetections = [image[1] for image in preparedBatch]
         batchSize = len(detections)
+        self._validate(coreImages, coreDetections)
         if landmarksType == FaceLandmarks.Landmarks5:
             postProcessing = partial(
                 _postProcessingBatch,
@@ -302,3 +302,44 @@ class FaceLandmarksEstimator(BaseEstimator):
             return AsyncTask(task, postProcessing)
         error, estimations = estimator(coreImages, coreDetections)
         return postProcessing(error, estimations, preparedBatch=preparedBatch, batchSize=batchSize)
+
+    def _validate(
+        self,
+        coreImages: Union[CoreImage, List[CoreImage]],
+        detections: Union[CoreFaceDetection, List[List[CoreFaceDetection]]],
+    ):
+        """
+        Validate input data for estimations. Collect errors from single operations and raise complex exception
+
+        Args:
+            coreImages: list of core images
+            detections: list of list face detection which corresponding to coreImages
+        Raises:
+            LunaSDKException: if validation are failed or data is not valid
+        """
+        if isinstance(coreImages, list):
+            mainError, imagesErrors = self._coreEstimator.validate(coreImages, detections)
+        else:
+            mainError, imagesErrors = self._coreEstimator.validate([coreImages], [[detections]])
+        if mainError.isOk:
+            return
+        if mainError.error != FSDKError.ValidationFailed:
+            raise LunaSDKException(
+                LunaVLError.ValidationFailed.format(mainError.what),
+                [LunaVLError.fromSDKError(errors[0]) for errors in imagesErrors],
+            )
+        if not isinstance(coreImages, list):
+            raise LunaSDKException(LunaVLError.fromSDKError(imagesErrors[0][0]))
+        errors = []
+
+        for imageErrors in imagesErrors:
+            for error in imageErrors:
+                if error.isOk:
+                    continue
+                errors.append(LunaVLError.fromSDKError(error))
+                break
+            else:
+                errors.append(LunaVLError.Ok.format(LunaVLError.Ok.description))
+        raise LunaSDKException(
+            LunaVLError.BatchedInternalError.format(LunaVLError.fromSDKError(mainError).detail), errors
+        )
