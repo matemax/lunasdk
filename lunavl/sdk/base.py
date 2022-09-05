@@ -124,7 +124,7 @@ class LandmarkWithScore(BaseEstimation):
         Returns:
             float[0,1]
         """
-        return self._coreEstimation.score
+        return self._coreEstimation.associationScore
 
     def asDict(self) -> dict:
         """
@@ -133,7 +133,7 @@ class LandmarkWithScore(BaseEstimation):
         Returns:
             dict with keys: score and point
         """
-        return {"score": self._coreEstimation.score, "point": (int(self.point.x), int(self.point.y))}
+        return {"score": self._coreEstimation.associationScore, "point": (int(self.point.x), int(self.point.y))}
 
     def __repr__(self) -> str:
         """

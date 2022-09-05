@@ -28,6 +28,7 @@ from ..estimators.face_estimators.glasses import GlassesEstimator
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.headwear import HeadwearEstimator
 from ..estimators.face_estimators.image_type import ImageColorTypeEstimator
+from ..estimators.face_estimators.landmarks import FaceLandmarksEstimator
 from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
@@ -610,5 +611,21 @@ class VLFaceEngine:
         launchOptions = self.getLaunchOptions(launchOptions)
         return HumanDetector(
             self._faceEngine.createHumanFaceDetector(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
+        )
+
+    def createLandmarksEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FaceLandmarksEstimator:
+        """
+        Create face landma detector. Human is optional union face, body, ...
+
+        Args:
+            launchOptions: estimator launch options
+
+        Returns:
+            estimator
+        """
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return FaceLandmarksEstimator(
+            self._faceEngine.createFaceLandmarksDetector(launchOptions=launchOptions.coreLaunchOptions),
             launchOptions,
         )

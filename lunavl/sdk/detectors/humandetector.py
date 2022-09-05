@@ -43,9 +43,9 @@ class HumanDetection:
         landmarks68 (Optional[Landmarks68]): optional landmarks5
     """
 
-    __slots__ = ("face", "body", "_image", "score")
+    __slots__ = ("face", "body", "_image", "associationScore")
 
-    def __init__(self, coreFaceDetection: Optional[Face], coreBodyDetection: Optional[Human], score, image: VLImage):
+    def __init__(self, coreFaceDetection: Optional[Face], coreBodyDetection: Optional[Human], image: VLImage, score=0):
         """
         Init.
 
@@ -54,7 +54,7 @@ class HumanDetection:
         """
         self.face = FaceDetection(coreFaceDetection, image) if coreFaceDetection else None
         self.body = BodyDetection(coreBodyDetection, image) if coreBodyDetection else None
-        self.score = score
+        self.associationScore = score
         self._image = image
 
     def asDict(self) -> Dict[str, Any]:
@@ -64,7 +64,11 @@ class HumanDetection:
         Returns:
             dict. required keys: 'rect', 'score'. optional keys: 'landmarks5', 'landmarks68'
         """
-        res = {"face": self.face.asDict() if self.face else None, "body": self.body.asDict() if self.body else None}
+        res = {
+            "face": self.face.asDict() if self.face else None,
+            "body": self.body.asDict() if self.body else None,
+            "association_score": self.associationScore,
+        }
         return res
 
     @property
@@ -108,7 +112,13 @@ def collectDetectionsResult(
             coreBody.img = vlImage.coreImage
             coreBody.detection = bodyDetection
             bodies.append(coreBody)
-        faces = [Face(vlImage.coreImage, detection) for detection in fsdkDetectRes.getFaceDetections(imageIdx)]
+        faces = []
+        for faceDetection in fsdkDetectRes.getFaceDetections(imageIdx):
+            coreFace = Face()
+            coreFace.img = vlImage.coreImage
+            coreFace.detection = faceDetection
+            faces.append(coreFace)
+
         associations = fsdkDetectRes.getAssociations(imageIdx)
         facesWithBody = set()
         bodiesWithFace = set()

@@ -1,6 +1,7 @@
 """
 Module contains function for detection faces on images.
 """
+from enum import Enum
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union, overload
 
@@ -46,6 +47,13 @@ def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
         Face object list. one object for one bbox
     """
     return [Face(image.image.coreImage, Detection(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
+
+
+class FaceLandmarks(Enum):
+    """Face landmarks types"""
+
+    Landmarks5 = "landmarks5"
+    Landmarks68 = "landmarks68"
 
 
 class Landmarks5(Landmarks):

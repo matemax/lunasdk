@@ -27,7 +27,7 @@ class TestHeadwear(BaseTestClass):
             HeadwearType.Hat: HAT,
             HeadwearType.Hood: HOOD,
             HeadwearType.BaseballCap: BASEBALL_CAP,
-            HeadwearType.HatWithEarFlaps: USHANKA,
+            HeadwearType.HatWithEarFlaps: USHANKA,  # FSDK-4088 problems, may be need to skip
             HeadwearType.Shawl: SHAWL,
             HeadwearType.Beanie: BEANIE,
             HeadwearType.PeakedCap: PEAKED_CAP,
