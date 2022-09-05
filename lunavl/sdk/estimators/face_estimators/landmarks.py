@@ -151,7 +151,7 @@ class FaceLandmarksEstimator(BaseEstimator):
         self,
         detection: FaceDetection,
         landmarksType: Literal[FaceLandmarks.Landmarks5],
-        asyncEstimate: Literal[False],
+        asyncEstimate: Literal[False] = False,
     ) -> Landmarks5:
         ...
 
