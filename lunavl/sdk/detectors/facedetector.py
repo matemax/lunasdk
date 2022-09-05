@@ -38,17 +38,6 @@ from ..image_utils.image import VLImage
 from ..launch_options import LaunchOptions
 
 
-def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
-    """
-    Create core faces for redetection
-    Args:
-        image: image and bounding boxes for redetection
-    Returns:
-        Face object list. one object for one bbox
-    """
-    return [Face(image.image.coreImage, Detection(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
-
-
 class FaceLandmarks(Enum):
     """Face landmarks types"""
 

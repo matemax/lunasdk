@@ -5,7 +5,6 @@ from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union, overload
 
 from FaceEngine import (  # pylint: disable=E0611,E0401
-    Detection,
     Face,
     Human,
     FSDKErrorResult,
@@ -16,7 +15,6 @@ from .facedetector import FaceDetection
 from ..async_task import AsyncTask
 from ..detectors.base import (
     ImageForDetection,
-    ImageForRedetection,
     getArgsForCoreDetectorForImages,
     validateBatchDetectInput,
 )
@@ -25,32 +23,34 @@ from ..image_utils.image import VLImage
 from ..launch_options import LaunchOptions
 
 
-def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
-    """
-    Create core faces for redetection
-    Args:
-        image: image and bounding boxes for redetection
-    Returns:
-        Face object list. one object for one bbox
-    """
-    return [Face(image.image.coreImage, Detection(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
-
-
 class HumanDetection:
     """
+    Human detection is union of face and body detection of one human.Face and body may be None if detector did not
+    detect corresponding part of the torso
+
     Attributes:
-        landmarks5 (Optional[Landmarks5]): optional landmarks5
-        landmarks68 (Optional[Landmarks68]): optional landmarks5
+        face (Optional[FaceDetection]): optional body detection
+        body (Optional[BodyDetection]): optional face detection
+        associationScore (Optional[float]): body and face association score
     """
 
     __slots__ = ("face", "body", "_image", "associationScore")
 
-    def __init__(self, coreFaceDetection: Optional[Face], coreBodyDetection: Optional[Human], image: VLImage, score=0):
+    def __init__(
+        self,
+        coreFaceDetection: Optional[Face],
+        coreBodyDetection: Optional[Human],
+        image: VLImage,
+        score: Optional[float] = None,
+    ):
         """
         Init.
 
         Args:
-            coreDetection: core detection
+            coreFaceDetection: core face detection
+            coreBodyDetection: core body detection
+            image: original image
+            score:  association score of body and face. If face or body is none score must be set to None
         """
         self.face = FaceDetection(coreFaceDetection, image) if coreFaceDetection else None
         self.body = BodyDetection(coreBodyDetection, image) if coreBodyDetection else None
@@ -59,7 +59,7 @@ class HumanDetection:
 
     def asDict(self) -> Dict[str, Any]:
         """
-        Convert face detection to dict (json).
+        Convert human detection to dict (json).
 
         Returns:
             dict. required keys: 'rect', 'score'. optional keys: 'landmarks5', 'landmarks68'
@@ -83,7 +83,7 @@ class HumanDetection:
 
 
 # alias for detection result
-FacesDetectResult = List[List[HumanDetection]]
+HumanDetectResult = List[List[HumanDetection]]
 
 
 def collectDetectionsResult(
@@ -91,7 +91,7 @@ def collectDetectionsResult(
     images: List[Union[VLImage, ImageForDetection]],
 ) -> Union[List[List[HumanDetection]]]:
     """
-    Collect detection results from core reply and prepare face detections
+    Collect detection results from core reply and prepare human detections
     Args:
         fsdkDetectRes: fsdk (re)detect results
         images: incoming images
@@ -152,7 +152,7 @@ def postProcessing(
     error: FSDKErrorResult, detectionsBatch, images: List[Union[VLImage, ImageForDetection]]
 ) -> List[List[HumanDetection]]:
     """
-    Convert core face detections from detector results to `FaceDetection` and error check.
+    Convert core hbodies and faces detections from detector results to `HumanDetection` and error check.
 
     Args:
         error: detection error, usually error.isError is False
@@ -191,7 +191,7 @@ class HumanDetector:
         self,
         images: List[Union[VLImage, ImageForDetection]],
         asyncEstimate: Literal[False] = False,
-    ) -> FacesDetectResult:
+    ) -> HumanDetectResult:
         ...
 
     @overload
@@ -199,20 +199,19 @@ class HumanDetector:
         self,
         images: List[Union[VLImage, ImageForDetection]],
         asyncEstimate: Literal[True],
-    ) -> AsyncTask[FacesDetectResult]:
+    ) -> AsyncTask[HumanDetectResult]:
         ...
 
     def detect(
         self,
         images: List[Union[VLImage, ImageForDetection]],
         asyncEstimate=False,
-    ) -> Union[FacesDetectResult, AsyncTask[FacesDetectResult]]:
+    ) -> Union[HumanDetectResult, AsyncTask[HumanDetectResult]]:
         """
         Batch detect humans on images.
 
         Args:
             images: input images list. Format must be R8G8B8
-            limit: max number of detections per input image
             asyncEstimate: estimate or run estimation in background
         Returns:
             asyncEstimate is False: return list of lists detection, order of detection lists
