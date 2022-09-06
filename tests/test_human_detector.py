@@ -74,13 +74,14 @@ class TestBodyDetector(BaseTestClass):
         for detection in detections:
             assert isinstance(detection, HumanDetection), f"{detection.__class__} is not HumanDetection"
             assert detection.image.asPillow() == imageVl.asPillow(), "Detection image does not match VLImage"
-            if body := detection.body:
+            body = detection.body
+            if body:
                 assert isinstance(body, BodyDetection)
                 assert body.coreEstimation.isValid()
                 self.assertBoundingBox(body.boundingBox)
                 assert body.landmarks17 is None
-
-            if face := detection.face:
+            face = detection.face
+            if face:
                 assert isinstance(face, FaceDetection)
                 assert face.coreEstimation.isValid()
                 assert face.landmarks5 is None
