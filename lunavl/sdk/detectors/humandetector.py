@@ -1,5 +1,5 @@
 """
-Module contains function for detection faces on images.
+Module contains function for detection on images.
 """
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union, overload
