@@ -17,7 +17,7 @@ def estimateLandmarks():
     """
     faceEngine = VLFaceEngine()
     detector = faceEngine.createHumanDetector()
-    landmarksEstimator = faceEngine.createLandmarksEstimator()
+    landmarksEstimator = faceEngine.createFaceLandmarksEstimator()
 
     imageWithSeveralFaces = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
 
@@ -42,7 +42,7 @@ async def asyncEstimateLandmarks():
     """
     faceEngine = VLFaceEngine()
     detector = faceEngine.createHumanDetector()
-    landmarksEstimator = faceEngine.createLandmarksEstimator()
+    landmarksEstimator = faceEngine.createFaceLandmarksEstimator()
 
     image = VLImage.load(filename=EXAMPLE_SEVERAL_FACES)
     detections = await detector.detect([image], asyncEstimate=True)

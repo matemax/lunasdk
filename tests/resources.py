@@ -17,6 +17,7 @@ SMALL_IMAGE = getPathToImage("small_image.jpg")
 WARP_WHITE_MAN = getPathToImage("warp_white_man.jpg")
 HUMAN_WARP = getPathToImage("human_body_warp.jpg")
 
+IMAGE_WITH_TWO_FACES = getPathToImage("2_men.jpg")
 IMAGE_WITH_TWO_BODY_ONE_FACE = getPathToImage("2_body_one_face.jpg")
 
 ALL_EMOTIONS = [emotion.name.lower() for emotion in Emotion]

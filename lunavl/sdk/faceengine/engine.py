@@ -614,9 +614,9 @@ class VLFaceEngine:
             launchOptions,
         )
 
-    def createLandmarksEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FaceLandmarksEstimator:
+    def createFaceLandmarksEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FaceLandmarksEstimator:
         """
-        Create face landma detector. Human is optional union face, body, ...
+        Create face landmarks estimator.
 
         Args:
             launchOptions: estimator launch options
