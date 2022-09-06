@@ -16,7 +16,7 @@ from lunavl.sdk.descriptors.descriptors import (
 )
 from lunavl.sdk.errors.errors import LunaVLError
 from lunavl.sdk.errors.exceptions import LunaSDKException
-from lunavl.sdk.estimators.body_estimators.human_descriptor import BodyDescriptorEstimator
+from lunavl.sdk.estimators.body_estimators.body_descriptor import BodyDescriptorEstimator
 from lunavl.sdk.estimators.body_estimators.bodywarper import BodyWarpedImage
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from lunavl.sdk.estimators.face_estimators.facewarper import FaceWarpedImage

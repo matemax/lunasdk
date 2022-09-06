@@ -12,7 +12,7 @@ from ..detectors.facedetector import FaceDetector
 from ..detectors.bodydetector import BodyDetector
 from ..detectors.humandetector import HumanDetector
 from ..estimators.body_estimators.body_attributes import BodyAttributesEstimator
-from ..estimators.body_estimators.human_descriptor import BodyDescriptorEstimator
+from ..estimators.body_estimators.body_descriptor import BodyDescriptorEstimator
 from ..estimators.body_estimators.bodywarper import BodyWarper
 from ..estimators.face_estimators.ags import AGSEstimator
 from ..estimators.face_estimators.background import FaceDetectionBackgroundEstimator
