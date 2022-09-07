@@ -2456,6 +2456,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
         """
         return LivenessV1Estimator(self._coreSettingProvider)
 
+    @property
+    def humanDetectorSettings(self) -> HumanDetectorSettings:
+        """
+        Getter for HumanDetectorSettings (HumanFaceDetector settings) settings section.
+
+        Returns:
+            Mutable HumanDetectorSettings section
+        """
+        return HumanDetectorSettings(self._coreSettingProvider)
+
 
 class RuntimeSettingsProvider(BaseSettingsProvider):
     """
