@@ -89,7 +89,7 @@ HumanDetectResult = List[List[HumanDetection]]
 def collectDetectionsResult(
     fsdkDetectRes,
     images: List[Union[VLImage, ImageForDetection]],
-) -> Union[List[List[HumanDetection]]]:
+) -> HumanDetectResult:
     """
     Collect detection results from core reply and prepare human detections
     Args:
