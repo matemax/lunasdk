@@ -976,12 +976,11 @@ class FaceDetV2Settings(FaceDetV12Settings):
 
 class BodyDetectorSettings(BaseSettingsSection):
     """
-    HumanDetector detector settings.
+    BodyDetector detector settings.
 
     Properties:
 
         - scoreThreshold (float): detection threshold in [0..1] range;
-        - redetectScoreThreshold (float): redetect face threshold in [0..1] range;
         - NMSThreshold (float): overlap threshold for NMS [0..1] range;
         - imageSize (int): Target image size for down scaling by load side;
         - nms (NMS): type of NMS: mean or best
@@ -1148,6 +1147,137 @@ class BodyDetectorSettings(BaseSettingsSection):
             value: new value
         """
         self.setValue("landmarks17Threshold", value)
+
+
+class HumanDetectorSettings(BaseSettingsSection):
+    """
+    HumanDetector detector settings.
+
+    Properties:
+
+        - faceThreshold (float): face detection threshold in [0..1] range;
+        - bodyThreshold (float): face detection threshold in [0..1] range;
+        - associationThreshold (float): body and face association threshold in [0..1] range;
+        - minFaceSize (int): Minimum face size in pixels;
+        - nmsFaceThreshold (float): overlap threshold for face NMS [0..1] range;
+        - nmsBodyThreshold (float): overlap threshold for face NMS [0..1] range;
+    """
+
+    sectionName = "HumanFaceDetector::Settings"
+
+    @property
+    def faceThreshold(self) -> Optional[float]:
+        """
+        Getter for faceThreshold
+
+        Returns:
+            faceThreshold
+        """
+        return self.getValue("faceThreshold")
+
+    @faceThreshold.setter
+    def faceThreshold(self, value: float) -> None:
+        """
+        Setter for faceThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("faceThreshold", value)
+
+    @property
+    def bodyThreshold(self) -> Optional[float]:
+        """
+        Getter for humanThreshold
+
+        Returns:
+            scoreThreshold
+        """
+        return self.getValue("humanThreshold")
+
+    @bodyThreshold.setter
+    def bodyThreshold(self, value: float) -> None:
+        """
+        Setter for humanThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("humanThreshold", value)
+
+    @property
+    def associationThreshold(self) -> Optional[float]:
+        """
+        Getter for associationThreshold
+
+        Returns:
+            scoreThreshold
+        """
+        return self.getValue("associationThreshold")
+
+    @associationThreshold.setter
+    def associationThreshold(self, value: float) -> None:
+        """
+        Setter for associationThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("associationThreshold", value)
+
+    @property
+    def minFaceSize(self) -> Optional[int]:
+        """
+        Getter for minFaceSize
+
+        Returns:
+            minFaceSize
+        """
+        return self.getValue("minFaceSize")
+
+    @minFaceSize.setter
+    def minFaceSize(self, value: int) -> None:
+        """
+        Setter for minFaceSize
+        Args:
+            value: new value
+        """
+        self.setValue("minFaceSize", value)
+
+    @property
+    def nmsFaceThreshold(self) -> Optional[float]:
+        """
+        Getter for nmsFaceThreshold
+
+        Returns:
+            nmsFaceThreshold value
+        """
+        return self.getValue("nmsFaceThreshold")
+
+    @nmsFaceThreshold.setter
+    def nmsFaceThreshold(self, value: float) -> None:
+        """
+        Setter for nmsFaceThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("nmsFaceThreshold", value)
+
+    @property
+    def nmsBodyThreshold(self) -> Optional[float]:
+        """
+        Getter for nmsHumanThreshold
+
+        Returns:
+            nmsBodyThreshold value
+        """
+        return self.getValue("nmsHumanThreshold")
+
+    @nmsBodyThreshold.setter
+    def nmsBodyThreshold(self, value: float) -> None:
+        """
+        Setter for nmsHumanThreshold
+        Args:
+            value: new value
+        """
+        self.setValue("nmsHumanThreshold", value)
 
 
 class LNetBaseSettings(BaseSettingsSection):
@@ -2325,6 +2455,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
             Mutable LivenessV1Estimator section
         """
         return LivenessV1Estimator(self._coreSettingProvider)
+
+    @property
+    def humanDetectorSettings(self) -> HumanDetectorSettings:
+        """
+        Getter for HumanDetectorSettings (HumanFaceDetector settings) settings section.
+
+        Returns:
+            Mutable HumanDetectorSettings section
+        """
+        return HumanDetectorSettings(self._coreSettingProvider)
 
 
 class RuntimeSettingsProvider(BaseSettingsProvider):

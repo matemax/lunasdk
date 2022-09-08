@@ -10,8 +10,9 @@ from ..descriptors.descriptors import FaceDescriptorFactory, BodyDescriptorFacto
 from ..descriptors.matcher import FaceMatcher
 from ..detectors.facedetector import FaceDetector
 from ..detectors.bodydetector import BodyDetector
+from ..detectors.humandetector import HumanDetector
 from ..estimators.body_estimators.body_attributes import BodyAttributesEstimator
-from ..estimators.body_estimators.human_descriptor import BodyDescriptorEstimator
+from ..estimators.body_estimators.body_descriptor import BodyDescriptorEstimator
 from ..estimators.body_estimators.bodywarper import BodyWarper
 from ..estimators.face_estimators.ags import AGSEstimator
 from ..estimators.face_estimators.background import FaceDetectionBackgroundEstimator
@@ -27,6 +28,7 @@ from ..estimators.face_estimators.glasses import GlassesEstimator
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.headwear import HeadwearEstimator
 from ..estimators.face_estimators.image_type import ImageColorTypeEstimator
+from ..estimators.face_estimators.landmarks import FaceLandmarksEstimator
 from ..estimators.face_estimators.livenessv1 import LivenessV1Estimator
 from ..estimators.face_estimators.mask import MaskEstimator
 from ..estimators.face_estimators.mouth_state import MouthStateEstimator
@@ -594,4 +596,36 @@ class VLFaceEngine:
         launchOptions = self.getLaunchOptions(launchOptions)
         return BodyAttributesEstimator(
             self._faceEngine.createHumanAttributeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
+
+    def createHumanDetector(self, launchOptions: Optional[LaunchOptions] = None) -> HumanDetector:
+        """
+        Create human detector. Human is optional union face, body, ...
+
+        Args:
+            launchOptions: estimator launch options
+
+        Returns:
+            detector
+        """
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return HumanDetector(
+            self._faceEngine.createHumanFaceDetector(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
+        )
+
+    def createFaceLandmarksEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FaceLandmarksEstimator:
+        """
+        Create face landmarks estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
+        Returns:
+            estimator
+        """
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return FaceLandmarksEstimator(
+            self._faceEngine.createFaceLandmarksDetector(launchOptions=launchOptions.coreLaunchOptions),
+            launchOptions,
         )

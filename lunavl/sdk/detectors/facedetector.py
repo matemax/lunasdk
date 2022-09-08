@@ -1,6 +1,7 @@
 """
 Module contains function for detection faces on images.
 """
+from enum import Enum
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union, overload
 
@@ -37,15 +38,11 @@ from ..image_utils.image import VLImage
 from ..launch_options import LaunchOptions
 
 
-def _createCoreFaces(image: ImageForRedetection) -> List[Face]:
-    """
-    Create core faces for redetection
-    Args:
-        image: image and bounding boxes for redetection
-    Returns:
-        Face object list. one object for one bbox
-    """
-    return [Face(image.image.coreImage, Detection(bBox.coreRectF, 1.0)) for bBox in image.bBoxes]
+class FaceLandmarks(Enum):
+    """Face landmarks types"""
+
+    Landmarks5 = "landmarks5"
+    Landmarks68 = "landmarks68"
 
 
 class Landmarks5(Landmarks):
@@ -365,7 +362,7 @@ class FaceDetector:
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
         asyncEstimate: bool = False,
-    ) -> Union[FaceRedetectResult, AsyncTask[FaceRedetectResult]]:
+    ):
         """
         Detect just one best detection on the image.
 
@@ -425,7 +422,7 @@ class FaceDetector:
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
         asyncEstimate=False,
-    ) -> Union[FacesDetectResult, AsyncTask[FacesDetectResult]]:
+    ):
         """
         Batch detect faces on images.
 
@@ -480,7 +477,7 @@ class FaceDetector:
         detect5Landmarks=True,
         detect68Landmarks=False,
         asyncEstimate=False,
-    ) -> Union[FaceRedetectResult, AsyncTask[FaceRedetectResult]]:
+    ):
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
 
@@ -576,7 +573,7 @@ class FaceDetector:
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
         asyncEstimate: bool = False,
-    ) -> Union[FacesRedetectResult, AsyncTask[FacesRedetectResult]]:
+    ):
         """
         Redetect face on each image.image in area, restricted with image.bBox.
 

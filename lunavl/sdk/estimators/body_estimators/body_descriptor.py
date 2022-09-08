@@ -1,7 +1,7 @@
 """
-Module contains a human descriptor estimator
+Module contains a body descriptor estimator
 
-See `human descriptor`_.
+See `body descriptor`_.
 
 """
 from typing import List, Optional, Tuple, Union
@@ -28,17 +28,17 @@ class BodyDescriptorEstimator(BaseEstimator):
     def __init__(
         self,
         coreExtractor: IDescriptorExtractorPtr,
-        humanDescriptorFactory: "BodyDescriptorFactory",
+        bodyDescriptorFactory: "BodyDescriptorFactory",
         launchOptions: LaunchOptions,
     ):
         """
         Init.
 
         Args:
-            humanDescriptorFactory: human descriptor factory
+            bodyDescriptorFactory: body descriptor factory
         """
         super().__init__(coreExtractor, launchOptions)
-        self.descriptorFactory = humanDescriptorFactory
+        self.descriptorFactory = bodyDescriptorFactory
 
     #  pylint: disable=W0221
     def estimate(  # type: ignore
@@ -48,7 +48,7 @@ class BodyDescriptorEstimator(BaseEstimator):
         asyncEstimate: bool = False,
     ) -> Union[BodyDescriptor, AsyncTask[BodyDescriptor]]:
         """
-        Estimate human descriptor from a warp image.
+        Estimate body descriptor from a warp image.
 
         Args:
             warp: warped image
