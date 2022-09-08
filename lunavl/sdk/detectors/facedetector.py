@@ -362,7 +362,7 @@ class FaceDetector:
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
         asyncEstimate: bool = False,
-    ) -> Union[FaceRedetectResult, AsyncTask[FaceRedetectResult]]:
+    ):
         """
         Detect just one best detection on the image.
 
@@ -422,7 +422,7 @@ class FaceDetector:
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
         asyncEstimate=False,
-    ) -> Union[FacesDetectResult, AsyncTask[FacesDetectResult]]:
+    ):
         """
         Batch detect faces on images.
 
@@ -477,7 +477,7 @@ class FaceDetector:
         detect5Landmarks=True,
         detect68Landmarks=False,
         asyncEstimate=False,
-    ) -> Union[FaceRedetectResult, AsyncTask[FaceRedetectResult]]:
+    ):
         """
         Redetect face on an image in area, restricted with image.bBox, bBox or detection.
 
@@ -573,7 +573,7 @@ class FaceDetector:
         detect5Landmarks: bool = True,
         detect68Landmarks: bool = False,
         asyncEstimate: bool = False,
-    ) -> Union[FacesRedetectResult, AsyncTask[FacesRedetectResult]]:
+    ):
         """
         Redetect face on each image.image in area, restricted with image.bBox.
 

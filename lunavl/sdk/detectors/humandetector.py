@@ -34,7 +34,7 @@ class HumanDetection:
         associationScore (Optional[float]): body and face association score
     """
 
-    __slots__ = ("face", "body", "_image", "associationScore")
+    __slots__ = ("face", "body", "image", "associationScore")
 
     def __init__(
         self,
@@ -55,7 +55,7 @@ class HumanDetection:
         self.face = FaceDetection(coreFaceDetection, image) if coreFaceDetection else None
         self.body = BodyDetection(coreBodyDetection, image) if coreBodyDetection else None
         self.associationScore = score
-        self._image = image
+        self.image = image
 
     def asDict(self) -> Dict[str, Any]:
         """
@@ -70,16 +70,6 @@ class HumanDetection:
             "association_score": self.associationScore,
         }
         return res
-
-    @property
-    def image(self) -> VLImage:
-        """
-        Get source of detection.
-
-        Returns:
-            source image
-        """
-        return self._image
 
 
 # alias for detection result

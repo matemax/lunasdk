@@ -183,7 +183,7 @@ class FaceLandmarksEstimator(BaseEstimator):
         detection: FaceDetection,
         landmarksType: Literal[FaceLandmarks.Landmarks5, FaceLandmarks.Landmarks68],
         asyncEstimate: bool = False,
-    ) -> Union[Landmarks5, Landmarks68, AsyncTask[Landmarks5], AsyncTask[Landmarks68]]:
+    ):
         """
         Estimate mouth state on warp.
 
