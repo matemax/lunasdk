@@ -5,7 +5,7 @@ See headwear_.
 from enum import Enum
 from typing import List, Union, Iterable
 
-from FaceEngine import HumanAttributeRequest  # pylint: disable=E0611,E0401
+from FaceEngine import HumanAttributeRequest, LowerBodyClothing  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
 from .bodywarper import BodyWarpedImage, BodyWarp
@@ -205,70 +205,6 @@ class HeadwearStateEnum(Enum):
         return cls[coreHeadwear.name]
 
 
-class HeadwearState(BaseEstimation):
-    """
-    Class for Headwear state estimation.
-
-    Headwear state properties:
-
-        - yes
-        - no
-        - unknown
-        - predominantState
-    """
-
-    @property
-    def yes(self) -> float:
-        """
-        Get `yes` predict value.
-
-        Returns:
-            value in range [0, 1]
-        """
-        return self._coreEstimation.hat
-
-    @property
-    def no(self):
-        """
-        Get `no` predict value.
-
-        Returns:
-            value in range [0, 1]
-        """
-        return self._coreEstimation.noHat
-
-    @property
-    def unknown(self):
-        """
-        Get `unknown` predict value.
-
-        Returns:
-            value in range [0, 1]
-        """
-        return self._coreEstimation.unknown
-
-    @property
-    def predominantState(self) -> HeadwearStateEnum:
-        """Get headwear predominant state"""
-        return HeadwearStateEnum.fromCoreHeadwear(self._coreEstimation.result)
-
-    def asDict(self) -> dict:
-        """
-        Convert to dict.
-
-        Returns:
-            dict in platform format
-        """
-        return {
-            "predominant_state": str(self._coreEstimation.result.name).lower(),
-            "estimations": {
-                "yes": self.yes,
-                "no": self.no,
-                "unknown": self.unknown,
-            },
-        }
-
-
 class SleeveLength(Enum):
     """Sleeve length enum"""
 
@@ -429,6 +365,193 @@ class OutwearColor(BaseEstimation):
         return [color.value for color in self.colors]
 
 
+def asDict(x: object):
+    """Wraps object asDict()."""
+    if x is None:
+        return None
+
+    return x.asDict()
+
+
+class BodyEstimation(BaseEstimation):
+    """Sugar for estimatios."""
+
+    def __new__(cls, estimation, *_):
+        if not estimation.isValid():
+            return None
+        return super().__new__(cls)
+
+    def __init__(self, estimation):
+        super().__init__(estimation.value())
+
+
+class ColorMixin:
+    """Extracts color from core estimation."""
+
+    _colors = {}
+    _unknown = "unknown"
+
+    def singleColor(self, estimation: object):
+        """Find first method (ie isBlack) that returns true, and return appropriate color name."""
+        for key, value in self._colors.items():
+            if getattr(estimation, key):
+                return value
+        return self._unknown
+
+    def multiColor(self, estimation: object):
+        """Find all methods (ie isBlack) that return true, and return appropriate color name."""
+        result = []
+        for key, value in self._colors.items():
+            if getattr(estimation, key):
+                result.append(value)
+
+        if not result:
+            result.append(self._unknown)
+        return result
+
+
+class HeadwearState(BodyEstimation, ColorMixin):
+    """
+    Class for Headwear state estimation.
+
+    Headwear state properties:
+
+        - yes
+        - no
+        - unknown
+        - predominantState
+    """
+
+    _colors = {
+        "isBlack": "black",
+        "isWhite": "white",
+        "isOther": "other",
+        "isUnknown": "undefined",
+    }
+    _unknown = "undefined"
+
+    @property
+    def yes(self) -> float:
+        """
+        Get `yes` predict value.
+
+        Returns:
+            value in range [0, 1]
+        """
+        return self._coreEstimation.hat
+
+    @property
+    def no(self):
+        """
+        Get `no` predict value.
+
+        Returns:
+            value in range [0, 1]
+        """
+        return self._coreEstimation.noHat
+
+    @property
+    def unknown(self):
+        """
+        Get `unknown` predict value.
+
+        Returns:
+            value in range [0, 1]
+        """
+        return self._coreEstimation.unknown
+
+    @property
+    def predominantState(self) -> HeadwearStateEnum:
+        """Get headwear predominant state"""
+        return HeadwearStateEnum.fromCoreHeadwear(self._coreEstimation.result)
+
+    @property
+    def apparentColor(self):
+        return self.singleColor(self._coreEstimation.hatColor)
+
+    def asDict(self) -> dict:
+        """
+        Convert to dict.
+
+        Returns:
+            dict in platform format
+        """
+        return {
+            "apparent_color": self.apparentColor,
+            "predominant_state": str(self._coreEstimation.result.name).lower(),
+            "estimations": {
+                "yes": self.yes,
+                "no": self.no,
+                "unknown": self.unknown,
+            },
+        }
+
+
+class Shoes(BodyEstimation, ColorMixin):
+    """Shoes estimation."""
+
+    _colors = {
+        "isBlack": "black",
+        "isWhite": "white",
+        "isOther": "other",
+        "isUnknown": "undefined",
+    }
+    _unknown = "undefined"
+
+    @property
+    def apparentColor(self) -> str:
+        """Return name of the estimated shoe color."""
+        return self.singleColor(self._coreEstimation)
+
+    def asDict(self) -> dict:
+        """Serialize to dict."""
+        return {"apparent_color": self.apparentColor}
+
+
+class LowerGarment(BodyEstimation, ColorMixin):
+    """Lower garment estimantion."""
+
+    _colors = {
+        "isBlack": "black",
+        "isWhite": "white",
+        "isBlue": "blue",
+        "isGreen": "green",
+        "isGrey": "gray",
+        "isOrange": "orange",
+        "isPurple": "purple",
+        "isRed": "red",
+        "isYellow": "yellow",
+        "isPink": "pink",
+        "isBrown": "brown",
+        "isBeige": "beige",
+        "isKhaki": "khaki",
+        "isMulticolored": "multicolored",
+    }
+    _unknown = "undefined"
+    _types = {
+        LowerBodyClothing.Unknown: "undefined",
+        LowerBodyClothing.Skirt: "skirt",
+        LowerBodyClothing.Pants: "trousers",
+        LowerBodyClothing.Shorts: "shorts",
+    }
+
+    @property
+    def type(self) -> str:
+        """Type of the garment."""
+        return self._types[self._coreEstimation.result]
+
+    @property
+    def colors(self) -> list[str]:
+        """List of colors with scores exceed threshold."""
+        if self.type == "undefined":
+            return [self._unknown]
+        return self.multiColor(self._coreEstimation.lowerBodyClothingColor)
+
+    def asDict(self) -> dict:
+        """Serialize to dict."""
+        return {"type": self.type, "colors": self.colors}
+
+
 class BodyAttributes(BaseEstimation):
     """
     Container for estimated body attributes.
@@ -441,10 +564,18 @@ class BodyAttributes(BaseEstimation):
         headwear (Optional[HeadwearState]): backpack state (yes, unknown or not)
         outwearColor (Optional[OutwearColor]): outwear color list
         sleeve (Optional[Sleeve]): sleeve size estimation
-
     """
 
-    __slots__ = ("apparentAge", "apparentGender", "backpack", "headwear", "outwearColor", "sleeve")
+    __slots__ = (
+        "apparentAge",
+        "apparentGender",
+        "backpack",
+        "headwear",
+        "outwearColor",
+        "sleeve",
+        "lowerGarment",
+        "shoes",
+    )
 
     def __init__(self, coreEstimation):
         super().__init__(coreEstimation)
@@ -464,10 +595,7 @@ class BodyAttributes(BaseEstimation):
         else:
             self.backpack = BackpackState(coreEstimation.backpack_opt.value())
 
-        if not coreEstimation.headwear_opt.isValid():
-            self.headwear = None
-        else:
-            self.headwear = HeadwearState(coreEstimation.headwear_opt.value())
+        self.headwear = HeadwearState(coreEstimation.headwear_opt)
 
         if not coreEstimation.outwearColor_opt.isValid():
             self.outwearColor = None
@@ -479,15 +607,20 @@ class BodyAttributes(BaseEstimation):
         else:
             self.sleeve = Sleeve(coreEstimation.sleeve_opt.value())
 
+        self.lowerGarment = LowerGarment(coreEstimation.lowerBodyClothing_opt)
+        self.shoes = Shoes(coreEstimation.shoeColor_opt)
+
     def asDict(self) -> Union[dict, list]:
         """Convert to dict"""
         return {
             "apparent_age": round(self.apparentAge) if self.apparentAge is not None else None,
             "apparent_gender": self.apparentGender.asDict() if self.apparentGender is not None else None,
             "backpack": self.backpack.asDict() if self.backpack is not None else None,
-            "headwear": self.headwear.asDict() if self.headwear is not None else None,
+            "headwear": asDict(self.headwear),
             "sleeve": self.sleeve.asDict() if self.sleeve is not None else None,
             "outwear_color": self.outwearColor.asDict() if self.outwearColor is not None else None,
+            "lower_garment": asDict(self.lowerGarment),
+            "shoes": asDict(self.shoes),
         }
 
 

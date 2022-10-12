@@ -16,6 +16,7 @@ from lunavl.sdk.estimators.body_estimators.body_attributes import (
 from lunavl.sdk.estimators.body_estimators.bodywarper import BodyWarpedImage
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
+from tests import resources
 from tests.resources import (
     ONE_FACE,
     CLEAN_ONE_FACE,
@@ -63,20 +64,18 @@ class TestBodyAttributes(BaseTestClass):
         assert isinstance(estimation.outwearColor, OutwearColor)
         assert set(estimation.outwearColor.colors) == {
             OutwearColorEnum.White,
-            OutwearColorEnum.Orange,
-            OutwearColorEnum.Red,
         }
         assert isinstance(estimation.sleeve, Sleeve)
         assert estimation.sleeve.predominantState == SleeveLength.Unknown
 
         assert isinstance(estimation.headwear, HeadwearState)
-        assert estimation.headwear.predominantState == HeadwearStateEnum.Unknown
+        assert estimation.headwear.predominantState == HeadwearStateEnum.No
 
         assert isinstance(estimation.apparentGender, ApparentGender)
         assert estimation.apparentGender.predominantGender == ApparentGenderEnum.Female
 
         assert isinstance(estimation.apparentAge, float)
-        assert round(estimation.apparentAge) == 14
+        assert round(estimation.apparentAge) == 26
 
         assert isinstance(estimation.backpack, BackpackState)
         assert estimation.backpack.predominantState == BackpackStateEnum.Unknown
@@ -114,6 +113,7 @@ class TestBodyAttributes(BaseTestClass):
                 },
             },
             "headwear": {
+                "apparent_color": estimation.headwear.apparentColor,
                 "predominant_state": str(estimation.headwear.predominantState.name).lower(),
                 "estimations": {
                     "yes": estimation.headwear.yes,
@@ -130,6 +130,8 @@ class TestBodyAttributes(BaseTestClass):
                 },
             },
             "outwear_color": [color.value for color in estimation.outwearColor.colors],
+            "lower_garment": {"type": "undefined", "colors": ["undefined"]},
+            "shoes": {"apparent_color": "undefined"},
         } == estimation.asDict()
 
     def test_estimate_body_attributes_batch(self):
@@ -189,10 +191,10 @@ class TestBodyAttributes(BaseTestClass):
         cases = (
             (HOOD, HeadwearStateEnum.Yes),
             (LONG_SLEEVE, HeadwearStateEnum.No),
-            (PALETTE_MODE, HeadwearStateEnum.Unknown),
+            (resources.MASK_FULL, HeadwearStateEnum.Unknown),
         )
         for image, expectedLength in cases:
-            with self.subTest(expectedLength):
+            with self.subTest(message=expectedLength):
                 estimation = self.estimate(image)[0]
                 assert expectedLength == estimation.headwear.predominantState
 
@@ -220,20 +222,80 @@ class TestBodyAttributes(BaseTestClass):
             # (BEIGE, OutwearColorEnum.Beige),
             (BLACK, OutwearColorEnum.Black),
             (ANGER, OutwearColorEnum.Blue),
-            # (BAD_THRESHOLD_WARP, OutwearColorEnum.Brown),
+            (resources.BROWN, OutwearColorEnum.Brown),
             (ANGER, OutwearColorEnum.Green),
             (RAISED, OutwearColorEnum.Grey),
             # (KHAKI, OutwearColorEnum.Khaki),
             # (COLORFUL, OutwearColorEnum.Multicolored),
             (SHAWL, OutwearColorEnum.Orange),
             # (PINK, OutwearColorEnum.Pink),
-            (PINK, OutwearColorEnum.Purple),
+            (resources.PURPLE_SHORTS, OutwearColorEnum.Purple),
             (RED, OutwearColorEnum.Red),
             (FULL_OCCLUDED_FACE, OutwearColorEnum.White),
             (YELLOW, OutwearColorEnum.Yellow),
         )
-        for image, expectedLength in cases:
-            with self.subTest(expectedLength):
+        for image, expected in cases:
+            with self.subTest(message=expected):
                 estimation = self.estimate(image)[0]
-                print(image, estimation.outwearColor.colors)
-                assert expectedLength in estimation.outwearColor.colors
+                assert expected in estimation.outwearColor.colors
+
+    def test_lower_body_garment_type(self):
+        """Lower body garment type."""
+        cases = (
+            (resources.BROWN, "trousers"),
+            (resources.YELLOW_SKIRT, "skirt"),
+            (resources.RED_SHORTS, "shorts"),
+            (resources.STATUE, "undefined"),
+        )
+        for image, garmentType  in cases:
+            with self.subTest(type=garmentType):
+                estimation = self.estimate(image)[0]
+                assert garmentType == estimation.lowerGarment.type
+
+    def test_lower_body_garment_colors(self):
+        """Lower body garment type."""
+        cases = (
+            (resources.BROWN, ["brown"]),
+            (resources.YELLOW, ["yellow"]),
+            (resources.RED_SHORTS, ["red"]),
+            (resources.STATUE, ["undefined"]),
+            (resources.WHITE_SKIRT, ["white"]),
+            (resources.GRAY_TROUSERS, ["gray"]),
+            (resources.BLACK_TROUSERS, ["black"]),
+            (resources.PURPLE_SHORTS, ["purple"]),
+            # green
+            # pink
+            # beige
+            # khaki
+            # multicolored
+        )
+        for image, garmentColors  in cases:
+            with self.subTest(colors=garmentColors):
+                estimation = self.estimate(image)[0]
+                assert garmentColors == estimation.lowerGarment.colors
+
+    def test_shoes_color(self):
+        """Shoes color."""
+        cases = (
+            (resources.PURPLE_SHORTS, "white"),
+            (resources.GRAY_TROUSERS, "black"),
+            (resources.BROWN, "other"),
+            (resources.STATUE, "undefined"),
+        )
+        for image, apparentColor in cases:
+            with self.subTest(colors=apparentColor):
+                estimation = self.estimate(image)[0]
+                assert apparentColor == estimation.shoes.apparentColor
+
+    def test_headwear_color(self):
+        """Headwear color."""
+        cases = (
+            (resources.BLACK_TROUSERS, "white"),
+            (resources.BEANIE, "other"),
+            (resources.HOOD, "black"),
+            (resources.STATUE, "undefined"),
+        )
+        for image, apparentColor in cases:
+            with self.subTest(colors=apparentColor):
+                estimation = self.estimate(image)[0]
+                assert apparentColor == estimation.headwear.apparentColor

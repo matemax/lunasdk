@@ -200,7 +200,7 @@ class TestBodyDetector(BodyDetectTestClass):
         assert 6 == len(detection)
 
         detection = self.detector.detect(images=[imageWithManyFaces], limit=20)[0]
-        assert 17 == len(detection)
+        assert 18 == len(detection)
 
     @pytest.mark.skip("core bug: Fatal error")
     def test_detect_limit_bad_param(self):
