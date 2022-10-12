@@ -3,15 +3,16 @@
 See headwear_.
 """
 from enum import Enum
-from typing import List, Union, Iterable
+from typing import Iterable, List, Union
 
 from FaceEngine import HumanAttributeRequest, LowerBodyClothing  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.base import BaseEstimation
-from .bodywarper import BodyWarpedImage, BodyWarp
+
+from ...async_task import AsyncTask, DefaultPostprocessingFactory
 from ..base import BaseEstimator
 from ..estimators_utils.extractor_utils import validateInputByBatchEstimator
-from ...async_task import AsyncTask, DefaultPostprocessingFactory
+from .bodywarper import BodyWarp, BodyWarpedImage
 
 
 class ApparentGenderEnum(Enum):
