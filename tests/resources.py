@@ -111,9 +111,31 @@ KHAKI = getPathToImage("khaki.jpg")
 COLORFUL = getPathToImage("colorful.jpg")
 # https://unsplash.com/photos/xgNSlx7DjYM
 RED = getPathToImage("red.jpg")
+# https://unsplash.com/photos/bXkMmTUyu1U
+BROWN = getPathToImage("brown.jpg")
 # https://unsplash.com/photos/LL0Rdbcd8X4
 MASK_CHIN = getPathToImage("mask_chin.jpg")
 # https://free-images.com/display/doctor_medical_medicine_health.html
 MASK_MOUTH = getPathToImage("medical_mask_mouth.jpg")
 # https://unsplash.com/photos/uCpBPcdK0ew
 MASK_FULL = getPathToImage("balaclava.jpg")
+# https://unsplash.com/photos/TRdBgw-ulNA
+YELLOW_SKIRT = getPathToImage("yellow_skirt.jpg")
+# https://unsplash.com/photos/MDWZ9H6oG7w
+RED_SHORTS = getPathToImage("red_shorts.jpg")
+# https://unsplash.com/photos/yNlZ2Hpm4to
+STATUE = getPathToImage("statue.jpg")
+# https://unsplash.com/photos/LH5zrpVyWQE
+WHITE_SKIRT = getPathToImage("white_skirt.jpg")
+# https://unsplash.com/photos/AAJXPWF0-VE
+BLUE_SKIRT = getPathToImage("blue_skirt.jpg")
+# https://unsplash.com/photos/QHuJNNmI9P8
+GRAY_TROUSERS = getPathToImage("gray_trousers.jpg")
+# https://unsplash.com/photos/YvIXIBW6bJk
+ORANGE_SKIRT = getPathToImage("orange_skirt.jpg")
+# https://unsplash.com/photos/8HDKeRalisQ
+BLACK_TROUSERS = getPathToImage("black_trousers.jpg")
+# https://unsplash.com/photos/lWaMh5rXPVo
+PURPLE_SHORTS = getPathToImage("purple_shorts.jpg")
+
+HAX = getPathToImage("hax.jpg")
