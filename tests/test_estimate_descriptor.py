@@ -25,9 +25,9 @@ from tests.base import BaseTestClass
 from tests.detect_test_class import VLIMAGE_SMALL
 from tests.resources import BAD_THRESHOLD_WARP, HUMAN_WARP, WARP_CLEAN_FACE, WARP_WHITE_MAN
 
-EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58, 59]
+EFDVa = EXISTENT_FACE_DESCRIPTOR_VERSION_ABUNDANCE = [54, 56, 57, 58, 59, 60]
 
-EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [102, 103, 104]
+EHDVa = EXISTENT_HUMAN_DESCRIPTOR_VERSION_ABUNDANCE = [102, 103, 104, 105, 106, 107]
 
 
 class DescriptorType(Enum):
@@ -254,7 +254,20 @@ class TestEstimateDescriptor(BaseTestClass):
         else:
             assert isinstance(descriptor, BodyDescriptor)
         assert descriptor.model == expectedVersion, "descriptor has wrong version"
-        length = {54: 512, 56: 512, 57: 512, 58: 512, 59: 512, 102: 2048, 103: 2048, 104: 2048}[expectedVersion]
+        length = {
+            54: 512,
+            56: 512,
+            57: 512,
+            58: 512,
+            59: 512,
+            60: 512,
+            102: 2048,
+            103: 2048,
+            104: 2048,
+            105: 512,
+            106: 512,
+            107: 512,
+        }[expectedVersion]
         assert length == len(descriptor.asBytes)
         assert length == len(descriptor.asVector)
         assert length + 8 == len(descriptor.rawDescriptor)
