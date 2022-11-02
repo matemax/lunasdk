@@ -286,3 +286,10 @@ class TestImage(BaseTestClass):
         vlImageFromBytes = VLImage(imageInBytes)
 
         assert vlImageFromPil.asNPArray().tobytes() == vlImageFromBytes.asNPArray().tobytes()
+
+    def test_cmyk_mode_conversion(self):
+        """
+        Test CMYK image conversion
+        """
+        image = VLImage(IMAGE.convert("CMYK"))
+        assert image.format == ColorFormat.R8G8B8
