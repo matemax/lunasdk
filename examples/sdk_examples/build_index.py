@@ -6,7 +6,7 @@ import asyncio
 import pprint
 
 from lunavl.sdk.faceengine.engine import VLFaceEngine
-from lunavl.sdk.faceengine.setting_provider import DetectorType
+from lunavl.sdk.faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider
 from lunavl.sdk.image_utils.image import VLImage
 from resources import EXAMPLE_1, EXAMPLE_O
 
@@ -15,7 +15,11 @@ def buildDescriptorIndex():
     """
     Build index and search.
     """
-    faceEngine = VLFaceEngine()
+
+    feConf = FaceEngineSettingsProvider()
+    feConf.index.construction = 1200
+    faceEngine = VLFaceEngine(faceEngineConf=feConf)
+
     detector = faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
     warper = faceEngine.createFaceWarper()
     extractor = faceEngine.createFaceDescriptorEstimator()
@@ -33,8 +37,11 @@ def buildDescriptorIndex():
     pprint.pprint(f"index buf size: {indexBuilder.bufSize}")
     index = indexBuilder.buildIndex()
     pprint.pprint(index[0])
+    index.remove(0)
     result = index.search(faceDescriptor, 1)
     pprint.pprint(f"result: {result}")
+
+    index.save("dynamic-index.dat")
 
 
 async def asyncBuildDescriptorIndex():

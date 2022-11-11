@@ -2195,6 +2195,33 @@ class LivenessV1Estimator(BaseSettingsSection):
         self.setValue("qualityThreshold", value)
 
 
+class IndexSettings(BaseSettingsSection):
+    """
+    Index settings.
+    """
+    sectionName = "IndexBuilder::Settings"
+
+    @property
+    def search(self) -> Optional[int]:
+        """EF coefficient for search."""
+        return self.getValue("search")
+
+    @search.setter
+    def search(self, value: int):
+        """EF coefficient for search."""
+        return self.setValue("search", value)
+
+    @property
+    def construction(self) -> Optional[int]:
+        """EF coefficient for construction."""
+        return self.getValue("construction")
+
+    @construction.setter
+    def construction(self, value: int):
+        """EF coefficient for construction."""
+        return self.setValue("construction", value)
+
+
 class BaseSettingsProvider:
     """
     Runtime SDK Setting faceEngineProvider.
@@ -2465,6 +2492,16 @@ class FaceEngineSettingsProvider(BaseSettingsProvider):
             Mutable HumanDetectorSettings section
         """
         return HumanDetectorSettings(self._coreSettingProvider)
+
+    @property
+    def index(self) -> IndexSettings:
+        """
+        Getter for index settings.
+
+        Returns:
+            Mutable IndexSettings object.
+        """
+        return IndexSettings(self._coreSettingProvider)
 
 
 class RuntimeSettingsProvider(BaseSettingsProvider):
