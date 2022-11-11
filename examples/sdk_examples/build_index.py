@@ -37,6 +37,7 @@ def buildDescriptorIndex():
     pprint.pprint(f"index buf size: {indexBuilder.bufSize}")
     index = indexBuilder.buildIndex()
     pprint.pprint(index[0])
+    index.remove(0)
     result = index.search(faceDescriptor, 1)
     pprint.pprint(f"result: {result}")
 

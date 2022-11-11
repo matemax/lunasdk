@@ -57,6 +57,10 @@ class DynamicIndex(CoreIndex):
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         assertError(error)
 
+    def remove(self, i: int):
+        """Remove descriptor at index `i` (0-based)."""
+        self._coreIndex.removeDescriptor(i)
+
     #  pylint: disable=W0221
     @overload
     def search(  # type: ignore
