@@ -25,7 +25,9 @@ POST_PROCESSING = DefaultPostprocessingFactory(IndexResult)
 
 class DynamicIndex(CoreIndex):
     """
-    Dynamic Index
+    Dynamic Index.
+
+    Allows updates, but loads slower than dense.
     """
 
     @property
@@ -89,7 +91,7 @@ class DynamicIndex(CoreIndex):
         assertError(error)
         return [IndexResult(result) for result in resIndex]
 
-    def save(self, path: str, indexType: IndexType) -> None:
+    def save(self, path: str, indexType: IndexType = IndexType.dynamic) -> None:
         """
         Save index as 'dynamic' or 'dense' to local storage.
         Args:
@@ -115,7 +117,9 @@ class DynamicIndex(CoreIndex):
 
 class DenseIndex(CoreIndex):
     """
-    Dense Index
+    Dense Index.
+
+    Read-only index, cannot be changed, but loads faster.
     """
 
     def __delitem__(self, index: int):
