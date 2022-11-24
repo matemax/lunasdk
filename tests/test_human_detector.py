@@ -24,7 +24,7 @@ from tests.resources import (
     NO_FACES,
     ONE_FACE,
     IMAGE_WITH_TWO_BODY_ONE_FACE,
-    WARP_FACE_WITH_SUNGLASSES,
+    IMAGE_WITH_DIFFERENT_FACE_AND_BODY,
 )
 
 
@@ -131,7 +131,7 @@ class TestBodyDetector(BaseTestClass):
         """
 
         detections = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE])[0]
-        assert 5 == len(detections)
+        assert 6 == len(detections)
         self.assertDetections(detections, VLIMAGE_SEVERAL_FACE)
 
     def test_batch_detect_with_image_without_humans(self):
@@ -165,7 +165,7 @@ class TestBodyDetector(BaseTestClass):
         self.assertDetections(detection[0], VLIMAGE_SEVERAL_FACE)
         self.assertDetections(detection[1], VLIMAGE_ONE_FACE)
         assert 2 == len(detection)
-        assert 5 == len(detection[0])
+        assert 6 == len(detection[0])
         assert 1 == len(detection[1])
 
     def test_batch_detect_many_faces(self):
@@ -235,7 +235,7 @@ class TestBodyDetector(BaseTestClass):
         Test detect face and  body without associations
         """
 
-        image = VLImage.load(filename=WARP_FACE_WITH_SUNGLASSES)
+        image = VLImage.load(filename=IMAGE_WITH_DIFFERENT_FACE_AND_BODY)
         res = self.detector.detect(images=[image])
         detections = res[0]
         self.assertDetections(detections, image)
