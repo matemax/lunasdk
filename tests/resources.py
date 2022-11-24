@@ -19,6 +19,8 @@ HUMAN_WARP = getPathToImage("human_body_warp.jpg")
 
 IMAGE_WITH_TWO_FACES = getPathToImage("2_men.jpg")
 IMAGE_WITH_TWO_BODY_ONE_FACE = getPathToImage("2_body_one_face.jpg")
+# https://unsplash.com/photos/4KRsNO9QxwM
+IMAGE_WITH_DIFFERENT_FACE_AND_BODY = getPathToImage("different_face_body.jpg")
 
 ALL_EMOTIONS = [emotion.name.lower() for emotion in Emotion]
 EMOTION_FACES = {emotion: getPathToImage(f"{emotion}.jpg") for emotion in ALL_EMOTIONS}
