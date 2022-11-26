@@ -1,4 +1,5 @@
 from enum import Enum
+from platform import platform
 from typing import Optional
 
 import FaceEngine as CoreFE  # pylint: disable=E0611,E0401
@@ -37,9 +38,9 @@ class LaunchOptions:
             if deviceClass == DeviceClass.gpu:
                 device = CoreFE.DeviceClass.GPU
             else:
-                device = CoreFE.DeviceClass.CPU_AVX2
+                device = CoreFE.DeviceClass.CPU_ARM if "arm" in platform() else CoreFE.DeviceClass.CPU_AVX2
         else:
-            device = CoreFE.DeviceClass.CPU_AVX2
+            device = CoreFE.DeviceClass.CPU_ARM if "arm" in platform() else CoreFE.DeviceClass.CPU_AVX2
         self._coreLaunchOptions.deviceClass = device
         if deviceId:
             self._coreLaunchOptions.deviceId = deviceId

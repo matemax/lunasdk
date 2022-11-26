@@ -196,6 +196,8 @@ class VLImage:
             blackNWhiteModes = ("1", "L", "LA", "La")
             if body.mode == "P" and body.palette is not None and body.palette.mode not in blackNWhiteModes:
                 body = body.convert()
+            if body.mode == "CMYK":
+                body = body.convert("RGB")
             array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(

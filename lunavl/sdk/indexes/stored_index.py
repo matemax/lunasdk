@@ -25,7 +25,9 @@ POST_PROCESSING = DefaultPostprocessingFactory(IndexResult)
 
 class DynamicIndex(CoreIndex):
     """
-    Dynamic Index
+    Dynamic Index.
+
+    Allows updates, but loads slower than dense.
     """
 
     @property
@@ -54,6 +56,10 @@ class DynamicIndex(CoreIndex):
         """
         error = self._coreIndex.appendBatch(descriptorsBatch.coreEstimation)
         assertError(error)
+
+    def remove(self, i: int):
+        """Remove descriptor at index `i` (0-based)."""
+        self._coreIndex.removeDescriptor(i)
 
     #  pylint: disable=W0221
     @overload
@@ -89,7 +95,7 @@ class DynamicIndex(CoreIndex):
         assertError(error)
         return [IndexResult(result) for result in resIndex]
 
-    def save(self, path: str, indexType: IndexType) -> None:
+    def save(self, path: str, indexType: IndexType = IndexType.dynamic) -> None:
         """
         Save index as 'dynamic' or 'dense' to local storage.
         Args:
@@ -115,7 +121,9 @@ class DynamicIndex(CoreIndex):
 
 class DenseIndex(CoreIndex):
     """
-    Dense Index
+    Dense Index.
+
+    Read-only index, cannot be changed, but loads faster.
     """
 
     def __delitem__(self, index: int):
