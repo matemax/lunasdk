@@ -3,11 +3,16 @@ Module realize face descriptor match.
 
 see `face descriptors matching`_.
 """
-from typing import List, Union
+from typing import List, Union, Generic
 
 from FaceEngine import IDescriptorMatcherPtr  # pylint: disable=E0611,E0401
 
-from lunavl.sdk.descriptors.descriptors import FaceDescriptorFactory
+from lunavl.sdk.descriptors.descriptors import (
+    BaseDescriptor,
+    BaseDescriptorFactory,
+    DescriptorType,
+    BodyDescriptor,
+)
 from lunavl.sdk.errors.exceptions import assertError
 from lunavl.sdk.estimators.face_estimators.face_descriptor import FaceDescriptor, FaceDescriptorBatch
 
@@ -28,19 +33,19 @@ class MatchingResult:
         self.similarity = similarity
 
 
-class FaceMatcher:
+class BaseMatcher(Generic[DescriptorType]):
     """
     Base estimator class. Class is  a container for core estimations. Mostly estimate attributes  can be get through
     a corresponding properties.
 
     Attributes:
         _coreMatcher (IDescriptorMatcherPtr): core matcher
-        descriptorFactory (FaceDescriptorFactory): face descriptor factory
+        descriptorFactory (BaseDescriptorFactory): descriptor factory
     """
 
     __slots__ = ("_coreMatcher", "descriptorFactory")
 
-    def __init__(self, coreMatcher: IDescriptorMatcherPtr, descriptorFactory: FaceDescriptorFactory):
+    def __init__(self, coreMatcher: IDescriptorMatcherPtr, descriptorFactory: BaseDescriptorFactory[DescriptorType]):
         """
         Init.
 
@@ -48,15 +53,15 @@ class FaceMatcher:
             coreMatcher: core matcher
         """
         self._coreMatcher: IDescriptorMatcherPtr = coreMatcher
-        self.descriptorFactory: FaceDescriptorFactory = descriptorFactory
+        self.descriptorFactory: BaseDescriptorFactory[DescriptorType] = descriptorFactory
 
     def match(
         self,
-        reference: Union[FaceDescriptor, bytes],
-        candidates: Union[FaceDescriptor, bytes, List[Union[FaceDescriptor, bytes]], FaceDescriptorBatch],
+        reference: Union[DescriptorType, bytes],
+        candidates: Union[DescriptorType, bytes, List[Union[DescriptorType, bytes]], FaceDescriptorBatch],
     ) -> Union[MatchingResult, List[MatchingResult]]:
         """
-        Match face descriptor vs face descriptors.
+        Match face/body descriptor vs face/body descriptors.
 
         Returns:
             List of matching results if match by several descriptors otherwise one MatchingResult.
@@ -73,7 +78,7 @@ class FaceMatcher:
             error, matchResults = self._coreMatcher.match(
                 referenceForMatcher.coreEstimation, candidatesForMatcher.coreEstimation
             )
-        elif isinstance(candidates, FaceDescriptor):
+        elif isinstance(candidates, BaseDescriptor):
             error, matchResults = self._coreMatcher.match(referenceForMatcher.coreEstimation, candidates.coreEstimation)
         elif isinstance(candidates, list):
             batch = self.descriptorFactory.generateDescriptorsBatch(len(candidates))
@@ -91,3 +96,11 @@ class FaceMatcher:
 
         assertError(error)
         return matchResults
+
+
+class FaceMatcher(BaseMatcher[FaceDescriptor]):
+    pass
+
+
+class BodyMatcher(BaseMatcher[BodyDescriptor]):
+    pass

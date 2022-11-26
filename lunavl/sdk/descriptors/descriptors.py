@@ -4,7 +4,7 @@ Module contains a face descriptor estimator
 See `face descriptor`_.
 
 """
-from typing import Dict, Iterator, List, Optional, Type, Union
+from typing import Dict, Iterator, List, Optional, Type, Union, TypeVar, Generic
 
 from FaceEngine import DescriptorBatchResult, IDescriptorBatchPtr, IDescriptorPtr  # pylint: disable=E0611,E0401
 
@@ -90,7 +90,10 @@ class BaseDescriptor(BaseEstimation):
         self.garbageScore = garbageScore
 
 
-class BaseDescriptorBatch(BaseEstimation):
+DescriptorType = TypeVar("DescriptorType", bound=BaseDescriptor)
+
+
+class BaseDescriptorBatch(BaseEstimation, Generic[DescriptorType]):
     """
     Base descriptor batch.
 
@@ -98,7 +101,7 @@ class BaseDescriptorBatch(BaseEstimation):
         scores (List[float]):  list of garbage scores
     """
 
-    _descriptorFactory: Type[BaseDescriptor]
+    _descriptorFactory: Type[DescriptorType]
 
     #  pylint: disable=W0235
     def __init__(self, coreEstimation: IDescriptorBatchPtr, scores: Optional[List[float]] = None):
@@ -135,7 +138,7 @@ class BaseDescriptorBatch(BaseEstimation):
         """
         return [descriptor.asDict() for descriptor in self]
 
-    def __getitem__(self, i) -> BaseDescriptor:
+    def __getitem__(self, i) -> DescriptorType:
         """
         Get descriptor by index
 
@@ -152,7 +155,7 @@ class BaseDescriptorBatch(BaseEstimation):
         descriptor = self.__class__._descriptorFactory(descriptor, self.scores[i])
         return descriptor
 
-    def __iter__(self) -> Iterator[BaseDescriptor]:
+    def __iter__(self) -> Iterator[DescriptorType]:
         """
         Iterator by batch.
 
@@ -164,7 +167,7 @@ class BaseDescriptorBatch(BaseEstimation):
             assertError(error)
             yield self._descriptorFactory(descriptor, self.scores[index])
 
-    def append(self, descriptor: BaseDescriptor) -> None:
+    def append(self, descriptor: DescriptorType) -> None:
         """
         Add descriptor to end of batch.
 
@@ -188,7 +191,7 @@ class BaseDescriptorBatch(BaseEstimation):
         return str(fullDescriptors)
 
 
-class BaseDescriptorFactory:
+class BaseDescriptorFactory(Generic[DescriptorType]):
     """
     Base Descriptor factory.
 
@@ -197,8 +200,8 @@ class BaseDescriptorFactory:
         _descriptorVersion (int): descriptor version or zero for use default descriptor version
     """
 
-    _descriptorFactory: Type[BaseDescriptor]
-    _descriptorBatchFactory: Type[BaseDescriptorBatch]
+    _descriptorFactory: Type[DescriptorType]
+    _descriptorBatchFactory: Type[BaseDescriptorBatch[DescriptorType]]
 
     def __init__(self, faceEngine: "VLFaceEngine", descriptorVersion: int = 0):  # type: ignore # noqa: F821
         self._faceEngine = faceEngine
@@ -215,7 +218,7 @@ class BaseDescriptorFactory:
 
     def generateDescriptor(
         self, descriptor: Optional[bytes] = None, garbageScore: Optional[float] = None, descriptorVersion=0
-    ) -> BaseDescriptor:
+    ) -> DescriptorType:
         """
         Generate core descriptor.
 
@@ -248,7 +251,7 @@ class BaseDescriptorFactory:
             )
         return outputDescriptor
 
-    def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> BaseDescriptorBatch:
+    def generateDescriptorsBatch(self, size: int, descriptorVersion: int = 0) -> BaseDescriptorBatch[DescriptorType]:
         """
         Generate core descriptors batch.
 
@@ -274,7 +277,7 @@ class FaceDescriptor(BaseDescriptor):
     pass
 
 
-class FaceDescriptorBatch(BaseDescriptorBatch):
+class FaceDescriptorBatch(BaseDescriptorBatch[FaceDescriptor]):
     """
     Face descriptor batch.
     """
@@ -282,7 +285,7 @@ class FaceDescriptorBatch(BaseDescriptorBatch):
     _descriptorFactory = FaceDescriptor
 
 
-class FaceDescriptorFactory(BaseDescriptorFactory):
+class FaceDescriptorFactory(BaseDescriptorFactory[FaceDescriptor]):
     """
     Face Descriptor factory.
     """
@@ -299,7 +302,7 @@ class BodyDescriptor(BaseDescriptor):
     pass
 
 
-class BodyDescriptorBatch(BaseDescriptorBatch):
+class BodyDescriptorBatch(BaseDescriptorBatch[BodyDescriptor]):
     """
     Body descriptor batch.
     """
@@ -307,7 +310,7 @@ class BodyDescriptorBatch(BaseDescriptorBatch):
     _descriptorFactory = BodyDescriptor
 
 
-class BodyDescriptorFactory(BaseDescriptorFactory):
+class BodyDescriptorFactory(BaseDescriptorFactory[BodyDescriptor]):
     """
     Body Descriptor factory.
     """
