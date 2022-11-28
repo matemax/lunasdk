@@ -1,8 +1,9 @@
 """
 Module contains helper functions for a pillow image conversion into np array
 """
-import numpy as np
+
 import PIL.Image
+import numpy as np
 from PIL.Image import Image, _fromarray_typemap as imageTypeMap
 
 
@@ -48,14 +49,26 @@ def pilToNumpy(img: Image) -> np.ndarray:
 
     # NumPy buffer for the result
     shape, typestr = PIL.Image._conv_type_shape(img)
-    data = np.empty(shape, dtype=np.dtype(typestr))
-    mem = data.data.cast("B", (data.data.nbytes,))
+    size = shape[0] * shape[1] * shape[2]
+    shape1 = size + 32
+    data = np.empty(shape1, dtype=np.dtype(typestr, align=True))
+    cdata = data.ctypes.data
+    if cdata % 32 != 0:
+        offset = 32 - cdata % 32
+        data1 = data[offset : offset + size]  # noqa: E203
+    else:
+        data1 = data[:size]
+    data = data1.reshape(shape)
+    # data = np.empty(shape, dtype=np.dtype(typestr, align=True))
+    dData = data.data
+    mem = dData.cast("B", (dData.nbytes,))
 
     bufsize, s, offset = 65536, 0, 0
+    encode = e.encode
     while not s:
-        l, s, d = e.encode(bufsize)
-        mem[offset : offset + len(d)] = d  # noqa: E203
-        offset += len(d)
+        l, s, d = encode(bufsize)
+        mem[offset : offset + l] = d  # noqa: E203
+        offset += l
     if s < 0:
         raise RuntimeError("encoder error %d in tobytes" % s)
     return data

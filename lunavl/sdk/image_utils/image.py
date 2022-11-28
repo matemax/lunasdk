@@ -149,13 +149,14 @@ class VLImage:
         filename (str): filename of the file which is source of image
     """
 
-    __slots__ = ("coreImage", "source", "filename")
+    __slots__ = ("coreImage", "source", "filename", "_copyNpArray")
 
     def __init__(
         self,
         body: Union[bytes, bytearray, PilImage, CoreImage],
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
+        copy=True,
     ):
         """
         Init.
@@ -168,6 +169,7 @@ class VLImage:
             TypeError: if body has incorrect type
             LunaSDKException: if failed to load image to sdk Image
         """
+        self._copyNpArray = None
         if isinstance(body, bytearray):
             body = bytes(body)
 
@@ -187,8 +189,12 @@ class VLImage:
         elif isinstance(body, np.ndarray):
             mode = getNPImageType(body)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=body, inputColorFormat=ColorFormat.load(mode), colorFormat=colorFormat or ColorFormat.R8G8B8
+                ndarray=body,
+                inputColorFormat=ColorFormat.load(mode),
+                colorFormat=colorFormat or ColorFormat.R8G8B8,
+                copy=copy,
             )
+            self._copyNpArray = body
         elif isinstance(body, PilImage):
             # prevent palette-mode colorful images conversion to grayscale image by converting it
             # with considering palette info
@@ -201,8 +207,13 @@ class VLImage:
             array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
             self.coreImage = self._coreImageFromNumpyArray(
-                ndarray=array, inputColorFormat=inputColorFormat, colorFormat=colorFormat or ColorFormat.R8G8B8
+                ndarray=array,
+                inputColorFormat=inputColorFormat,
+                colorFormat=colorFormat or ColorFormat.R8G8B8,
+                copy=copy,
             )
+
+            self._copyNpArray = array
         else:
             raise TypeError(f"Bad image type: {type(body)}")
 
@@ -276,7 +287,7 @@ class VLImage:
 
     @staticmethod
     def _coreImageFromNumpyArray(
-        ndarray: np.ndarray, inputColorFormat: ColorFormat, colorFormat: Optional[ColorFormat] = None
+        ndarray: np.ndarray, inputColorFormat: ColorFormat, colorFormat: Optional[ColorFormat] = None, copy: bool = True
     ) -> CoreImage:
         """
         Load VLImage from numpy array into `self`.
@@ -290,13 +301,16 @@ class VLImage:
             core image instance
         """
         baseCoreImage = CoreImage()
-        baseCoreImage.setData(ndarray, inputColorFormat.coreFormat)
+        res = baseCoreImage.setData(ndarray, inputColorFormat.coreFormat, copy=copy)
+        assertError(res)
+
         if colorFormat is None or baseCoreImage.getFormat() == colorFormat.coreFormat:
             return baseCoreImage
-
-        error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
-        assertError(error)
-
+        if inputColorFormat.coreFormat != colorFormat.coreFormat:
+            error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
+            assertError(error)
+        else:
+            convertedCoreImage = baseCoreImage
         return convertedCoreImage
 
     @classmethod

@@ -28,6 +28,7 @@ class FaceWarpedImage(VLImage):
         body: Union[bytes, bytearray, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
+        copy=True,
     ):
         """
         Init.
@@ -42,7 +43,7 @@ class FaceWarpedImage(VLImage):
             self.filename = body.filename
             self.coreImage = body.coreImage
         else:
-            super().__init__(body, filename=filename, colorFormat=colorFormat)
+            super().__init__(body, filename=filename, colorFormat=colorFormat, copy=copy)
         self.assertWarp()
 
     def assertWarp(self):
@@ -55,9 +56,11 @@ class FaceWarpedImage(VLImage):
         Warnings:
             this checks are not guarantee that image is warp. This function is intended for debug
         """
-        if self.rect.size.height != 250 or self.rect.width != 250:
+        coreImage = self.coreImage
+        coreRect = coreImage.getRect()
+        if coreRect.height != 250 or coreRect.width != 250:
             raise ValueError("Bad image size for face warped image")
-        if self.format != self.format.R8G8B8:
+        if coreImage.getFormat().name != "R8G8B8":
             raise ValueError("Bad image format for warped image, must be R8G8B8")
 
     #  pylint: disable=W0221
