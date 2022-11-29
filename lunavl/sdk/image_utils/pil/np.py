@@ -1,6 +1,7 @@
 """
 Module contains helper functions for a pillow image conversion into np array
 """
+from functools import reduce
 
 import PIL.Image
 import numpy as np
@@ -49,7 +50,7 @@ def pilToNumpy(img: Image) -> np.ndarray:
 
     # NumPy buffer for the result
     shape, typestr = PIL.Image._conv_type_shape(img)
-    size = shape[0] * shape[1] * shape[2]
+    size = reduce(lambda x, y: x * y, shape)
     # faceengine require alignment by 32 bits
     data = np.empty(size + 32, dtype=np.dtype(typestr, align=True))
     cdata = data.ctypes.data
