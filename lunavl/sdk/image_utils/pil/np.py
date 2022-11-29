@@ -36,7 +36,7 @@ def pilToNumpy(img: Image) -> np.ndarray:
     Args:
         img: pillow image
     Returns:
-        numpy array
+        numpy array which alignment by 32 bit
     Raises:
         RuntimeError: if encoding failed
     References:
@@ -50,25 +50,24 @@ def pilToNumpy(img: Image) -> np.ndarray:
     # NumPy buffer for the result
     shape, typestr = PIL.Image._conv_type_shape(img)
     size = shape[0] * shape[1] * shape[2]
-    shape1 = size + 32
-    data = np.empty(shape1, dtype=np.dtype(typestr, align=True))
+    # faceengine require alignment by 32 bits
+    data = np.empty(size + 32, dtype=np.dtype(typestr, align=True))
     cdata = data.ctypes.data
     if cdata % 32 != 0:
-        offset = 32 - cdata % 32
-        data1 = data[offset : offset + size]  # noqa: E203
+        offsetForAlignment = 32 - cdata % 32
     else:
-        data1 = data[:size]
-    data = data1.reshape(shape)
-    # data = np.empty(shape, dtype=np.dtype(typestr, align=True))
+        offsetForAlignment = 0
     dData = data.data
     mem = dData.cast("B", (dData.nbytes,))
 
-    bufsize, s, offset = 65536, 0, 0
+    bufsize, s, offset = 65536, 0, offsetForAlignment
     encode = e.encode
     while not s:
         l, s, d = encode(bufsize)
         mem[offset : offset + l] = d  # noqa: E203
         offset += l
+    data = data[offsetForAlignment : offsetForAlignment + size]  # noqa: E203
+    data = data.reshape(shape)
     if s < 0:
         raise RuntimeError("encoder error %d in tobytes" % s)
     return data
