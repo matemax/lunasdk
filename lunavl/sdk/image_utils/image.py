@@ -10,7 +10,7 @@ import numpy as np
 import requests
 from FaceEngine import FormatType, Image as CoreImage  # pylint: disable=E0611,E0401
 from PIL import Image as pilImage
-from PIL.Image import Image as PilImage
+from PIL.Image import Image as PilImage, Transpose
 
 from .geometry import Rect
 from .pil.np import getNPImageType, pilToNumpy
@@ -147,16 +147,17 @@ class VLImage:
         coreImage (CoreFE.Image): core image object
         source (Union[bytes, bytearray, PilImage, CoreImage]): body of image
         filename (str): filename of the file which is source of image
+        _copyNpArrayRef (np.ndarray): ref to nd array for prevented numpy memory clean after array deletion by python gc
     """
 
-    __slots__ = ("coreImage", "source", "filename", "_copyNpArray")
+    __slots__ = ("coreImage", "source", "filename", "_copyNpArrayRef")
 
     def __init__(
         self,
-        body: Union[bytes, bytearray, PilImage, CoreImage],
+        body: Union[bytes, bytearray, np.ndarray, PilImage, CoreImage],
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
-        copy=True,
+        copy: bool = True,
     ):
         """
         Init.
@@ -165,11 +166,13 @@ class VLImage:
             body: body of image - bytes numpy array or core image
             colorFormat: img format to cast into
             filename: user mark a source of image
+            copy: copy image bytes to faceengine or not. Use only for numpy array. If copy is False initialization
+                  will be faster, but you MUST to guarantee that no one change memory while faceengine will be use it.
         Raises:
             TypeError: if body has incorrect type
             LunaSDKException: if failed to load image to sdk Image
         """
-        self._copyNpArray = None
+        self._copyNpArrayRef = None
         if isinstance(body, bytearray):
             body = bytes(body)
 
@@ -188,13 +191,14 @@ class VLImage:
 
         elif isinstance(body, np.ndarray):
             mode = getNPImageType(body)
-            self.coreImage = self._coreImageFromNumpyArray(
+            self.coreImage, copied = self._coreImageFromNumpyArray(
                 ndarray=body,
                 inputColorFormat=ColorFormat.load(mode),
                 colorFormat=colorFormat or ColorFormat.R8G8B8,
                 copy=copy,
             )
-            self._copyNpArray = body
+            if not copied:
+                self._copyNpArrayRef = body
         elif isinstance(body, PilImage):
             # prevent palette-mode colorful images conversion to grayscale image by converting it
             # with considering palette info
@@ -206,14 +210,14 @@ class VLImage:
                 body = body.convert("RGB")
             array = pilToNumpy(body)
             inputColorFormat = ColorFormat.load(body.mode)
-            self.coreImage = self._coreImageFromNumpyArray(
+            self.coreImage, copied = self._coreImageFromNumpyArray(
                 ndarray=array,
                 inputColorFormat=inputColorFormat,
                 colorFormat=colorFormat or ColorFormat.R8G8B8,
-                copy=copy,
+                copy=True,
             )
-
-            self._copyNpArray = array
+            if not copied:
+                self._copyNpArrayRef = array
         else:
             raise TypeError(f"Bad image type: {type(body)}")
 
@@ -233,11 +237,11 @@ class VLImage:
             rotated vl image
         """
         if angle == RotationAngle.ANGLE_90:
-            angleForRotation = pilImage.ROTATE_90
+            angleForRotation = Transpose.ROTATE_90
         elif angle == RotationAngle.ANGLE_270:
-            angleForRotation = pilImage.ROTATE_270
+            angleForRotation = Transpose.ROTATE_270
         elif angle == RotationAngle.ANGLE_180:
-            angleForRotation = pilImage.ROTATE_180
+            angleForRotation = Transpose.ROTATE_180
         else:
             return copy(image)
 
@@ -303,15 +307,16 @@ class VLImage:
         baseCoreImage = CoreImage()
         res = baseCoreImage.setData(ndarray, inputColorFormat.coreFormat, copy=copy)
         assertError(res)
-
-        if colorFormat is None or baseCoreImage.getFormat() == colorFormat.coreFormat:
-            return baseCoreImage
+        copied = copy
+        if colorFormat is None:
+            return baseCoreImage, copied
         if inputColorFormat.coreFormat != colorFormat.coreFormat:
             error, convertedCoreImage = baseCoreImage.convert(colorFormat.coreFormat)
             assertError(error)
+            copied = True
         else:
             convertedCoreImage = baseCoreImage
-        return convertedCoreImage
+        return convertedCoreImage, copied
 
     @classmethod
     def fromNumpyArray(
@@ -320,6 +325,7 @@ class VLImage:
         inputColorFormat: Optional[Union[str, ColorFormat]] = None,
         colorFormat: Optional[ColorFormat] = None,
         filename: str = "",
+        copy: bool = True,
     ) -> "VLImage":
         """
         Load VLImage from numpy array.
@@ -329,6 +335,8 @@ class VLImage:
             inputColorFormat: input numpy pixel array format
             colorFormat: pixel format to cast into
             filename: optional filename
+            copy: copy image bytes to faceengine or not. If copy is False initialization
+                  will be faster, but you MUST to guarantee that no one change memory while faceengine will be use it.
 
         Returns:
             vl image
@@ -340,10 +348,15 @@ class VLImage:
             imageType = getNPImageType(arr)
             inputColorFormat = ColorFormat.load(imageType)
 
-        coreImage = cls._coreImageFromNumpyArray(
-            ndarray=arr, inputColorFormat=inputColorFormat, colorFormat=colorFormat
+        coreImage, copied = cls._coreImageFromNumpyArray(
+            ndarray=arr,
+            inputColorFormat=inputColorFormat,
+            colorFormat=colorFormat,
+            copy=copy,
         )
         img = cls(coreImage, filename=filename)
+        if copied:
+            img._copyNpArrayRef = arr
         img.source = arr
         return img
 

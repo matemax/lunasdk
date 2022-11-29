@@ -2199,6 +2199,7 @@ class IndexSettings(BaseSettingsSection):
     """
     Index settings.
     """
+
     sectionName = "IndexBuilder::Settings"
 
     @property

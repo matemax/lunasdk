@@ -28,7 +28,7 @@ class FaceWarpedImage(VLImage):
         body: Union[bytes, bytearray, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
-        copy=True,
+        copy: bool = True,
     ):
         """
         Init.
@@ -37,6 +37,9 @@ class FaceWarpedImage(VLImage):
             body: body of image - bytes/bytearray or core image or pil image or vlImage
             filename: user mark a source of image
             colorFormat: output image color format
+            copy: copy image bytes to faceengine or not. Use only for numpy array. If copy is False initialization
+                  will be faster, but you MUST to guarantee that no one change memory while faceengine will be use it.
+
         """
         if isinstance(body, VLImage):
             self.source = body.source
