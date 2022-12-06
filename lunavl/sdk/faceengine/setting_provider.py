@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Optional, Tuple, Type, TypeVar, Union
 
 import FaceEngine as CoreFE
-from FaceEngine import ObjectDetectorClassType, PyISettingsProvider  # pylint: disable=E0611,E0401
+from FaceEngine import ObjectDetectorClassType, PyISettingsProvider, CrowdEstimatorType  # pylint: disable=E0611,E0401
 
 from lunavl.sdk.launch_options import DeviceClass
 
@@ -174,6 +174,16 @@ class DetectorType(BiDirectionEnum):
             "FaceDetV3": "FACE_DET_V3",
         }
         return getattr(ObjectDetectorClassType, mapEnumToCoreEnum[self.value])
+
+
+class PeopleCountEstimatorType(Enum):
+    DEFAULT = 0  # type from config file
+    CROWD_ONLY = 1  # only Crowd estimator will be used
+    CROWD_AND_HEAD = 2  # Crowd and HeadDetector will be used
+
+    @property
+    def coreEstimatorType(self) -> CrowdEstimatorType:
+        return CrowdEstimatorType(self.value)
 
 
 class BaseSettingsSection:
@@ -2199,6 +2209,7 @@ class IndexSettings(BaseSettingsSection):
     """
     Index settings.
     """
+
     sectionName = "IndexBuilder::Settings"
 
     @property
