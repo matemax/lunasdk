@@ -36,18 +36,6 @@ class TestPeopleCount(BaseTestClass):
                 cls.crowd9People.rect.height + 100,
             )
         )
-        cls.areaWithoutPeople = ImageForPeopleEstimation(
-            cls.crowd9People,
-            Rect(10, 10, 100, 100)
-        )
-        cls.invalidRectImage = ImageForPeopleEstimation(
-            cls.crowd9People,
-            Rect(0, 0, 0, 0)
-        )
-        cls.errorCoreRectImage = ImageForPeopleEstimation(
-            cls.crowd9People,
-            Rect(0.1, 0.1, 0.1, 0.1)
-        )
 
     def test_people_count_async(self):
         """
@@ -92,7 +80,8 @@ class TestPeopleCount(BaseTestClass):
         detail = f"Bad image format for people estimation," \
                  f" format: {self.badFormatImage.format.value}," \
                  f" image: {self.badFormatImage.filename}"
-        self.assertLunaVlError(exceptionInfo, LunaVLError.InvalidImageFormat.format(detail))
+        self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
+        self.assertReceivedAndRawExpectedErrors(exceptionInfo.value.context[0], LunaVLError.InvalidImageFormat)
 
     def test_people_count_batch_with_bad_format_image(self):
         """
@@ -171,15 +160,23 @@ class TestPeopleCount(BaseTestClass):
         """
         Test estimation with not contain people area
         """
-        peopleCount = self.peopleCountEstimator.estimateBatch([self.areaWithoutPeople, self.crowd7People])
+        areaWithoutPeople = ImageForPeopleEstimation(
+            self.crowd9People,
+            Rect(10, 10, 100, 100)
+        )
+        peopleCount = self.peopleCountEstimator.estimateBatch([areaWithoutPeople, self.crowd7People])
         assert peopleCount == [0, 7]
 
     def test_people_count_with_invalid_area(self):
         """
         Test estimation with invalid rectangle
         """
+        invalidRectImage = ImageForPeopleEstimation(
+            self.crowd9People,
+            Rect(0, 0, 0, 0)
+        )
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.peopleCountEstimator.estimate(self.invalidRectImage)
+            self.peopleCountEstimator.estimate(invalidRectImage)
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
         self.assertReceivedAndRawExpectedErrors(
             exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Invalid rectangle")
@@ -189,8 +186,12 @@ class TestPeopleCount(BaseTestClass):
         """
         Test estimation with invalid core rectangle
         """
+        errorCoreRectImage = ImageForPeopleEstimation(
+            self.crowd9People,
+            Rect(0.1, 0.1, 0.1, 0.1)
+        )
         with pytest.raises(LunaSDKException) as exceptionInfo:
-            self.peopleCountEstimator.estimate(self.errorCoreRectImage)
+            self.peopleCountEstimator.estimate(errorCoreRectImage)
         self.assertLunaVlError(exceptionInfo, LunaVLError.BatchedInternalError.format("Failed validation."))
         self.assertReceivedAndRawExpectedErrors(
             exceptionInfo.value.context[0], LunaVLError.InvalidRect.format("Invalid rectangle")

@@ -21,19 +21,6 @@ class ImageForPeopleEstimation(NamedTuple):
     detectArea: Rect
 
 
-def assertImageFormat(image: VLImage):
-    """
-    Assert image for people estimation
-    Args:
-        image: image
-
-    Raises:
-        LunaSDKException: if image format is not R8G8B8
-    """
-    if image.format != ColorFormat.R8G8B8:
-        details = f"Bad image format for people estimation, format: {image.format.value}, image: {image.filename}"
-        raise LunaSDKException(LunaVLError.InvalidImageFormat.format(details))
-
 def getEstimatorArgsFromImages(
         images: List[Union[VLImage, ImageForPeopleEstimation]]
 ) -> Tuple[List[CoreImage], List[CoreRectI]]:
@@ -56,7 +43,6 @@ def getEstimatorArgsFromImages(
         else:
             img = image.image
             detectAreas.append(image.detectArea.coreRectI)
-        # assertImageFormat(img)
         coreImages.append(img.coreImage)
 
     return coreImages, detectAreas
@@ -112,7 +98,6 @@ class PeopleCountEstimator(BaseEstimator):
             image = image.image
         else:
             detectArea = image.coreImage.getRect()
-        assertImageFormat(image)
         validateInputByBatchEstimator(self._coreEstimator, [image.coreImage], [detectArea])
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate([image.coreImage], [detectArea])
