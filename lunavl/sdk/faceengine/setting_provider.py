@@ -178,8 +178,8 @@ class DetectorType(BiDirectionEnum):
 
 class PeopleCountEstimatorType(Enum):
     DEFAULT = 0  # type from config file
-    CROWD_ONLY = 1  # only Crowd estimator will be used
-    CROWD_AND_HEAD = 2  # Crowd and HeadDetector will be used
+    PEOPLE_COUNT_V1 = 1  # only Crowd estimator will be used
+    PEOPLE_COUNT_V2 = 2  # Crowd and HeadDetector will be used
 
     @property
     def coreEstimatorType(self) -> CrowdEstimatorType:

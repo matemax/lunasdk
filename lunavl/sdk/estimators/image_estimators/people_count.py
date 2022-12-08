@@ -22,7 +22,7 @@ class ImageForPeopleEstimation(NamedTuple):
 
 
 def getEstimatorArgsFromImages(
-        images: List[Union[VLImage, ImageForPeopleEstimation]]
+        images: List[Union[VLImage, ImageForPeopleEstimation, Tuple[VLImage, Rect]]]
 ) -> Tuple[List[CoreImage], List[CoreRectI]]:
     """
     Create args for people estimation from image list
@@ -41,8 +41,8 @@ def getEstimatorArgsFromImages(
             img = image
             detectAreas.append(image.coreImage.getRect())
         else:
-            img = image.image
-            detectAreas.append(image.detectArea.coreRectI)
+            img = image[0]
+            detectAreas.append(image[1].coreRectI)
         coreImages.append(img.coreImage)
 
     return coreImages, detectAreas
@@ -80,7 +80,11 @@ def postProcessing(error: FSDKErrorResult, crowdEstimation: CrowdEstimation) -> 
 
 class PeopleCountEstimator(BaseEstimator):
 
-    def estimate(self, image: Union[VLImage, ImageForPeopleEstimation], asyncEstimate: bool = False):
+    def estimate(
+            self,
+            image: Union[VLImage, ImageForPeopleEstimation, Tuple[VLImage, Rect]],
+            asyncEstimate: bool = False,
+    ):
         """
         Estimate people count from single image
 
@@ -105,7 +109,11 @@ class PeopleCountEstimator(BaseEstimator):
         error, crowdEstimation = self._coreEstimator.estimate([image.coreImage], [detectArea])
         return postProcessing(error, crowdEstimation)
 
-    def estimateBatch(self, images: List[Union[VLImage, ImageForPeopleEstimation]], asyncEstimate: bool = False):
+    def estimateBatch(
+            self,
+            images: List[Union[VLImage, ImageForPeopleEstimation, Tuple[VLImage, Rect]]],
+            asyncEstimate: bool = False,
+    ):
         """
         Estimate people count from single image
 

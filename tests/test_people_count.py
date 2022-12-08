@@ -15,7 +15,7 @@ class TestPeopleCount(BaseTestClass):
     @classmethod
     def setup_class(cls):
         super().setup_class()
-        cls.peopleCountEstimator = cls.faceEngine.createPeopleCountEstimator(PeopleCountEstimatorType.CROWD_AND_HEAD)
+        cls.peopleCountEstimator = cls.faceEngine.createPeopleCountEstimator(PeopleCountEstimatorType.PEOPLE_COUNT_V2)
         cls.crowd9People = VLImage.load(filename=CROWD_9_PEOPLE)
         cls.crowd7People = VLImage.load(filename=CROWD_7_PEOPLE)
         cls.badFormatImage = VLImage.load(filename=CROWD_7_PEOPLE, colorFormat=ColorFormat.B8G8R8)
