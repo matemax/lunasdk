@@ -129,7 +129,7 @@ class PeopleCountEstimator(BaseEstimator):
         coreImages, detectAreas = getEstimatorArgsFromImages(images)
         validateInputByBatchEstimator(self._coreEstimator, coreImages, detectAreas)
         if asyncEstimate:
-            task = self._coreEstimator.asyncEstimate(coreImages)
+            task = self._coreEstimator.asyncEstimate(coreImages, detectAreas)
             return AsyncTask(task, postProcessingBatch)
         error, crowdEstimations = self._coreEstimator.estimate(coreImages, detectAreas)
         return postProcessingBatch(error, crowdEstimations)
