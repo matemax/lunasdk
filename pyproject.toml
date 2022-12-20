@@ -15,6 +15,7 @@ version = "1.3.0"
 description = "Python interface for VisionLabs Luna platform"
 authors = ["VisionLabs <m.limonov@visionlabs.ru>"]
 repository = "https://github.com/matemax/lunasdk"
+
 [tool.poetry.dependencies]
 python = ">=3.9"
 numpy = "*"
@@ -22,9 +23,9 @@ requests = "*"
 Pillow = {version = "*", markers = "sys_platform == 'win32' or sys_platform == 'darwin'"}
 pillow-simd = {version = "*", markers = "sys_platform != 'win32' and sys_platform != 'darwin'"}
 
-# [tool.poetry.dependencies.FaceEngine]
-# git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-# tag = "v.5.11.0.0"
+[tool.poetry.dependencies.FaceEngine]
+git = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
+tag = "v.5.12.0.0"
 
 [tool.poetry.dev-dependencies]
 sphinx = ">=2.0.0"
