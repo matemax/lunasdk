@@ -211,22 +211,6 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
-name = "FaceEngine"
-version = "5.12.0.0"
-description = "Python bindings of FaceEngine using pybind11 and CMake"
-category = "main"
-optional = false
-python-versions = "*"
-files = []
-develop = false
-
-[package.source]
-type = "git"
-url = "ssh://git@git.visionlabs.ru/face-recognition/FaceEnginePythonBindings.git"
-reference = "v.5.12.0.0"
-resolved_reference = "a3b3344fc7a92ac27a660ea76a1092609598c585"
-
-[[package]]
 name = "filelock"
 version = "3.8.2"
 description = "A platform independent file lock."
@@ -1389,4 +1373,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "e7dac8bfc2bd321d9a9278a05baef5675975ef7a7f714ba11fb5d140386709e9"
+content-hash = "1e0e683fb572edffb2ca86caeffe1b53d719d461db7be380cf2d8349d8bfb2a3"
