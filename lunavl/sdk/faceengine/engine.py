@@ -36,7 +36,13 @@ from ..estimators.face_estimators.natural_light import FaceNaturalLightEstimator
 from ..estimators.face_estimators.red_eye import RedEyesEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
-from ..faceengine.setting_provider import DetectorType, FaceEngineSettingsProvider, RuntimeSettingsProvider
+from ..estimators.image_estimators.people_count import PeopleCountEstimator
+from ..faceengine.setting_provider import (
+    DetectorType,
+    FaceEngineSettingsProvider,
+    RuntimeSettingsProvider,
+    PeopleCountEstimatorType,
+)
 from ..globals import DEFAULT_HUMAN_DESCRIPTOR_VERSION as DHDV
 from ..indexes.builder import IndexBuilder
 from ..launch_options import DeviceClass, LaunchOptions
@@ -446,6 +452,27 @@ class VLFaceEngine:
         launchOptions = self.getLaunchOptions(launchOptions)
         return OrientationModeEstimator(
             self._faceEngine.createOrientationEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
+
+    def createPeopleCountEstimator(
+        self, estimatorType: PeopleCountEstimatorType, launchOptions: Optional[LaunchOptions] = None
+    ) -> PeopleCountEstimator:
+        """
+        Create an people count estimator
+
+        Args:
+            estimatorType: type of the estimator
+            launchOptions: estimator launch options
+
+        Retruns:
+            estimator
+        """
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return PeopleCountEstimator(
+            self._faceEngine.createCrowdEstimator(
+                estimatorType.coreEstimatorType, launchOptions=launchOptions.coreLaunchOptions
+            ),
+            launchOptions,
         )
 
     def createIndexBuilder(self, descriptorVersion: int = 0, capacity: int = 0) -> IndexBuilder:
