@@ -53,6 +53,7 @@ class VerboseLogging(BiDirectionEnum):
     Level of log versobing enum
     """
 
+    default = 0
     error = 1
     warnings = 2
     info = 3
