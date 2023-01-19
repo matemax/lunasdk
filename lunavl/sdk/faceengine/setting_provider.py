@@ -53,10 +53,11 @@ class VerboseLogging(BiDirectionEnum):
     Level of log versobing enum
     """
 
-    error = 0
-    warnings = 1
-    info = 2
-    debug = 3
+    default = 0
+    error = 1
+    warnings = 2
+    info = 3
+    debug = 4
 
 
 class Distance(BiDirectionEnum):
