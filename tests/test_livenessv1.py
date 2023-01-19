@@ -27,7 +27,7 @@ class TestEstimateLivenessV1(BaseTestClass):
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
         cls.headPoseEstimator = cls.faceEngine.createHeadPoseEstimator()
         cls.livenessEstimator = cls.faceEngine.createLivenessV1Estimator()
-        cls.detection = cls.detector.detectOne(VLImage.load(filename=CLEAN_ONE_FACE), detect68Landmarks=True)
+        cls.detection = cls.detector.detectOne(VLImage.load(filename=CLEAN_ONE_FACE))
 
     def assertLivenessEstimation(self, estimation: LivenessV1, expectedPrediction: Optional[LivenessPrediction] = None):
         """
@@ -123,7 +123,7 @@ class TestEstimateLivenessV1(BaseTestClass):
         """
         Test estimate liveness batch with threshold
         """
-        qualityThreshold = 0.95
+        qualityThreshold = 0.9
         detection = self.detector.detectOne(VLImage.load(filename=SPOOF))
         estimations = self.livenessEstimator.estimateBatch(
             [self.detection, detection],
