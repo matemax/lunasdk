@@ -29,6 +29,14 @@ class TestDynamicRange(BaseTestClass):
         dynamicRange = self.dynamicRangeEstimator.estimate(faceDetection)
         assert 0 <= dynamicRange <= 1
 
+    def test_dynamic_range_known_value(self):
+        """
+        Test dynamic range with known value of image
+        """
+        faceDetection = self.detector.detectOne(self.testImage2)
+        dynamicRange = self.dynamicRangeEstimator.estimate(faceDetection)
+        assert dynamicRange == 0.6157873868942261
+
     def test_dynamic_range_batch(self):
         """
         Test dynamic range batch
@@ -53,6 +61,11 @@ class TestDynamicRange(BaseTestClass):
         faceDetection = self.detector.detectOne(self.testImage)
         task = self.dynamicRangeEstimator.estimate(faceDetection, asyncEstimate=True)
         self.assertAsyncEstimation(task, float)
+
+    def test_async_estimate_dynamic_range_batch(self):
+        """
+        Test async estimate dynamic range batch
+        """
         faceDetections = self.detector.detect([self.testImage, self.testImage2])
         task = self.dynamicRangeEstimator.estimateBatch(
             [faceDetections[0][0], faceDetections[1][0]], asyncEstimate=True

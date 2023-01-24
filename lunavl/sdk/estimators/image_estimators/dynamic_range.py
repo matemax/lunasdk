@@ -33,9 +33,7 @@ def postProcessing(error: FSDKErrorResult, dynamicRangeEstimator: DynamicRangeEs
         dynamic range
     """
     assertError(error)
-    if dynamicRangeEstimator != []:
-        return dynamicRangeEstimator[0].dynamicRangeScore
-    return 0.0
+    return dynamicRangeEstimator[0].dynamicRangeScore
 
 
 class DynamicRangeEstimator(BaseEstimator):
