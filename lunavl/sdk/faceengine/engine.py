@@ -35,7 +35,7 @@ from ..estimators.face_estimators.mouth_state import MouthStateEstimator
 from ..estimators.face_estimators.natural_light import FaceNaturalLightEstimator
 from ..estimators.face_estimators.red_eye import RedEyesEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
-from ..estimators.image_estimators.dynamic_range import DynamicRangeEstimator
+from sdk.estimators.face_estimators.dynamic_range import DynamicRangeEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..estimators.image_estimators.people_count import PeopleCountEstimator
 from ..faceengine.setting_provider import (
