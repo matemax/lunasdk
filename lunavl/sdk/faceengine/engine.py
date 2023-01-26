@@ -35,6 +35,7 @@ from ..estimators.face_estimators.mouth_state import MouthStateEstimator
 from ..estimators.face_estimators.natural_light import FaceNaturalLightEstimator
 from ..estimators.face_estimators.red_eye import RedEyesEstimator
 from ..estimators.face_estimators.warp_quality import WarpQualityEstimator
+from ..estimators.face_estimators.dynamic_range import DynamicRangeEstimator
 from ..estimators.image_estimators.orientation_mode import OrientationModeEstimator
 from ..estimators.image_estimators.people_count import PeopleCountEstimator
 from ..faceengine.setting_provider import (
@@ -473,6 +474,21 @@ class VLFaceEngine:
                 estimatorType.coreEstimatorType, launchOptions=launchOptions.coreLaunchOptions
             ),
             launchOptions,
+        )
+
+    def createDynamicRangeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> DynamicRangeEstimator:
+        """
+        Create an dynamic range estimator.
+
+        Args:
+            launchOptions: estimator launch options
+
+        Returns:
+            estimator
+        """
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return DynamicRangeEstimator(
+            self._faceEngine.createDynamicRangeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
         )
 
     def createIndexBuilder(self, descriptorVersion: int = 0, capacity: int = 0) -> IndexBuilder:

@@ -131,7 +131,7 @@ class TestBodyDetector(BaseTestClass):
         """
 
         detections = self.detector.detect(images=[VLIMAGE_SEVERAL_FACE])[0]
-        assert 6 == len(detections)
+        assert 8 == len(detections)
         self.assertDetections(detections, VLIMAGE_SEVERAL_FACE)
 
     def test_batch_detect_with_image_without_humans(self):
@@ -165,7 +165,7 @@ class TestBodyDetector(BaseTestClass):
         self.assertDetections(detection[0], VLIMAGE_SEVERAL_FACE)
         self.assertDetections(detection[1], VLIMAGE_ONE_FACE)
         assert 2 == len(detection)
-        assert 6 == len(detection[0])
+        assert 8 == len(detection[0])
         assert 1 == len(detection[1])
 
     def test_batch_detect_many_faces(self):
