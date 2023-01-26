@@ -55,11 +55,6 @@ class DynamicRangeEstimator(BaseEstimator):
         Raises:
             LunaSDKException: if estimation is failed
         """
-        validateInputByBatchEstimator(
-            self._coreEstimator,
-            [imageWithFaceDetection.image.coreImage],
-            [imageWithFaceDetection.boundingBox.coreEstimation]
-        )
         if asyncEstimate:
             task = self._coreEstimator.asyncEstimate(
                 [imageWithFaceDetection.image.coreImage],

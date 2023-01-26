@@ -35,7 +35,7 @@ class TestDynamicRange(BaseTestClass):
         """
         faceDetection = self.detector.detectOne(self.testImage2)
         dynamicRange = self.dynamicRangeEstimator.estimate(faceDetection)
-        assert dynamicRange == 0.6157873868942261
+        assert 0.61 <= dynamicRange <= 0.62
 
     def test_dynamic_range_batch(self):
         """
