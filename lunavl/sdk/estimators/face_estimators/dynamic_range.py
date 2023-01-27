@@ -6,7 +6,7 @@ from lunavl.sdk.estimators.estimators_utils.extractor_utils import validateInput
 from typing import List
 
 
-def postProcessingBatch(error: FSDKErrorResult, dynamicRangeEstimations: List[DynamicRangeEstimation]) -> List[int]:
+def postProcessingBatch(error: FSDKErrorResult, dynamicRangeEstimations: List[DynamicRangeEstimation]) -> List[float]:
     """
     Post processing batch dynamic range estimation
 
@@ -21,7 +21,7 @@ def postProcessingBatch(error: FSDKErrorResult, dynamicRangeEstimations: List[Dy
     return [estimation.dynamicRangeScore for estimation in dynamicRangeEstimations]
 
 
-def postProcessing(error: FSDKErrorResult, dynamicRangeEstimator: DynamicRangeEstimation) -> int:
+def postProcessing(error: FSDKErrorResult, dynamicRangeEstimator: DynamicRangeEstimation) -> float:
     """
     Post processing single dynamic range estimation
 
