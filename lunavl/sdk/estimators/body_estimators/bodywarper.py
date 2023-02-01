@@ -26,6 +26,7 @@ class BodyWarpedImage(VLImage):
         body: Union[bytes, bytearray, ndarray, PilImage, CoreImage, VLImage],
         filename: str = "",
         colorFormat: Optional[ColorFormat] = None,
+        copy: bool = True,
     ):
         """
         Init.
@@ -40,7 +41,7 @@ class BodyWarpedImage(VLImage):
             self.filename = body.filename
             self.coreImage = body.coreImage
         else:
-            super().__init__(body, filename=filename, colorFormat=colorFormat)
+            super().__init__(body, filename=filename, colorFormat=colorFormat, copy=copy)
         self.assertWarp()
 
     def assertWarp(self):
