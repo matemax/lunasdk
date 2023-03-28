@@ -23,7 +23,7 @@ from ..estimators.face_estimators.eyebrow_expressions import EyebrowExpressionEs
 from ..estimators.face_estimators.eyes import EyeEstimator, GazeEstimator
 from ..estimators.face_estimators.face_descriptor import FaceDescriptorEstimator
 from ..estimators.face_estimators.facewarper import FaceWarper
-from ..estimators.face_estimators.fisheye import FisheyeEstimator
+from ..estimators.face_estimators.fisheye_warp import FisheyeEstimator
 from ..estimators.face_estimators.glasses import GlassesEstimator
 from ..estimators.face_estimators.head_pose import HeadPoseEstimator
 from ..estimators.face_estimators.headwear import HeadwearEstimator
@@ -584,6 +584,22 @@ class VLFaceEngine:
         )
 
     def createFisheyeEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FisheyeEstimator:
+        """
+        Create a fisheye effect estimator.
+
+        Args:
+            launchOptions: estimator launch options
+        Returns:
+            estimator
+        """
+        from ..estimators.face_estimators.fisheye import FisheyeEstimator as FisheyeEstimatorDeprecated
+
+        launchOptions = self.getLaunchOptions(launchOptions)
+        return FisheyeEstimatorDeprecated(
+            self._faceEngine.createFishEyeEstimator(launchOptions=launchOptions.coreLaunchOptions), launchOptions
+        )
+
+    def createFisheyeWarpedEstimator(self, launchOptions: Optional[LaunchOptions] = None) -> FisheyeEstimator:
         """
         Create a fisheye effect estimator.
 

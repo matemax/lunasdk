@@ -1,4 +1,4 @@
-from lunavl.sdk.estimators.face_estimators.fisheye import Fisheye
+from lunavl.sdk.estimators.face_estimators.fisheye_warp import Fisheye
 from lunavl.sdk.faceengine.setting_provider import DetectorType
 from lunavl.sdk.image_utils.image import VLImage
 from tests.base import BaseTestClass
@@ -14,7 +14,8 @@ class TestFisheyeEffect(BaseTestClass):
     def setup_class(cls):
         super().setup_class()
         cls.detector = cls.faceEngine.createFaceDetector(DetectorType.FACE_DET_V3)
-        cls.fisheyeEstimator = cls.faceEngine.createFisheyeEstimator()
+        cls.warper = cls.faceEngine.createFaceWarper()
+        cls.fisheyeEstimator = cls.faceEngine.createFisheyeWarpedEstimator()
 
     def test_estimate_fisheye_correctness(self):
         """
@@ -27,7 +28,8 @@ class TestFisheyeEffect(BaseTestClass):
     def estimate(self, image: str = FROWNING) -> Fisheye:
         """Estimate fisheye on image"""
         faceDetection = self.detector.detectOne(VLImage.load(filename=image))
-        estimation = self.fisheyeEstimator.estimate(faceDetection)
+        warp = self.warper.warp(faceDetection)
+        estimation = self.fisheyeEstimator.estimate(warp.warpedImage)
         assert isinstance(estimation, Fisheye)
         return estimation
 
@@ -53,7 +55,8 @@ class TestFisheyeEffect(BaseTestClass):
         """
         Batch fisheye estimation test
         """
-        faceDetections = self.detector.detect([VLImage.load(filename=FROWNING), VLImage.load(filename=FISHEYE)])
-        estimations = self.fisheyeEstimator.estimateBatch([faceDetections[0][0], faceDetections[1][0]])
+        imageDetections = self.detector.detect([VLImage.load(filename=FROWNING), VLImage.load(filename=FISHEYE)])
+        warps = [self.warper.warp(res[0]) for res in imageDetections]
+        estimations = self.fisheyeEstimator.estimateBatch(warps)
         assert not estimations[0].status
         assert estimations[1].status
